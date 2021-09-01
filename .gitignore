@@ -1,0 +1,9 @@
+/bin/
+/target/
+.settings
+.metadata
+.classpath
+.project
+pruebaConcepto/target/
+pruebaConcepto/.settings
+pruebaConcepto/.project
