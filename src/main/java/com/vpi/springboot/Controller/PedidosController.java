@@ -17,13 +17,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vpi.springboot.Modelo.Pedidos;
+import com.vpi.springboot.exception.PedidosException;
 import com.vpi.springboot.mongoRepository.MongoRepo;
+import com.vpi.springboot.mongoServices.PedidosService;
 
 @RestController
 public class PedidosController {
 
 	@Autowired
 	private MongoRepo mongoRepo;
+	
+	@Autowired
+	private PedidosService mongoService;
 
 	@GetMapping("/pedidos")
 	public ResponseEntity<?> getAllPedidos() {
@@ -42,6 +47,18 @@ public class PedidosController {
 			return new ResponseEntity<Pedidos>(pedido, HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@PostMapping("/pedidosService")
+	public ResponseEntity<?> createTodoService(@RequestBody Pedidos pedido) {
+		try {
+			mongoService.createTodo(pedido);
+			return new ResponseEntity<Pedidos>(pedido, HttpStatus.OK);
+		} catch (ConstraintViolationException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
+		} catch (PedidosException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
 		}
 	}
 
