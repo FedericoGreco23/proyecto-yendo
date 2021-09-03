@@ -1,6 +1,8 @@
 package com.vpi.springboot.mongoServices;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javax.validation.ConstraintViolationException;
@@ -26,6 +28,26 @@ public class PedidosServiceImp implements PedidosService {
 		}else {
 			pedido.setCreatedAt(new Date(System.currentTimeMillis()));
 			repo.save(pedido);
+		}
+	}
+
+	@Override
+	public List<Pedidos> getAllPedidos() {
+		List<Pedidos> pedidos = repo.findAll();
+		if(pedidos.size() > 0) {
+			return pedidos;
+		}else {
+			return new ArrayList<Pedidos>();
+		}
+	}
+
+	@Override
+	public Pedidos getPedido(String id) throws PedidosException {
+		Optional<Pedidos> pedido = repo.findById(id);
+		if(pedido.isPresent()) {
+			return pedido.get();
+		}else {
+			throw new PedidosException(PedidosException.NotFoundException(id));
 		}
 	}
 

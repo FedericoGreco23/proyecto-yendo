@@ -26,7 +26,7 @@ public class PedidosController {
 
 	@Autowired
 	private MongoRepo mongoRepo;
-	
+
 	@Autowired
 	private PedidosService mongoService;
 
@@ -39,6 +39,12 @@ public class PedidosController {
 			return new ResponseEntity<>("No se encontraron pedidos", HttpStatus.NOT_FOUND);
 	}
 
+	@GetMapping("/pedidosService")
+	public ResponseEntity<?> getAllPedidosService() {
+		List<Pedidos> pedidos = mongoService.getAllPedidos();
+		return new ResponseEntity<>(pedidos, pedidos.size() > 0 ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+	}
+
 	@PostMapping("/pedidos")
 	public ResponseEntity<?> createTodo(@RequestBody Pedidos pedido) {
 		try {
@@ -49,7 +55,7 @@ public class PedidosController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@PostMapping("/pedidosService")
 	public ResponseEntity<?> createTodoService(@RequestBody Pedidos pedido) {
 		try {
@@ -69,7 +75,15 @@ public class PedidosController {
 			return new ResponseEntity<>(pedidosOptional.get(), HttpStatus.OK);
 		} else
 			return new ResponseEntity<>("no se encontre un pedido con la id " + id, HttpStatus.NOT_FOUND);
+	}
 
+	@GetMapping("/pedidosService/{id}")
+	public ResponseEntity<?> getSinglePedido(@PathVariable("id") String id) {
+		try {
+			return new ResponseEntity<>(mongoService.getPedido(id), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>("No se encontre un pedido con la id " + id, HttpStatus.NOT_FOUND);
+		}
 	}
 
 	@PutMapping("/pedidos/{id}")
