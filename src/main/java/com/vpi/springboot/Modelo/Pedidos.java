@@ -23,9 +23,9 @@ public class Pedidos {
 	@Id
 	private String id;
 	
-	@NotNull(message = "comida no puede ser nulo")
+//	@NotNull(message = "comida no puede ser nulo")
 	private String comida;
-	@NotNull(message = "valoracion no puede ser nulo")
+//	@NotNull(message = "valoracion no puede ser nulo")
 	private int valoracion;
 	
 	private Date createdAt;
