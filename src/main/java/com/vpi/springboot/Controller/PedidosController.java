@@ -69,7 +69,7 @@ public class PedidosController {
 	}
 
 	@GetMapping("/pedidos/{id}")
-	public ResponseEntity<?> getSingleTodo(@PathVariable("id") String id) {
+	public ResponseEntity<?> getSinglePedido(@PathVariable("id") String id) {
 		Optional<Pedidos> pedidosOptional = mongoRepo.findById(id);
 		if (pedidosOptional.isPresent()) {
 			return new ResponseEntity<>(pedidosOptional.get(), HttpStatus.OK);
@@ -78,7 +78,7 @@ public class PedidosController {
 	}
 
 	@GetMapping("/pedidosService/{id}")
-	public ResponseEntity<?> getSinglePedido(@PathVariable("id") String id) {
+	public ResponseEntity<?> getSinglePedidoService(@PathVariable("id") String id) {
 		try {
 			return new ResponseEntity<>(mongoService.getPedido(id), HttpStatus.OK);
 		} catch (Exception e) {
@@ -88,7 +88,6 @@ public class PedidosController {
 
 	@PutMapping("/pedidos/{id}")
 	public ResponseEntity<?> updateById(@PathVariable("id") String id, @RequestBody Pedidos pedido) {
-
 		Optional<Pedidos> pedidosOptional = mongoRepo.findById(id);
 		if (pedidosOptional.isPresent()) {
 			Pedidos pedidostoSave = pedidosOptional.get();
@@ -99,7 +98,19 @@ public class PedidosController {
 			return new ResponseEntity<Pedidos>(pedidostoSave, HttpStatus.OK);
 		} else
 			return new ResponseEntity<>("no se encontre un pedido con la id " + id, HttpStatus.NOT_FOUND);
-
+	}
+	
+	@PutMapping("/pedidosService/{id}")
+	public ResponseEntity<?> updateByIdService(@PathVariable("id") String id, @RequestBody Pedidos pedido) {
+		try {
+			mongoService.updatePedido(id, pedido);
+			return new ResponseEntity<>("Actualizado pedido " + id, HttpStatus.OK);
+		} catch (ConstraintViolationException e) {
+			// TODO Auto-generated catch block
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
+		} catch(PedidosException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		}			
 	}
 
 	@DeleteMapping("/pedidos/{id}")
@@ -111,5 +122,14 @@ public class PedidosController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 	}
-
+	
+	@DeleteMapping("/pedidos/{id}")
+	public ResponseEntity<?> deleteByIdService(@PathVariable("id") String id) {
+		try {
+			mongoService.deletePedido(id);
+			return new ResponseEntity<>("Se ha eliminado exitosamente  " + id, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		}
+	}
 }

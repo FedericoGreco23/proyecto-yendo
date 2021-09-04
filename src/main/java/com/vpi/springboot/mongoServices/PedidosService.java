@@ -14,4 +14,8 @@ public interface PedidosService {
 	public List<Pedidos> getAllPedidos();
 	
 	public Pedidos getPedido(String id) throws PedidosException;
+	
+	public void updatePedido(String id, Pedidos pedido) throws PedidosException;
+	
+	public void deletePedido(String id) throws PedidosException;
 }

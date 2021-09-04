@@ -51,4 +51,28 @@ public class PedidosServiceImp implements PedidosService {
 		}
 	}
 
+	@Override
+	public void updatePedido(String id, Pedidos pedido) throws PedidosException {
+		Optional<Pedidos> ped = repo.findById(id);
+		if(ped.isPresent()) {
+			Pedidos p = ped.get();
+			p.setComida(pedido.getComida());
+			p.setValoracion(pedido.getValoracion());
+			repo.save(p);
+		}else {
+			throw new PedidosException(PedidosException.NotFoundException(id));
+		}
+	}
+
+	@Override
+	public void deletePedido(String id) throws PedidosException {
+		Optional<Pedidos> ped = repo.findById(id);
+		if(ped.isPresent()) {
+			Pedidos pedido = ped.get();
+			repo.delete(pedido);
+		}else {
+			throw new PedidosException(PedidosException.NotFoundException(id));
+		}
+	}
+
 }
