@@ -113,15 +113,15 @@ public class PedidosController {
 		}			
 	}
 
-	@DeleteMapping("/pedidos/{id}")
-	public ResponseEntity<?> deleteById(@PathVariable("id") String id) {
-		try {
-			mongoRepo.deleteById(id);
-			return new ResponseEntity<>("Se ha eliminado exitosamente  " + id, HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-		}
-	}
+//	@DeleteMapping("/pedidos/{id}")
+//	public ResponseEntity<?> deleteById(@PathVariable("id") String id) {
+//		try {
+//			mongoRepo.deleteById(id);
+//			return new ResponseEntity<>("Se ha eliminado exitosamente  " + id, HttpStatus.OK);
+//		} catch (Exception e) {
+//			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+//		}
+//	}
 	
 	@DeleteMapping("/pedidos/{id}")
 	public ResponseEntity<?> deleteByIdService(@PathVariable("id") String id) {
