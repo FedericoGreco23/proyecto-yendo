@@ -1,12 +1,27 @@
 package com.vpi.springboot.Modelo;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+
+@Entity
 public class Direccion {
+
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String calle;
     private String nroPuerta;
     private String nombre;
+    @OneToOne
     private GeoLocalizacion geoLocalizacion;
+	@ManyToOne
+	@JoinColumn(name="mail")
+	private Cliente cliente;
 
+    
     public Direccion() {
     }
 
@@ -48,8 +63,18 @@ public class Direccion {
     public void setGeoLocalizacion(GeoLocalizacion geoLocalizacion) {
         this.geoLocalizacion = geoLocalizacion;
     }
+    
+    
 
-    @Override
+    public Cliente getCliente() {
+		return cliente;
+	}
+
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
+	}
+
+	@Override
     public String toString() {
         return "Direccion{" +
                 "id=" + id +

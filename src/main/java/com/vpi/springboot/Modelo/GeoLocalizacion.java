@@ -1,7 +1,14 @@
 package com.vpi.springboot.Modelo;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+
+@Entity
 public class GeoLocalizacion {
 
+
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private Double latitud;
     private Double longitud;

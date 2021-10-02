@@ -1,7 +1,18 @@
 package com.vpi.springboot.Modelo;
 
+import java.util.List;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+
+@Entity
 public class Producto {
 
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	private String nombre;
 	private String descripcion;
@@ -9,6 +20,11 @@ public class Producto {
 	private String foto;
 	private int descuento;
 	private boolean activo;
+	@ManyToOne
+	@JoinColumn(name="mail")
+	private Restaurante restaurante;
+	@ManyToMany
+	private List<Producto> productos;
 	
 	public Producto(int id, String nombre, String descripcion, double precio, String foto, int descuento,
 			boolean activo) {
@@ -64,5 +80,15 @@ public class Producto {
 	public void setActivo(boolean activo) {
 		this.activo = activo;
 	}
+
+	public Restaurante getRestaurante() {
+		return restaurante;
+	}
+
+	public void setRestaurante(Restaurante restaurante) {
+		this.restaurante = restaurante;
+	}
+	
+	
 	
 }
