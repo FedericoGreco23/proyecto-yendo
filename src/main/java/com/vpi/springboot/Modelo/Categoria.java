@@ -11,8 +11,6 @@ public class Categoria {
 
 	@Id
 	private String nombre;
-	@ManyToMany
-	private List<Producto> producto;
 	
 
 	public Categoria() {
@@ -32,13 +30,7 @@ public class Categoria {
 		this.nombre = nombre;
 	}
 
-	public List<Producto> getProducto() {
-		return producto;
-	}
 
-	public void setProducto(List<Producto> producto) {
-		this.producto = producto;
-	}
 
 
 	

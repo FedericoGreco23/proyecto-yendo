@@ -5,13 +5,14 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
 @Entity
 public class Producto {
-
+	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	private String nombre;
@@ -21,11 +22,14 @@ public class Producto {
 	private int descuento;
 	private boolean activo;
 	@ManyToOne
-	@JoinColumn(name="mail")
+	@JoinColumn(name="restauranteMail")
 	private Restaurante restaurante;
 	@ManyToMany
-	private List<Producto> productos;
+	private List<Categoria> categorias;
+
+
 	
+		
 	public Producto(int id, String nombre, String descripcion, double precio, String foto, int descuento,
 			boolean activo) {
 		this.id = id;
@@ -88,6 +92,15 @@ public class Producto {
 	public void setRestaurante(Restaurante restaurante) {
 		this.restaurante = restaurante;
 	}
+
+	public List<Categoria> getCategorias() {
+		return categorias;
+	}
+
+	public void setCategorias(List<Categoria> categorias) {
+		this.categorias = categorias;
+	}
+
 	
 	
 	

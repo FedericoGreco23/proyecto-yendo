@@ -3,6 +3,7 @@ package com.vpi.springboot.Modelo;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
@@ -10,6 +11,7 @@ import javax.persistence.OneToOne;
 @Entity
 public class Direccion {
 
+	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String calle;
@@ -18,7 +20,7 @@ public class Direccion {
     @OneToOne
     private GeoLocalizacion geoLocalizacion;
 	@ManyToOne
-	@JoinColumn(name="mail")
+	@JoinColumn(name="clienteMail")
 	private Cliente cliente;
 
     

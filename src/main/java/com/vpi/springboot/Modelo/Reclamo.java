@@ -2,6 +2,7 @@ package com.vpi.springboot.Modelo;
 
 import java.time.LocalDateTime;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -20,24 +21,24 @@ public class Reclamo {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private String id;
+	private int id;
 	private String comentario;
-	@Temporal(TemporalType.TIMESTAMP)
+	@Column(columnDefinition = "TIMESTAMP")
 	private LocalDateTime fecha;
 	@Enumerated(EnumType.STRING)
 	private EnumEstadoReclamo estado;
 	private String resolucion;
 	@ManyToOne
-	@JoinColumn(name="id")
+	@JoinColumn(name="idPedido")
 	private Pedido pedido;
 	@ManyToOne
-	@JoinColumn(name="mail")
+	@JoinColumn(name="restauranteMail")
 	private Restaurante restaurante;
 	
 	
 
 	
-	public Reclamo(String id, String comentario, LocalDateTime fecha, EnumEstadoReclamo estado, String resolucion) {
+	public Reclamo(int id, String comentario, LocalDateTime fecha, EnumEstadoReclamo estado, String resolucion) {
 		super();
 		this.id = id;
 		this.comentario = comentario;
@@ -53,10 +54,10 @@ public class Reclamo {
 	}
 	
 	
-	public String getId() {
+	public int getId() {
 		return id;
 	}
-	public void setId(String id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 	public String getComentario() {

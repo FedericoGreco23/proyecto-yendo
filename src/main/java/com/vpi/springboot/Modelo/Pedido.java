@@ -4,11 +4,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -18,10 +21,12 @@ import javax.persistence.TemporalType;
 import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
 import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
 
+@Entity
 public class Pedido {
+	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	@Temporal(TemporalType.TIMESTAMP)
+	@Column(columnDefinition = "TIMESTAMP")
 	private LocalDateTime fecha;
 	private Double costoTotal;
 	@Enumerated(EnumType.STRING)
@@ -30,10 +35,10 @@ public class Pedido {
 	private EnumMetodoDePago metodoDePago;
 	private int carrito;
 	@ManyToOne
-	@JoinColumn(name="mail")
+	@JoinColumn(name="clienteMail")
 	private Cliente cliente;
 	@ManyToOne
-	@JoinColumn(name="mail")
+	@JoinColumn(name="restauranteMail")
 	private Restaurante restaurante;
     @OneToMany(mappedBy = "pedido", fetch = FetchType.LAZY,
             cascade = CascadeType.ALL)

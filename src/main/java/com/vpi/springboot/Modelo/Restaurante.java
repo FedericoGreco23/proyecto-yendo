@@ -5,6 +5,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -26,15 +27,15 @@ public class Restaurante extends Usuario {
 	private Float calificacionPromedio;
 	@Enumerated(EnumType.STRING)
 	private EnumEstadoRestaurante estado;
-	@Temporal(TemporalType.TIME)
+	@Column(columnDefinition = "TIME")
 	private LocalTime horarioApertura;
-	@Temporal(TemporalType.TIME)
+	@Column(columnDefinition = "TIME")
 	private LocalTime horarioCierre;
-	@Temporal(TemporalType.TIME)
+	@Column(columnDefinition = "TIME")
 	private LocalTime tiempoEstimadoMinimo;
-	@Temporal(TemporalType.TIME)
+	@Column(columnDefinition = "TIME")
 	private LocalTime tiempoEstimadoMaximo;
-	@Temporal(TemporalType.DATE)
+	@Column(columnDefinition = "DATE")
 	private LocalDate fechaApertura;
 	private Integer costoDeEnvio;
 	@OneToMany(mappedBy = "restaurante", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

@@ -5,8 +5,8 @@ import java.io.Serializable;
 public class CalificacionRestauranteId implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
-	private String mailRestaurante;
-	private String mailCliente;
+	private String restaurante;
+	private String cliente;
 	
 	
 	public CalificacionRestauranteId() {
@@ -15,32 +15,34 @@ public class CalificacionRestauranteId implements Serializable{
 	}
 
 
-	public String getMailRestaurante() {
-		return mailRestaurante;
+	public String getRestaurante() {
+		return restaurante;
 	}
 
 
-	public void setMailRestaurante(String mailRestaurante) {
-		this.mailRestaurante = mailRestaurante;
+	public void setRestaurante(String restaurante) {
+		this.restaurante = restaurante;
 	}
 
 
-	public String getMailCliente() {
-		return mailCliente;
+	public String getCliente() {
+		return cliente;
 	}
 
 
-	public void setMailCliente(String mailCliente) {
-		this.mailCliente = mailCliente;
+	public void setCliente(String cliente) {
+		this.cliente = cliente;
 	}
+
+
 
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((mailCliente == null) ? 0 : mailCliente.hashCode());
-		result = prime * result + ((mailRestaurante == null) ? 0 : mailRestaurante.hashCode());
+		result = prime * result + ((cliente == null) ? 0 : cliente.hashCode());
+		result = prime * result + ((restaurante == null) ? 0 : restaurante.hashCode());
 		return result;
 	}
 
@@ -54,18 +56,20 @@ public class CalificacionRestauranteId implements Serializable{
 		if (getClass() != obj.getClass())
 			return false;
 		CalificacionRestauranteId other = (CalificacionRestauranteId) obj;
-		if (mailCliente == null) {
-			if (other.mailCliente != null)
+		if (cliente == null) {
+			if (other.cliente != null)
 				return false;
-		} else if (!mailCliente.equals(other.mailCliente))
+		} else if (!cliente.equals(other.cliente))
 			return false;
-		if (mailRestaurante == null) {
-			if (other.mailRestaurante != null)
+		if (restaurante == null) {
+			if (other.restaurante != null)
 				return false;
-		} else if (!mailRestaurante.equals(other.mailRestaurante))
+		} else if (!restaurante.equals(other.restaurante))
 			return false;
 		return true;
 	}
-	
+
+
+
 
 }
