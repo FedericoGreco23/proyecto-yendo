@@ -2,6 +2,8 @@ package com.vpi.springboot.Modelo.dto;
 
 import java.io.Serializable;
 
+import com.vpi.springboot.Modelo.Producto;
+
 public class DTProductoCarrito implements Serializable {
     private Producto producto;
     private Integer cantidad;
