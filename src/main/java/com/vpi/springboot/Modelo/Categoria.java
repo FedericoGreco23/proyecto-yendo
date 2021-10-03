@@ -1,10 +1,7 @@
 package com.vpi.springboot.Modelo;
 
-import java.util.List;
-
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 
 @Entity
 public class Categoria {

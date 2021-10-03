@@ -5,7 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DTCarrito implements Serializable {
-    private List<DTProductoCarrito> dtProductoCarritoList= new ArrayList<DTProductoCarrito>();
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private List<DTProductoCarrito> dtProductoCarritoList= new ArrayList<DTProductoCarrito>();
 
     public DTCarrito(List<DTProductoCarrito> dtProductoCarritoList) {
         this.dtProductoCarritoList = dtProductoCarritoList;

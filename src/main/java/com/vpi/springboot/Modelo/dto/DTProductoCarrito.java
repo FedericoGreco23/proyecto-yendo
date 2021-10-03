@@ -5,7 +5,11 @@ import java.io.Serializable;
 import com.vpi.springboot.Modelo.Producto;
 
 public class DTProductoCarrito implements Serializable {
-    private Producto producto;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private Producto producto;
     private Integer cantidad;
 
     public DTProductoCarrito(Producto producto, Integer cantidad) {

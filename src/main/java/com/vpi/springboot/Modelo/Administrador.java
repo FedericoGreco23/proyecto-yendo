@@ -2,7 +2,6 @@ package com.vpi.springboot.Modelo;
 
 
 import javax.persistence.Entity;
-import javax.persistence.Table;
 
 @Entity
 public class Administrador extends Usuario{
