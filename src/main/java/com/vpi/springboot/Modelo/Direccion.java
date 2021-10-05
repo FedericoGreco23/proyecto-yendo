@@ -13,62 +13,71 @@ public class Direccion {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-    private String calle;
-    private String nroPuerta;
-    private String nombre;
-    @OneToOne
-    private GeoLocalizacion geoLocalizacion;
+	private int id;
+	private String calle;
+	private String nroPuerta;
+	private String nombre;
+	@OneToOne
+	private GeoLocalizacion geoLocalizacion;
 	@ManyToOne
-	@JoinColumn(name="clienteMail")
+	@JoinColumn(name = "clienteMail")
 	private Cliente cliente;
 
-    
-    public Direccion() {
-    }
+	public Direccion() {
+		super();
+	}
 
-    public Direccion(String calle, String nroPuerta, String nombre, GeoLocalizacion geoLocalizacion) {
-        this.calle = calle;
-        this.nroPuerta = nroPuerta;
-        this.nombre = nombre;
-        this.geoLocalizacion = geoLocalizacion;
-    }
+	// Puede haber una direccion sin cliente
+	public Direccion(String calle, String nroPuerta, String nombre, GeoLocalizacion geoLocalizacion) {
+		super();
+		this.calle = calle;
+		this.nroPuerta = nroPuerta;
+		this.nombre = nombre;
+		this.geoLocalizacion = geoLocalizacion;
+	}
 
-    public String getCalle() {
-        return calle;
-    }
+	public Direccion(String calle, String nroPuerta, String nombre, Cliente cliente, GeoLocalizacion geoLocalizacion) {
+		super();
+		this.calle = calle;
+		this.nroPuerta = nroPuerta;
+		this.nombre = nombre;
+		this.cliente = cliente;
+		this.geoLocalizacion = geoLocalizacion;
+	}
 
-    public void setCalle(String calle) {
-        this.calle = calle;
-    }
+	public String getCalle() {
+		return calle;
+	}
 
-    public String getNroPuerta() {
-        return nroPuerta;
-    }
+	public void setCalle(String calle) {
+		this.calle = calle;
+	}
 
-    public void setNroPuerta(String nroPuerta) {
-        this.nroPuerta = nroPuerta;
-    }
+	public String getNroPuerta() {
+		return nroPuerta;
+	}
 
-    public String getNombre() {
-        return nombre;
-    }
+	public void setNroPuerta(String nroPuerta) {
+		this.nroPuerta = nroPuerta;
+	}
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
+	public String getNombre() {
+		return nombre;
+	}
 
-    public GeoLocalizacion getGeoLocalizacion() {
-        return geoLocalizacion;
-    }
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
 
-    public void setGeoLocalizacion(GeoLocalizacion geoLocalizacion) {
-        this.geoLocalizacion = geoLocalizacion;
-    }
-    
-    
+	public GeoLocalizacion getGeoLocalizacion() {
+		return geoLocalizacion;
+	}
 
-    public Cliente getCliente() {
+	public void setGeoLocalizacion(GeoLocalizacion geoLocalizacion) {
+		this.geoLocalizacion = geoLocalizacion;
+	}
+
+	public Cliente getCliente() {
 		return cliente;
 	}
 
@@ -77,12 +86,8 @@ public class Direccion {
 	}
 
 	@Override
-    public String toString() {
-        return "Direccion{" +
-                "id=" + id +
-                ", calle='" + calle + '\'' +
-                ", nroPuerta='" + nroPuerta + '\'' +
-                ", nombre='" + nombre + '\'' +
-                '}';
-    }
+	public String toString() {
+		return "Direccion{" + "id=" + id + ", calle='" + calle + '\'' + ", nroPuerta='" + nroPuerta + '\''
+				+ ", nombre='" + nombre + '\'' + '}';
+	}
 }

@@ -1,37 +1,39 @@
-package com.vpi.springboot.Modelo;
+package com.vpi.springboot.Modelo.dto;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import com.vpi.springboot.Modelo.Calificacion;
 
-@MappedSuperclass
-public class Calificacion {
+public class DTCalificacion implements Serializable {
+	private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	private int puntaje;
 	private String comentario;
 	private String foto;
-	@Column(columnDefinition = "TIMESTAMP")
 	private LocalDateTime fecha;
 
-	public Calificacion() {
+	public DTCalificacion() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
-	public Calificacion(int id, int puntaje, String comentario, String foto, LocalDateTime fecha) {
+	public DTCalificacion(int id, int puntaje, String comentario, String foto, LocalDateTime fecha) {
 		super();
 		this.id = id;
 		this.puntaje = puntaje;
 		this.comentario = comentario;
 		this.foto = foto;
 		this.fecha = fecha;
+	}
+
+	public DTCalificacion(Calificacion cal) {
+		super();
+		this.id = cal.getId();
+		this.puntaje = cal.getPuntaje();
+		this.comentario = cal.getComentario();
+		this.foto = cal.getFoto();
+		this.fecha = cal.getFecha();
 	}
 
 	public int getId() {

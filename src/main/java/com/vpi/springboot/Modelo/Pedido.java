@@ -28,126 +28,99 @@ public class Pedido {
 	private LocalDateTime fecha;
 	private Double costoTotal;
 	@Enumerated(EnumType.STRING)
-	private EnumEstadoPedido estadoPedidido;
+	private EnumEstadoPedido estadoPedido;
 	@Enumerated(EnumType.STRING)
 	private EnumMetodoDePago metodoDePago;
 	private int carrito;
 	@ManyToOne
-	@JoinColumn(name="clienteMail")
+	@JoinColumn(name = "clienteMail")
 	private Cliente cliente;
 	@ManyToOne
-	@JoinColumn(name="restauranteMail")
+	@JoinColumn(name = "restauranteMail")
 	private Restaurante restaurante;
-    @OneToMany(mappedBy = "pedido", fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "pedido", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<Reclamo> reclamos;
-	
-	
-	public Pedido(int id, LocalDateTime fecha, Double costoTotal, EnumEstadoPedido estadoPedidido, EnumMetodoDePago metodoDePago,
-			Integer carrito) {
+
+	public Pedido(int id, LocalDateTime fecha, Double costoTotal, EnumEstadoPedido estadoPedido,
+			EnumMetodoDePago metodoDePago, Integer carrito) {
 		super();
 		this.id = id;
 		this.fecha = fecha;
 		this.costoTotal = costoTotal;
-		this.estadoPedidido = estadoPedidido;
+		this.estadoPedido = estadoPedido;
 		this.metodoDePago = metodoDePago;
 		this.carrito = carrito;
 	}
-
 
 	public int getId() {
 		return id;
 	}
 
-
 	public void setId(int id) {
 		this.id = id;
 	}
-
 
 	public LocalDateTime getFecha() {
 		return fecha;
 	}
 
-
 	public void setFecha(LocalDateTime fecha) {
 		this.fecha = fecha;
 	}
-
 
 	public Double getCostoTotal() {
 		return costoTotal;
 	}
 
-
 	public void setCostoTotal(Double costoTotal) {
 		this.costoTotal = costoTotal;
 	}
 
-
-	public EnumEstadoPedido getEstadoPedidido() {
-		return estadoPedidido;
+	public EnumEstadoPedido getEstadoPedido() {
+		return estadoPedido;
 	}
 
-
-	public void setEstadoPedidido(EnumEstadoPedido estadoPedidido) {
-		this.estadoPedidido = estadoPedidido;
+	public void setEstadoPedidido(EnumEstadoPedido estadoPedido) {
+		this.estadoPedido = estadoPedido;
 	}
-
 
 	public EnumMetodoDePago getMetodoDePago() {
 		return metodoDePago;
 	}
 
-
 	public void setMetodoDePago(EnumMetodoDePago metodoDePago) {
 		this.metodoDePago = metodoDePago;
 	}
-
 
 	public int getCarrito() {
 		return carrito;
 	}
 
-
 	public void setCarrito(int carrito) {
 		this.carrito = carrito;
 	}
-
 
 	public Cliente getCliente() {
 		return cliente;
 	}
 
-
 	public void setCliente(Cliente cliente) {
 		this.cliente = cliente;
 	}
-
 
 	public Restaurante getRestaurante() {
 		return restaurante;
 	}
 
-
 	public void setRestaurante(Restaurante restaurante) {
 		this.restaurante = restaurante;
 	}
-
 
 	public List<Reclamo> getReclamos() {
 		return reclamos;
 	}
 
-
 	public void setReclamos(List<Reclamo> reclamos) {
 		this.reclamos = reclamos;
 	}
-	
-	
-	
-	
-	
-	
-
 }

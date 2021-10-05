@@ -42,24 +42,18 @@ public class Restaurante extends Usuario {
 	private List<Reclamo> reclamos;
 	@OneToOne
 	private GeoLocalizacion geoLocalizacion;
-	
+
 	@OneToMany(mappedBy = "restaurante", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<Producto> productos;
 
-
-
-
-public Restaurante() {
+	public Restaurante() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-
-
-
-public Restaurante(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado,
-		Boolean activo, String nombre, String direccion, Float calificacionPromedio, EnumEstadoRestaurante estado,
-			LocalTime horarioApertura, LocalTime horarioCierre, LocalDate fechaApertura, Integer costoDeEnvio, 
+	public Restaurante(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado, Boolean activo,
+			String nombre, String direccion, Float calificacionPromedio, EnumEstadoRestaurante estado,
+			LocalTime horarioApertura, LocalTime horarioCierre, LocalDate fechaApertura, Integer costoDeEnvio,
 			GeoLocalizacion geoLocalizacion, List<Producto> productos) {
 
 		super(mail, contrasenia, telefono, foto, bloqueado, activo);
@@ -74,8 +68,6 @@ public Restaurante(String mail, String contrasenia, String telefono, String foto
 		this.geoLocalizacion = geoLocalizacion;
 		this.productos = productos;
 	}
-
-
 
 //----------------------GETTERS Y SETTERS---------------------------------------------------------
 
@@ -159,55 +151,36 @@ public Restaurante(String mail, String contrasenia, String telefono, String foto
 		this.costoDeEnvio = costoDeEnvio;
 	}
 
-
-
 	public List<Pedido> getPedidos() {
 		return pedidos;
 	}
-
-
 
 	public void setPedidos(List<Pedido> pedidos) {
 		this.pedidos = pedidos;
 	}
 
-
-
 	public List<Reclamo> getReclamos() {
 		return reclamos;
 	}
-
-
 
 	public void setReclamos(List<Reclamo> reclamos) {
 		this.reclamos = reclamos;
 	}
 
-
-
 	public GeoLocalizacion getGeoLocalizacion() {
 		return geoLocalizacion;
 	}
-
-
 
 	public void setGeoLocalizacion(GeoLocalizacion geoLocalizacion) {
 		this.geoLocalizacion = geoLocalizacion;
 	}
 
-
-
-
 	public List<Producto> getProductos() {
 		return productos;
 	}
 
-
-
-
 	public void setProductos(List<Producto> productos) {
 		this.productos = productos;
 	}
-	
-	
+
 }

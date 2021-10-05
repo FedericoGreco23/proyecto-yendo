@@ -8,7 +8,6 @@ public class Categoria {
 
 	@Id
 	private String nombre;
-	
 
 	public Categoria() {
 		super();
@@ -26,10 +25,4 @@ public class Categoria {
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
-
-
-
-
-	
-	
 }

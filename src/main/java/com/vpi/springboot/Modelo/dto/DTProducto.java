@@ -1,19 +1,14 @@
-package com.vpi.springboot.Modelo;
+package com.vpi.springboot.Modelo.dto;
 
+import java.io.Serializable;
 import java.util.List;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
+import com.vpi.springboot.Modelo.Categoria;
+import com.vpi.springboot.Modelo.Producto;
 
-@Entity
-public class Producto {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+public class DTProducto implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	private int id;
 	private String nombre;
 	private String descripcion;
@@ -21,13 +16,14 @@ public class Producto {
 	private String foto;
 	private int descuento;
 	private boolean activo;
-	@ManyToOne
-	@JoinColumn(name = "restauranteMail")
-	private Restaurante restaurante;
-	@ManyToMany
-	private List<Categoria> categorias;
+	private DTRestaurante restaurante;
+	private List<DTCategoria> categorias;
 
-	public Producto(int id, String nombre, String descripcion, double precio, String foto, int descuento,
+	public DTProducto() {
+		super();
+	}
+
+	public DTProducto(int id, String nombre, String descripcion, double precio, String foto, int descuento,
 			boolean activo) {
 		this.id = id;
 		this.nombre = nombre;
@@ -36,6 +32,20 @@ public class Producto {
 		this.foto = foto;
 		this.descuento = descuento;
 		this.activo = activo;
+	}
+
+	public DTProducto(Producto pro) {
+		this.id = pro.getId();
+		this.nombre = pro.getNombre();
+		this.descripcion = pro.getDescripcion();
+		this.precio = pro.getPrecio();
+		this.foto = pro.getFoto();
+		this.descuento = pro.getDescuento();
+		this.activo = pro.isActivo();
+
+		for (Categoria cat : pro.getCategorias()) {
+			this.categorias.add(new DTCategoria(cat));
+		}
 	}
 
 	public int getId() {
@@ -94,20 +104,19 @@ public class Producto {
 		this.activo = activo;
 	}
 
-	public Restaurante getRestaurante() {
+	public DTRestaurante getRestaurante() {
 		return restaurante;
 	}
 
-	public void setRestaurante(Restaurante restaurante) {
+	public void setRestaurante(DTRestaurante restaurante) {
 		this.restaurante = restaurante;
 	}
 
-	public List<Categoria> getCategorias() {
+	public List<DTCategoria> getCategorias() {
 		return categorias;
 	}
 
-	public void setCategorias(List<Categoria> categorias) {
+	public void setCategorias(List<DTCategoria> categorias) {
 		this.categorias = categorias;
 	}
-
 }
