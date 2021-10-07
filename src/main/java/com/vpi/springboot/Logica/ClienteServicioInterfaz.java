@@ -6,10 +6,10 @@ import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Usuario;
 import com.vpi.springboot.exception.UsuarioException;
 
-public interface UsuarioServicioInterfaz {
+public interface ClienteServicioInterfaz {
 
 	public void createTodo(Cliente usuario);
 	
 	public List<Cliente> getAllClientes();
-	
+
 }

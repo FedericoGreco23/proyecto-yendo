@@ -12,7 +12,7 @@ import com.vpi.springboot.Repositorios.ClienteRepositorio;
 import com.vpi.springboot.exception.UsuarioException;
 
 @Service
-public class UsuarioService implements UsuarioServicioInterfaz {
+public class ClienteService implements ClienteServicioInterfaz {
 
 	@Autowired
 	private ClienteRepositorio userRepo;
@@ -25,7 +25,6 @@ public class UsuarioService implements UsuarioServicioInterfaz {
 		} else {
 			userRepo.save(usuario);
 		}
-
 	}
 
 	@Override
