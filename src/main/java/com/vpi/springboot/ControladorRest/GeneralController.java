@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vpi.springboot.Logica.GeneralService;
-import com.vpi.springboot.Modelo.Cliente;
-import com.vpi.springboot.Modelo.Usuario;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
@@ -27,8 +25,9 @@ public class GeneralController {
 	private GeneralService service;
 
 	@GetMapping("/getUsuarios")
-	public List<String> getUsuarios() {
-		return service.listarUsuariosRegistrados();
+	public List<String> getUsuarios(@RequestParam(defaultValue = "0") int page, 
+									@RequestParam(defaultValue = "5") int size) {
+		return service.listarUsuariosRegistrados(page, size);
 	}
 
 	@PostMapping("/recuperar")

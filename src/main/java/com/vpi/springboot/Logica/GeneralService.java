@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.vpi.springboot.Modelo.*;
@@ -146,12 +149,17 @@ public class GeneralService implements GeneralServicioInterfaz {
 		}
 	}
 
-	public List<String> listarUsuariosRegistrados() {
+	public List<String> listarUsuariosRegistrados(int page, int size) {
 		List<String> usuarios = new ArrayList<String>();
+		
+		Pageable paging = PageRequest.of(page, size);
+		Page<Cliente> pageUsuarios;
 
-		List<Cliente> clientes = (List<Cliente>) clienteRepo.findAll();
-		List<Administrador> admins = (List<Administrador>) adminRepo.findAll();
-		List<Restaurante> restaurantes = (List<Restaurante>) resRepo.findAll();
+		pageUsuarios = clienteRepo.findAll(paging);
+		
+		List<Cliente> clientes = clienteRepo.findAll();
+		List<Administrador> admins = adminRepo.findAll();
+		List<Restaurante> restaurantes = resRepo.findAll();
 
 		for (Administrador a : admins) {
 			usuarios.add(a.getMail());

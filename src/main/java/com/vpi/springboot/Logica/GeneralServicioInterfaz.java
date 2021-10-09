@@ -13,5 +13,5 @@ public interface GeneralServicioInterfaz {
 
 	public void activarCuenta(String mail, String tipo);
 	
-	public List<String> listarUsuariosRegistrados();
+	public List<String> listarUsuariosRegistrados(int page, int size);
 }
