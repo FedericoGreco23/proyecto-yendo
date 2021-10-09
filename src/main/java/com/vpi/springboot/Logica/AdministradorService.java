@@ -24,7 +24,11 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 		if(optionalUser.isPresent()) {
 			throw new AdministradorException(AdministradorException.AdministradorYaExiste());
 		} else {
-			repo.save(admin);
+			String mail = admin.getMail();
+			if(mail.contains("@") && mail.contains(".com"))
+				repo.save(admin);
+			else
+				throw new AdministradorException("Tiene que introducir un mail válido.");
 		}
 	}	
 }

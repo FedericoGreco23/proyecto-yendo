@@ -31,6 +31,36 @@ public class GeneralController {
 		return service.listarUsuariosRegistrados();
 	}
 
+	@PostMapping("/recuperar")
+	public ResponseEntity<?> recuperarPassword(@RequestParam String mail) {
+		try {
+			service.recuperarPassword(mail);
+			return new ResponseEntity<String>(mail, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@PostMapping("/verificar")
+	public ResponseEntity<?> verificarMail(@RequestParam String mail) {
+		try {
+			service.verificarMail(mail);
+			return new ResponseEntity<String>("Verificado correctamente.", HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@PostMapping("/activar")
+	public ResponseEntity<?> activarCuenta(@RequestParam String mail, @RequestParam String tipo) {
+		try {
+			service.activarCuenta(mail, tipo);
+			return new ResponseEntity<String>("Cuenta " + mail + " activada.", HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
 	@PostMapping("/login")
 	public ResponseEntity<?> iniciarSesion(@RequestParam String mail, @RequestParam String pass) {
 		try {
