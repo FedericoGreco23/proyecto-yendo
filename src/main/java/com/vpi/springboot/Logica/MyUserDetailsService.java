@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-public class MyUserDetalilsService implements UserDetailsService{
+public class MyUserDetailsService implements UserDetailsService{
 
 	/**
 	 * este metodo serà llamado por spring para cargar un usuario por su nombre de usuario
