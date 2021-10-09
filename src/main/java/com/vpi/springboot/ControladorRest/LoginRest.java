@@ -30,7 +30,7 @@ public class LoginRest {
 	private MyUserDetailsService userDetailsService;
 
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
-	@RequestMapping(value = "/login", method = RequestMethod.POST)
+	@RequestMapping(value = "/public/login", method = RequestMethod.POST)
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception {
 
 		try {

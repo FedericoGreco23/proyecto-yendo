@@ -18,19 +18,21 @@ import com.vpi.springboot.Modelo.Usuario;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController 
-@RequestMapping("api/usuario/")
+@RequestMapping("public/")
 public class UserController {
 	
 	@Autowired
 	private UsuarioService userService;
-
+	
+	
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@GetMapping("/getallClientes")
 	public List<Cliente> getAllUser() {
 		return userService.getAllClientes();
 	}
 
 
-
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/crear")
 	public ResponseEntity<?> createTodo(@RequestBody Cliente usuario) {
 		try {
