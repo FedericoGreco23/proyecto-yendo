@@ -18,7 +18,7 @@ import com.vpi.springboot.Modelo.Usuario;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController 
-@RequestMapping("public/")
+@RequestMapping("api/usuario/")
 public class UserController {
 	
 	@Autowired
