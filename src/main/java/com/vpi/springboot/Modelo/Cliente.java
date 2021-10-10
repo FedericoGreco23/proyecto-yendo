@@ -103,6 +103,10 @@ public class Cliente extends Usuario{
 		this.direcciones = direcciones;
 	}
 
+	public void addDireccion(Direccion dir) {
+		this.direcciones.add(dir);
+	} 
+	
 	public List<Pedido> getPedidos() {
 		return pedidos;
 	}
