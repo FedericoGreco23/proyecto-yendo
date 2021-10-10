@@ -19,4 +19,6 @@ public interface ClienteServicioInterfaz {
 	public void bajaCuenta(String mail) throws UsuarioException;
 
 	void modificarDireccion(Direccion vieja, DTDireccion nueva, String mail) throws UsuarioException;
+
+	void eliminarDireccion(Direccion direccion, String mail) throws UsuarioException;
 }

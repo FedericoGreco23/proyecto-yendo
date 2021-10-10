@@ -156,4 +156,21 @@ public class ClienteService implements ClienteServicioInterfaz {
 			throw new UsuarioException("No existe cliente");
 		}
 	}
+	
+	@Override
+	public void eliminarDireccion(Direccion direccion, String mail) throws UsuarioException {
+		Optional<Cliente> optionalCliente = userRepo.findById(mail);
+		if(optionalCliente.isPresent()) {
+			Cliente cliente = optionalCliente.get();
+			Optional<Direccion> optionalDireccion = dirRepo.findByStreetNumberandMail(direccion.getCalle(), direccion.getNroPuerta(), cliente);
+			if(optionalDireccion.isPresent()) {
+				Direccion dir = optionalDireccion.get();
+				dirRepo.delete(dir);
+			}else {
+				throw new UsuarioException("No existe direccion");
+			}
+		}else {
+			throw new UsuarioException("No existe cliente");
+		}
+	}
 }

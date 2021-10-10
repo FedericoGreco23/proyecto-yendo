@@ -97,4 +97,16 @@ public class ClienteController {
 				return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
+		
+		
+		@PostMapping("eliminarDireccion")
+		public ResponseEntity<?> modificarDireccion(@RequestBody Direccion direccion,
+													@RequestParam String mail){
+			try {
+				clienteService.eliminarDireccion(direccion,mail);
+				return new ResponseEntity<String>("Direccion eliminada", HttpStatus.OK);
+			} catch (Exception e) {
+				return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
 }
