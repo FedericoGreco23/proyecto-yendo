@@ -19,4 +19,9 @@ public class UsuarioException extends Exception {
 	public static String PassIncorrecta() {
 		return "Contraseña incorrecta";
 	}
+	
+	public static String NoNickname() {
+		return "Debe ingresar nickname";
+	}
+	
 }
