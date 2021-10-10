@@ -46,7 +46,7 @@ public class ClienteController {
 
 		
 		@PostMapping("/agregarDireccion")
-		public ResponseEntity<?> agregarDireccion(@RequestBody Direccion direccion, @PathVariable String mail) {
+		public ResponseEntity<?> agregarDireccion(@RequestBody Direccion direccion, @RequestParam String mail) {
 			try {
 				clienteService.altaDireccion(direccion, mail);
 				return new ResponseEntity<String>("Direccion agregada", HttpStatus.OK);
@@ -56,7 +56,7 @@ public class ClienteController {
 		}
 		
 		@PostMapping("bajaCuenta")
-		public ResponseEntity<?> bajaCuenta(@PathVariable String mail){
+		public ResponseEntity<?> bajaCuenta(@RequestParam String mail){
 			try {
 				clienteService.bajaCuenta(mail);
 				return new ResponseEntity<String>("Cuenta dada de baja", HttpStatus.OK);
@@ -82,12 +82,12 @@ public class ClienteController {
 
 		@PostMapping("modificarDireccion")
 		public ResponseEntity<?> modificarDireccion(@RequestBody Direccion direccionVieja,
-													@PathVariable String nroPuerta,
-													@PathVariable String calle,
-													@PathVariable String nombre,
-													@PathVariable String mail,
-													@PathVariable Double latitud,
-													@PathVariable Double longitud
+													@RequestParam String nroPuerta,
+													@RequestParam String calle,
+													@RequestParam String nombre,
+													@RequestParam String mail,
+													@RequestParam Double latitud,
+													@RequestParam Double longitud
 													){
 			DTDireccion direccionNueva = new DTDireccion(calle, nroPuerta, nombre, new GeoLocalizacion(latitud, longitud));
 			try {
