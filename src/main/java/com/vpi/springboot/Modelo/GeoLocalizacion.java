@@ -5,6 +5,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import com.vpi.springboot.Modelo.dto.DTGeoLocalizacion;
+
 @Entity
 public class GeoLocalizacion {
 
@@ -21,6 +23,12 @@ public class GeoLocalizacion {
         this.latitud = latitud;
         this.longitud = longitud;
     }
+    
+    public GeoLocalizacion(DTGeoLocalizacion geo) {
+        this.latitud = geo.getLatitud();
+        this.longitud = geo.getLongitud();
+    }
+    
 
     public Double getLatitud() {
         return latitud;

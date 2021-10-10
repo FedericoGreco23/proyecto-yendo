@@ -7,10 +7,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.vpi.springboot.Logica.ClienteService;
 import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Direccion;
+import com.vpi.springboot.Modelo.GeoLocalizacion;
 import com.vpi.springboot.Modelo.Usuario;
+import com.vpi.springboot.Modelo.dto.DTDireccion;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController 
@@ -37,17 +40,17 @@ public class ClienteController {
 		}
 		
 		@PostMapping("/agregarDireccion")
-		public ResponseEntity<?> agregarDireccion(@RequestBody Direccion direccion, @RequestHeader String mail) {
+		public ResponseEntity<?> agregarDireccion(@RequestBody Direccion direccion, @PathVariable String mail) {
 			try {
 				clienteService.altaDireccion(direccion, mail);
-				return new ResponseEntity<String>("Direccion agragada", HttpStatus.OK);
+				return new ResponseEntity<String>("Direccion agregada", HttpStatus.OK);
 			} catch (Exception e) {
 				return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 		
 		@PostMapping("bajaCuenta")
-		public ResponseEntity<?> bajaCuenta(@RequestHeader String mail){
+		public ResponseEntity<?> bajaCuenta(@PathVariable String mail){
 			try {
 				clienteService.bajaCuenta(mail);
 				return new ResponseEntity<String>("Cuenta dada de baja", HttpStatus.OK);
@@ -56,7 +59,37 @@ public class ClienteController {
 			}
 			
 		}
-		
+	/*	
+		@PostMapping("modificarDireccion")
+		public ResponseEntity<?> modificarDireccion(@RequestBody Direccion direccionVieja, 
+													@RequestBody DTDireccion direccionNueva,
+													@PathVariable String mail){
+			try {
+				clienteService.modificarDireccion(direccionVieja,direccionNueva,mail);
+				return new ResponseEntity<String>("Direccion modificada", HttpStatus.OK);
+			} catch (Exception e) {
+				return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+	*/
 
+		@PostMapping("modificarDireccion")
+		public ResponseEntity<?> modificarDireccion(@RequestBody Direccion direccionVieja,
+													@PathVariable String nroPuerta,
+													@PathVariable String calle,
+													@PathVariable String nombre,
+													@PathVariable String mail,
+													@PathVariable Double latitud,
+													@PathVariable Double longitud
+													){
+			DTDireccion direccionNueva = new DTDireccion(calle, nroPuerta, nombre, new GeoLocalizacion(latitud, longitud));
+			try {
+				clienteService.modificarDireccion(direccionVieja,direccionNueva,mail);
+				return new ResponseEntity<String>("Direccion modificada", HttpStatus.OK);
+			} catch (Exception e) {
+				return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+		
 
 }

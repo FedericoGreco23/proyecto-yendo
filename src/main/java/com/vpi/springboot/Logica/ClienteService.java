@@ -14,8 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Direccion;
+import com.vpi.springboot.Modelo.GeoLocalizacion;
+import com.vpi.springboot.Modelo.dto.DTDireccion;
 import com.vpi.springboot.Repositorios.ClienteRepositorio;
 import com.vpi.springboot.Repositorios.DireccionRepositorio;
+import com.vpi.springboot.Repositorios.GeoLocalizacionRepositorio;
 import com.vpi.springboot.exception.UsuarioException;
 
 @Service
@@ -25,6 +28,8 @@ public class ClienteService implements ClienteServicioInterfaz {
 	private ClienteRepositorio userRepo;
 	@Autowired
 	private DireccionRepositorio dirRepo;
+	@Autowired
+	private GeoLocalizacionRepositorio geoRepo;
 	
 	private static final int iterations = 20 * 1000;
 	private static final int saltLen = 32;
@@ -41,6 +46,10 @@ public class ClienteService implements ClienteServicioInterfaz {
 			if(mail.contains("@") && mail.contains(".com")) {
 				String nick = usuario.getNickname();
 				if(nick != null) {
+					usuario.setActivo(true);
+					usuario.setBloqueado(false);
+					usuario.setSaldoBono(0.0f);
+					usuario.setCalificacionPromedio(5.0f);
 					byte[] salt = SecureRandom.getInstance("SHA1PRNG").generateSeed(saltLen);
 					String contrasenia = Base64.getEncoder().encodeToString(salt) + "$" + hash(usuario.getContrasenia(), salt);
 					usuario.setContrasenia(contrasenia);
@@ -80,6 +89,9 @@ public class ClienteService implements ClienteServicioInterfaz {
 		Optional<Cliente> optionalCliente = userRepo.findById(mail);
 		if(optionalCliente.isPresent()) {
 			Cliente cliente = optionalCliente.get();
+			GeoLocalizacion geo = direccion.getGeoLocalizacion();
+			geoRepo.save(geo);
+			
 			if(mail != null) {
 				direccion.setCliente(cliente);
 			}
@@ -114,5 +126,26 @@ public class ClienteService implements ClienteServicioInterfaz {
 		}
 	}
 	
+	
+	@Override
+	public void modificarDireccion(Direccion vieja, DTDireccion nueva, String mail) throws UsuarioException {
+		Optional<Cliente> optionalCliente = userRepo.findById(mail);
+		if(optionalCliente.isPresent()) {
+			Cliente cliente = optionalCliente.get();
+			Optional<Direccion> optionalDireccion = dirRepo.findByStreetNumberandMail(vieja.getCalle(), vieja.getNroPuerta(), cliente);
+			if(optionalDireccion.isPresent()) {
+				Direccion dirNueva = optionalDireccion.get();
+				dirNueva.setCalle(nueva.getCalle());
+				dirNueva.setNroPuerta(nueva.getNroPuerta());
+				dirNueva.setNombre(nueva.getNombre());
+				dirNueva.setGeoLocalizacion(new GeoLocalizacion(nueva.getGeoLocalizacion()));
+				dirRepo.save(dirNueva);
+			}else {
+				throw new UsuarioException("No existe direccion");
+			}
+		}else {
+			throw new UsuarioException("No existe cliente");
+		}
+	}
 
 }

@@ -1,5 +1,6 @@
 package com.vpi.springboot.Modelo;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -7,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+
 
 @Entity
 public class Direccion {
@@ -17,7 +19,7 @@ public class Direccion {
 	private String calle;
 	private String nroPuerta;
 	private String nombre;
-	@OneToOne
+	@OneToOne (cascade = CascadeType.ALL)
 	private GeoLocalizacion geoLocalizacion;
 	@ManyToOne
 	@JoinColumn(name = "clienteMail")
