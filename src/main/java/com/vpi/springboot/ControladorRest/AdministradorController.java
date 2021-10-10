@@ -19,10 +19,10 @@ import com.vpi.springboot.Logica.AdministradorService;
 import com.vpi.springboot.Modelo.Administrador;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
-@RestController 
+@RestController
 @RequestMapping("api/admin/")
 public class AdministradorController {
-	
+
 	@Autowired
 	private AdministradorService service;
 
@@ -42,6 +42,4 @@ public class AdministradorController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-
-
-	}
+}

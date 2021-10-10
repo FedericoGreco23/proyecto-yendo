@@ -1,8 +1,5 @@
 package com.vpi.springboot.Repositorios;
 
-
-
-
 import javax.transaction.Transactional;
 
 import com.vpi.springboot.Modelo.Usuario;
@@ -14,5 +11,5 @@ import com.vpi.springboot.Modelo.Usuario;
  */
 @Transactional
 public interface UsuarioRepositorio extends UserBaseRepository<Usuario> {
-	
+
 }

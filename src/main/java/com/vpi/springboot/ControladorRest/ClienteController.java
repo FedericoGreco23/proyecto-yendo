@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.vpi.springboot.Logica.ClienteService;
 import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Direccion;
@@ -15,29 +14,36 @@ import com.vpi.springboot.Modelo.GeoLocalizacion;
 import com.vpi.springboot.Modelo.Usuario;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
 
+import com.vpi.springboot.exception.UsuarioException;
+
+
 @CrossOrigin(origins = "*", allowedHeaders = "*")
-@RestController 
+@RestController
 @RequestMapping("api/cliente/")
 public class ClienteController {
-		
-		@Autowired
-		private ClienteService clienteService;
 
-		@GetMapping("/obtenerTodos")
-		public List<Cliente> getAllUser() {
-			return clienteService.obtenerClientes();
+	@Autowired
+	private ClienteService clienteService;
+
+	@GetMapping("/getDireccion/{mail}")
+	public List<Direccion> getDireccionUsuario(@PathVariable String mail) {
+		try {
+			return clienteService.getDireccionCliente(mail);
+		} catch (UsuarioException e) {
+			return null;
 		}
+	}
 
-
-		@PostMapping("/crear")
-		public ResponseEntity<?> altaCliente(@RequestBody Cliente usuario) {
-			try {
-				clienteService.altaCliente(usuario);
-				return new ResponseEntity<Usuario>(usuario, HttpStatus.OK);
-			} catch (Exception e) {
-				return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-			}
+	@PostMapping("/crear")
+	public ResponseEntity<?> altaCliente(@RequestBody Cliente usuario) {
+		try {
+			clienteService.altaCliente(usuario);
+			return new ResponseEntity<Usuario>(usuario, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
+
 		
 		@PostMapping("/agregarDireccion")
 		public ResponseEntity<?> agregarDireccion(@RequestBody Direccion direccion, @PathVariable String mail) {
@@ -59,6 +65,7 @@ public class ClienteController {
 			}
 			
 		}
+		
 	/*	
 		@PostMapping("modificarDireccion")
 		public ResponseEntity<?> modificarDireccion(@RequestBody Direccion direccionVieja, 
@@ -90,6 +97,4 @@ public class ClienteController {
 				return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
-		
-
 }

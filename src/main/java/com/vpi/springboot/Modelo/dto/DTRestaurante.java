@@ -33,10 +33,10 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 
 	// En caso de que no queramos iniciar el DT con geolocalizacion o lista de
 	// productos
-	public DTRestaurante(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado,
+	public DTRestaurante(String mail, String telefono, String foto, Boolean bloqueado,
 			Boolean activo, String nombre, String direccion, Float calificacionPromedio, EnumEstadoRestaurante estado,
 			LocalTime horarioApertura, LocalTime horarioCierre, LocalDate fechaApertura, Integer costoDeEnvio) {
-		super(mail, contrasenia, telefono, foto, bloqueado, activo);
+		super(mail, telefono, foto, bloqueado, activo, "Restaurante");
 		this.nombre = nombre;
 		this.direccion = direccion;
 		this.calificacionPromedio = calificacionPromedio;
@@ -51,7 +51,7 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 			Boolean activo, String nombre, String direccion, Float calificacionPromedio, EnumEstadoRestaurante estado,
 			LocalTime horarioApertura, LocalTime horarioCierre, LocalDate fechaApertura, Integer costoDeEnvio,
 			GeoLocalizacion geoLocalizacion, List<Producto> productos) {
-		super(mail, contrasenia, telefono, foto, bloqueado, activo);
+		super(mail, telefono, foto, bloqueado, activo, "Restaurante");
 		this.nombre = nombre;
 		this.direccion = direccion;
 		this.calificacionPromedio = calificacionPromedio;
