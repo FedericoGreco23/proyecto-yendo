@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vpi.springboot.Logica.GeneralService;
+import com.vpi.springboot.Modelo.dto.DTUsuario;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
@@ -25,9 +26,10 @@ public class GeneralController {
 	private GeneralService service;
 
 	@GetMapping("/getUsuarios")
-	public List<String> getUsuarios(@RequestParam(defaultValue = "0") int page, 
-									@RequestParam(defaultValue = "5") int size) {
-		return service.listarUsuariosRegistrados(page, size);
+	public List<DTUsuario> getUsuarios(@RequestParam(defaultValue = "0") int page, 
+									@RequestParam(defaultValue = "5") int size,
+									@RequestParam(defaultValue = "0") int tipoUsuario) {
+		return service.listarUsuariosRegistrados(page, size, tipoUsuario);
 	}
 
 	@PostMapping("/recuperar")
@@ -44,16 +46,17 @@ public class GeneralController {
 	public ResponseEntity<?> verificarMail(@RequestParam String mail) {
 		try {
 			service.verificarMail(mail);
-			return new ResponseEntity<String>("Verificado correctamente.", HttpStatus.OK);
+			return new ResponseEntity<String>("Verificación enviada.", HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	
 	@PostMapping("/activar")
-	public ResponseEntity<?> activarCuenta(@RequestParam String mail, @RequestParam String tipo) {
+	public ResponseEntity<?> activarCuenta(@RequestParam(required = true) String mail, 
+										   @RequestParam(required = true) int tipoUsuario) {
 		try {
-			service.activarCuenta(mail, tipo);
+			service.activarCuenta(mail, tipoUsuario);
 			return new ResponseEntity<String>("Cuenta " + mail + " activada.", HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

@@ -2,6 +2,7 @@ package com.vpi.springboot.Logica;
 
 import java.util.List;
 
+import com.vpi.springboot.Modelo.dto.DTUsuario;
 import com.vpi.springboot.exception.UsuarioException;
 
 public interface GeneralServicioInterfaz {
@@ -11,7 +12,7 @@ public interface GeneralServicioInterfaz {
 	
 	public void verificarMail(String mail) throws UsuarioException;
 
-	public void activarCuenta(String mail, String tipo);
+	public void activarCuenta(String mail, int tipoUsuario);
 	
-	public List<String> listarUsuariosRegistrados(int page, int size);
+	public List<DTUsuario> listarUsuariosRegistrados(int page, int size, int tipoUsuario);
 }

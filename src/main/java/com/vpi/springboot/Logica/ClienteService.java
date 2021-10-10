@@ -25,35 +25,46 @@ public class ClienteService implements ClienteServicioInterfaz {
 	private ClienteRepositorio userRepo;
 	@Autowired
 	private DireccionRepositorio dirRepo;
-	
+
 	private static final int iterations = 20 * 1000;
 	private static final int saltLen = 32;
 	private static final int desiredKeyLen = 256;
-	
-	
+
+	@Override
+	public List<Direccion> getDireccionCliente(String mail) throws UsuarioException {
+		Optional<Cliente> optionalUser = userRepo.findById(mail);
+
+		if (optionalUser.isPresent()) {
+			Cliente cliente = optionalUser.get();
+			return cliente.getDirecciones();
+		} else {
+			throw new UsuarioException(UsuarioException.NotFoundException(mail));
+		}
+	}
+
 	@Override
 	public void altaCliente(Cliente usuario) throws UsuarioException, Exception {
 		Optional<Cliente> optionalUser = userRepo.findById(usuario.getMail());
-		if(optionalUser.isPresent()) {
+		if (optionalUser.isPresent()) {
 			throw new UsuarioException(UsuarioException.UsuarioYaExiste());
-		}else {
+		} else {
 			String mail = usuario.getMail();
-			if(mail.contains("@") && mail.contains(".com")) {
+			if (mail.contains("@") && mail.contains(".com")) {
 				String nick = usuario.getNickname();
-				if(nick != null) {
+				if (nick != null) {
 					byte[] salt = SecureRandom.getInstance("SHA1PRNG").generateSeed(saltLen);
-					String contrasenia = Base64.getEncoder().encodeToString(salt) + "$" + hash(usuario.getContrasenia(), salt);
+					String contrasenia = Base64.getEncoder().encodeToString(salt) + "$"
+							+ hash(usuario.getContrasenia(), salt);
 					usuario.setContrasenia(contrasenia);
 					userRepo.save(usuario);
-				}else {
+				} else {
 					throw new UsuarioException("Debe ingresar nickname");
 				}
-			}else
+			} else
 				throw new UsuarioException("Tiene que introducir un mail válido.");
 		}
-
 	}
-	
+
 	// METODO PARA HASHEAR CONTRASEÑA
 	private static String hash(String password, byte[] salt) throws Exception {
 		if (password == null || password.length() == 0)
@@ -63,56 +74,53 @@ public class ClienteService implements ClienteServicioInterfaz {
 		return Base64.getEncoder().encodeToString(key.getEncoded());
 
 	}
-	//--------------------------------------
+	// --------------------------------------
 
 	@Override
 	public List<Cliente> obtenerClientes() {
 		Iterable<Cliente> usuario = userRepo.findAll();
-			List<Cliente> clientes =new ArrayList<Cliente>();
+		List<Cliente> clientes = new ArrayList<Cliente>();
 		usuario.forEach(c -> clientes.add(c));
 
-			return clientes;
+		return clientes;
 
 	}
-	
+
 	@Override
 	public void altaDireccion(Direccion direccion, String mail) throws UsuarioException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mail);
-		if(optionalCliente.isPresent()) {
+		if (optionalCliente.isPresent()) {
 			Cliente cliente = optionalCliente.get();
-			if(mail != null) {
-				direccion.setCliente(cliente);
-			}
+			direccion.setCliente(cliente);
 			dirRepo.save(direccion);
-			if(cliente.getDirecciones() == null) {
+			
+			if (cliente.getDirecciones() == null) {
 				List<Direccion> direcciones = new ArrayList<Direccion>();
 				direcciones.add(direccion);
 				cliente.setDirecciones(direcciones);
-			}else {
+			} else {
 				cliente.addDireccion(direccion);
 			}
 			userRepo.save(cliente);
-		}else {
+		} else {
 			throw new UsuarioException(UsuarioException.NotFoundException(mail));
 		}
 
 	}
-	
+
 	@Override
 	public void bajaCuenta(String mail) throws UsuarioException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mail);
-		if(optionalCliente.isPresent()) {
+		if (optionalCliente.isPresent()) {
 			Cliente cliente = optionalCliente.get();
-			if(cliente.getActivo() != false) {
+			if (cliente.getActivo() != false) {
 				cliente.setActivo(false);
 				userRepo.save(cliente);
-			}else {
-				throw new UsuarioException("El usuario "+ mail +" ya esta inactivo");
+			} else {
+				throw new UsuarioException("El usuario " + mail + " ya esta inactivo");
 			}
-		}else {
+		} else {
 			throw new UsuarioException("No existe usuario");
 		}
 	}
-	
-
 }

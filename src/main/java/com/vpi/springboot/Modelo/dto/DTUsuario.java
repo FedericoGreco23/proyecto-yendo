@@ -8,34 +8,34 @@ public class DTUsuario implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private String mail;
-	private String contrasenia;
 	private String telefono;
 	private String foto;
 	private Boolean bloqueado;
 	private Boolean activo;
+	private String tipoUsuario;
 
 	public DTUsuario() {
 		super();
 	}
 
-	public DTUsuario(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado, Boolean activo) {
+	public DTUsuario(String mail, String telefono, String foto, Boolean bloqueado, Boolean activo, String tipoUsuario) {
 		super();
 		this.mail = mail;
-		this.contrasenia = contrasenia;
 		this.telefono = telefono;
 		this.foto = foto;
 		this.bloqueado = bloqueado;
 		this.activo = activo;
+		this.tipoUsuario = tipoUsuario;
 	}
 
-	public DTUsuario(Usuario user) {
+	public DTUsuario(Usuario user, String tipoUsuario) {
 		super();
 		this.mail = user.getMail();
-		this.contrasenia = user.getContrasenia();
 		this.telefono = user.getTelefono();
 		this.foto = user.getFoto();
 		this.bloqueado = user.getBloqueado();
 		this.activo = user.getActivo();
+		this.tipoUsuario = tipoUsuario;
 	}
 
 	public String getMail() {
@@ -44,14 +44,6 @@ public class DTUsuario implements Serializable {
 
 	public void setMail(String mail) {
 		this.mail = mail;
-	}
-
-	public String getContrasenia() {
-		return contrasenia;
-	}
-
-	public void setContrasenia(String contrasenia) {
-		this.contrasenia = contrasenia;
 	}
 
 	public String getTelefono() {
@@ -84,5 +76,13 @@ public class DTUsuario implements Serializable {
 
 	public void setActivo(Boolean activo) {
 		this.activo = activo;
+	}
+
+	public String getTipoUsuario() {
+		return tipoUsuario;
+	}
+
+	public void setTipoUsuario(String tipoUsuario) {
+		this.tipoUsuario = tipoUsuario;
 	}
 }

@@ -18,10 +18,10 @@ public class DTCliente extends DTUsuario implements Serializable {
 		super();
 	}
 
-	public DTCliente(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado, Boolean activo,
+	public DTCliente(String mail, String telefono, String foto, Boolean bloqueado, Boolean activo,
 			String nickname, Float calificacionPromedio, Float saldoBono, String nombre, String apellido,
 			String tokenDispositivo) {
-		super(mail, contrasenia, telefono, foto, bloqueado, activo);
+		super(mail, telefono, foto, bloqueado, activo, "Cliente");
 		this.nickname = nickname;
 		this.calificacionPromedio = calificacionPromedio;
 		this.saldoBono = saldoBono;
@@ -31,8 +31,8 @@ public class DTCliente extends DTUsuario implements Serializable {
 	}
 
 	public DTCliente(Cliente user) {
-		super(user.getMail(), user.getContrasenia(), user.getTelefono(), user.getFoto(), user.getBloqueado(),
-				user.getActivo());
+		super(user.getMail(), user.getTelefono(), user.getFoto(), user.getBloqueado(),
+				user.getActivo(), "Cliente");
 		this.nickname = user.getNickname();
 		this.calificacionPromedio = user.getCalificacionPromedio();
 		this.saldoBono = user.getSaldoBono();
