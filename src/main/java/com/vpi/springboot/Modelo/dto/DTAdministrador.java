@@ -14,11 +14,11 @@ public class DTAdministrador extends DTUsuario implements Serializable {
 
 	public DTAdministrador(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado,
 			Boolean activo, LocalDate fechaCreacion) {
-		super(mail, contrasenia, telefono, foto, bloqueado, activo, fechaCreacion);
+		super(mail, contrasenia, telefono, foto, bloqueado, activo, "Administrador", fechaCreacion);
 	}
 
 	public DTAdministrador(Administrador user) {
-		super(user.getMail(), user.getContrasenia(), user.getTelefono(), user.getFoto(), user.getBloqueado(),
+		super(user.getMail(), user.getTelefono(), user.getFoto(), user.getBloqueado(),
 				user.getActivo(), user.getFechaCreacion());
 	}
 	

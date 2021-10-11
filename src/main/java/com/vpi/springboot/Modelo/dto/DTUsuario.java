@@ -13,12 +13,24 @@ public class DTUsuario implements Serializable {
 	private String foto;
 	private Boolean bloqueado;
 	private Boolean activo;
+	private String tipoUsuario;
 	protected LocalDate fechaCreacion;
 
 	public DTUsuario() {
 		super();
 	}
 
+	public DTUsuario(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado, Boolean activo, String tipoUsuario, LocalDate fechaCreacion) {
+		super();
+		this.mail = mail;
+		this.telefono = telefono;
+		this.foto = foto;
+		this.bloqueado = bloqueado;
+		this.activo = activo;
+		this.tipoUsuario = tipoUsuario;
+		this.fechaCreacion = fechaCreacion;
+	}
+	
 	public DTUsuario(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado, Boolean activo, LocalDate fechaCreacion) {
 		super();
 		this.mail = mail;
@@ -28,7 +40,7 @@ public class DTUsuario implements Serializable {
 		this.activo = activo;
 		this.fechaCreacion = fechaCreacion;
 	}
-
+	
 	public DTUsuario(Usuario user) {
 		super();
 		this.mail = user.getMail();
@@ -36,6 +48,17 @@ public class DTUsuario implements Serializable {
 		this.foto = user.getFoto();
 		this.bloqueado = user.getBloqueado();
 		this.activo = user.getActivo();
+		this.fechaCreacion = user.getFechaCreacion();
+	}
+	
+	public DTUsuario(Usuario user, String tipoUsuario) {
+		super();
+		this.mail = user.getMail();
+		this.telefono = user.getTelefono();
+		this.foto = user.getFoto();
+		this.bloqueado = user.getBloqueado();
+		this.activo = user.getActivo();
+		this.tipoUsuario = tipoUsuario;
 		this.fechaCreacion = user.getFechaCreacion();
 	}
 	
@@ -105,6 +128,14 @@ public class DTUsuario implements Serializable {
 
 	public void setActivo(Boolean activo) {
 		this.activo = activo;
+	}
+	
+	public String getTipoUsuario() {
+		return tipoUsuario;
+	}
+
+	public void setTipoUsuario(String tipoUsuario) {
+		this.tipoUsuario = tipoUsuario;
 	}
 	
 	public LocalDate getFechaCreacion() {
