@@ -82,14 +82,12 @@ public class ClienteController {
 
 		@PostMapping("modificarDireccion")
 		public ResponseEntity<?> modificarDireccion(@RequestBody Direccion direccionVieja,
-													@RequestParam String nroPuerta,
-													@RequestParam String calle,
-													@RequestParam String nombre,
+													@RequestParam String calleNro,
 													@RequestParam String mail,
 													@RequestParam Double latitud,
 													@RequestParam Double longitud
 													){
-			DTDireccion direccionNueva = new DTDireccion(calle, nroPuerta, nombre, new GeoLocalizacion(latitud, longitud));
+			DTDireccion direccionNueva = new DTDireccion(calleNro, new GeoLocalizacion(latitud, longitud));
 			try {
 				clienteService.modificarDireccion(direccionVieja,direccionNueva,mail);
 				return new ResponseEntity<String>("Direccion modificada", HttpStatus.OK);
