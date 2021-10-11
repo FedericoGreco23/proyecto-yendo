@@ -26,7 +26,7 @@ public class ClienteController {
 	private ClienteService clienteService;
 
 	@GetMapping("/getDireccion/{mail}")
-	public List<Direccion> getDireccionUsuario(@PathVariable String mail) {
+	public List<DTDireccion> getDireccionUsuario(@PathVariable String mail) {
 		try {
 			return clienteService.getDireccionCliente(mail);
 		} catch (UsuarioException e) {
@@ -45,9 +45,10 @@ public class ClienteController {
 	}
 
 		
-		@PostMapping("/agregarDireccion")
+
+		@PostMapping(path="/agregarDireccion", produces = "application/json")
 		@ResponseBody
-		public ResponseEntity<?> agregarDireccion(@RequestBody Direccion direccion, @RequestParam String mail) {
+		public ResponseEntity<String> agregarDireccion(@RequestBody DTDireccion direccion, @RequestParam String mail) {
 			try {
 				clienteService.altaDireccion(direccion, mail);
 				return new ResponseEntity<String>("Direccion agregada", HttpStatus.OK);

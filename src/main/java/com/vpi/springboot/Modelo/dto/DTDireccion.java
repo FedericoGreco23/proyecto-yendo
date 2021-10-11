@@ -17,6 +17,13 @@ public class DTDireccion implements Serializable {
 	}
 
 	// Puede haber una direccion sin cliente
+	public DTDireccion(int id, String calleNro, GeoLocalizacion geoLocalizacion) {
+		super();
+		this.id = id;
+		this.calleNro = calleNro;
+		this.geoLocalizacion = new DTGeoLocalizacion(geoLocalizacion);
+	}
+	
 	public DTDireccion(String calleNro, GeoLocalizacion geoLocalizacion) {
 		super();
 		this.calleNro = calleNro;

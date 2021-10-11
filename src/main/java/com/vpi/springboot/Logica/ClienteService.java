@@ -36,15 +36,14 @@ public class ClienteService implements ClienteServicioInterfaz {
 	private static final int desiredKeyLen = 256;
 
 	@Override
-	public List<Direccion> getDireccionCliente(String mail) throws UsuarioException {
+	public List<DTDireccion> getDireccionCliente(String mail) throws UsuarioException {
 		Optional<Cliente> optionalUser = userRepo.findById(mail);
-
 		if (optionalUser.isPresent()) {
 			Cliente cliente = optionalUser.get();
-			List<Direccion> retorno = new ArrayList<Direccion>();
+			List<DTDireccion> retorno = new ArrayList<DTDireccion>();
 			if(cliente.getDirecciones() != null) {
 				for (Direccion direccion : cliente.getDirecciones()) {
-					retorno.add(new Direccion(direccion.getId(),direccion.getCalleNro(),direccion.getGeoLocalizacion()));
+					retorno.add(new DTDireccion(direccion.getId(), direccion.getCalleNro(), direccion.getGeoLocalizacion()));
 				}
 				return retorno;
 			}else {
@@ -103,23 +102,23 @@ public class ClienteService implements ClienteServicioInterfaz {
 	}
 
 	@Override
-	public void altaDireccion(Direccion direccion, String mail) throws UsuarioException {
+	public void altaDireccion(DTDireccion direccion, String mail) throws UsuarioException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mail);
 		if(optionalCliente.isPresent()) {
 			Cliente cliente = optionalCliente.get();
-			GeoLocalizacion geo = direccion.getGeoLocalizacion();
+			GeoLocalizacion geo = new GeoLocalizacion(direccion.getGeoLocalizacion().getLatitud(), direccion.getGeoLocalizacion().getLongitud());
 			geoRepo.save(geo);
-			
+			Direccion dir = new Direccion(direccion.getCalleNro(),geo);	
 			if(mail != null) {
-				direccion.setCliente(cliente);
+				dir.setCliente(cliente);
 			}
-			dirRepo.save(direccion);
+			dirRepo.save(dir);
 			if(cliente.getDirecciones() == null) {
 				List<Direccion> direcciones = new ArrayList<Direccion>();
-				direcciones.add(direccion);
+				direcciones.add(dir);
 				cliente.setDirecciones(direcciones);
 			}else {
-				cliente.addDireccion(direccion);
+				cliente.addDireccion(dir);
 			}
 			userRepo.save(cliente);
 		}else {
