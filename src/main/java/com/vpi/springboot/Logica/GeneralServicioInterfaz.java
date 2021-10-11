@@ -6,7 +6,7 @@ import com.vpi.springboot.Modelo.dto.DTUsuario;
 import com.vpi.springboot.exception.UsuarioException;
 
 public interface GeneralServicioInterfaz {
-	public String iniciarSesion(String mail, String password) throws UsuarioException;
+	public String iniciarSesion(String mail, String password) throws UsuarioException, Exception;
 	
 	public void recuperarPassword(String mail) throws UsuarioException;
 	

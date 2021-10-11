@@ -1,8 +1,13 @@
 package com.vpi.springboot.Logica;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
+
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -26,13 +31,16 @@ public class GeneralService implements GeneralServicioInterfaz {
 	private AdministradorRepositorio adminRepo;
 	@Autowired
 	private MailService mailSender;
+	
+	private static final int iterations = 20 * 1000;
+	private static final int desiredKeyLen = 256;
 
 	@Override
-	public String iniciarSesion(String mail, String password) throws UsuarioException {
+	public String iniciarSesion(String mail, String password) throws Exception {
 		Optional<Cliente> optionalCliente = clienteRepo.findById(mail);
 		if (optionalCliente.isPresent()) { // cliente
 			Cliente cliente = optionalCliente.get();
-			if (cliente.getContrasenia().equals(password))
+			if (decodePass(cliente.getContrasenia(), password).equals(true))
 				return "cliente";
 			else
 				throw new UsuarioException(UsuarioException.PassIncorrecta());
@@ -40,7 +48,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 			Optional<Restaurante> optionalRestaurante = resRepo.findById(mail);
 			if (optionalRestaurante.isPresent()) { // restaurante
 				Restaurante restaurante = optionalRestaurante.get();
-				if (restaurante.getContrasenia().equals(password))
+				if (decodePass(restaurante.getContrasenia(), password).equals(true))
 					return "restaurante";
 				else
 					throw new UsuarioException(UsuarioException.PassIncorrecta());
@@ -48,7 +56,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 				Optional<Administrador> optionalAdmin = adminRepo.findById(mail);
 				if (optionalAdmin.isPresent()) { // administrador
 					Administrador administrador = optionalAdmin.get();
-					if (administrador.getContrasenia().equals(password))
+					if (decodePass(administrador.getContrasenia(), password).equals(true))
 						return "administrador";
 					else
 						throw new UsuarioException(UsuarioException.PassIncorrecta());
@@ -58,6 +66,27 @@ public class GeneralService implements GeneralServicioInterfaz {
 			}
 		}
 	}
+	
+	//Compara las contraseñas
+	private Boolean decodePass(String passGuardada, String passIngresada) throws Exception {
+		String[] guardada = passGuardada.split("\\$");
+		String ingresada = hash(passIngresada, Base64.getDecoder().decode(guardada[0]));
+		if(ingresada.equals(guardada[1])) {
+			return true;
+		}else
+			return false;
+	}
+	
+	// METODO PARA HASHEAR CONTRASEÑA
+	private static String hash(String password, byte[] salt) throws Exception {
+		if (password == null || password.length() == 0)
+			throw new IllegalArgumentException("Contraseña vacia.");
+		SecretKeyFactory f = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+		SecretKey key = f.generateSecret(new PBEKeySpec(password.toCharArray(), salt, iterations, desiredKeyLen));
+		return Base64.getEncoder().encodeToString(key.getEncoded());
+	}
+//--------------------------------------------
+	
 
 	public void recuperarPassword(String mail) throws UsuarioException {
 		// Se tiene que ver cómo se genera la contraseña opcional

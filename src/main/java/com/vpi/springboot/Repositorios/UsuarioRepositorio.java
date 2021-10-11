@@ -12,4 +12,5 @@ import com.vpi.springboot.Modelo.Usuario;
 @Transactional
 public interface UsuarioRepositorio extends UserBaseRepository<Usuario> {
 
+
 }
