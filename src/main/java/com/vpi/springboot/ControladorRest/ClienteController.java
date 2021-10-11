@@ -13,7 +13,7 @@ import com.vpi.springboot.Modelo.Direccion;
 import com.vpi.springboot.Modelo.GeoLocalizacion;
 import com.vpi.springboot.Modelo.Usuario;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
-
+import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.exception.UsuarioException;
 
 
@@ -35,12 +35,12 @@ public class ClienteController {
 	}
 
 	@PostMapping("/crear")
-	public ResponseEntity<?> altaCliente(@RequestBody Cliente usuario) {
+	public ResponseEntity<DTRespuesta> altaCliente(@RequestBody Cliente usuario) {
 		try {
 			clienteService.altaCliente(usuario);
-			return new ResponseEntity<Usuario>(usuario, HttpStatus.OK);
+			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Cliente agregado con éxito"), HttpStatus.OK);
 		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -48,12 +48,12 @@ public class ClienteController {
 
 		@PostMapping(path="/agregarDireccion", produces = "application/json")
 		@ResponseBody
-		public ResponseEntity<?> agregarDireccion(@RequestBody DTDireccion direccion, @RequestParam String mail) {
+		public ResponseEntity<DTRespuesta> agregarDireccion(@RequestBody DTDireccion direccion, @RequestParam String mail) {
 			try {
 				clienteService.altaDireccion(direccion, mail);
-				return new ResponseEntity<DTDireccion>(direccion, HttpStatus.OK);
+				return new ResponseEntity<DTRespuesta>(new DTRespuesta("Direccion agregada con éxito"), HttpStatus.OK);
 			} catch (Exception e) {
-				return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+				return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 		
@@ -61,9 +61,9 @@ public class ClienteController {
 		public ResponseEntity<?> bajaCuenta(@RequestParam String mail){
 			try {
 				clienteService.bajaCuenta(mail);
-				return new ResponseEntity<String>("Cuenta dada de baja", HttpStatus.OK);
+				return new ResponseEntity<DTRespuesta>(new DTRespuesta("Cuenta dada de baja con éxito"), HttpStatus.OK);
 			} catch (Exception e) {
-				return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+				return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 			
 		}
@@ -92,9 +92,9 @@ public class ClienteController {
 			DTDireccion direccionNueva = new DTDireccion(calleNro, new GeoLocalizacion(latitud, longitud));
 			try {
 				clienteService.modificarDireccion(direccionVieja,direccionNueva,mail);
-				return new ResponseEntity<String>("Direccion modificada", HttpStatus.OK);
+				return new ResponseEntity<DTRespuesta>(new DTRespuesta("Dirección modificada con éxito"), HttpStatus.OK);
 			} catch (Exception e) {
-				return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+				return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 		
@@ -104,9 +104,9 @@ public class ClienteController {
 													@RequestParam String mail){
 			try {
 				clienteService.eliminarDireccion(id,mail);
-				return new ResponseEntity<String>("Direccion eliminada", HttpStatus.OK);
+				return new ResponseEntity<DTRespuesta>(new DTRespuesta("Dirección eliminada con éxito"), HttpStatus.OK);
 			} catch (Exception e) {
-				return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+				return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 }
