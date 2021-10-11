@@ -9,7 +9,6 @@ public class DTUsuario implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private String mail;
-	private String contrasenia;
 	private String telefono;
 	private String foto;
 	private Boolean bloqueado;
@@ -23,7 +22,6 @@ public class DTUsuario implements Serializable {
 	public DTUsuario(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado, Boolean activo, LocalDate fechaCreacion) {
 		super();
 		this.mail = mail;
-		this.contrasenia = contrasenia;
 		this.telefono = telefono;
 		this.foto = foto;
 		this.bloqueado = bloqueado;
@@ -34,7 +32,6 @@ public class DTUsuario implements Serializable {
 	public DTUsuario(Usuario user) {
 		super();
 		this.mail = user.getMail();
-		this.contrasenia = user.getContrasenia();
 		this.telefono = user.getTelefono();
 		this.foto = user.getFoto();
 		this.bloqueado = user.getBloqueado();
@@ -76,14 +73,6 @@ public class DTUsuario implements Serializable {
 
 	public void setMail(String mail) {
 		this.mail = mail;
-	}
-
-	public String getContrasenia() {
-		return contrasenia;
-	}
-
-	public void setContrasenia(String contrasenia) {
-		this.contrasenia = contrasenia;
 	}
 
 	public String getTelefono() {

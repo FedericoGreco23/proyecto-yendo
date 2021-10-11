@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.vpi.springboot.Modelo.*;
@@ -27,58 +30,64 @@ public class GeneralService implements GeneralServicioInterfaz {
 	@Override
 	public String iniciarSesion(String mail, String password) throws UsuarioException {
 		Optional<Cliente> optionalCliente = clienteRepo.findById(mail);
-		Optional<Restaurante> optionalRestaurante = resRepo.findById(mail);
-		Optional<Administrador> optionalAdmin = adminRepo.findById(mail);
-
-		// Se tiene que ver como se va a guardar la password
-		if (optionalCliente.isPresent()) {
+		if (optionalCliente.isPresent()) { // cliente
 			Cliente cliente = optionalCliente.get();
 			if (cliente.getContrasenia().equals(password))
 				return "cliente";
 			else
 				throw new UsuarioException(UsuarioException.PassIncorrecta());
-		} else if (optionalRestaurante.isPresent()) {
-			Restaurante restaurante = optionalRestaurante.get();
-			if (restaurante.getContrasenia().equals(password))
-				return "restaurante";
-			else
-				throw new UsuarioException(UsuarioException.PassIncorrecta());
-		} else if (optionalAdmin.isPresent()) {
-			Administrador administrador = optionalAdmin.get();
-			if (administrador.getContrasenia().equals(password))
-				return "administrador";
-			else
-				throw new UsuarioException(UsuarioException.PassIncorrecta());
 		} else {
-			throw new UsuarioException(UsuarioException.NotFoundException(mail));
+			Optional<Restaurante> optionalRestaurante = resRepo.findById(mail);
+			if (optionalRestaurante.isPresent()) { // restaurante
+				Restaurante restaurante = optionalRestaurante.get();
+				if (restaurante.getContrasenia().equals(password))
+					return "restaurante";
+				else
+					throw new UsuarioException(UsuarioException.PassIncorrecta());
+			} else {
+				Optional<Administrador> optionalAdmin = adminRepo.findById(mail);
+				if (optionalAdmin.isPresent()) { // administrador
+					Administrador administrador = optionalAdmin.get();
+					if (administrador.getContrasenia().equals(password))
+						return "administrador";
+					else
+						throw new UsuarioException(UsuarioException.PassIncorrecta());
+				} else {
+					throw new UsuarioException(UsuarioException.NotFoundException(mail));
+				}
+			}
 		}
 	}
 
 	public void recuperarPassword(String mail) throws UsuarioException {
-		Optional<Cliente> optionalCliente = clienteRepo.findById(mail);
-		Optional<Restaurante> optionalRestaurante = resRepo.findById(mail);
-		Optional<Administrador> optionalAdmin = adminRepo.findById(mail);
+		// Se tiene que ver cómo se genera la contraseña opcional
 		String pass = "passTemporal";
 		String to = "";
-
-		// Se tiene que ver cómo se va a generar la nueva contraseña
-		if (optionalCliente.isPresent()) {
+		
+		Optional<Cliente> optionalCliente = clienteRepo.findById(mail);
+		if (optionalCliente.isPresent()) { // cliente
 			Cliente cliente = optionalCliente.get();
 			cliente.setContrasenia(pass);
 			clienteRepo.save(cliente);
 			to = cliente.getMail();
-		} else if (optionalRestaurante.isPresent()) {
-			Restaurante restaurante = optionalRestaurante.get();
-			restaurante.setContrasenia(pass);
-			resRepo.save(restaurante);
-			to = restaurante.getMail();
-		} else if (optionalAdmin.isPresent()) {
-			Administrador administrador = optionalAdmin.get();
-			administrador.setContrasenia(pass);
-			adminRepo.save(administrador);
-			to = administrador.getMail();
 		} else {
-			throw new UsuarioException(UsuarioException.NotFoundException(mail));
+			Optional<Restaurante> optionalRestaurante = resRepo.findById(mail);
+			if (optionalRestaurante.isPresent()) { // restaurante
+				Restaurante restaurante = optionalRestaurante.get();
+				restaurante.setContrasenia(pass);
+				resRepo.save(restaurante);
+				to = restaurante.getMail();
+			} else {
+				Optional<Administrador> optionalAdmin = adminRepo.findById(mail);
+				if (optionalAdmin.isPresent()) { // administrador
+					Administrador administrador = optionalAdmin.get();
+					administrador.setContrasenia(pass);
+					adminRepo.save(administrador);
+					to = administrador.getMail();
+				} else {
+					throw new UsuarioException(UsuarioException.NotFoundException(mail));
+				}
+			}
 		}
 
 		// Enviamos el mail a la cuenta del usuario
@@ -92,30 +101,33 @@ public class GeneralService implements GeneralServicioInterfaz {
 	}
 
 	public void verificarMail(String mail) throws UsuarioException {
-		Optional<Cliente> optionalCliente = clienteRepo.findById(mail);
-		Optional<Restaurante> optionalRestaurante = resRepo.findById(mail);
-		Optional<Administrador> optionalAdmin = adminRepo.findById(mail);
 		String to = "";
-		String tipo = "";
+		int tipo;
 
-		// Se tiene que ver cómo se va a generar la nueva contraseña
-		if (optionalCliente.isPresent()) {
+		Optional<Cliente> optionalCliente = clienteRepo.findById(mail);
+		if (optionalCliente.isPresent()) { // cliente
 			Cliente cliente = optionalCliente.get();
 			to = cliente.getMail();
-			tipo = "Cliente";
-		} else if (optionalRestaurante.isPresent()) {
-			Restaurante restaurante = optionalRestaurante.get();
-			to = restaurante.getMail();
-			tipo = "Restaurante";
-		} else if (optionalAdmin.isPresent()) {
-			Administrador administrador = optionalAdmin.get();
-			to = administrador.getMail();
-			tipo = "Administrador";
+			tipo = 0;
 		} else {
-			throw new UsuarioException(UsuarioException.NotFoundException(mail));
+			Optional<Restaurante> optionalRestaurante = resRepo.findById(mail);
+			if (optionalRestaurante.isPresent()) { // restaurante
+				Restaurante restaurante = optionalRestaurante.get();
+				to = restaurante.getMail();
+				tipo = 1;
+			} else {
+				Optional<Administrador> optionalAdmin = adminRepo.findById(mail);
+				if (optionalAdmin.isPresent()) { // administrador
+					Administrador administrador = optionalAdmin.get();
+					to = administrador.getMail();
+					tipo = 2;
+				} else {
+					throw new UsuarioException(UsuarioException.NotFoundException(mail));
+				}
+			}
 		}
 
-		// Tenemos que ver de qué forma el usuario verifica su cuenta
+		// TODO Tenemos que ver de qué forma el usuario verifica su cuenta
 		// Mandar el link no funciona
 		String servicio = "localhost:8080/api/general/activar/?mail=" + mail + "&tipo=" + tipo;
 
@@ -127,40 +139,61 @@ public class GeneralService implements GeneralServicioInterfaz {
 	}
 
 	// Para activar la cuenta del usuario al enviar el mail
-	public void activarCuenta(String mail, String tipo) {
-		if (tipo.equals("Cliente")) {
+	// 0 -> cliente
+	// 1 -> restaurante
+	// 2 -> administrador
+	public void activarCuenta(String mail, int tipoUsuario) {
+		switch (tipoUsuario) {
+		case 0:
 			Optional<Cliente> optionalCliente = clienteRepo.findById(mail);
 			Cliente cliente = optionalCliente.get();
 			cliente.setActivo(true);
 			clienteRepo.save(cliente);
-		} else if (tipo.equals("Restaurante")) {
+			break;
+		case 1:
 			Optional<Restaurante> optionalRestaurante = resRepo.findById(mail);
 			Restaurante res = optionalRestaurante.get();
 			res.setActivo(true);
 			resRepo.save(res);
-		} else if (tipo.equals("Administrador")) {
+			break;
+		case 2:
 			Optional<Administrador> optionalAdmin = adminRepo.findById(mail);
 			Administrador admin = optionalAdmin.get();
 			admin.setActivo(true);
 			adminRepo.save(admin);
+			break;
 		}
 	}
 
-	public List<String> listarUsuariosRegistrados() {
-		List<String> usuarios = new ArrayList<String>();
+	// 0 -> cliente
+	// 1 -> restaurante
+	// 2 -> administrador
+	public List<DTUsuario> listarUsuariosRegistrados(int page, int size, int tipoUsuario) {
+		List<DTUsuario> usuarios = new ArrayList<DTUsuario>();
+		Pageable paging = PageRequest.of(page, size);
 
-		List<Cliente> clientes = (List<Cliente>) clienteRepo.findAll();
-		List<Administrador> admins = (List<Administrador>) adminRepo.findAll();
-		List<Restaurante> restaurantes = (List<Restaurante>) resRepo.findAll();
-
-		for (Administrador a : admins) {
-			usuarios.add(a.getMail());
-		}
-		for (Restaurante r : restaurantes) {
-			usuarios.add(r.getMail());
-		}
-		for (Cliente c : clientes) {
-			usuarios.add(c.getMail());
+		switch (tipoUsuario) {
+		case 0:
+			Page<Cliente> pageClientes = clienteRepo.findAll(paging);
+			List<Cliente> clientes = pageClientes.getContent();
+			for (Cliente c : clientes) {
+				usuarios.add(new DTUsuario(c, "Cliente"));
+			}
+			break;
+		case 1:
+			Page<Restaurante> pageRestaurantes = resRepo.findAll(paging);
+			List<Restaurante> restaurantes = pageRestaurantes.getContent();
+			for (Restaurante c : restaurantes) {
+				usuarios.add(new DTUsuario(c, "Restaurante"));
+			}
+			break;
+		case 2:
+			Page<Administrador> pageAdministradores = adminRepo.findAll(paging);
+			List<Administrador> administrador = pageAdministradores.getContent();
+			for (Administrador c : administrador) {
+				usuarios.add(new DTUsuario(c, "Administrador"));
+			}
+			break;
 		}
 
 		return usuarios;
