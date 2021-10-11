@@ -18,6 +18,7 @@ import com.vpi.springboot.Logica.UsuarioService;
 import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Usuario;
 import com.vpi.springboot.Modelo.dto.DTListasTiposDeUsuarios;
+import com.vpi.springboot.Modelo.dto.DTUsuario;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController 
@@ -44,8 +45,8 @@ public class UserController {
 	
 	
 	@GetMapping("/buscarUsuario")
-	public DTListasTiposDeUsuarios buscarUsuario(@RequestParam(value="tipoUsuario", required=false) String tipoUsuario, @RequestParam(value="antiguedadUsuario", required=false) Integer antiguedadUsuario, @RequestParam(value="texto", required=false) String texto) {
-		return userService.buscarUsuario(tipoUsuario, antiguedadUsuario, texto);
+	public List<DTUsuario> buscarUsuario(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "0") int tipoUsuario, @RequestParam Integer antiguedadUsuario, @RequestParam String texto) {
+		return userService.buscarUsuario(page, size, tipoUsuario, antiguedadUsuario, texto);
 	}
 
 

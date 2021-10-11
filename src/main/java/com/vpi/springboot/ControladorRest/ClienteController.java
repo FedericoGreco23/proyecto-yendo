@@ -34,15 +34,6 @@ public class ClienteController {
 		}
 	}
 
-	@PostMapping("/crear")
-	public ResponseEntity<DTRespuesta> altaCliente(@RequestBody Cliente usuario) {
-		try {
-			clienteService.altaCliente(usuario);
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Cliente agregado con éxito"), HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
 
 		
 
