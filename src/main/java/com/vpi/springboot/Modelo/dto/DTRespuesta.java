@@ -12,8 +12,6 @@ public class DTRespuesta implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 	
-	
-
 	public DTRespuesta(String respuesta) {
 		super();
 		this.respuesta = respuesta;
