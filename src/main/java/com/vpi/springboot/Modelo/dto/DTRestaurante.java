@@ -33,10 +33,10 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 
 	// En caso de que no queramos iniciar el DT con geolocalizacion o lista de
 	// productos
-	public DTRestaurante(String mail, String telefono, String foto, Boolean bloqueado,
-			Boolean activo, String nombre, String direccion, Float calificacionPromedio, EnumEstadoRestaurante estado,
+	public DTRestaurante(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado,
+			Boolean activo, LocalDate fechaCreacion, String nombre, String direccion, Float calificacionPromedio, EnumEstadoRestaurante estado,
 			LocalTime horarioApertura, LocalTime horarioCierre, LocalDate fechaApertura, Integer costoDeEnvio) {
-		super(mail, telefono, foto, bloqueado, activo, "Restaurante");
+		super(mail, contrasenia, telefono, foto, bloqueado, activo, fechaCreacion);
 		this.nombre = nombre;
 		this.direccion = direccion;
 		this.calificacionPromedio = calificacionPromedio;
@@ -48,10 +48,10 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 	}
 
 	public DTRestaurante(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado,
-			Boolean activo, String nombre, String direccion, Float calificacionPromedio, EnumEstadoRestaurante estado,
+			Boolean activo, LocalDate fechaCreacion, String nombre, String direccion, Float calificacionPromedio, EnumEstadoRestaurante estado,
 			LocalTime horarioApertura, LocalTime horarioCierre, LocalDate fechaApertura, Integer costoDeEnvio,
 			GeoLocalizacion geoLocalizacion, List<Producto> productos) {
-		super(mail, telefono, foto, bloqueado, activo, "Restaurante");
+		super(mail, contrasenia, telefono, foto, bloqueado, activo, fechaCreacion);
 		this.nombre = nombre;
 		this.direccion = direccion;
 		this.calificacionPromedio = calificacionPromedio;
@@ -65,6 +65,23 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 		for (Producto pro : productos) {
 			this.productos.add(new DTProducto(pro));
 		}
+	}
+	
+	//Funcion constructora para buscarUsuario
+	public DTRestaurante(String mail, String nombre, String direccion, Float calificacionPromedio, EnumEstadoRestaurante estado, LocalTime horarioApertura, LocalTime horarioCierre, 
+			LocalTime tiempoEstimadoMaximo, LocalTime tiempoEstimadoMinimo, LocalDate fechaApertura, Integer costoDeEnvio, LocalDate fechaCreacion) {
+		super(mail, fechaCreacion);
+		this.nombre = nombre;
+		this.direccion = direccion;
+		this.calificacionPromedio = calificacionPromedio;
+		this.estado = estado;
+		this.horarioApertura = horarioApertura;
+		this.horarioCierre = horarioCierre;
+		this.tiempoEstimadoMaximo = tiempoEstimadoMaximo;
+		this.tiempoEstimadoMinimo = tiempoEstimadoMinimo;
+		this.fechaApertura = fechaApertura;
+		this.costoDeEnvio = costoDeEnvio;
+		this.fechaCreacion = fechaCreacion;
 	}
 
 	public DTRestaurante(Restaurante res) {
@@ -84,6 +101,10 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 		}
 	}
 
+	
+//----------------------GETTERS Y SETTERS---------------------------------------------------------
+	
+	
 	public String getNombre() {
 		return nombre;
 	}

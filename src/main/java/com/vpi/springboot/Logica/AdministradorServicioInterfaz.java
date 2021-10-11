@@ -7,4 +7,7 @@ import com.vpi.springboot.exception.AdministradorException;
 
 public interface AdministradorServicioInterfaz {
 	public void crearAdministrador(Administrador admin) throws AdministradorException;
+	public void eliminarUsuario(String mail);
+	public void bloquearUsuario(String mail, String clienteRestaurante);
+	public void desbloquearUsuario(String mail, String clienteRestaurante);
 }

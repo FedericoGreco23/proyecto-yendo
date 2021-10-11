@@ -1,6 +1,7 @@
 package com.vpi.springboot.Modelo.dto;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
 import com.vpi.springboot.Modelo.Usuario;
 
@@ -13,12 +14,13 @@ public class DTUsuario implements Serializable {
 	private Boolean bloqueado;
 	private Boolean activo;
 	private String tipoUsuario;
+	protected LocalDate fechaCreacion;
 
 	public DTUsuario() {
 		super();
 	}
 
-	public DTUsuario(String mail, String telefono, String foto, Boolean bloqueado, Boolean activo, String tipoUsuario) {
+	public DTUsuario(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado, Boolean activo, String tipoUsuario, LocalDate fechaCreacion) {
 		super();
 		this.mail = mail;
 		this.telefono = telefono;
@@ -26,8 +28,29 @@ public class DTUsuario implements Serializable {
 		this.bloqueado = bloqueado;
 		this.activo = activo;
 		this.tipoUsuario = tipoUsuario;
+		this.fechaCreacion = fechaCreacion;
 	}
-
+	
+	public DTUsuario(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado, Boolean activo, LocalDate fechaCreacion) {
+		super();
+		this.mail = mail;
+		this.telefono = telefono;
+		this.foto = foto;
+		this.bloqueado = bloqueado;
+		this.activo = activo;
+		this.fechaCreacion = fechaCreacion;
+	}
+	
+	public DTUsuario(Usuario user) {
+		super();
+		this.mail = user.getMail();
+		this.telefono = user.getTelefono();
+		this.foto = user.getFoto();
+		this.bloqueado = user.getBloqueado();
+		this.activo = user.getActivo();
+		this.fechaCreacion = user.getFechaCreacion();
+	}
+	
 	public DTUsuario(Usuario user, String tipoUsuario) {
 		super();
 		this.mail = user.getMail();
@@ -36,7 +59,36 @@ public class DTUsuario implements Serializable {
 		this.bloqueado = user.getBloqueado();
 		this.activo = user.getActivo();
 		this.tipoUsuario = tipoUsuario;
+		this.fechaCreacion = user.getFechaCreacion();
 	}
+	
+	public DTUsuario(String mail, String foto, LocalDate fechaCreacion) {
+		super();
+		this.mail = mail;
+		this.foto = foto;
+		this.fechaCreacion = fechaCreacion;
+	}
+	
+	//Funcion constructora necesaria de DTRestaurante para buscarUsuario
+	public DTUsuario(String mail, LocalDate fechaCreacion) {
+		super();
+		this.mail = mail;
+		this.fechaCreacion = fechaCreacion;
+	}
+	
+	public DTUsuario(String mail, String telefono, String foto, Boolean bloqueado, Boolean activo, LocalDate fechaCreacion) {
+		super();
+		this.mail = mail;
+		this.telefono = telefono;
+		this.foto = foto;
+		this.bloqueado = bloqueado;
+		this.activo = activo;
+		this.fechaCreacion = fechaCreacion;
+	}
+	
+	
+//----------------------GETTERS Y SETTERS---------------------------------------------------------
+	
 
 	public String getMail() {
 		return mail;
@@ -77,12 +129,20 @@ public class DTUsuario implements Serializable {
 	public void setActivo(Boolean activo) {
 		this.activo = activo;
 	}
-
+	
 	public String getTipoUsuario() {
 		return tipoUsuario;
 	}
 
 	public void setTipoUsuario(String tipoUsuario) {
 		this.tipoUsuario = tipoUsuario;
+	}
+	
+	public LocalDate getFechaCreacion() {
+		return fechaCreacion;
+	}
+
+	public void setFechaCreacion(LocalDate fechaCreacion) {
+		this.fechaCreacion = fechaCreacion;
 	}
 }
