@@ -1,6 +1,7 @@
 package com.vpi.springboot.Modelo.dto;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
 import com.vpi.springboot.Modelo.Usuario;
 
@@ -13,12 +14,13 @@ public class DTUsuario implements Serializable {
 	private String foto;
 	private Boolean bloqueado;
 	private Boolean activo;
+	protected LocalDate fechaCreacion;
 
 	public DTUsuario() {
 		super();
 	}
 
-	public DTUsuario(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado, Boolean activo) {
+	public DTUsuario(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado, Boolean activo, LocalDate fechaCreacion) {
 		super();
 		this.mail = mail;
 		this.contrasenia = contrasenia;
@@ -26,6 +28,7 @@ public class DTUsuario implements Serializable {
 		this.foto = foto;
 		this.bloqueado = bloqueado;
 		this.activo = activo;
+		this.fechaCreacion = fechaCreacion;
 	}
 
 	public DTUsuario(Usuario user) {
@@ -36,7 +39,36 @@ public class DTUsuario implements Serializable {
 		this.foto = user.getFoto();
 		this.bloqueado = user.getBloqueado();
 		this.activo = user.getActivo();
+		this.fechaCreacion = user.getFechaCreacion();
 	}
+	
+	public DTUsuario(String mail, String foto, LocalDate fechaCreacion) {
+		super();
+		this.mail = mail;
+		this.foto = foto;
+		this.fechaCreacion = fechaCreacion;
+	}
+	
+	//Funcion constructora necesaria de DTRestaurante para buscarUsuario
+	public DTUsuario(String mail, LocalDate fechaCreacion) {
+		super();
+		this.mail = mail;
+		this.fechaCreacion = fechaCreacion;
+	}
+	
+	public DTUsuario(String mail, String telefono, String foto, Boolean bloqueado, Boolean activo, LocalDate fechaCreacion) {
+		super();
+		this.mail = mail;
+		this.telefono = telefono;
+		this.foto = foto;
+		this.bloqueado = bloqueado;
+		this.activo = activo;
+		this.fechaCreacion = fechaCreacion;
+	}
+	
+	
+//----------------------GETTERS Y SETTERS---------------------------------------------------------
+	
 
 	public String getMail() {
 		return mail;
@@ -84,5 +116,13 @@ public class DTUsuario implements Serializable {
 
 	public void setActivo(Boolean activo) {
 		this.activo = activo;
+	}
+	
+	public LocalDate getFechaCreacion() {
+		return fechaCreacion;
+	}
+
+	public void setFechaCreacion(LocalDate fechaCreacion) {
+		this.fechaCreacion = fechaCreacion;
 	}
 }

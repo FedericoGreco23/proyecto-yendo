@@ -1,6 +1,7 @@
 package com.vpi.springboot.Modelo.dto;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
 import com.vpi.springboot.Modelo.Cliente;
 
@@ -18,10 +19,10 @@ public class DTCliente extends DTUsuario implements Serializable {
 		super();
 	}
 
-	public DTCliente(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado, Boolean activo,
+	public DTCliente(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado, Boolean activo, LocalDate fechaCreacion,
 			String nickname, Float calificacionPromedio, Float saldoBono, String nombre, String apellido,
 			String tokenDispositivo) {
-		super(mail, contrasenia, telefono, foto, bloqueado, activo);
+		super(mail, contrasenia, telefono, foto, bloqueado, activo, fechaCreacion);
 		this.nickname = nickname;
 		this.calificacionPromedio = calificacionPromedio;
 		this.saldoBono = saldoBono;
@@ -32,7 +33,7 @@ public class DTCliente extends DTUsuario implements Serializable {
 
 	public DTCliente(Cliente user) {
 		super(user.getMail(), user.getContrasenia(), user.getTelefono(), user.getFoto(), user.getBloqueado(),
-				user.getActivo());
+				user.getActivo(), user.getFechaCreacion());
 		this.nickname = user.getNickname();
 		this.calificacionPromedio = user.getCalificacionPromedio();
 		this.saldoBono = user.getSaldoBono();
@@ -40,6 +41,19 @@ public class DTCliente extends DTUsuario implements Serializable {
 		this.apellido = user.getApellido();
 		this.tokenDispositivo = user.getTokenDispositivo();
 	}
+	
+	//Funcion constructora para buscarUsuario
+	public DTCliente(String mail, String telefono, String foto, Boolean bloqueado, Boolean activo, LocalDate fechaCreacion, String nickname, Float calificacionPromedio, String nombre, String apellido) {
+		super(mail, telefono, foto, bloqueado, activo, fechaCreacion);
+		this.nickname = nickname;
+		this.calificacionPromedio = calificacionPromedio;
+		this.nombre = nombre;
+		this.apellido = apellido;
+	}
+
+	
+//----------------------GETTERS Y SETTERS---------------------------------------------------------
+	
 
 	public String getNickname() {
 		return nickname;

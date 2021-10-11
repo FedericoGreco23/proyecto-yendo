@@ -1,5 +1,7 @@
 package com.vpi.springboot.Modelo;
 
+import java.time.LocalDate;
+
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
@@ -21,13 +23,15 @@ public class Usuario {
 	private Boolean bloqueado;
 	@Column(name = "ACTIVO")
 	private Boolean activo;
+	@Column(columnDefinition = "DATE")
+	private LocalDate fechaCreacion;
 
 	public Usuario() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public Usuario(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado, Boolean activo) {
+	public Usuario(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado, Boolean activo, LocalDate fechaCreacion) {
 		super();
 		this.mail = mail;
 		this.contrasenia = contrasenia;
@@ -35,6 +39,7 @@ public class Usuario {
 		this.foto = foto;
 		this.bloqueado = bloqueado;
 		this.activo = activo;
+		this.fechaCreacion = fechaCreacion;
 	}
 
 //----------------------GETTERS Y SETTERS---------------------------------------------------------
@@ -85,5 +90,13 @@ public class Usuario {
 
 	public void setActivo(Boolean activo) {
 		this.activo = activo;
+	}
+	
+	public LocalDate getFechaCreacion() {
+		return fechaCreacion;
+	}
+
+	public void setFechaCreacion(LocalDate fechaCreacion) {
+		this.fechaCreacion = fechaCreacion;
 	}
 }

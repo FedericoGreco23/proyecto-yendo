@@ -1,5 +1,6 @@
 package com.vpi.springboot.Modelo;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -7,6 +8,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
+
+import com.vpi.springboot.Modelo.dto.DTCliente;
 
 @Entity
 public class Cliente extends Usuario{
@@ -34,9 +37,9 @@ public class Cliente extends Usuario{
 	}
 
 	public Cliente(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado, 
-			Boolean activo, String nickname, Float calificacionPromedio, Float saldoBono, String nombre, 
+			Boolean activo, LocalDate fechaCreacion, String nickname, Float calificacionPromedio, Float saldoBono, String nombre, 
 			String apellido, String tokenDispositivo) {
-		super(mail, contrasenia, telefono, foto, bloqueado, activo);
+		super(mail, contrasenia, telefono, foto, bloqueado, activo, fechaCreacion);
 		// TODO Auto-generated constructor stub
         this.nickname = nickname;
         this.calificacionPromedio = calificacionPromedio;
@@ -45,7 +48,16 @@ public class Cliente extends Usuario{
         this.apellido = apellido;
         this.tokenDispositivo = tokenDispositivo;
 	}
+	
+	//Funcion para pasar a DT de buscarUsuario y otros
+	public DTCliente getDatos() {
+		return new DTCliente(this.getMail(), this.getTelefono(), this.getFoto(), this.getBloqueado(), this.getActivo(), this.getFechaCreacion(), 
+				this.getNickname(), this.getCalificacionPromedio(), this.getNombre(), this.getApellido());
+	}
 
+	
+//----------------------GETTERS Y SETTERS---------------------------------------------------------
+	
 
     public String getNickname() {
         return nickname;

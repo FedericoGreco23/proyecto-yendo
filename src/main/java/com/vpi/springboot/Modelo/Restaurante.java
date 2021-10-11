@@ -14,6 +14,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.vpi.springboot.Modelo.dto.DTRestaurante;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 
 @Entity
@@ -51,12 +52,12 @@ public class Restaurante extends Usuario {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Restaurante(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado, Boolean activo,
+	public Restaurante(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado, Boolean activo, LocalDate fechaCreacion,
 			String nombre, String direccion, Float calificacionPromedio, EnumEstadoRestaurante estado,
 			LocalTime horarioApertura, LocalTime horarioCierre, LocalDate fechaApertura, Integer costoDeEnvio,
 			GeoLocalizacion geoLocalizacion, List<Producto> productos) {
 
-		super(mail, contrasenia, telefono, foto, bloqueado, activo);
+		super(mail, contrasenia, telefono, foto, bloqueado, activo, fechaCreacion);
 		this.nombre = nombre;
 		this.direccion = direccion;
 		this.calificacionPromedio = calificacionPromedio;
@@ -68,9 +69,17 @@ public class Restaurante extends Usuario {
 		this.geoLocalizacion = geoLocalizacion;
 		this.productos = productos;
 	}
+	
+	//Funcion para buscarUsuario y otros
+	public DTRestaurante getDatos() {
+		return new DTRestaurante(this.getMail(), this.nombre, this.direccion, this.calificacionPromedio, this.estado, this.horarioApertura, this.horarioCierre, 
+				this.tiempoEstimadoMaximo, this.tiempoEstimadoMinimo, this.fechaApertura, this.costoDeEnvio, this.getFechaCreacion());
+	}
 
+	
 //----------------------GETTERS Y SETTERS---------------------------------------------------------
 
+	
 	public String getNombre() {
 		return nombre;
 	}
