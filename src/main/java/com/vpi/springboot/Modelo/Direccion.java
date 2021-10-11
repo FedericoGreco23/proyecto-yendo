@@ -16,9 +16,12 @@ public class Direccion {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
+	
 	private String calleNro;
+	
 	@OneToOne (cascade = CascadeType.ALL)
 	private GeoLocalizacion geoLocalizacion;
+	
 	@ManyToOne
 	@JoinColumn(name = "clienteMail")
 	private Cliente cliente;
