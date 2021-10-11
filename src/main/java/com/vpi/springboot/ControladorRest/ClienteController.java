@@ -13,7 +13,7 @@ import com.vpi.springboot.Modelo.Direccion;
 import com.vpi.springboot.Modelo.GeoLocalizacion;
 import com.vpi.springboot.Modelo.Usuario;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
-
+import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.exception.UsuarioException;
 
 
@@ -48,12 +48,12 @@ public class ClienteController {
 
 		@PostMapping(path="/agregarDireccion", produces = "application/json")
 		@ResponseBody
-		public ResponseEntity<?> agregarDireccion(@RequestBody DTDireccion direccion, @RequestParam String mail) {
+		public ResponseEntity<DTRespuesta> agregarDireccion(@RequestBody DTDireccion direccion, @RequestParam String mail) {
 			try {
 				clienteService.altaDireccion(direccion, mail);
-				return new ResponseEntity<DTDireccion>(direccion, HttpStatus.OK);
+				return new ResponseEntity<DTRespuesta>(new DTRespuesta("Direccion agregada con éxito"), HttpStatus.OK);
 			} catch (Exception e) {
-				return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+				return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 		
