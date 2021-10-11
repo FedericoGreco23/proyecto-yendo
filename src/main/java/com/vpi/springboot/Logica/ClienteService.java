@@ -41,7 +41,15 @@ public class ClienteService implements ClienteServicioInterfaz {
 
 		if (optionalUser.isPresent()) {
 			Cliente cliente = optionalUser.get();
-			return cliente.getDirecciones();
+			List<Direccion> retorno = new ArrayList<Direccion>();
+			if(cliente.getDirecciones() != null) {
+				for (Direccion direccion : cliente.getDirecciones()) {
+					retorno.add(new Direccion(direccion.getId(),direccion.getCalleNro(),direccion.getGeoLocalizacion()));
+				}
+				return retorno;
+			}else {
+				throw new UsuarioException("El usuario no tiene direcciones");
+			}
 		} else {
 			throw new UsuarioException(UsuarioException.NotFoundException(mail));
 		}
@@ -155,12 +163,29 @@ public class ClienteService implements ClienteServicioInterfaz {
 		}
 	}
 	
-	@Override
+	/*@Override
 	public void eliminarDireccion(Direccion direccion, String mail) throws UsuarioException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mail);
 		if(optionalCliente.isPresent()) {
 			Cliente cliente = optionalCliente.get();
 			Optional<Direccion> optionalDireccion = dirRepo.findByStreetNumberandMail(direccion.getCalleNro(), cliente);
+			if(optionalDireccion.isPresent()) {
+				Direccion dir = optionalDireccion.get();
+				dirRepo.delete(dir);
+			}else {
+				throw new UsuarioException("No existe direccion");
+			}
+		}else {
+			throw new UsuarioException("No existe cliente");
+		}
+	}*/
+	
+	@Override
+	public void eliminarDireccion(Integer id, String mail) throws UsuarioException {
+		Optional<Cliente> optionalCliente = userRepo.findById(mail);
+		if(optionalCliente.isPresent()) {
+			Cliente cliente = optionalCliente.get();
+			Optional<Direccion> optionalDireccion = dirRepo.findById(id);
 			if(optionalDireccion.isPresent()) {
 				Direccion dir = optionalDireccion.get();
 				dirRepo.delete(dir);

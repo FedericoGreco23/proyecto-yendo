@@ -44,11 +44,10 @@ public class Direccion {
 		this.geoLocalizacion = geoLocalizacion;
 	}
 	
-	public Direccion(int id, String calleNro, Cliente cliente, GeoLocalizacion geoLocalizacion) {
+	public Direccion(int id, String calleNro, GeoLocalizacion geoLocalizacion) {
 		super();
 		this.id = id;
 		this.calleNro = calleNro;
-		this.cliente = cliente;
 		this.geoLocalizacion = geoLocalizacion;
 	}
 
@@ -80,6 +79,14 @@ public class Direccion {
 	public String toString() {
 		return "Direccion [id=" + id + ", calleNro=" + calleNro + ", geoLocalizacion=" + geoLocalizacion + ", cliente="
 				+ cliente + "]";
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	
