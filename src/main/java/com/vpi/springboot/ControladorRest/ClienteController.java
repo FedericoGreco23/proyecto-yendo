@@ -46,6 +46,7 @@ public class ClienteController {
 
 		
 		@PostMapping("/agregarDireccion")
+		@ResponseBody
 		public ResponseEntity<?> agregarDireccion(@RequestBody Direccion direccion, @RequestParam String mail) {
 			try {
 				clienteService.altaDireccion(direccion, mail);
