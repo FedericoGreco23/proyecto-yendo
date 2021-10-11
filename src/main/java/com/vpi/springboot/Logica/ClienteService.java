@@ -144,11 +144,11 @@ public class ClienteService implements ClienteServicioInterfaz {
 	}
 	
 	@Override
-	public void modificarDireccion(Direccion vieja, DTDireccion nueva, String mail) throws UsuarioException {
+	public void modificarDireccion(int id, DTDireccion nueva, String mail) throws UsuarioException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mail);
 		if(optionalCliente.isPresent()) {
 			Cliente cliente = optionalCliente.get();
-			Optional<Direccion> optionalDireccion = dirRepo.findByStreetNumberandMail(vieja.getCalleNro(), cliente);
+			Optional<Direccion> optionalDireccion = dirRepo.findById(id);
 			if(optionalDireccion.isPresent()) {
 				Direccion dirNueva = optionalDireccion.get();
 				dirNueva.setCalleNro(nueva.getCalleNro());

@@ -68,36 +68,20 @@ public class ClienteController {
 			
 		}
 		
-	/*	
+	
 		@PostMapping("modificarDireccion")
-		public ResponseEntity<?> modificarDireccion(@RequestBody Direccion direccionVieja, 
-													@RequestBody DTDireccion direccionNueva,
-													@PathVariable String mail){
-			try {
-				clienteService.modificarDireccion(direccionVieja,direccionNueva,mail);
-				return new ResponseEntity<String>("Direccion modificada", HttpStatus.OK);
-			} catch (Exception e) {
-				return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-			}
-		}
-	*/
-
-		@PostMapping("modificarDireccion")
-		public ResponseEntity<?> modificarDireccion(@RequestBody Direccion direccionVieja,
-													@RequestParam String calleNro,
+		public ResponseEntity<?> modificarDireccion(@RequestParam int id, 
 													@RequestParam String mail,
-													@RequestParam Double latitud,
-													@RequestParam Double longitud
+													@RequestBody DTDireccion direccionNueva
 													){
-			DTDireccion direccionNueva = new DTDireccion(calleNro, new GeoLocalizacion(latitud, longitud));
 			try {
-				clienteService.modificarDireccion(direccionVieja,direccionNueva,mail);
+				clienteService.modificarDireccion(id,direccionNueva,mail);
 				return new ResponseEntity<DTRespuesta>(new DTRespuesta("Dirección modificada con éxito"), HttpStatus.OK);
 			} catch (Exception e) {
 				return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
-		
+
 		
 		@PostMapping("eliminarDireccion")
 		public ResponseEntity<?> modificarDireccion(@RequestParam Integer id,
