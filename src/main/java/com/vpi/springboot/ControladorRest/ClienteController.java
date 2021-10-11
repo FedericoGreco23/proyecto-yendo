@@ -48,10 +48,10 @@ public class ClienteController {
 
 		@PostMapping(path="/agregarDireccion", produces = "application/json")
 		@ResponseBody
-		public ResponseEntity<String> agregarDireccion(@RequestBody DTDireccion direccion, @RequestParam String mail) {
+		public ResponseEntity<?> agregarDireccion(@RequestBody DTDireccion direccion, @RequestParam String mail) {
 			try {
 				clienteService.altaDireccion(direccion, mail);
-				return new ResponseEntity<String>("Direccion agregada", HttpStatus.OK);
+				return new ResponseEntity<DTDireccion>(direccion, HttpStatus.OK);
 			} catch (Exception e) {
 				return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 			}
