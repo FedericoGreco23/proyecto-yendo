@@ -14,16 +14,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.vpi.springboot.Logica.ClienteService;
 import com.vpi.springboot.Logica.GeneralService;
+import com.vpi.springboot.Modelo.Cliente;
+import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.DTUsuario;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
-@RequestMapping("api/general/")
+@RequestMapping("public/")
 public class GeneralController {
 
 	@Autowired
 	private GeneralService service;
+
+	@Autowired
+	private ClienteService clienteService;
 
 	@GetMapping("/getUsuarios")
 	public List<DTUsuario> getUsuarios(@RequestParam(defaultValue = "0") int page, 
@@ -70,6 +76,17 @@ public class GeneralController {
 			return new ResponseEntity<String>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+
+	@PostMapping("/crear")
+	public ResponseEntity<DTRespuesta> altaCliente(@RequestBody Cliente usuario) {
+		try {
+			clienteService.altaCliente(usuario);
+			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Cliente agregado con éxito"), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 }
