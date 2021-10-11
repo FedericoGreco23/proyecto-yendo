@@ -16,9 +16,7 @@ public class Direccion {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	private String calle;
-	private String nroPuerta;
-	private String nombre;
+	private String calleNro;
 	@OneToOne (cascade = CascadeType.ALL)
 	private GeoLocalizacion geoLocalizacion;
 	@ManyToOne
@@ -30,45 +28,33 @@ public class Direccion {
 	}
 
 	// Puede haber una direccion sin cliente
-	public Direccion(String calle, String nroPuerta, String nombre, GeoLocalizacion geoLocalizacion) {
+	public Direccion(String calleNro, GeoLocalizacion geoLocalizacion) {
 		super();
-		this.calle = calle;
-		this.nroPuerta = nroPuerta;
-		this.nombre = nombre;
+		this.calleNro = calleNro;
 		this.geoLocalizacion = geoLocalizacion;
 	}
 
-	public Direccion(String calle, String nroPuerta, String nombre, Cliente cliente, GeoLocalizacion geoLocalizacion) {
+	public Direccion(String calleNro, Cliente cliente, GeoLocalizacion geoLocalizacion) {
 		super();
-		this.calle = calle;
-		this.nroPuerta = nroPuerta;
-		this.nombre = nombre;
+		this.calleNro = calleNro;
+		this.cliente = cliente;
+		this.geoLocalizacion = geoLocalizacion;
+	}
+	
+	public Direccion(int id, String calleNro, Cliente cliente, GeoLocalizacion geoLocalizacion) {
+		super();
+		this.id = id;
+		this.calleNro = calleNro;
 		this.cliente = cliente;
 		this.geoLocalizacion = geoLocalizacion;
 	}
 
-	public String getCalle() {
-		return calle;
+	public String getCalleNro() {
+		return calleNro;
 	}
 
-	public void setCalle(String calle) {
-		this.calle = calle;
-	}
-
-	public String getNroPuerta() {
-		return nroPuerta;
-	}
-
-	public void setNroPuerta(String nroPuerta) {
-		this.nroPuerta = nroPuerta;
-	}
-
-	public String getNombre() {
-		return nombre;
-	}
-
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
+	public void setCalleNro(String calleNro) {
+		this.calleNro = calleNro;
 	}
 
 	public GeoLocalizacion getGeoLocalizacion() {
@@ -89,7 +75,9 @@ public class Direccion {
 
 	@Override
 	public String toString() {
-		return "Direccion{" + "id=" + id + ", calle='" + calle + '\'' + ", nroPuerta='" + nroPuerta + '\''
-				+ ", nombre='" + nombre + '\'' + '}';
+		return "Direccion [id=" + id + ", calleNro=" + calleNro + ", geoLocalizacion=" + geoLocalizacion + ", cliente="
+				+ cliente + "]";
 	}
+
+	
 }

@@ -8,9 +8,7 @@ public class DTDireccion implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private int id;
-	private String calle;
-	private String nroPuerta;
-	private String nombre;
+	private String calleNro;
 	private DTGeoLocalizacion geoLocalizacion;
 	private String cliente;
 
@@ -19,19 +17,15 @@ public class DTDireccion implements Serializable {
 	}
 
 	// Puede haber una direccion sin cliente
-	public DTDireccion(String calle, String nroPuerta, String nombre, GeoLocalizacion geoLocalizacion) {
+	public DTDireccion(String calleNro, GeoLocalizacion geoLocalizacion) {
 		super();
-		this.calle = calle;
-		this.nroPuerta = nroPuerta;
-		this.nombre = nombre;
+		this.calleNro = calleNro;
 		this.geoLocalizacion = new DTGeoLocalizacion(geoLocalizacion);
 	}
 
-	public DTDireccion(String calle, String nroPuerta, String nombre, String cliente, GeoLocalizacion geoLocalizacion) {
+	public DTDireccion(String calleNro, String cliente, GeoLocalizacion geoLocalizacion) {
 		super();
-		this.calle = calle;
-		this.nroPuerta = nroPuerta;
-		this.nombre = nombre;
+		this.calleNro = calleNro;
 		this.cliente = cliente;
 		this.geoLocalizacion = new DTGeoLocalizacion(geoLocalizacion);
 	}
@@ -44,28 +38,12 @@ public class DTDireccion implements Serializable {
 		this.id = id;
 	}
 
-	public String getCalle() {
-		return calle;
+	public String getCalleNro() {
+		return calleNro;
 	}
 
-	public void setCalle(String calle) {
-		this.calle = calle;
-	}
-
-	public String getNroPuerta() {
-		return nroPuerta;
-	}
-
-	public void setNroPuerta(String nroPuerta) {
-		this.nroPuerta = nroPuerta;
-	}
-
-	public String getNombre() {
-		return nombre;
-	}
-
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
+	public void setCalleNro(String calleNro) {
+		this.calleNro = calleNro;
 	}
 
 	public DTGeoLocalizacion getGeoLocalizacion() {

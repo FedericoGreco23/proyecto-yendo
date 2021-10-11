@@ -17,9 +17,8 @@ import com.vpi.springboot.Modelo.Direccion;
 @Transactional
 public interface DireccionRepositorio extends JpaRepository<Direccion, Integer>{
 	
-	  @Query("select d from Direccion d where d.calle = :calle and d.nroPuerta = :nroPuerta and d.cliente = :cliente")
-	  Optional<Direccion> findByStreetNumberandMail(@Param("calle") String calle,
-	                                 @Param("nroPuerta") String nroPuerta,
+	  @Query("select d from Direccion d where d.calleNro = :calleNro and d.cliente = :cliente")
+	  Optional<Direccion> findByStreetNumberandMail(@Param("calleNro") String calleNro,
 	                                 @Param("cliente") Cliente cliente);
 	
 }

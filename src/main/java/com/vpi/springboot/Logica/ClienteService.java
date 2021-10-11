@@ -141,12 +141,10 @@ public class ClienteService implements ClienteServicioInterfaz {
 		Optional<Cliente> optionalCliente = userRepo.findById(mail);
 		if(optionalCliente.isPresent()) {
 			Cliente cliente = optionalCliente.get();
-			Optional<Direccion> optionalDireccion = dirRepo.findByStreetNumberandMail(vieja.getCalle(), vieja.getNroPuerta(), cliente);
+			Optional<Direccion> optionalDireccion = dirRepo.findByStreetNumberandMail(vieja.getCalleNro(), cliente);
 			if(optionalDireccion.isPresent()) {
 				Direccion dirNueva = optionalDireccion.get();
-				dirNueva.setCalle(nueva.getCalle());
-				dirNueva.setNroPuerta(nueva.getNroPuerta());
-				dirNueva.setNombre(nueva.getNombre());
+				dirNueva.setCalleNro(nueva.getCalleNro());
 				dirNueva.setGeoLocalizacion(new GeoLocalizacion(nueva.getGeoLocalizacion()));
 				dirRepo.save(dirNueva);
 			}else {
@@ -162,7 +160,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 		Optional<Cliente> optionalCliente = userRepo.findById(mail);
 		if(optionalCliente.isPresent()) {
 			Cliente cliente = optionalCliente.get();
-			Optional<Direccion> optionalDireccion = dirRepo.findByStreetNumberandMail(direccion.getCalle(), direccion.getNroPuerta(), cliente);
+			Optional<Direccion> optionalDireccion = dirRepo.findByStreetNumberandMail(direccion.getCalleNro(), cliente);
 			if(optionalDireccion.isPresent()) {
 				Direccion dir = optionalDireccion.get();
 				dirRepo.delete(dir);
