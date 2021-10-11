@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Usuario;
-import com.vpi.springboot.Modelo.dto.DTListasTiposDeUsuarios;
+import com.vpi.springboot.Modelo.dto.DTUsuario;
 import com.vpi.springboot.exception.UsuarioException;
 
 public interface UsuarioServicioInterfaz {
@@ -13,6 +13,6 @@ public interface UsuarioServicioInterfaz {
 	
 	public List<Cliente> getAllClientes();
 	
-	public DTListasTiposDeUsuarios buscarUsuario(String tipoUsuario, Integer antiguedadUsuario, String nombreUsuario);
+	public List<DTUsuario> buscarUsuario(int page, int size, int tipoUsuario, Integer antiguedadUsuario, String nombreUsuario);
 	
 }
