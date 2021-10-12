@@ -1,6 +1,7 @@
 package com.vpi.springboot.Logica;
 
 import java.security.SecureRandom;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -68,6 +69,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 					usuario.setBloqueado(false);
 					usuario.setSaldoBono(0.0f);
 					usuario.setCalificacionPromedio(5.0f);
+					usuario.setFechaCreacion(LocalDate.now());
 					byte[] salt = SecureRandom.getInstance("SHA1PRNG").generateSeed(saltLen);
 					String contrasenia = Base64.getEncoder().encodeToString(salt) + "$" + hash(usuario.getContrasenia(), salt);
 					usuario.setContrasenia(contrasenia);
