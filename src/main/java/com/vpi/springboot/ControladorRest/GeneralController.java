@@ -62,6 +62,7 @@ public class GeneralController {
 	public ResponseEntity<?> activarCuenta(@RequestParam(required = true) String mail, 
 										   @RequestParam(required = true) int tipoUsuario) {
 		try {
+			System.out.println("Dentro de GeneralController /activar");
 			service.activarCuenta(mail, tipoUsuario);
 			return new ResponseEntity<String>("Cuenta " + mail + " activada.", HttpStatus.OK);
 		} catch (Exception e) {
