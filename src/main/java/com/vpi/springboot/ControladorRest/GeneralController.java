@@ -22,7 +22,7 @@ import com.vpi.springboot.Modelo.dto.DTUsuario;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
-@RequestMapping("public/")
+//@RequestMapping("public/")
 public class GeneralController {
 
 	@Autowired
@@ -31,6 +31,7 @@ public class GeneralController {
 	@Autowired
 	private ClienteService clienteService;
 
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@GetMapping("/getUsuarios")
 	public List<DTUsuario> getUsuarios(@RequestParam(defaultValue = "0") int page, 
 									@RequestParam(defaultValue = "5") int size,
@@ -38,6 +39,7 @@ public class GeneralController {
 		return service.listarUsuariosRegistrados(page, size, tipoUsuario);
 	}
 
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/recuperar")
 	public ResponseEntity<?> recuperarPassword(@RequestParam String mail) {
 		try {
@@ -47,7 +49,8 @@ public class GeneralController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/verificar")
 	public ResponseEntity<?> verificarMail(@RequestParam String mail) {
 		try {
@@ -57,7 +60,8 @@ public class GeneralController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/activar")
 	public ResponseEntity<?> activarCuenta(@RequestParam(required = true) String mail, 
 										   @RequestParam(required = true) int tipoUsuario) {
@@ -70,6 +74,7 @@ public class GeneralController {
 		}
 	}
 
+/*
 	@PostMapping("/login")
 	public ResponseEntity<?> iniciarSesion(@RequestParam String mail, @RequestParam String pass) {
 		try {
@@ -78,9 +83,10 @@ public class GeneralController {
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-	}
+	}*/
 	
 
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/crear")
 	public ResponseEntity<DTRespuesta> altaCliente(@RequestBody Cliente usuario) {
 		try {
