@@ -110,8 +110,6 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
         //configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
-        source.registerCorsConfiguration("/public/**", configuration);
-        source.registerCorsConfiguration("/public/crear", configuration);
         return source;
     }
 }
