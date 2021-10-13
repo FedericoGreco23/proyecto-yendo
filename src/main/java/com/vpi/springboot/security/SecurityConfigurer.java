@@ -75,7 +75,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
 				.authorizeRequests().antMatchers("/public/*", "/public/**", "/public/login", "/public/crear", "/public/recuperar").permitAll().
 						anyRequest().authenticated().and().
 						exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
-				.sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().cors();
+				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 		
 				httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 	
