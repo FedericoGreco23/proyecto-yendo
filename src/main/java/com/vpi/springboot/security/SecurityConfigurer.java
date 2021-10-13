@@ -21,6 +21,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.vpi.springboot.Logica.MyUserDetailsService;
 import com.vpi.springboot.security.filtro.JwtRequestFilter;
+import com.vpi.springboot.security.util.JwtAuthenticationEntryPoint;
 
 @Configuration
 @EnableWebSecurity
@@ -32,7 +33,8 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
 	@Autowired
 	private JwtRequestFilter jwtRequestFilter;
 	
-	
+	@Autowired
+	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 	
 	/**
 	 * la idea aca es configurar AuthenticationManagerBuilder pasandole el servicio que maneja la autenticacion creado por nosotros
@@ -70,10 +72,12 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 		httpSecurity.csrf().disable()
-				.authorizeRequests().antMatchers("/**").permitAll().
+				.authorizeRequests().antMatchers("/public/**").permitAll().
 						anyRequest().authenticated().and().
-						exceptionHandling().and().sessionManagement()
-				.sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().cors().and().addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+						exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
+				.sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().cors();
+		
+				httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 	
 		//como Spring no crea la sesion, la siguiente linea permite que para cada request se configure el security context
 		//no se guarda una sesion en ningun momento
