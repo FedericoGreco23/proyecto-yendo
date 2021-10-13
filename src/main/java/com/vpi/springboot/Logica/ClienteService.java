@@ -58,11 +58,15 @@ public class ClienteService implements ClienteServicioInterfaz {
 	@Override
 	public void altaCliente(Cliente usuario) throws UsuarioException, Exception {
 		Optional<Cliente> optionalUser = userRepo.findById(usuario.getMail());
+		Optional<Cliente> optionalUser2 = userRepo.findByNickname(usuario.getNickname());
 		if(optionalUser.isPresent()) {
 			throw new UsuarioException(UsuarioException.UsuarioYaExiste());
-		}else {
+		}else if(optionalUser2.isPresent()) {
+			throw new UsuarioException(UsuarioException.NicknameRepetido());
+		}
+		else {
 			String mail = usuario.getMail();
-			if(mail.contains("@") && mail.contains(".com")) {
+			if(mail.contains("@") && mail.contains(".")) {
 				String nick = usuario.getNickname();
 				if(nick != null) {
 					usuario.setActivo(true);
