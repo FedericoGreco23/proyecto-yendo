@@ -71,7 +71,7 @@ public class PublicRest {
 	
 	
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
-	@PostMapping("/crear")
+	@RequestMapping(value = "/crear", method = RequestMethod.POST)
 	public ResponseEntity<DTRespuesta> altaCliente(@RequestBody Cliente usuario) {
 		try {
 			clienteService.altaCliente(usuario);
@@ -84,7 +84,7 @@ public class PublicRest {
 	
 	
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
-	@PostMapping("/recuperar")
+	@RequestMapping(value = "/recuperar", method = RequestMethod.POST)
 	public ResponseEntity<?> recuperarPassword(@RequestParam String mail) {
 		try {
 			service.recuperarPassword(mail);
@@ -95,7 +95,7 @@ public class PublicRest {
 	}
 	
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
-	@PostMapping("/verificar")
+	@RequestMapping(value = "/verificar", method = RequestMethod.POST)
 	public ResponseEntity<?> verificarMail(@RequestParam String mail) {
 		try {
 			service.verificarMail(mail);
