@@ -26,7 +26,7 @@ import com.vpi.springboot.security.util.MyDetails;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
-@RequestMapping("/api/public/")
+@RequestMapping("public/")
 public class PublicRest {
 
 	@Autowired
