@@ -22,14 +22,12 @@ import com.vpi.springboot.Modelo.dto.DTUsuario;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
-//@RequestMapping("public/")
+@RequestMapping("api/general/")
 public class GeneralController {
 
 	@Autowired
 	private GeneralService service;
 
-	@Autowired
-	private ClienteService clienteService;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 	@GetMapping("/getUsuarios")
@@ -39,27 +37,6 @@ public class GeneralController {
 		return service.listarUsuariosRegistrados(page, size, tipoUsuario);
 	}
 
-@CrossOrigin(origins = "*", allowedHeaders = "*")
-	@PostMapping("/recuperar")
-	public ResponseEntity<?> recuperarPassword(@RequestParam String mail) {
-		try {
-			service.recuperarPassword(mail);
-			return new ResponseEntity<String>(mail, HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
-
-@CrossOrigin(origins = "*", allowedHeaders = "*")
-	@PostMapping("/verificar")
-	public ResponseEntity<?> verificarMail(@RequestParam String mail) {
-		try {
-			service.verificarMail(mail);
-			return new ResponseEntity<String>("Verificación enviada.", HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/activar")
@@ -74,26 +51,5 @@ public class GeneralController {
 		}
 	}
 
-/*
-	@PostMapping("/login")
-	public ResponseEntity<?> iniciarSesion(@RequestParam String mail, @RequestParam String pass) {
-		try {
-			String response = service.iniciarSesion(mail, pass);
-			return new ResponseEntity<String>(response, HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}*/
-	
 
-@CrossOrigin(origins = "*", allowedHeaders = "*")
-	@PostMapping("/crear")
-	public ResponseEntity<DTRespuesta> altaCliente(@RequestBody Cliente usuario) {
-		try {
-			clienteService.altaCliente(usuario);
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Cliente agregado con éxito"), HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
 }

@@ -60,8 +60,9 @@ public class JwtUtil {
      * @param userDetais: es el usuario que devuelve MyUserDetailsService
      * @return: un JWT basado en los detalles del usuario que llega por parametro
      */
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(MyDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("foto", userDetails.getUser().getFoto());
         return createToken(claims, userDetails.getUsername());
     }
 

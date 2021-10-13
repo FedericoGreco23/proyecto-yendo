@@ -49,6 +49,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return NoOpPasswordEncoder.getInstance();
+		//return null;
 	}
 	
 	/**
@@ -69,7 +70,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 		httpSecurity.csrf().disable()
-				.authorizeRequests().antMatchers("/*").permitAll().
+				.authorizeRequests().antMatchers("/api/public/**").permitAll().
 						anyRequest().authenticated().and().
 						exceptionHandling().and().sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().cors().and().addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
