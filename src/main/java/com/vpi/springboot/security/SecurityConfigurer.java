@@ -70,7 +70,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 		httpSecurity.csrf().disable()
-				.authorizeRequests().antMatchers("/api/public/*").permitAll().
+				.authorizeRequests().antMatchers( "/api/public/**", "/api/public/login", "/api/public/crear", "/api/public/recuperar").permitAll().
 						anyRequest().authenticated().and().
 						exceptionHandling().and().sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().cors().and().addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
