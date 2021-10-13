@@ -75,8 +75,8 @@ public class ClienteService implements ClienteServicioInterfaz {
 					usuario.setCalificacionPromedio(5.0f);
 					usuario.setFechaCreacion(LocalDate.now());
 					byte[] salt = SecureRandom.getInstance("SHA1PRNG").generateSeed(saltLen);
-					String contrasenia = Base64.getEncoder().encodeToString(salt) + "$" + hash(usuario.getContrasenia(), salt);
-					usuario.setContrasenia(contrasenia);
+					//String contrasenia = Base64.getEncoder().encodeToString(salt) + "$" + hash(usuario.getContrasenia(), salt);
+					//usuario.setContrasenia(contrasenia);
 					userRepo.save(usuario);
 				}else {
 					throw new UsuarioException("Debe ingresar nickname");

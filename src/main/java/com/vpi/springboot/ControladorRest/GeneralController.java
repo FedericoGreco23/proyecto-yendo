@@ -22,15 +22,14 @@ import com.vpi.springboot.Modelo.dto.DTUsuario;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
-@RequestMapping("public/")
+@RequestMapping("api/general/")
 public class GeneralController {
 
 	@Autowired
 	private GeneralService service;
 
-	@Autowired
-	private ClienteService clienteService;
 
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@GetMapping("/getUsuarios")
 	public List<DTUsuario> getUsuarios(@RequestParam(defaultValue = "0") int page, 
 									@RequestParam(defaultValue = "5") int size,
@@ -38,30 +37,13 @@ public class GeneralController {
 		return service.listarUsuariosRegistrados(page, size, tipoUsuario);
 	}
 
-	@PostMapping("/recuperar")
-	public ResponseEntity<?> recuperarPassword(@RequestParam String mail) {
-		try {
-			service.recuperarPassword(mail);
-			return new ResponseEntity<String>(mail, HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
-	
-	@PostMapping("/verificar")
-	public ResponseEntity<?> verificarMail(@RequestParam String mail) {
-		try {
-			service.verificarMail(mail);
-			return new ResponseEntity<String>("Verificación enviada.", HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
-	
+
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/activar")
 	public ResponseEntity<?> activarCuenta(@RequestParam(required = true) String mail, 
 										   @RequestParam(required = true) int tipoUsuario) {
 		try {
+			System.out.println("Dentro de GeneralController /activar");
 			service.activarCuenta(mail, tipoUsuario);
 			return new ResponseEntity<String>("Cuenta " + mail + " activada.", HttpStatus.OK);
 		} catch (Exception e) {
@@ -69,24 +51,5 @@ public class GeneralController {
 		}
 	}
 
-	@PostMapping("/login")
-	public ResponseEntity<?> iniciarSesion(@RequestParam String mail, @RequestParam String pass) {
-		try {
-			String response = service.iniciarSesion(mail, pass);
-			return new ResponseEntity<String>(response, HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
-	
 
-	@PostMapping("/crear")
-	public ResponseEntity<DTRespuesta> altaCliente(@RequestBody Cliente usuario) {
-		try {
-			clienteService.altaCliente(usuario);
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Cliente agregado con éxito"), HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
 }
