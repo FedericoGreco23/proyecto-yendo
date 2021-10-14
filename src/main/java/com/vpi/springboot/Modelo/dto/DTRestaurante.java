@@ -26,6 +26,7 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 	private List<DTReclamo> reclamos;
 	private DTGeoLocalizacion geoLocalizacion;
 	private List<DTProducto> productos;
+	private String diasAbierto;
 
 	public DTRestaurante() {
 		super();
@@ -35,7 +36,7 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 	// productos
 	public DTRestaurante(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado,
 			Boolean activo, LocalDate fechaCreacion, String nombre, String direccion, Float calificacionPromedio, EnumEstadoRestaurante estado,
-			LocalTime horarioApertura, LocalTime horarioCierre, LocalDate fechaApertura, Integer costoDeEnvio) {
+			LocalTime horarioApertura, LocalTime horarioCierre, LocalDate fechaApertura, Integer costoDeEnvio, String diasAbierto) {
 		super(mail, contrasenia, telefono, foto, bloqueado, activo, fechaCreacion);
 		this.nombre = nombre;
 		this.direccion = direccion;
@@ -45,12 +46,13 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 		this.horarioCierre = horarioCierre;
 		this.fechaApertura = fechaApertura;
 		this.costoDeEnvio = costoDeEnvio;
+		this.diasAbierto = diasAbierto;
 	}
 
 	public DTRestaurante(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado,
 			Boolean activo, LocalDate fechaCreacion, String nombre, String direccion, Float calificacionPromedio, EnumEstadoRestaurante estado,
 			LocalTime horarioApertura, LocalTime horarioCierre, LocalDate fechaApertura, Integer costoDeEnvio,
-			GeoLocalizacion geoLocalizacion, List<Producto> productos) {
+			GeoLocalizacion geoLocalizacion, List<Producto> productos, String diasAbierto) {
 		super(mail, contrasenia, telefono, foto, bloqueado, activo, fechaCreacion);
 		this.nombre = nombre;
 		this.direccion = direccion;
@@ -61,6 +63,7 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 		this.fechaApertura = fechaApertura;
 		this.costoDeEnvio = costoDeEnvio;
 		this.geoLocalizacion = new DTGeoLocalizacion(geoLocalizacion);
+		this.diasAbierto = diasAbierto;
 
 		for (Producto pro : productos) {
 			this.productos.add(new DTProducto(pro));
@@ -69,7 +72,7 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 	
 	//Funcion constructora para buscarUsuario
 	public DTRestaurante(String mail, String nombre, String direccion, Float calificacionPromedio, EnumEstadoRestaurante estado, LocalTime horarioApertura, LocalTime horarioCierre, 
-			LocalTime tiempoEstimadoMaximo, LocalTime tiempoEstimadoMinimo, LocalDate fechaApertura, Integer costoDeEnvio, LocalDate fechaCreacion) {
+			LocalTime tiempoEstimadoMaximo, LocalTime tiempoEstimadoMinimo, LocalDate fechaApertura, Integer costoDeEnvio, LocalDate fechaCreacion, String diasAbierto) {
 		super(mail, fechaCreacion);
 		this.nombre = nombre;
 		this.direccion = direccion;
@@ -82,6 +85,7 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 		this.fechaApertura = fechaApertura;
 		this.costoDeEnvio = costoDeEnvio;
 		this.fechaCreacion = fechaCreacion;
+		this.diasAbierto = diasAbierto;
 	}
 
 	public DTRestaurante(Restaurante res) {
@@ -95,6 +99,7 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 		this.fechaApertura = res.getFechaApertura();
 		this.costoDeEnvio = res.getCostoDeEnvio();
 		this.geoLocalizacion = new DTGeoLocalizacion(res.getGeoLocalizacion());
+		this.diasAbierto = res.getDiasAbierto();
 
 		for (Producto pro : res.getProductos()) {
 			this.productos.add(new DTProducto(pro));
@@ -215,5 +220,13 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 
 	public void setProductos(List<DTProducto> productos) {
 		this.productos = productos;
+	}
+
+	public String getDiasAbierto() {
+		return diasAbierto;
+	}
+
+	public void setDiasAbierto(String diasAbierto) {
+		this.diasAbierto = diasAbierto;
 	}
 }

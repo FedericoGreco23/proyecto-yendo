@@ -1,7 +1,5 @@
 package com.vpi.springboot.Logica;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +10,6 @@ import com.vpi.springboot.Repositorios.AdministradorRepositorio;
 import com.vpi.springboot.Repositorios.ClienteRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
 import com.vpi.springboot.exception.AdministradorException;
-import com.vpi.springboot.exception.UsuarioException;
 
 @Service
 public class AdministradorService implements AdministradorServicioInterfaz {
