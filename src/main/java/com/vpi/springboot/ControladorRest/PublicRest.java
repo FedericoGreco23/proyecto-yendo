@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.vpi.springboot.Logica.ClienteService;
 import com.vpi.springboot.Logica.GeneralService;
 import com.vpi.springboot.Logica.MyUserDetailsService;
+import com.vpi.springboot.Logica.RestauranteService;
 import com.vpi.springboot.Modelo.Cliente;
+import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.dto.AuthenticationRequest;
 import com.vpi.springboot.Modelo.dto.AuthenticationResponse;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
@@ -43,6 +45,9 @@ public class PublicRest {
 
 	@Autowired
 	private ClienteService clienteService;
+	
+	@Autowired
+	private RestauranteService restService;
 	
 	
 
@@ -71,11 +76,22 @@ public class PublicRest {
 	
 	
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
-	@RequestMapping(value = "/crear", method = RequestMethod.POST)
+	@RequestMapping(value = "/crearCliente", method = RequestMethod.POST)
 	public ResponseEntity<DTRespuesta> altaCliente(@RequestBody Cliente usuario) {
 		try {
 			clienteService.altaCliente(usuario);
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Cliente agregado con éxito"), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	
+	@PostMapping("/crearRestaurante")
+	public ResponseEntity<DTRespuesta> crearRestaurante(@RequestBody Restaurante rest) {
+		try {
+			restService.altaRestaurante(rest);
+			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Restaurante agregado con éxito"), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}

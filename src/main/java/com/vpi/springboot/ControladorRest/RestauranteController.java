@@ -17,18 +17,6 @@ import com.vpi.springboot.Modelo.dto.DTRespuesta;
 @RestController
 @RequestMapping("api/restaurante/")
 public class RestauranteController {
-
-	@Autowired
-	private RestauranteService service;
 	
-	@PostMapping("/crear")
-	public ResponseEntity<DTRespuesta> crearRestaurante(@RequestBody Restaurante rest) {
-		try {
-			service.altaRestaurante(rest);
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Restaurante agregado con éxito"), HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
 
 }
