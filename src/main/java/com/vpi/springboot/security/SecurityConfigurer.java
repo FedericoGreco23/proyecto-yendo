@@ -117,7 +117,6 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
         //configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         Map<String, CorsConfiguration> corsConfigMap= new HashMap<String, CorsConfiguration>();
-        corsConfigMap.put("/*", configuration);
         corsConfigMap.put("/**", configuration);
         corsConfigMap.put("/public/*", configuration);
         corsConfigMap.put("/public/**", configuration);
