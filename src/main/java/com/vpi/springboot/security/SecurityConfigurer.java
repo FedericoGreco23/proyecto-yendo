@@ -1,6 +1,8 @@
 package com.vpi.springboot.security;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -114,7 +116,13 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
         configuration.setExposedHeaders(Arrays.asList("*"));
         //configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        Map<String, CorsConfiguration> corsConfigMap= new HashMap<String, CorsConfiguration>();
+        corsConfigMap.put("/public/*", configuration);
+        corsConfigMap.put("/public/**", configuration);
+        corsConfigMap.put("/public/login", configuration);
+        corsConfigMap.put("/public/crear", configuration);
+        corsConfigMap.put("/public/recuperar", configuration);
+        source.setCorsConfigurations(corsConfigMap);
         return source;
     }
 }
