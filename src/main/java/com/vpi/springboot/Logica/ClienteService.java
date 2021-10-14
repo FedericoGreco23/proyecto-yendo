@@ -62,7 +62,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 	@Override
 	public void altaCliente(Cliente usuario) throws UsuarioException, Exception {
 		if (emailExist(usuario.getMail())) {
-			throw new UsuarioException(UsuarioException.UsuarioYaExiste());
+			throw new UsuarioException(UsuarioException.UsuarioYaExiste(usuario.getMail()));
 		}
 		Cliente user = new Cliente();
 		String mail = usuario.getMail();
