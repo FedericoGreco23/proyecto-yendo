@@ -81,6 +81,7 @@ public class Restaurante extends Usuario {
 			LocalTime horarioApertura, LocalTime horarioCierre, LocalDate fechaApertura, Integer costoDeEnvio,
 			GeoLocalizacion geoLocalizacion, List<Producto> productos, String diasAbierto) {
 
+
 		super(mail, contrasenia, telefono, foto, bloqueado, activo, fechaCreacion);
 		this.nombre = nombre;
 		this.direccion = direccion;
@@ -94,17 +95,16 @@ public class Restaurante extends Usuario {
 		this.productos = productos;
 		this.diasAbierto = diasAbierto;
 	}
-	
-	//Funcion para buscarUsuario y otros
+
+	// Funcion para buscarUsuario y otros
 	public DTRestaurante getDatos() {
 		return new DTRestaurante(this.getMail(), this.nombre, this.direccion, this.calificacionPromedio, this.estado, this.horarioApertura, this.horarioCierre, 
 				this.tiempoEstimadoMaximo, this.tiempoEstimadoMinimo, this.fechaApertura, this.costoDeEnvio, this.getFechaCreacion(), this.getDiasAbierto());
+
 	}
 
-	
 //----------------------GETTERS Y SETTERS---------------------------------------------------------
 
-	
 	public String getNombre() {
 		return nombre;
 	}
@@ -192,6 +192,10 @@ public class Restaurante extends Usuario {
 	public void setPedidos(List<Pedido> pedidos) {
 		this.pedidos = pedidos;
 	}
+	
+	public void addPedido(Pedido pedido) {
+		this.pedidos.add(pedido);
+	}
 
 	public List<Reclamo> getReclamos() {
 		return reclamos;
@@ -217,6 +221,7 @@ public class Restaurante extends Usuario {
 		this.productos = productos;
 	}
 
+
 	public String getDiasAbierto() {
 		return diasAbierto;
 	}
@@ -225,4 +230,8 @@ public class Restaurante extends Usuario {
 		this.diasAbierto = diasAbierto;
 	}
 
+	
+	public void addProducto(Producto producto) {
+		this.productos.add(producto);
+	}
 }

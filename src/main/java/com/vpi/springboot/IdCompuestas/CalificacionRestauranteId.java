@@ -2,40 +2,32 @@ package com.vpi.springboot.IdCompuestas;
 
 import java.io.Serializable;
 
-public class CalificacionRestauranteId implements Serializable{
-	
+public class CalificacionRestauranteId implements Serializable {
+
 	private static final long serialVersionUID = 1L;
 	private String restaurante;
 	private String cliente;
-	
-	
+
 	public CalificacionRestauranteId() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-
 	public String getRestaurante() {
 		return restaurante;
 	}
-
 
 	public void setRestaurante(String restaurante) {
 		this.restaurante = restaurante;
 	}
 
-
 	public String getCliente() {
 		return cliente;
 	}
 
-
 	public void setCliente(String cliente) {
 		this.cliente = cliente;
 	}
-
-
-
 
 	@Override
 	public int hashCode() {
@@ -45,7 +37,6 @@ public class CalificacionRestauranteId implements Serializable{
 		result = prime * result + ((restaurante == null) ? 0 : restaurante.hashCode());
 		return result;
 	}
-
 
 	@Override
 	public boolean equals(Object obj) {
@@ -68,8 +59,4 @@ public class CalificacionRestauranteId implements Serializable{
 			return false;
 		return true;
 	}
-
-
-
-
 }

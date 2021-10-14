@@ -78,8 +78,6 @@ public class PublicRest {
 		return ResponseEntity.ok(new AuthenticationResponse(jwt));
 	}
 	
-	
-	
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@RequestMapping(value = "/crearCliente", method = RequestMethod.POST)
 	public ResponseEntity<DTRespuesta> altaCliente(@RequestBody Cliente usuario) {
@@ -103,7 +101,7 @@ public class PublicRest {
 	}
 	
 	
-	
+
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@RequestMapping(value = "/recuperar", method = RequestMethod.POST)
 	public ResponseEntity<?> recuperarPassword(@RequestParam String mail) {
@@ -114,7 +112,7 @@ public class PublicRest {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@RequestMapping(value = "/verificar", method = RequestMethod.POST)
 	public ResponseEntity<?> verificarMail(@RequestParam String mail) {

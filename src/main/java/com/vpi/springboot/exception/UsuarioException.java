@@ -9,19 +9,18 @@ public class UsuarioException extends Exception {
 	}
 	
 	public static String NotFoundException(String mail) {
-		return "Usuario de mail " + mail + " no se pudo encontrar";
+		return "Usuario de mail " + mail + " no se pudo encontrar.";
 	}
 	
-	public static String UsuarioYaExiste() {
-		return "Usuario ya existe";
+	public static String UsuarioYaExiste(String mail) {
+		return "Usuario " + mail + " ya existe.";
 	}
 	
 	public static String PassIncorrecta() {
-		return "Contraseña incorrecta";
+		return "Contraseña incorrecta.";
 	}
 	
 	public static String NoNickname() {
-		return "Debe ingresar nickname";
+		return "Debe ingresar nickname.";
 	}
-	
 }

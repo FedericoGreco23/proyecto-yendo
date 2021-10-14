@@ -28,7 +28,8 @@ public class CalificacionCliente extends Calificacion {
 		super(id, puntaje, comentario, foto, fecha);
 	}
 	
-	public CalificacionCliente(int id, int puntaje, String comentario, String foto, LocalDateTime fecha, Restaurante restaurante, Cliente cliente) {
+	public CalificacionCliente(int id, int puntaje, String comentario, String foto, LocalDateTime fecha,
+			Restaurante restaurante, Cliente cliente) {
 		super(id, puntaje, comentario, foto, fecha);
 		this.restaurante = restaurante;
 		this.cliente = cliente;

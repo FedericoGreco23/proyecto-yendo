@@ -27,6 +27,10 @@ public class Producto {
 	@ManyToMany
 	private List<Categoria> categorias;
 
+	public Producto() {
+		super();
+	}
+	
 	public Producto(int id, String nombre, String descripcion, double precio, String foto, int descuento,
 			boolean activo) {
 		this.id = id;
@@ -109,5 +113,4 @@ public class Producto {
 	public void setCategorias(List<Categoria> categorias) {
 		this.categorias = categorias;
 	}
-
 }
