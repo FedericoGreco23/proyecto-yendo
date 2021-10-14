@@ -16,7 +16,7 @@ public class DTProducto implements Serializable {
 	private String foto;
 	private int descuento;
 	private boolean activo;
-	private DTRestaurante restaurante;
+	private String restaurante;
 	private List<DTCategoria> categorias;
 
 	public DTProducto() {
@@ -104,11 +104,11 @@ public class DTProducto implements Serializable {
 		this.activo = activo;
 	}
 
-	public DTRestaurante getRestaurante() {
+	public String getRestaurante() {
 		return restaurante;
 	}
 
-	public void setRestaurante(DTRestaurante restaurante) {
+	public void setRestaurante(String restaurante) {
 		this.restaurante = restaurante;
 	}
 

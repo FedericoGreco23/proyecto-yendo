@@ -1,7 +1,5 @@
 package com.vpi.springboot.Repositorios;
 
-import java.util.List;
-
 import javax.transaction.Transactional;
 
 import org.springframework.data.domain.Page;
@@ -9,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.vpi.springboot.Modelo.Administrador;
+import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.Modelo.Restaurante;
 
 @Transactional
@@ -28,4 +26,14 @@ public interface RestauranteRepositorio extends UserBaseRepository<Restaurante> 
 	
 	@Query("SELECT r FROM Restaurante r")
 	public Page<Restaurante> buscarRestaurante(@Param("page") Pageable page);
+	
+//	@Query(value = "SELECT p FROM Restaurante p WHERE p.nombre = ?1", nativeQuery = true)
+//	@Query(value = "SELECT u FROM Restaurante u WHERE u.nombre = ?1", nativeQuery = true)
+	@Query("SELECT u FROM Restaurante u WHERE u.nombre = :nombre")
+	Restaurante findByNombre(@Param("nombre") String nombre); 
+	
+//	@Query("SELECT u FROM User u WHERE u.status = :status and u.name = :name")
+//	User findUserByStatusAndNameNamedParams(
+//	  @Param("status") Integer status, 
+//	  @Param("name") String name);
 }

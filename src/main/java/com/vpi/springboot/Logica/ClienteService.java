@@ -59,7 +59,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 	public void altaCliente(Cliente usuario) throws UsuarioException, Exception {
 		Optional<Cliente> optionalUser = userRepo.findById(usuario.getMail());
 		if(optionalUser.isPresent()) {
-			throw new UsuarioException(UsuarioException.UsuarioYaExiste());
+			throw new UsuarioException(UsuarioException.UsuarioYaExiste(usuario.getMail()));
 		}else {
 			String mail = usuario.getMail();
 			if(mail.contains("@") && mail.contains(".com")) {
