@@ -10,6 +10,7 @@ import java.util.Optional;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,13 +18,20 @@ import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Direccion;
 import com.vpi.springboot.Modelo.GeoLocalizacion;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
+import com.vpi.springboot.Modelo.dto.DTProducto;
 import com.vpi.springboot.Repositorios.ClienteRepositorio;
 import com.vpi.springboot.Repositorios.DireccionRepositorio;
 import com.vpi.springboot.Repositorios.GeoLocalizacionRepositorio;
 import com.vpi.springboot.exception.UsuarioException;
+import org.springframework.beans.factory.ObjectFactory;
 
 @Service
 public class ClienteService implements ClienteServicioInterfaz {
+	
+	
+
+	@Autowired
+	ObjectFactory<HttpSession> httpSessionFactory;
 
 	@Autowired
 	private ClienteRepositorio userRepo;
@@ -199,6 +207,19 @@ public class ClienteService implements ClienteServicioInterfaz {
 			}
 		}else {
 			throw new UsuarioException("No existe cliente");
+		}
+	}
+	
+	public void agregarACarrito(DTProducto p) {
+		HttpSession session = httpSessionFactory.getObject();
+		if(session.getAttribute("carrito") == null) {
+			List<DTProducto> carrito = new ArrayList<DTProducto>();
+			carrito.add(p);
+			session.setAttribute("carrito", carrito);
+		}else {
+			List<DTProducto> carrito = (List<DTProducto>) httpSessionFactory.getObject().getAttribute("carrito");
+			carrito.add(p);
+			session.setAttribute("carrito", carrito);
 		}
 	}
 }
