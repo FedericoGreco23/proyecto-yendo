@@ -11,6 +11,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.vpi.springboot.Logica.MyUserDetailsService;
 import com.vpi.springboot.security.util.JwtUtil;
+import com.vpi.springboot.security.util.MyDetails;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -59,7 +60,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
         	//se obtienen los detalles del usuario
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+            MyDetails userDetails = (MyDetails) this.userDetailsService.loadUserByUsername(username);
 
             //si el token es valido para ese usuario
             if (jwtUtil.validateToken(jwt, userDetails)) {

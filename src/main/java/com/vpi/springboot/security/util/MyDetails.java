@@ -1,5 +1,6 @@
 package com.vpi.springboot.security.util;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -26,7 +27,7 @@ public class MyDetails implements UserDetails {
 		@Override
 		public Collection<? extends GrantedAuthority> getAuthorities() {
 			// TODO Auto-generated method stub
-			return null;
+			return new ArrayList<>();
 		}
 
 		@Override
