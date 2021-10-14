@@ -9,7 +9,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.vpi.springboot.Modelo.Usuario;
 
 public class MyDetails implements UserDetails {
-	    private Usuario user;
+	    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+		private Usuario user;
 
 	     public MyDetails(Usuario user) {
 	    	super();
