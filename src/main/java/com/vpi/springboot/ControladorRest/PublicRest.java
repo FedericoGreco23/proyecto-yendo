@@ -16,13 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.vpi.springboot.Logica.ClienteService;
 import com.vpi.springboot.Logica.GeneralService;
-import com.vpi.springboot.Logica.MyUserDetailsService;
 import com.vpi.springboot.Logica.RestauranteService;
 import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.dto.AuthenticationRequest;
 import com.vpi.springboot.Modelo.dto.AuthenticationResponse;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
+import com.vpi.springboot.security.MyUserDetailsService;
 import com.vpi.springboot.security.util.JwtUtil;
 import com.vpi.springboot.security.util.MyDetails;
 

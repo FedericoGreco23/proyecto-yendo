@@ -12,6 +12,7 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Direccion;
@@ -31,6 +32,8 @@ public class ClienteService implements ClienteServicioInterfaz {
 	private DireccionRepositorio dirRepo;
 	@Autowired
 	private GeoLocalizacionRepositorio geoRepo;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 	
 	private static final int iterations = 20 * 1000;
 	private static final int saltLen = 32;
@@ -57,12 +60,13 @@ public class ClienteService implements ClienteServicioInterfaz {
 
 	@Override
 	public void altaCliente(Cliente usuario) throws UsuarioException, Exception {
-		Optional<Cliente> optionalUser = userRepo.findById(usuario.getMail());
-		if(optionalUser.isPresent()) {
+		if (emailExist(usuario.getMail())) {
 			throw new UsuarioException(UsuarioException.UsuarioYaExiste());
-		}else {
-			String mail = usuario.getMail();
-			if(mail.contains("@") && mail.contains(".com")) {
+	    }
+		Cliente user = new Cliente();
+		String mail = usuario.getMail();
+		
+			if(mail!=null && !mail.isEmpty() && usuario.getContrasenia().length()>5) {
 				String nick = usuario.getNickname();
 				if(nick != null) {
 					usuario.setActivo(true);
@@ -70,18 +74,34 @@ public class ClienteService implements ClienteServicioInterfaz {
 					usuario.setSaldoBono(0.0f);
 					usuario.setCalificacionPromedio(5.0f);
 					usuario.setFechaCreacion(LocalDate.now());
-					byte[] salt = SecureRandom.getInstance("SHA1PRNG").generateSeed(saltLen);
+					//byte[] salt = SecureRandom.getInstance("SHA1PRNG").generateSeed(saltLen);
 					//String contrasenia = Base64.getEncoder().encodeToString(salt) + "$" + hash(usuario.getContrasenia(), salt);
 					//usuario.setContrasenia(contrasenia);
+
+					/**
+					 * se carga contraseña encode
+					 */
+					usuario.setContrasenia(passwordEncoder.encode(usuario.getContrasenia()));
 					userRepo.save(usuario);
 				}else {
 					throw new UsuarioException("Debe ingresar nickname");
 				}
 			}else
-				throw new UsuarioException("Tiene que introducir un mail válido.");
-		}
+				throw new UsuarioException("Tiene que introducir un mail válido y una contraseña de 5 caracteres o más");
+	    
+	    
+		
+		
+		
+		
+			
+		
 
 	}
+	private boolean emailExist(String mail) {
+		return userRepo.findById(mail).isPresent();
+	}
+
 	// METODO PARA HASHEAR CONTRASEÑA
 	private static String hash(String password, byte[] salt) throws Exception {
 		if (password == null || password.length() == 0)
