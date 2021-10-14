@@ -32,6 +32,9 @@ public interface RestauranteRepositorio extends UserBaseRepository<Restaurante> 
 	@Query("SELECT u FROM Restaurante u WHERE u.nombre = :nombre")
 	Restaurante findByNombre(@Param("nombre") String nombre); 
 	
+	@Query("SELECT u FROM Restaurante u WHERE u.estado = :estado")
+	Page<Restaurante> findByEstado(@Param("estado") String estado, Pageable pageable);
+	
 //	@Query("SELECT u FROM User u WHERE u.status = :status and u.name = :name")
 //	User findUserByStatusAndNameNamedParams(
 //	  @Param("status") Integer status, 

@@ -24,7 +24,7 @@ public class DTProducto implements Serializable {
 	}
 
 	public DTProducto(int id, String nombre, String descripcion, double precio, String foto, int descuento,
-			boolean activo) {
+			boolean activo, String restaurante) {
 		this.id = id;
 		this.nombre = nombre;
 		this.descripcion = descripcion;
@@ -32,6 +32,7 @@ public class DTProducto implements Serializable {
 		this.foto = foto;
 		this.descuento = descuento;
 		this.activo = activo;
+		this.restaurante = restaurante;
 	}
 
 	public DTProducto(Producto pro) {
@@ -42,6 +43,7 @@ public class DTProducto implements Serializable {
 		this.foto = pro.getFoto();
 		this.descuento = pro.getDescuento();
 		this.activo = pro.isActivo();
+		this.restaurante = pro.getRestaurante().getNombre();
 
 		for (Categoria cat : pro.getCategorias()) {
 			this.categorias.add(new DTCategoria(cat));

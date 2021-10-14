@@ -258,7 +258,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 			retorno.add(new DTProducto(p));
 		}
 
-		response.put("productos", productos);
+		response.put("productos", retorno);
 		return response;
 	}
 }

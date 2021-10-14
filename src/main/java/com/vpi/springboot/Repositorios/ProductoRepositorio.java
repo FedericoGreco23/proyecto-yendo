@@ -24,5 +24,4 @@ public interface ProductoRepositorio extends ProductoBaseRepository<Producto> {
 	
 	@Query("SELECT u FROM Producto u WHERE u.restaurante = :restaurante")
 	Page<Producto> findAllByRestaurante(@Param("restaurante") Restaurante restaurante, Pageable pageable);
-
 }
