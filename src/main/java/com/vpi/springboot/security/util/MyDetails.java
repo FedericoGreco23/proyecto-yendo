@@ -1,5 +1,6 @@
 package com.vpi.springboot.security.util;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -8,7 +9,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.vpi.springboot.Modelo.Usuario;
 
 public class MyDetails implements UserDetails {
-	    private Usuario user;
+	    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+		private Usuario user;
 
 	     public MyDetails(Usuario user) {
 	    	super();
@@ -26,7 +31,7 @@ public class MyDetails implements UserDetails {
 		@Override
 		public Collection<? extends GrantedAuthority> getAuthorities() {
 			// TODO Auto-generated method stub
-			return null;
+			return new ArrayList<>();
 		}
 
 		@Override

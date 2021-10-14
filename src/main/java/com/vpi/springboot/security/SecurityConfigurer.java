@@ -1,6 +1,8 @@
 package com.vpi.springboot.security;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -21,6 +23,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.vpi.springboot.Logica.MyUserDetailsService;
 import com.vpi.springboot.security.filtro.JwtRequestFilter;
+import com.vpi.springboot.security.util.JwtAuthenticationEntryPoint;
 
 @Configuration
 @EnableWebSecurity
@@ -32,7 +35,8 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
 	@Autowired
 	private JwtRequestFilter jwtRequestFilter;
 	
-	
+	@Autowired
+	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 	
 	/**
 	 * la idea aca es configurar AuthenticationManagerBuilder pasandole el servicio que maneja la autenticacion creado por nosotros
@@ -70,10 +74,12 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 		httpSecurity.csrf().disable()
-				.authorizeRequests().antMatchers("/**").permitAll().
+				.authorizeRequests().antMatchers("/public/*", "/public/**", "/public/login", "/public/crear", "/public/recuperar").permitAll().
 						anyRequest().authenticated().and().
-						exceptionHandling().and().sessionManagement()
-				.sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().cors().and().addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+						exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
+				.sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().cors();
+		
+				httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 	
 		//como Spring no crea la sesion, la siguiente linea permite que para cada request se configure el security context
 		//no se guarda una sesion en ningun momento
@@ -110,7 +116,14 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
         configuration.setExposedHeaders(Arrays.asList("*"));
         //configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        Map<String, CorsConfiguration> corsConfigMap= new HashMap<String, CorsConfiguration>();
+        corsConfigMap.put("/**", configuration);
+        corsConfigMap.put("/public/*", configuration);
+        corsConfigMap.put("/public/**", configuration);
+        corsConfigMap.put("/public/login", configuration);
+        corsConfigMap.put("/public/crear", configuration);
+        corsConfigMap.put("/public/recuperar", configuration);
+        source.setCorsConfigurations(corsConfigMap);
         return source;
     }
 }
