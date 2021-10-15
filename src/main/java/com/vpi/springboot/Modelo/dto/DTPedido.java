@@ -2,6 +2,7 @@ package com.vpi.springboot.Modelo.dto;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.vpi.springboot.Modelo.Pedido;
@@ -15,9 +16,9 @@ public class DTPedido implements Serializable {
 	private EnumEstadoPedido estadoPedidido;
 	private EnumMetodoDePago metodoDePago;
 	private int carrito;
-	private DTCliente cliente;
-	private DTRestaurante restaurante;
-	private List<DTReclamo> reclamos;
+	private String cliente;
+	private String restaurante;
+	private List<DTReclamo> reclamos = new ArrayList<>();
 
 	public DTPedido() {
 		super();
@@ -33,7 +34,7 @@ public class DTPedido implements Serializable {
 		this.metodoDePago = metodoDePago;
 		this.carrito = carrito;
 	}
-	
+
 	public DTPedido(Pedido ped) {
 		super();
 		this.id = ped.getId();
@@ -42,9 +43,8 @@ public class DTPedido implements Serializable {
 		this.estadoPedidido = ped.getEstadoPedido();
 		this.metodoDePago = ped.getMetodoDePago();
 		this.carrito = ped.getCarrito();
-		this.cliente = new DTCliente(ped.getCliente());
-		this.restaurante = new DTRestaurante(ped.getRestaurante());
-		
+		this.cliente = ped.getCliente().getMail();
+		this.restaurante = ped.getRestaurante().getNombre();
 	}
 
 	public int getId() {
@@ -95,19 +95,19 @@ public class DTPedido implements Serializable {
 		this.carrito = carrito;
 	}
 
-	public DTCliente getCliente() {
+	public String getCliente() {
 		return cliente;
 	}
 
-	public void setCliente(DTCliente cliente) {
+	public void setCliente(String cliente) {
 		this.cliente = cliente;
 	}
 
-	public DTRestaurante getRestaurante() {
+	public String getRestaurante() {
 		return restaurante;
 	}
 
-	public void setRestaurante(DTRestaurante restaurante) {
+	public void setRestaurante(String restaurante) {
 		this.restaurante = restaurante;
 	}
 

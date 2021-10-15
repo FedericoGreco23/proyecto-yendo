@@ -1,6 +1,7 @@
 package com.vpi.springboot.ControladorRest;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.ConstraintViolationException;
 
@@ -32,6 +33,7 @@ public class AdministradorController {
 //		return userService.getAllClientes();
 //	}
 
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/crear")
 	public ResponseEntity<?> altaAdministrador(@RequestBody Administrador admin) {
 		try {
@@ -44,6 +46,7 @@ public class AdministradorController {
 		}
 	}
 	
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/eliminar")
 	public ResponseEntity<?> eliminarUsuario(@RequestParam String mail) {
 		try {
@@ -54,6 +57,7 @@ public class AdministradorController {
 		}
 	}
 	
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/bloquear")
 	public ResponseEntity<?> bloquearUsuario(@RequestParam String mail, @RequestParam String clienteRestaurante) {
 		try {
@@ -64,6 +68,7 @@ public class AdministradorController {
 		}
 	}
 	
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/desbloquear")
 	public ResponseEntity<?> desbloquearUsuario(@RequestParam String mail, @RequestParam String clienteRestaurante) {
 		try {
@@ -72,5 +77,21 @@ public class AdministradorController {
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
+	
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
+	@GetMapping("/getUsuarios")
+	public Map<String, Object> getUsuarios(@RequestParam(defaultValue = "0") int page,
+									  	   @RequestParam(defaultValue = "5") int size, 
+									       @RequestParam(defaultValue = "0") int tipoUsuario) {
+		return service.listarUsuariosRegistrados(page, size, tipoUsuario);
+	}
+	
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
+	@GetMapping("/getRestaurantes")
+	public Map<String, Object> getRestaurantes(@RequestParam(defaultValue = "0") int page,
+									  	   @RequestParam(defaultValue = "5") int size, 
+									       @RequestParam(defaultValue = "3") int tipo) {
+		return service.listarRestaurantes(page, size, tipo);
 	}
 }

@@ -16,5 +16,7 @@ public interface AdministradorServicioInterfaz {
 
 	public void desbloquearUsuario(String mail, String clienteRestaurante);
 	
+	public Map<String, Object> listarUsuariosRegistrados(int page, int size, int tipoUsuario);
+	
 	public Map<String, Object> listarRestaurantes(int page, int size, int estado);
 }

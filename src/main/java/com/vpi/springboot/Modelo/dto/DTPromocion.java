@@ -1,6 +1,7 @@
 package com.vpi.springboot.Modelo.dto;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -8,7 +9,7 @@ public class DTPromocion implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	// No tiene mucho sentido poner el DT aca
-    private List<String> productos;
+    private List<String> productos = new ArrayList<>();
 	
 	public DTPromocion() {
 		super();

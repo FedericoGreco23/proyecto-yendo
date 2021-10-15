@@ -197,48 +197,6 @@ public class GeneralService implements GeneralServicioInterfaz {
 		}
 	}
 
-	// 0 -> cliente
-	// 1 -> restaurante
-	// 2 -> administrador
-	public Map<String, Object> listarUsuariosRegistrados(int page, int size, int tipoUsuario) {
-		Map<String, Object> response = new HashMap<>();
-		List<DTUsuario> usuarios = new ArrayList<DTUsuario>();
-		Pageable paging = PageRequest.of(page, size);
-
-		switch (tipoUsuario) {
-		case 0:
-			Page<Cliente> pageClientes = clienteRepo.findAll(paging);
-			List<Cliente> clientes = pageClientes.getContent();
-			response.put("currentPage", pageClientes.getNumber());
-			response.put("totalItems", pageClientes.getTotalElements());
-			for (Cliente c : clientes) {
-				usuarios.add(new DTUsuario(c, "Cliente"));
-			}
-			break;
-		case 1:
-			Page<Restaurante> pageRestaurantes = resRepo.findAll(paging);
-			List<Restaurante> restaurantes = pageRestaurantes.getContent();
-			response.put("currentPage", pageRestaurantes.getNumber());
-			response.put("totalItems", pageRestaurantes.getTotalElements());
-			for (Restaurante c : restaurantes) {
-				usuarios.add(new DTUsuario(c, "Restaurante"));
-			}
-			break;
-		case 2:
-			Page<Administrador> pageAdministradores = adminRepo.findAll(paging);
-			List<Administrador> administrador = pageAdministradores.getContent();
-			response.put("currentPage", pageAdministradores.getNumber());
-			response.put("totalItems", pageAdministradores.getTotalElements());
-			for (Administrador c : administrador) {
-				usuarios.add(new DTUsuario(c, "Administrador"));
-			}
-			break;
-		}
-
-		response.put("usuarios", usuarios);
-		return response;
-	}
-
 	public Map<String, Object> listarMenusRestaurante(int page, int size, String nombreRestaurante) throws RestauranteException {
 		Restaurante restaurante = resRepo.findByNombre(nombreRestaurante);
 		if (restaurante == null) {
