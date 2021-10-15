@@ -91,8 +91,8 @@ public class AdministradorController {
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@GetMapping("/getRestaurantes")
 	public Map<String, Object> getRestaurantes(@RequestParam(defaultValue = "0") int page,
-									  	   @RequestParam(defaultValue = "5") int size, 
-									       @RequestParam(defaultValue = "3") int tipo) {
+									  	   	   @RequestParam(defaultValue = "5") int size, 
+									           @RequestParam(defaultValue = "3") int tipo) {
 		return service.listarRestaurantes(page, size, tipo);
 	}
 	

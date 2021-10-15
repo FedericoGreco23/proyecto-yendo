@@ -78,7 +78,7 @@ public class ClienteController {
 	}
 
 	@PostMapping("eliminarDireccion")
-	public ResponseEntity<?> modificarDireccion(@RequestParam Integer id) {
+	public ResponseEntity<?> eliminarDireccion(@RequestParam Integer id) {
 		try {
 			String mail= getMailFromJwt();
 			clienteService.eliminarDireccion(id, mail);

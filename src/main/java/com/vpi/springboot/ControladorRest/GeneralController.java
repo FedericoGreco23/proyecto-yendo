@@ -44,30 +44,4 @@ public class GeneralController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
-	@CrossOrigin(origins = "*", allowedHeaders = "*")
-	@GetMapping("/getProductos/{restaurante}")
-	public Map<String, Object> getMenusRestaurante(@RequestParam(defaultValue = "0") int page,
-									  	   		@RequestParam(defaultValue = "5") int size, 
-									  	   		@PathVariable(required = true) String restaurante) {
-		try {
-			return service.listarMenusRestaurante(page, size, restaurante);
-		} catch (RestauranteException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-	
-	@CrossOrigin(origins = "*", allowedHeaders = "*")
-	@GetMapping("/getPromociones/{restaurante}")
-	public Map<String, Object> listarPromociones(@RequestParam(defaultValue = "0") int page,
-									  	   	 @RequestParam(defaultValue = "5") int size, 
-									  	   	 @PathVariable(required = true) String restaurante) {
-		try {
-			return service.listarPromocionesRestaurante(page, size, restaurante);
-		} catch (RestauranteException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
 }

@@ -199,7 +199,8 @@ public class GeneralService implements GeneralServicioInterfaz {
 		}
 	}
 
-	public Map<String, Object> listarMenusRestaurante(int page, int size, String nombreRestaurante) throws RestauranteException {
+	public Map<String, Object> listarMenusRestaurante(int page, int size, String nombreRestaurante)
+			throws RestauranteException {
 		Restaurante restaurante = resRepo.findByNombre(nombreRestaurante);
 		if (restaurante == null) {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(nombreRestaurante));
@@ -210,7 +211,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 		Page<Producto> pageProducto = proRepo.findAllByRestaurante(restaurante, paging);
 		List<DTProducto> retorno = new ArrayList<DTProducto>();
 		List<Producto> productos = pageProducto.getContent();
-		
+
 		response.put("currentPage", pageProducto.getNumber());
 		response.put("totalItems", pageProducto.getTotalElements());
 
@@ -221,7 +222,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 		response.put("productos", retorno);
 		return response;
 	}
-	
+
 	public Map<String, Object> listarPromocionesRestaurante(int page, int size, String nombreRestaurante)
 			throws RestauranteException {
 		Restaurante restaurante = resRepo.findByNombre(nombreRestaurante);
