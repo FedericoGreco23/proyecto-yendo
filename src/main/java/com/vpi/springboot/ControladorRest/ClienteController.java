@@ -2,6 +2,8 @@ package com.vpi.springboot.ControladorRest;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,8 +15,10 @@ import com.vpi.springboot.Modelo.Direccion;
 import com.vpi.springboot.Modelo.GeoLocalizacion;
 import com.vpi.springboot.Modelo.Usuario;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
+import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.exception.UsuarioException;
+import com.vpi.springboot.security.util.JwtUtil;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
@@ -23,6 +27,12 @@ public class ClienteController {
 
 	@Autowired
 	private ClienteService clienteService;
+	
+    @Autowired
+    private JwtUtil jwtUtil;
+    
+	@Autowired
+	private HttpServletRequest request;
 
 	@GetMapping("/getDireccion/{mail}")
 	public List<DTDireccion> getDireccionUsuario(@PathVariable String mail) {
@@ -75,4 +85,9 @@ public class ClienteController {
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	/*@PostMapping("agregarACarrito")
+	public ResponseEntity<?> agregarACarrito(@RequestBody DTProductoCarrito productoCarrito){
+		String mail= getMailFromJwt();
+	}*/
 }

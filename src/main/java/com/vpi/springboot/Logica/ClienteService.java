@@ -15,14 +15,18 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import com.vpi.springboot.Modelo.Carrito;
 import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Direccion;
 import com.vpi.springboot.Modelo.GeoLocalizacion;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
 import com.vpi.springboot.Modelo.dto.DTProducto;
+import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.Repositorios.ClienteRepositorio;
 import com.vpi.springboot.Repositorios.DireccionRepositorio;
 import com.vpi.springboot.Repositorios.GeoLocalizacionRepositorio;
+import com.vpi.springboot.Repositorios.MongoRepositorio;
 import com.vpi.springboot.exception.UsuarioException;
 import org.springframework.beans.factory.ObjectFactory;
 
@@ -42,6 +46,8 @@ public class ClienteService implements ClienteServicioInterfaz {
 	private GeoLocalizacionRepositorio geoRepo;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+	@Autowired
+	private MongoRepositorio mongoRepo;
 
 	private static final int iterations = 20 * 1000;
 	private static final int saltLen = 32;
@@ -219,7 +225,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 		}
 	}
 	
-	public void agregarACarrito(DTProducto p) {
+	/*public void agregarACarrito(DTProducto p) {
 		HttpSession session = httpSessionFactory.getObject();
 		if(session.getAttribute("carrito") == null) {
 			List<DTProducto> carrito = new ArrayList<DTProducto>();
@@ -230,5 +236,13 @@ public class ClienteService implements ClienteServicioInterfaz {
 			carrito.add(p);
 			session.setAttribute("carrito", carrito);
 		}
+	}*/
+	
+	public void agregarACarrito(DTProductoCarrito p, String mail) {
+		Carrito carrito = new Carrito(mail, p);
+		mongoRepo.save(carrito);
+		
+		
 	}
+	
 }
