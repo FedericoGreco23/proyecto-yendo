@@ -3,6 +3,7 @@ package com.vpi.springboot.Modelo.dto;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.vpi.springboot.Modelo.GeoLocalizacion;
@@ -22,10 +23,10 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 	private LocalTime tiempoEstimadoMaximo;
 	private LocalDate fechaApertura;
 	private Integer costoDeEnvio;
-	private List<DTPedido> pedidos;
-	private List<DTReclamo> reclamos;
+	private List<DTPedido> pedidos = new ArrayList<>();;
+	private List<DTReclamo> reclamos = new ArrayList<>();;
 	private DTGeoLocalizacion geoLocalizacion;
-	private List<DTProducto> productos;
+	private List<String> productos = new ArrayList<>();
 	private String diasAbierto;
 
 	public DTRestaurante() {
@@ -35,8 +36,9 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 	// En caso de que no queramos iniciar el DT con geolocalizacion o lista de
 	// productos
 	public DTRestaurante(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado,
-			Boolean activo, LocalDate fechaCreacion, String nombre, String direccion, Float calificacionPromedio, EnumEstadoRestaurante estado,
-			LocalTime horarioApertura, LocalTime horarioCierre, LocalDate fechaApertura, Integer costoDeEnvio, String diasAbierto) {
+			Boolean activo, LocalDate fechaCreacion, String nombre, String direccion, Float calificacionPromedio,
+			EnumEstadoRestaurante estado, LocalTime horarioApertura, LocalTime horarioCierre, LocalDate fechaApertura,
+			Integer costoDeEnvio, String diasAbierto) {
 		super(mail, contrasenia, telefono, foto, bloqueado, activo, fechaCreacion);
 		this.nombre = nombre;
 		this.direccion = direccion;
@@ -50,9 +52,9 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 	}
 
 	public DTRestaurante(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado,
-			Boolean activo, LocalDate fechaCreacion, String nombre, String direccion, Float calificacionPromedio, EnumEstadoRestaurante estado,
-			LocalTime horarioApertura, LocalTime horarioCierre, LocalDate fechaApertura, Integer costoDeEnvio,
-			GeoLocalizacion geoLocalizacion, List<Producto> productos, String diasAbierto) {
+			Boolean activo, LocalDate fechaCreacion, String nombre, String direccion, Float calificacionPromedio,
+			EnumEstadoRestaurante estado, LocalTime horarioApertura, LocalTime horarioCierre, LocalDate fechaApertura,
+			Integer costoDeEnvio, GeoLocalizacion geoLocalizacion, List<Producto> productos, String diasAbierto) {
 		super(mail, contrasenia, telefono, foto, bloqueado, activo, fechaCreacion);
 		this.nombre = nombre;
 		this.direccion = direccion;
@@ -66,13 +68,15 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 		this.diasAbierto = diasAbierto;
 
 		for (Producto pro : productos) {
-			this.productos.add(new DTProducto(pro));
+			this.productos.add(pro.getNombre());
 		}
 	}
-	
-	//Funcion constructora para buscarUsuario
-	public DTRestaurante(String mail, String nombre, String direccion, Float calificacionPromedio, EnumEstadoRestaurante estado, LocalTime horarioApertura, LocalTime horarioCierre, 
-			LocalTime tiempoEstimadoMaximo, LocalTime tiempoEstimadoMinimo, LocalDate fechaApertura, Integer costoDeEnvio, LocalDate fechaCreacion, String diasAbierto) {
+
+	// Funcion constructora para buscarUsuario
+	public DTRestaurante(String mail, String nombre, String direccion, Float calificacionPromedio,
+			EnumEstadoRestaurante estado, LocalTime horarioApertura, LocalTime horarioCierre,
+			LocalTime tiempoEstimadoMaximo, LocalTime tiempoEstimadoMinimo, LocalDate fechaApertura,
+			Integer costoDeEnvio, LocalDate fechaCreacion, String diasAbierto) {
 		super(mail, fechaCreacion);
 		this.nombre = nombre;
 		this.direccion = direccion;
@@ -98,18 +102,20 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 		this.horarioCierre = res.getHorarioCierre();
 		this.fechaApertura = res.getFechaApertura();
 		this.costoDeEnvio = res.getCostoDeEnvio();
-		this.geoLocalizacion = new DTGeoLocalizacion(res.getGeoLocalizacion());
+		if (res.getGeoLocalizacion() != null)
+			this.geoLocalizacion = new DTGeoLocalizacion(res.getGeoLocalizacion());
+		else
+			this.geoLocalizacion = new DTGeoLocalizacion();
 		this.diasAbierto = res.getDiasAbierto();
 
-		for (Producto pro : res.getProductos()) {
-			this.productos.add(new DTProducto(pro));
+		if (res.getProductos() != null || !res.getProductos().isEmpty()) {
+			for (Producto pro : res.getProductos()) {
+				this.productos.add(pro.getNombre());
+			}
 		}
 	}
-
-	
 //----------------------GETTERS Y SETTERS---------------------------------------------------------
-	
-	
+
 	public String getNombre() {
 		return nombre;
 	}
@@ -214,11 +220,11 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 		this.geoLocalizacion = geoLocalizacion;
 	}
 
-	public List<DTProducto> getProductos() {
+	public List<String> getProductos() {
 		return productos;
 	}
 
-	public void setProductos(List<DTProducto> productos) {
+	public void setProductos(List<String> productos) {
 		this.productos = productos;
 	}
 

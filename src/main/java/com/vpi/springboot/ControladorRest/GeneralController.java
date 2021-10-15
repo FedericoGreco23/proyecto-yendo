@@ -33,14 +33,6 @@ public class GeneralController {
 	private GeneralService service;
 
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
-	@GetMapping("/getUsuarios")
-	public Map<String, Object> getUsuarios(@RequestParam(defaultValue = "0") int page,
-									  	   @RequestParam(defaultValue = "5") int size, 
-									       @RequestParam(defaultValue = "0") int tipoUsuario) {
-		return service.listarUsuariosRegistrados(page, size, tipoUsuario);
-	}
-
-	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/activar")
 	public ResponseEntity<?> activarCuenta(@RequestParam(required = true) String mail,
 										   @RequestParam(required = true) int tipoUsuario) {
@@ -60,6 +52,19 @@ public class GeneralController {
 									  	   		@PathVariable(required = true) String restaurante) {
 		try {
 			return service.listarMenusRestaurante(page, size, restaurante);
+		} catch (RestauranteException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
+	@GetMapping("/getPromociones/{restaurante}")
+	public Map<String, Object> listarPromociones(@RequestParam(defaultValue = "0") int page,
+									  	   	 @RequestParam(defaultValue = "5") int size, 
+									  	   	 @PathVariable(required = true) String restaurante) {
+		try {
+			return service.listarPromocionesRestaurante(page, size, restaurante);
 		} catch (RestauranteException e) {
 			e.printStackTrace();
 			return null;

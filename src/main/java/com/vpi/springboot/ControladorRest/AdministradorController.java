@@ -1,6 +1,7 @@
 package com.vpi.springboot.ControladorRest;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.ConstraintViolationException;
 
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,6 +34,7 @@ public class AdministradorController {
 //		return userService.getAllClientes();
 //	}
 
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/crear")
 	public ResponseEntity<?> altaAdministrador(@RequestBody Administrador admin) {
 		try {
@@ -44,6 +47,7 @@ public class AdministradorController {
 		}
 	}
 	
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/eliminar")
 	public ResponseEntity<?> eliminarUsuario(@RequestParam String mail) {
 		try {
@@ -54,6 +58,7 @@ public class AdministradorController {
 		}
 	}
 	
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/bloquear")
 	public ResponseEntity<?> bloquearUsuario(@RequestParam String mail, @RequestParam String clienteRestaurante) {
 		try {
@@ -64,11 +69,39 @@ public class AdministradorController {
 		}
 	}
 	
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/desbloquear")
 	public ResponseEntity<?> desbloquearUsuario(@RequestParam String mail, @RequestParam String clienteRestaurante) {
 		try {
 			service.desbloquearUsuario(mail, clienteRestaurante);
 			return new ResponseEntity<String>("Desbloqueado correctamente", HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
+	@GetMapping("/getUsuarios")
+	public Map<String, Object> getUsuarios(@RequestParam(defaultValue = "0") int page,
+									  	   @RequestParam(defaultValue = "5") int size, 
+									       @RequestParam(defaultValue = "0") int tipoUsuario) {
+		return service.listarUsuariosRegistrados(page, size, tipoUsuario);
+	}
+	
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
+	@GetMapping("/getRestaurantes")
+	public Map<String, Object> getRestaurantes(@RequestParam(defaultValue = "0") int page,
+									  	   @RequestParam(defaultValue = "5") int size, 
+									       @RequestParam(defaultValue = "3") int tipo) {
+		return service.listarRestaurantes(page, size, tipo);
+	}
+	
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
+	@PostMapping("/cambiarEstado/{varRestaurante}")
+	public ResponseEntity<?> cambiarEstadoRestaurante(@PathVariable String varRestaurante, @RequestParam (required = true) int estado ) {
+		try {
+			service.cambiarEstadoRestaurante(varRestaurante, estado);
+			return new ResponseEntity<String>("Cambio de estado exitoso", HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}

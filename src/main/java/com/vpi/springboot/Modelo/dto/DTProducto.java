@@ -1,6 +1,7 @@
 package com.vpi.springboot.Modelo.dto;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.vpi.springboot.Modelo.Categoria;
@@ -17,7 +18,7 @@ public class DTProducto implements Serializable {
 	private int descuento;
 	private boolean activo;
 	private String restaurante;
-	private List<DTCategoria> categorias;
+	private List<DTCategoria> categorias = new ArrayList<>();
 
 	public DTProducto() {
 		super();

@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.Modelo.Restaurante;
+import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 
 @Transactional
 public interface RestauranteRepositorio extends UserBaseRepository<Restaurante> {
@@ -32,7 +33,7 @@ public interface RestauranteRepositorio extends UserBaseRepository<Restaurante> 
 	Restaurante findByNombre(@Param("nombre") String nombre); 
 	
 	@Query("SELECT u FROM Restaurante u WHERE u.estado = :estado")
-	Page<Restaurante> findByEstado(@Param("estado") String estado, Pageable pageable);
+	Page<Restaurante> findByEstado(@Param("estado") EnumEstadoRestaurante estado, Pageable pageable);
 	
 //	@Query("SELECT u FROM User u WHERE u.status = :status and u.name = :name")
 //	User findUserByStatusAndNameNamedParams(

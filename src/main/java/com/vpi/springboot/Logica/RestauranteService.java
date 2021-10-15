@@ -1,50 +1,66 @@
 package com.vpi.springboot.Logica;
 
-
 import java.time.LocalDate;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.vpi.springboot.Modelo.GeoLocalizacion;
+import com.vpi.springboot.Modelo.Pedido;
 import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.dto.DTGeoLocalizacion;
+import com.vpi.springboot.Modelo.dto.DTPedido;
+import com.vpi.springboot.Modelo.dto.DTPromocion;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Repositorios.GeoLocalizacionRepositorio;
+import com.vpi.springboot.Repositorios.PedidoRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
 import com.vpi.springboot.Modelo.Producto;
+import com.vpi.springboot.Modelo.Promocion;
 import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Repositorios.ProductoRepositorio;
+import com.vpi.springboot.Repositorios.PromocionRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
 import com.vpi.springboot.exception.ProductoException;
 import com.vpi.springboot.exception.RestauranteException;
 
 @Service
 public class RestauranteService implements RestauranteServicioInterfaz {
-	
+
 	@Autowired
 	private RestauranteRepositorio restauranteRepo;
+
+	@Autowired
+	private GeoLocalizacionRepositorio geoRepo;
+
+	@Autowired
+	private PedidoRepositorio pedidoRepo;
 	
 	@Autowired
+	private PromocionRepositorio promoRepo;
 
-	private GeoLocalizacionRepositorio geoRepo;
-	
 	@Override
 	public void altaRestaurante(Restaurante rest) throws RestauranteException {
-		
-		//Seccion verificar que nombreRestaurante o restauranteMail no exista ya
+
+		// Seccion verificar que nombreRestaurante o restauranteMail no exista ya
 		Optional<Restaurante> busquedaMail = restauranteRepo.findById(rest.getMail());
 		Restaurante busquedaNombre = null;
 		busquedaNombre = restauranteRepo.existeRestauranteNombre(rest.getNombre());
-		if(busquedaMail.isPresent()) {
+		if (busquedaMail.isPresent()) {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(rest.getMail()));
-		}else if (busquedaNombre != null){
+		} else if (busquedaNombre != null) {
 			throw new RestauranteException(RestauranteException.RestauranteYaExiste(rest.getNombre()));
 		}
-		//Fin de seccion
-		
+		// Fin de seccion
+
 		rest.setActivo(true);
 		rest.setBloqueado(false);
 		rest.setCalificacionPromedio(5.0f);
@@ -54,8 +70,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		rest.setProductos(null);
 		rest.setReclamos(null);
 		rest.setPedidos(null);
-		
-		restauranteRepo.save(rest);	
+
+		restauranteRepo.save(rest);
 	}
 
 	private ProductoRepositorio proRepo;
@@ -114,5 +130,28 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		producto.setCategorias(menu.getCategorias());
 
 		proRepo.save(producto);
+	}
+
+	public Map<String, Object> listarPedidos(int page, int size, String nombreRestaurante) throws RestauranteException {
+		Restaurante restaurante = resRepo.findByNombre(nombreRestaurante);
+		if (restaurante == null) {
+			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(nombreRestaurante));
+		}
+
+		Map<String, Object> response = new HashMap<>();
+		Pageable paging = PageRequest.of(page, size);
+		Page<Pedido> pagePedido = pedidoRepo.findAllByRestaurante(restaurante, paging);
+		List<Pedido> pedidos = pagePedido.getContent();
+		List<DTPedido> retorno = new ArrayList<>();
+
+		response.put("currentPage", pagePedido.getNumber());
+		response.put("totalItems", pagePedido.getTotalElements());
+
+		for (Pedido p : pedidos) {
+			retorno.add(new DTPedido(p));
+		}
+
+		response.put("pedidos", pedidos);
+		return response;
 	}
 }

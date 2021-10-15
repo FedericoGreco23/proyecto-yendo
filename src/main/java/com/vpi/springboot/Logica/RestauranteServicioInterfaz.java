@@ -2,6 +2,9 @@ package com.vpi.springboot.Logica;
 
 
 import com.vpi.springboot.Modelo.Restaurante;
+
+import java.util.Map;
+
 import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.exception.ProductoException;
 import com.vpi.springboot.exception.RestauranteException;
@@ -14,4 +17,6 @@ public interface RestauranteServicioInterfaz {
 	void altaRestaurante(Restaurante rest) throws RestauranteException;
 
 	public void modificarMenu(Producto menu) throws ProductoException;
+	
+	public Map<String, Object> listarPedidos(int page, int size, String nombreRestaurante) throws RestauranteException;
 }

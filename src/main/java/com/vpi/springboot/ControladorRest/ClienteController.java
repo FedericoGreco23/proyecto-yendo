@@ -10,10 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.vpi.springboot.Logica.ClienteService;
-import com.vpi.springboot.Modelo.Cliente;
-import com.vpi.springboot.Modelo.Direccion;
-import com.vpi.springboot.Modelo.GeoLocalizacion;
-import com.vpi.springboot.Modelo.Usuario;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
@@ -34,10 +30,13 @@ public class ClienteController {
 	@Autowired
 	private HttpServletRequest request;
 
-	@GetMapping("/getDireccion/{mail}")
-	public List<DTDireccion> getDireccionUsuario(@PathVariable String mail) {
+	@GetMapping("/getDireccion")
+	public List<DTDireccion> getDireccionUsuario() {
 		try {
-			return clienteService.getDireccionCliente(mail);
+			//obtiene mail del jwt del header. Si mail es null, devuelve null
+			String mail= getMailFromJwt();
+			return mail!=null? clienteService.getDireccionCliente(mail): null;
+			
 		} catch (UsuarioException e) {
 			return null;
 		}
@@ -45,8 +44,9 @@ public class ClienteController {
 
 	@PostMapping(path = "/agregarDireccion", produces = "application/json")
 	@ResponseBody
-	public ResponseEntity<DTRespuesta> agregarDireccion(@RequestBody DTDireccion direccion, @RequestParam String mail) {
+	public ResponseEntity<DTRespuesta> agregarDireccion(@RequestBody DTDireccion direccion) {
 		try {
+			String mail= getMailFromJwt();
 			clienteService.altaDireccion(direccion, mail);
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Direccion agregada con éxito"), HttpStatus.OK);
 		} catch (Exception e) {
@@ -55,8 +55,9 @@ public class ClienteController {
 	}
 
 	@PostMapping("bajaCuenta")
-	public ResponseEntity<?> bajaCuenta(@RequestParam String mail) {
+	public ResponseEntity<?> bajaCuenta() {
 		try {
+			String mail= getMailFromJwt();
 			clienteService.bajaCuenta(mail);
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Cuenta dada de baja con éxito"), HttpStatus.OK);
 		} catch (Exception e) {
@@ -66,9 +67,10 @@ public class ClienteController {
 	}
 
 	@PostMapping("modificarDireccion")
-	public ResponseEntity<?> modificarDireccion(@RequestParam int id, @RequestParam String mail,
+	public ResponseEntity<?> modificarDireccion(@RequestParam int id, 
 			@RequestBody DTDireccion direccionNueva) {
 		try {
+			String mail= getMailFromJwt();
 			clienteService.modificarDireccion(id, direccionNueva, mail);
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Dirección modificada con éxito"), HttpStatus.OK);
 		} catch (Exception e) {
@@ -77,8 +79,9 @@ public class ClienteController {
 	}
 
 	@PostMapping("eliminarDireccion")
-	public ResponseEntity<?> modificarDireccion(@RequestParam Integer id, @RequestParam String mail) {
+	public ResponseEntity<?> modificarDireccion(@RequestParam Integer id) {
 		try {
+			String mail= getMailFromJwt();
 			clienteService.eliminarDireccion(id, mail);
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Dirección eliminada con éxito"), HttpStatus.OK);
 		} catch (Exception e) {
@@ -86,8 +89,33 @@ public class ClienteController {
 		}
 	}
 	
-	/*@PostMapping("agregarACarrito")
+
+	@PostMapping("agregarACarrito")
 	public ResponseEntity<?> agregarACarrito(@RequestBody DTProductoCarrito productoCarrito){
-		String mail= getMailFromJwt();
-	}*/
+		try {
+			String mail= getMailFromJwt();
+			clienteService.agregarACarrito(productoCarrito, mail);
+			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Producto agregado con éxito"), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		
+	}
+
+	private String getMailFromJwt() {
+		//obtenemos el token del header y le sacamos "Bearer "
+        final String authorizationHeader = request.getHeader("Authorization");
+
+        
+        String mail = null;
+        String jwt = null;
+
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            jwt = authorizationHeader.substring(7);
+            mail = jwtUtil.extractUsername(jwt);
+        }
+        return mail;
+	}
+
 }

@@ -17,7 +17,9 @@ public interface GeneralServicioInterfaz {
 
 	public void activarCuenta(String mail, int tipoUsuario);
 
-	public Map<String, Object> listarUsuariosRegistrados(int page, int size, int tipoUsuario);
-	
-	public Map<String, Object> listarMenusRestaurante(int page, int size, String nombreRestaurante) throws RestauranteException;
+	public Map<String, Object> listarMenusRestaurante(int page, int size, String nombreRestaurante)
+			throws RestauranteException;
+
+	public Map<String, Object> listarPromocionesRestaurante(int page, int size, String nombreRestaurante)
+			throws RestauranteException;
 }

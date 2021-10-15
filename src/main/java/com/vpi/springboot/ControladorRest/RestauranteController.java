@@ -2,6 +2,7 @@
 package com.vpi.springboot.ControladorRest;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.ConstraintViolationException;
 
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.vpi.springboot.Logica.RestauranteService;
 import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.Modelo.Restaurante;
+import com.vpi.springboot.exception.RestauranteException;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
@@ -35,6 +37,7 @@ public class RestauranteController {
 //		return userService.getAllClientes();
 //	}
 
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/crearMenu/{varRestaurante}")
 	public ResponseEntity<?> altaMenu(@RequestBody Producto menu, @PathVariable (required = true) String varRestaurante) {
 		try {
@@ -47,6 +50,7 @@ public class RestauranteController {
 		}
 	}
 
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/eliminarMenu/{id}")
 	public ResponseEntity<?> bajaMenu(@PathVariable int id) {
 		try {
@@ -57,6 +61,7 @@ public class RestauranteController {
 		}
 	}
 
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/modificarMenu")
 	public ResponseEntity<?> modificarMenus(@RequestBody Producto menu) {
 		try {
@@ -66,6 +71,19 @@ public class RestauranteController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
+	@GetMapping("/getPedidos/{restaurante}")
+	public Map<String, Object> listarPedidos(@RequestParam(defaultValue = "0") int page,
+									  	   	 @RequestParam(defaultValue = "5") int size, 
+									  	   	 @PathVariable(required = true) String restaurante) {
+		try {
+			return service.listarPedidos(page, size, restaurante);
+		} catch (RestauranteException e) {
+			e.printStackTrace();
+			return null;
 		}
 	}
 }
