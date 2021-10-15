@@ -1,6 +1,6 @@
 package com.vpi.springboot.Repositorios;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 
 import com.vpi.springboot.Modelo.Producto;
@@ -13,7 +13,7 @@ import com.vpi.springboot.Modelo.Producto;
  */
 @NoRepositoryBean
 public interface ProductoBaseRepository<T extends Producto> 
-extends CrudRepository<T, Integer> {
+extends JpaRepository<T, Integer> {
 	
  
 }

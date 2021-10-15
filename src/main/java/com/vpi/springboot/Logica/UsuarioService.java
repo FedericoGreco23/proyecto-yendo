@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import com.vpi.springboot.Modelo.*;
 import com.vpi.springboot.Modelo.dto.DTAdministrador;
 import com.vpi.springboot.Modelo.dto.DTCliente;
-import com.vpi.springboot.Modelo.dto.DTListasTiposDeUsuarios;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
 import com.vpi.springboot.Modelo.dto.DTUsuario;
 import com.vpi.springboot.Repositorios.AdministradorRepositorio;

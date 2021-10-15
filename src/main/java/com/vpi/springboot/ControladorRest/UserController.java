@@ -28,7 +28,7 @@ public class UserController {
 	@Autowired
 	private UsuarioService userService;
 
-	@GetMapping("/getallClientes")
+/*	@GetMapping("/getallClientes")
 	public List<Cliente> getAllUser() {
 		return userService.getAllClientes();
 	}
@@ -42,7 +42,7 @@ public class UserController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+	*/
 	
 	@GetMapping("/buscarUsuario")
 	public List<DTUsuario> buscarUsuario(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "0") int tipoUsuario, @RequestParam Integer antiguedadUsuario, @RequestParam String texto) {

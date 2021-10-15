@@ -16,11 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.vpi.springboot.Logica.ClienteService;
 import com.vpi.springboot.Logica.GeneralService;
-import com.vpi.springboot.Logica.MyUserDetailsService;
+import com.vpi.springboot.Logica.RestauranteService;
 import com.vpi.springboot.Modelo.Cliente;
+import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.dto.AuthenticationRequest;
 import com.vpi.springboot.Modelo.dto.AuthenticationResponse;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
+import com.vpi.springboot.security.MyUserDetailsService;
 import com.vpi.springboot.security.util.JwtUtil;
 import com.vpi.springboot.security.util.MyDetails;
 
@@ -44,6 +46,9 @@ public class PublicRest {
 	@Autowired
 	private ClienteService clienteService;
 	
+	@Autowired
+	private RestauranteService restService;
+	
 	
 
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -62,16 +67,19 @@ public class PublicRest {
 
 		final MyDetails userDetails = (MyDetails) userDetailsService
 				.loadUserByUsername(authenticationRequest.getUsername());
+		
+		if(!userDetails.getUser().getActivo() && userDetails.getUser().getBloqueado()) {
+
+			throw new Exception("Este usuario se encuentra bloqueado o inactivo, comuniquese con un administrados");
+		}
 
 		final String jwt = jwtTokenUtil.generateToken(userDetails);
 
 		return ResponseEntity.ok(new AuthenticationResponse(jwt));
 	}
 	
-	
-	
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
-	@RequestMapping(value = "/crear", method = RequestMethod.POST)
+	@RequestMapping(value = "/crearCliente", method = RequestMethod.POST)
 	public ResponseEntity<DTRespuesta> altaCliente(@RequestBody Cliente usuario) {
 		try {
 			clienteService.altaCliente(usuario);
@@ -82,7 +90,18 @@ public class PublicRest {
 	}
 	
 	
+	@PostMapping("/crearRestaurante")
+	public ResponseEntity<DTRespuesta> crearRestaurante(@RequestBody Restaurante rest) {
+		try {
+			restService.altaRestaurante(rest);
+			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Restaurante agregado con éxito"), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 	
+	
+
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@RequestMapping(value = "/recuperar", method = RequestMethod.POST)
 	public ResponseEntity<?> recuperarPassword(@RequestParam String mail) {
@@ -93,7 +112,7 @@ public class PublicRest {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@RequestMapping(value = "/verificar", method = RequestMethod.POST)
 	public ResponseEntity<?> verificarMail(@RequestParam String mail) {

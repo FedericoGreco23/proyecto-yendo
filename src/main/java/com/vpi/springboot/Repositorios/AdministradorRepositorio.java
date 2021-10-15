@@ -1,7 +1,5 @@
 package com.vpi.springboot.Repositorios;
 
-import java.util.List;
-
 import javax.transaction.Transactional;
 
 import org.springframework.data.domain.Page;
@@ -16,14 +14,8 @@ public interface AdministradorRepositorio extends UserBaseRepository<Administrad
 	//x.mail LIKE CONCAT('%',UPPER(:mail),'%') enrealidad lo que busca es si el parametro de entrada para buscar esta contenido en la columna mail
 	//Usamos UPPER en las entradas y variables para que discrimine mayusculas y minusculas
 	
-	/*@Query("SELECT a FROM Administrador a WHERE UPPER(a.mail) LIKE CONCAT('%',UPPER(:mail),'%')")
-	public List<Administrador> buscarAdministradorNombre(@Param("mail") String mail);*/
-	
 	@Query("SELECT a FROM Administrador a WHERE UPPER(a.mail) LIKE CONCAT('%',UPPER(:mail),'%')")
 	public Page<Administrador> buscarAdministradorNombre(@Param("mail") String mail, @Param("page") Pageable page);
-	
-	/*@Query("SELECT a FROM Administrador a")
-	public List<Administrador> buscarAdministrador();*/
 	
 	@Query("SELECT a FROM Administrador a")
 	public Page<Administrador> buscarAdministrador(@Param("page") Pageable page);

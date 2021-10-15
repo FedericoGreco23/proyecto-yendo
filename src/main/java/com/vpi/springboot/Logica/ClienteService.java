@@ -13,6 +13,7 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Direccion;
@@ -39,7 +40,9 @@ public class ClienteService implements ClienteServicioInterfaz {
 	private DireccionRepositorio dirRepo;
 	@Autowired
 	private GeoLocalizacionRepositorio geoRepo;
-	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
 	private static final int iterations = 20 * 1000;
 	private static final int saltLen = 32;
 	private static final int desiredKeyLen = 256;
@@ -50,12 +53,13 @@ public class ClienteService implements ClienteServicioInterfaz {
 		if (optionalUser.isPresent()) {
 			Cliente cliente = optionalUser.get();
 			List<DTDireccion> retorno = new ArrayList<DTDireccion>();
-			if(cliente.getDirecciones() != null) {
+			if (cliente.getDirecciones() != null) {
 				for (Direccion direccion : cliente.getDirecciones()) {
-					retorno.add(new DTDireccion(direccion.getId(), direccion.getCalleNro(), direccion.getGeoLocalizacion()));
+					retorno.add(new DTDireccion(direccion.getId(), direccion.getCalleNro(),
+							direccion.getGeoLocalizacion()));
 				}
 				return retorno;
-			}else {
+			} else {
 				throw new UsuarioException("El usuario no tiene direcciones");
 			}
 		} else {
@@ -65,35 +69,44 @@ public class ClienteService implements ClienteServicioInterfaz {
 
 	@Override
 	public void altaCliente(Cliente usuario) throws UsuarioException, Exception {
-		Optional<Cliente> optionalUser = userRepo.findById(usuario.getMail());
-		Optional<Cliente> optionalUser2 = userRepo.findByNickname(usuario.getNickname());
-		if(optionalUser.isPresent()) {
-			throw new UsuarioException(UsuarioException.UsuarioYaExiste());
-		}else if(optionalUser2.isPresent()) {
-			throw new UsuarioException(UsuarioException.NicknameRepetido());
+
+		if (emailExist(usuario.getMail())) {
+			throw new UsuarioException(UsuarioException.UsuarioYaExiste(usuario.getMail()));
 		}
-		else {
-			String mail = usuario.getMail();
-			if(mail.contains("@") && mail.contains(".")) {
-				String nick = usuario.getNickname();
-				if(nick != null) {
-					usuario.setActivo(true);
-					usuario.setBloqueado(false);
-					usuario.setSaldoBono(0.0f);
-					usuario.setCalificacionPromedio(5.0f);
-					usuario.setFechaCreacion(LocalDate.now());
-					byte[] salt = SecureRandom.getInstance("SHA1PRNG").generateSeed(saltLen);
-					//String contrasenia = Base64.getEncoder().encodeToString(salt) + "$" + hash(usuario.getContrasenia(), salt);
-					//usuario.setContrasenia(contrasenia);
-					userRepo.save(usuario);
-				}else {
-					throw new UsuarioException("Debe ingresar nickname");
-				}
-			}else
-				throw new UsuarioException("Tiene que introducir un mail válido.");
+		Cliente user = new Cliente();
+		String mail = usuario.getMail();
+
+		if (mail != null && !mail.isEmpty() && usuario.getNickname() != null) {
+			usuario.setActivo(true);
+			usuario.setBloqueado(false);
+			usuario.setSaldoBono(0.0f);
+			usuario.setCalificacionPromedio(5.0f);
+			usuario.setFechaCreacion(LocalDate.now());
+			// byte[] salt = SecureRandom.getInstance("SHA1PRNG").generateSeed(saltLen);
+			// String contrasenia = Base64.getEncoder().encodeToString(salt) + "$" +
+			// hash(usuario.getContrasenia(), salt);
+			// usuario.setContrasenia(contrasenia);
+
+			/**
+			 * se carga contraseña encode
+			 */
+			usuario.setContrasenia(passwordEncoder.encode(usuario.getContrasenia()));
+			try {
+
+				userRepo.save(usuario);
+			} catch (Exception e) {
+				throw new UsuarioException("Ya existe un usuario con el nickname " + usuario.getNickname());
+			}
+		} else {
+			throw new UsuarioException("Mail, nickname y contraseña son campos obligatorios");
 		}
 
 	}
+
+	private boolean emailExist(String mail) {
+		return userRepo.findById(mail).isPresent();
+	}
+
 	// METODO PARA HASHEAR CONTRASEÑA
 	private static String hash(String password, byte[] salt) throws Exception {
 		if (password == null || password.length() == 0)
@@ -118,24 +131,25 @@ public class ClienteService implements ClienteServicioInterfaz {
 	@Override
 	public void altaDireccion(DTDireccion direccion, String mail) throws UsuarioException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mail);
-		if(optionalCliente.isPresent()) {
+		if (optionalCliente.isPresent()) {
 			Cliente cliente = optionalCliente.get();
-			GeoLocalizacion geo = new GeoLocalizacion(direccion.getGeoLocalizacion().getLatitud(), direccion.getGeoLocalizacion().getLongitud());
+			GeoLocalizacion geo = new GeoLocalizacion(direccion.getGeoLocalizacion().getLatitud(),
+					direccion.getGeoLocalizacion().getLongitud());
 			geoRepo.save(geo);
-			Direccion dir = new Direccion(direccion.getCalleNro(),geo);	
-			if(mail != null) {
+			Direccion dir = new Direccion(direccion.getCalleNro(), geo);
+			if (mail != null) {
 				dir.setCliente(cliente);
 			}
 			dirRepo.save(dir);
-			if(cliente.getDirecciones() == null) {
+			if (cliente.getDirecciones() == null) {
 				List<Direccion> direcciones = new ArrayList<Direccion>();
 				direcciones.add(dir);
 				cliente.setDirecciones(direcciones);
-			}else {
+			} else {
 				cliente.addDireccion(dir);
 			}
 			userRepo.save(cliente);
-		}else {
+		} else {
 			throw new UsuarioException(UsuarioException.NotFoundException(mail));
 		}
 
@@ -156,56 +170,51 @@ public class ClienteService implements ClienteServicioInterfaz {
 			throw new UsuarioException("No existe usuario");
 		}
 	}
-	
+
 	@Override
 	public void modificarDireccion(int id, DTDireccion nueva, String mail) throws UsuarioException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mail);
-		if(optionalCliente.isPresent()) {
+		if (optionalCliente.isPresent()) {
 			Cliente cliente = optionalCliente.get();
 			Optional<Direccion> optionalDireccion = dirRepo.findById(id);
-			if(optionalDireccion.isPresent()) {
+			if (optionalDireccion.isPresent()) {
 				Direccion dirNueva = optionalDireccion.get();
 				dirNueva.setCalleNro(nueva.getCalleNro());
 				dirNueva.setGeoLocalizacion(new GeoLocalizacion(nueva.getGeoLocalizacion()));
 				dirRepo.save(dirNueva);
-			}else {
+			} else {
 				throw new UsuarioException("No existe direccion");
 			}
-		}else {
+		} else {
 			throw new UsuarioException("No existe cliente");
 		}
 	}
-	
-	/*@Override
-	public void eliminarDireccion(Direccion direccion, String mail) throws UsuarioException {
-		Optional<Cliente> optionalCliente = userRepo.findById(mail);
-		if(optionalCliente.isPresent()) {
-			Cliente cliente = optionalCliente.get();
-			Optional<Direccion> optionalDireccion = dirRepo.findByStreetNumberandMail(direccion.getCalleNro(), cliente);
-			if(optionalDireccion.isPresent()) {
-				Direccion dir = optionalDireccion.get();
-				dirRepo.delete(dir);
-			}else {
-				throw new UsuarioException("No existe direccion");
-			}
-		}else {
-			throw new UsuarioException("No existe cliente");
-		}
-	}*/
-	
+
+	/*
+	 * @Override public void eliminarDireccion(Direccion direccion, String mail)
+	 * throws UsuarioException { Optional<Cliente> optionalCliente =
+	 * userRepo.findById(mail); if(optionalCliente.isPresent()) { Cliente cliente =
+	 * optionalCliente.get(); Optional<Direccion> optionalDireccion =
+	 * dirRepo.findByStreetNumberandMail(direccion.getCalleNro(), cliente);
+	 * if(optionalDireccion.isPresent()) { Direccion dir = optionalDireccion.get();
+	 * dirRepo.delete(dir); }else { throw new
+	 * UsuarioException("No existe direccion"); } }else { throw new
+	 * UsuarioException("No existe cliente"); } }
+	 */
+
 	@Override
 	public void eliminarDireccion(Integer id, String mail) throws UsuarioException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mail);
-		if(optionalCliente.isPresent()) {
+		if (optionalCliente.isPresent()) {
 			Cliente cliente = optionalCliente.get();
 			Optional<Direccion> optionalDireccion = dirRepo.findById(id);
-			if(optionalDireccion.isPresent()) {
+			if (optionalDireccion.isPresent()) {
 				Direccion dir = optionalDireccion.get();
 				dirRepo.delete(dir);
-			}else {
+			} else {
 				throw new UsuarioException("No existe direccion");
 			}
-		}else {
+		} else {
 			throw new UsuarioException("No existe cliente");
 		}
 	}

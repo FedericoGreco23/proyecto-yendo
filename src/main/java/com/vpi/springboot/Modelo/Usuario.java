@@ -30,6 +30,16 @@ public class Usuario {
 		super();
 		// TODO Auto-generated constructor stub
 	}
+	
+	public Usuario(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado, Boolean activo) {
+		super();
+		this.mail = mail;
+		this.contrasenia = contrasenia;
+		this.telefono = telefono;
+		this.foto = foto;
+		this.bloqueado = bloqueado;
+		this.activo = activo;
+	}
 
 	public Usuario(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado, Boolean activo, LocalDate fechaCreacion) {
 		super();

@@ -9,10 +9,10 @@ public class AdministradorException extends Exception {
 	}
 	
 	public static String NotFoundException(String mail) {
-		return "Administrador de mail " + mail + " no se pudo encontrar";
+		return "Administrador de mail " + mail + " no se pudo encontrar.";
 	}
 	
-	public static String AdministradorYaExiste() {
-		return "Administrador ya existe";
+	public static String AdministradorYaExiste(String mail) {
+		return "Administrador " + mail + " ya existe.";
 	}
 }
