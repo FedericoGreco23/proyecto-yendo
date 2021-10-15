@@ -1,5 +1,7 @@
 package com.vpi.springboot.ControladorRest;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -7,6 +9,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +26,7 @@ import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.dto.AuthenticationRequest;
 import com.vpi.springboot.Modelo.dto.AuthenticationResponse;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
+import com.vpi.springboot.exception.RestauranteException;
 import com.vpi.springboot.security.MyUserDetailsService;
 import com.vpi.springboot.security.util.JwtUtil;
 import com.vpi.springboot.security.util.MyDetails;
@@ -100,8 +105,6 @@ public class PublicRest {
 		}
 	}
 	
-	
-
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@RequestMapping(value = "/recuperar", method = RequestMethod.POST)
 	public ResponseEntity<?> recuperarPassword(@RequestParam String mail) {
@@ -121,6 +124,32 @@ public class PublicRest {
 			return new ResponseEntity<String>("Verificación enviada.", HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
+	@GetMapping("/getProductos/{restaurante}")
+	public Map<String, Object> listarMenusRestaurante(@RequestParam(defaultValue = "0") int page,
+									  	   		@RequestParam(defaultValue = "5") int size, 
+									  	   		@PathVariable(required = true) String restaurante) {
+		try {
+			return service.listarMenusRestaurante(page, size, restaurante);
+		} catch (RestauranteException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
+	@GetMapping("/getPromociones/{restaurante}")
+	public Map<String, Object> listarPromociones(@RequestParam(defaultValue = "0") int page,
+									  	   	 @RequestParam(defaultValue = "5") int size, 
+									  	   	 @PathVariable(required = true) String restaurante) {
+		try {
+			return service.listarPromocionesRestaurante(page, size, restaurante);
+		} catch (RestauranteException e) {
+			e.printStackTrace();
+			return null;
 		}
 	}
 }
