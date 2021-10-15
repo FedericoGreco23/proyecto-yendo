@@ -199,13 +199,14 @@ public class GeneralService implements GeneralServicioInterfaz {
 		}
 	}
 
-	public Map<String, Object> listarMenusRestaurante(int page, int size, String nombreRestaurante)
+	public Map<String, Object> listarMenusRestaurante(int page, int size, String mailRestaurante)
 			throws RestauranteException {
-		Restaurante restaurante = resRepo.findByNombre(nombreRestaurante);
-		if (restaurante == null) {
-			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(nombreRestaurante));
+		Optional<Restaurante> optionalRestaurante = resRepo.findById(mailRestaurante);
+		if (!optionalRestaurante.isPresent()) {
+			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(mailRestaurante));
 		}
 
+		Restaurante restaurante = optionalRestaurante.get();
 		Map<String, Object> response = new HashMap<>();
 		Pageable paging = PageRequest.of(page, size);
 		Page<Producto> pageProducto = proRepo.findAllByRestaurante(restaurante, paging);
@@ -223,13 +224,14 @@ public class GeneralService implements GeneralServicioInterfaz {
 		return response;
 	}
 
-	public Map<String, Object> listarPromocionesRestaurante(int page, int size, String nombreRestaurante)
+	public Map<String, Object> listarPromocionesRestaurante(int page, int size, String mailRestaurante)
 			throws RestauranteException {
-		Restaurante restaurante = resRepo.findByNombre(nombreRestaurante);
-		if (restaurante == null) {
-			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(nombreRestaurante));
+		Optional<Restaurante> optionalRestaurante = resRepo.findById(mailRestaurante);
+		if (!optionalRestaurante.isPresent()) {
+			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(mailRestaurante));
 		}
 
+		Restaurante restaurante = optionalRestaurante.get();
 		Map<String, Object> response = new HashMap<>();
 		Pageable paging = PageRequest.of(page, size);
 		Page<Promocion> promoPedido = promoRepo.findAllByRestaurante(restaurante, paging);
