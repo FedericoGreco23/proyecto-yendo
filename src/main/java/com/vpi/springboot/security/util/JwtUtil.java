@@ -19,7 +19,7 @@ public class JwtUtil {
     /**
      * 
      * @param token: 
-     * @return nombre de ususario
+     * @return mail de ususario
      */
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
