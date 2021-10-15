@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -93,5 +94,16 @@ public class AdministradorController {
 									  	   @RequestParam(defaultValue = "5") int size, 
 									       @RequestParam(defaultValue = "3") int tipo) {
 		return service.listarRestaurantes(page, size, tipo);
+	}
+	
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
+	@PostMapping("/cambiarEstado/{varRestaurante}")
+	public ResponseEntity<?> cambiarEstadoRestaurante(@PathVariable String varRestaurante, @RequestParam (required = true) int estado ) {
+		try {
+			service.cambiarEstadoRestaurante(varRestaurante, estado);
+			return new ResponseEntity<String>("Cambio de estado exitoso", HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }

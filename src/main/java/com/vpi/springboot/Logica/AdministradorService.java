@@ -20,6 +20,7 @@ import com.vpi.springboot.Repositorios.AdministradorRepositorio;
 import com.vpi.springboot.Repositorios.ClienteRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
 import com.vpi.springboot.exception.AdministradorException;
+import com.vpi.springboot.exception.RestauranteException;
 
 @Service
 public class AdministradorService implements AdministradorServicioInterfaz {
@@ -167,5 +168,23 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 		response.put("restaurantes", retorno);
 
 		return response;
+	}
+
+	public void cambiarEstadoRestaurante(String varRestaurante, int estado) throws RestauranteException {
+		Restaurante restaurante = resRepo.findByNombre(varRestaurante);
+		if(restaurante == null) 
+			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(varRestaurante));
+		
+		
+		switch(estado) {
+		case 1:
+			restaurante.setEstado(EnumEstadoRestaurante.ACEPTADO);
+			break;
+		case 2:
+			restaurante.setEstado(EnumEstadoRestaurante.RECHAZADO);
+			break;
+		}
+		
+		resRepo.save(restaurante);
 	}
 }

@@ -57,4 +57,17 @@ public class GeneralController {
 			return null;
 		}
 	}
+	
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
+	@GetMapping("/getPromociones/{restaurante}")
+	public Map<String, Object> listarPromociones(@RequestParam(defaultValue = "0") int page,
+									  	   	 @RequestParam(defaultValue = "5") int size, 
+									  	   	 @PathVariable(required = true) String restaurante) {
+		try {
+			return service.listarPromocionesRestaurante(page, size, restaurante);
+		} catch (RestauranteException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 }
