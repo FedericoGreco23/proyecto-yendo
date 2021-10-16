@@ -20,16 +20,24 @@ import com.vpi.springboot.Modelo.Carrito;
 import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Direccion;
 import com.vpi.springboot.Modelo.GeoLocalizacion;
+
 import com.vpi.springboot.Modelo.Producto;
+
+import com.vpi.springboot.Modelo.LastDireccioClientenMongo;
+
 import com.vpi.springboot.Modelo.dto.DTDireccion;
 import com.vpi.springboot.Modelo.dto.DTProducto;
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.Repositorios.ClienteRepositorio;
 import com.vpi.springboot.Repositorios.DireccionRepositorio;
 import com.vpi.springboot.Repositorios.GeoLocalizacionRepositorio;
+
 import com.vpi.springboot.Repositorios.MongoRepositorioCarrito;
 import com.vpi.springboot.Repositorios.ProductoRepositorio;
 import com.vpi.springboot.exception.ProductoException;
+
+import com.vpi.springboot.Repositorios.mongo.UltimaDireccionRepositorio;
+
 import com.vpi.springboot.exception.UsuarioException;
 import org.springframework.beans.factory.ObjectFactory;
 
@@ -57,6 +65,9 @@ public class ClienteService implements ClienteServicioInterfaz {
 	@Autowired
 	private NextSequenceService nextSequence;
 	
+
+	private UltimaDireccionRepositorio ultimaDireccionRepo;
+
 	private static final int iterations = 20 * 1000;
 	private static final int saltLen = 32;
 	private static final int desiredKeyLen = 256;
@@ -232,6 +243,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 			throw new UsuarioException("No existe cliente");
 		}
 	}
+
 	
 	/*public void agregarACarrito(DTProducto p) {
 		HttpSession session = httpSessionFactory.getObject();
@@ -271,4 +283,17 @@ public class ClienteService implements ClienteServicioInterfaz {
 		
 	}
 	
+
+	public String getUltimaDireccionSeleccionada(String mail) {
+		Optional<LastDireccioClientenMongo> direccion= ultimaDireccionRepo.findById(mail);
+		return direccion.isPresent()? direccion.get().getIdDireccion().toString():null;
+	}
+
+	public void setUltimaDireccionSeleccionada(Integer idDireccion, String mail) {
+		LastDireccioClientenMongo actualDire= new LastDireccioClientenMongo();
+		actualDire.setIdDireccion(idDireccion);
+		actualDire.set_id(mail);
+
+		ultimaDireccionRepo.save(actualDire);
+	}
 }

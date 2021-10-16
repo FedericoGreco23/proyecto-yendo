@@ -108,6 +108,32 @@ public class ClienteController {
 		
 	}
 
+	@GetMapping("/getLastDireccion")
+	public ResponseEntity<?> getLastDireccion() {
+		try {
+			String mail= getMailFromJwt();
+			String respuesta = clienteService.getUltimaDireccionSeleccionada(mail);
+			System.out.println(respuesta);
+			return mail!=null? new ResponseEntity<String>(respuesta, HttpStatus.OK): null;
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+
+	@PostMapping(path = "/lastDireccion/{idDireccion}", produces = "application/json")
+	@ResponseBody
+	public ResponseEntity<DTRespuesta> lastDireccion(@PathVariable String idDireccion) {
+		try {
+			String mail= getMailFromJwt();
+			clienteService.setUltimaDireccionSeleccionada(Integer.valueOf(idDireccion), mail);
+			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Direccion actualizada con éxito"), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+
 	private String getMailFromJwt() {
 		//obtenemos el token del header y le sacamos "Bearer "
         final String authorizationHeader = request.getHeader("Authorization");
