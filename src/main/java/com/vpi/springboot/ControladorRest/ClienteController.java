@@ -100,12 +100,12 @@ public class ClienteController {
 	}
 
 
-	@PostMapping(path = "/lastDireccion", produces = "application/json")
+	@PostMapping(path = "/lastDireccion/{idDireccion}", produces = "application/json")
 	@ResponseBody
-	public ResponseEntity<DTRespuesta> lastDireccion(@RequestBody String idDireccion) {
+	public ResponseEntity<DTRespuesta> lastDireccion(@PathVariable String idDireccion) {
 		try {
 			String mail= getMailFromJwt();
-			clienteService.setUltimaDireccionSeleccionada(idDireccion, mail);
+			clienteService.setUltimaDireccionSeleccionada(Integer.valueOf(idDireccion), mail);
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Direccion actualizada con éxito"), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);

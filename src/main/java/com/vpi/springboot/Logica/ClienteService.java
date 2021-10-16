@@ -220,8 +220,11 @@ public class ClienteService implements ClienteServicioInterfaz {
 		return direccion.isPresent()? direccion.get().getIdDireccion().toString():null;
 	}
 
-	public void setUltimaDireccionSeleccionada(String idDireccion, String mail) {
-		LastDireccioClientenMongo actualDire= new LastDireccioClientenMongo(mail, Integer.valueOf(idDireccion));
-			ultimaDireccionRepo.save(actualDire);
+	public void setUltimaDireccionSeleccionada(Integer idDireccion, String mail) {
+		LastDireccioClientenMongo actualDire= new LastDireccioClientenMongo();
+		actualDire.setIdDireccion(idDireccion);
+		actualDire.setMailCliente(mail);
+
+		ultimaDireccionRepo.save(actualDire);
 	}
 }
