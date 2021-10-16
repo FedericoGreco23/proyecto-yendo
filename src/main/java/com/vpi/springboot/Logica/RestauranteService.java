@@ -88,15 +88,18 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 		// La query tira una excepción si retorna más de una tupla
 		try {
-			if (proRepo.findByNombre(menu.getNombre(), restaurante) != null)
-				throw new ProductoException(ProductoException.ProductoYaExiste(menu.getNombre()));
+			if (proRepo.findByNombre(menu.getNombre(), restaurante) == null)
+				menu.setRestaurante(restaurante);
+				restaurante.addProducto(menu);
+				resRepo.save(restaurante);
+				
 		} catch (Exception e) {
-			throw new ProductoException(ProductoException.ProductoYaExiste(menu.getNombre()));
+			menu.setRestaurante(restaurante);
+			restaurante.addProducto(menu);
+			resRepo.save(restaurante);
 		}
 
-		menu.setRestaurante(restaurante);
-		restaurante.addProducto(menu);
-		resRepo.save(restaurante);
+	
 	}
 
 	public void bajaMenu(int id) throws ProductoException {

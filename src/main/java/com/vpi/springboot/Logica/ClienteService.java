@@ -20,13 +20,16 @@ import com.vpi.springboot.Modelo.Carrito;
 import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Direccion;
 import com.vpi.springboot.Modelo.GeoLocalizacion;
+import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
 import com.vpi.springboot.Modelo.dto.DTProducto;
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.Repositorios.ClienteRepositorio;
 import com.vpi.springboot.Repositorios.DireccionRepositorio;
 import com.vpi.springboot.Repositorios.GeoLocalizacionRepositorio;
-import com.vpi.springboot.Repositorios.MongoRepositorio;
+import com.vpi.springboot.Repositorios.MongoRepositorioCarrito;
+import com.vpi.springboot.Repositorios.ProductoRepositorio;
+import com.vpi.springboot.exception.ProductoException;
 import com.vpi.springboot.exception.UsuarioException;
 import org.springframework.beans.factory.ObjectFactory;
 
@@ -47,8 +50,13 @@ public class ClienteService implements ClienteServicioInterfaz {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	@Autowired
-	private MongoRepositorio mongoRepo;
+	private MongoRepositorioCarrito mongoRepo;
+	@Autowired
+	private ProductoRepositorio productoRepo;
 
+	@Autowired
+	private NextSequenceService nextSequence;
+	
 	private static final int iterations = 20 * 1000;
 	private static final int saltLen = 32;
 	private static final int desiredKeyLen = 256;
@@ -238,9 +246,27 @@ public class ClienteService implements ClienteServicioInterfaz {
 		}
 	}*/
 	
-	public void agregarACarrito(DTProductoCarrito p, String mail) {
-		Carrito carrito = new Carrito(mail, p);
-		mongoRepo.save(carrito);
+	@Override
+	public void agregarACarrito(DTProductoCarrito c, String mail) throws ProductoException {
+		int producto = c.getidProducto();
+		Optional<Producto> optionalProducto = productoRepo.findById(producto);
+		if(optionalProducto.isPresent()) {
+			Carrito optionalCarrito = mongoRepo.findByMailAndActivo(mail, true);
+		if(optionalCarrito != null) { //TIENE CARRITO ACTIVO
+				Carrito carritoExiste = optionalCarrito;
+				carritoExiste.addProductoCarrito(c);
+				mongoRepo.save(carritoExiste);
+			}else { //TIENE CARRITO INACTIVO O NO TIEN
+				List<DTProductoCarrito> productos = new ArrayList<DTProductoCarrito>();
+				productos.add(c);
+				Carrito carrito = new Carrito(mail, productos,true);
+				carrito.setId(nextSequence.getNextSequence("customSequences"));
+				mongoRepo.save(carrito);
+			}
+		}else {
+			throw new ProductoException(ProductoException.NotFoundExceptionId(producto));
+		}
+		
 		
 		
 	}

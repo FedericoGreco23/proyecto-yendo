@@ -1,26 +1,25 @@
 package com.vpi.springboot.Modelo;
+import java.util.List;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 
 @Document(collection="carrito")
 public class Carrito {
-	
-
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+	private long id;
 	
 	@NotNull(message = "mail no puede ser nulo")
 	private String mail;
 	@NotNull(message = "valoracion no puede ser nulo")
-	private DTProductoCarrito productoCarrito;
+	private List <DTProductoCarrito> productoCarrito;
+
+	private boolean activo;
 	
 	
 	
@@ -32,27 +31,47 @@ public class Carrito {
 
 
 	public Carrito(@NotNull(message = "mail no puede ser nulo") String mail,
-			@NotNull(message = "valoracion no puede ser nulo") DTProductoCarrito productoCarrito) {
+			@NotNull(message = "valoracion no puede ser nulo") List<DTProductoCarrito> productoCarrito, boolean activo) {
 		super();
 		this.mail = mail;
 		this.productoCarrito = productoCarrito;
+		this.activo = activo;
 	}
 	
 	
-	public int getId() {
+	public long getId() {
 		return id;
 	}
+	public void setId(long l) {
+		this.id = l;
+	}
+
+
 	public String getMail() {
 		return mail;
 	}
 	public void setMail(String mail) {
 		this.mail = mail;
 	}
-	public DTProductoCarrito getProductoCarrito() {
+	public List<DTProductoCarrito> getProductoCarrito() {
 		return productoCarrito;
 	}
-	public void setProductoCarrito(DTProductoCarrito productoCarrito) {
+	public void setProductoCarrito(List<DTProductoCarrito> productoCarrito) {
 		this.productoCarrito = productoCarrito;
+	}
+	
+	public void addProductoCarrito(DTProductoCarrito pc) {
+		this.productoCarrito.add(pc);
+	} 
+
+
+	public boolean isActivo() {
+		return activo;
+	}
+
+
+	public void setActivo(boolean activo) {
+		this.activo = activo;
 	}
 
 

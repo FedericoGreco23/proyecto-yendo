@@ -12,16 +12,16 @@ public class DTProductoCarrito implements Serializable {
 	private int idProducto;
     private Integer cantidad;
 
-    public DTProductoCarrito(int producto, Integer cantidad) {
-        this.idProducto = producto;
+    public DTProductoCarrito(int idProducto, Integer cantidad) {
+        this.idProducto = idProducto;
         this.cantidad = cantidad;
     }
 
-    public int getProducto() {
+    public int getidProducto() {
         return idProducto;
     }
 
-    public void setProducto(int producto) {
+    public void setidProducto(int producto) {
         this.idProducto = producto;
     }
 

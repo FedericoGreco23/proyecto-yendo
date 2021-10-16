@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.vpi.springboot.Logica.ClienteService;
+import com.vpi.springboot.Logica.NextSequenceService;
+import com.vpi.springboot.Modelo.Carrito;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
@@ -23,6 +25,8 @@ public class ClienteController {
 
 	@Autowired
 	private ClienteService clienteService;
+	
+
 	
     @Autowired
     private JwtUtil jwtUtil;
@@ -91,9 +95,10 @@ public class ClienteController {
 	
 
 	@PostMapping("agregarACarrito")
-	public ResponseEntity<?> agregarACarrito(@RequestBody DTProductoCarrito productoCarrito){
+	public ResponseEntity<?> agregarACarrito(@RequestParam int producto, Integer cantidad){
 		try {
 			String mail= getMailFromJwt();
+			DTProductoCarrito productoCarrito = new DTProductoCarrito(producto, cantidad);
 			clienteService.agregarACarrito(productoCarrito, mail);
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Producto agregado con éxito"), HttpStatus.OK);
 		} catch (Exception e) {
