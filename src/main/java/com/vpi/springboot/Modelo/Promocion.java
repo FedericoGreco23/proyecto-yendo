@@ -1,5 +1,6 @@
 package com.vpi.springboot.Modelo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -11,7 +12,7 @@ public class Promocion extends Producto{
 	
 	@ManyToMany
 	@JoinTable(name="producto_promocion")
-	private List<Producto> productos;
+	private List<Producto> productos = new ArrayList<>();
 	
 	
 

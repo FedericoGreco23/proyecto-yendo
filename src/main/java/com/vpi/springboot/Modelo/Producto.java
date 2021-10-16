@@ -1,5 +1,6 @@
 package com.vpi.springboot.Modelo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -25,7 +26,7 @@ public class Producto {
 	@JoinColumn(name = "restauranteMail")
 	private Restaurante restaurante;
 	@ManyToMany
-	private List<Categoria> categorias;
+	private List<Categoria> categorias = new ArrayList<>();
 
 	public Producto() {
 		super();

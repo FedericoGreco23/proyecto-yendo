@@ -52,6 +52,12 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	
 	@Autowired
 	private CategoriaRepositorio catRepo;
+	
+	@Autowired
+	private ProductoRepositorio proRepo;
+
+	@Autowired
+	private RestauranteRepositorio resRepo;
 
 	@Override
 	public void altaRestaurante(Restaurante rest) throws RestauranteException {
@@ -80,11 +86,6 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		restauranteRepo.save(rest);
 	}
 
-	private ProductoRepositorio proRepo;
-
-	@Autowired
-	private RestauranteRepositorio resRepo;
-
 	public void altaMenu(Producto menu, String varRestaurante)
 			throws ProductoException, RestauranteException, CategoriaException, Exception {
 		Optional<Restaurante> optionalRestaurante = resRepo.findById(varRestaurante);
@@ -93,23 +94,26 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		}
 		Restaurante restaurante = optionalRestaurante.get();
 		
+		List<Categoria> categorias = new ArrayList<>();
 		for(Categoria c: menu.getCategorias()) {			
 			Optional<Categoria> optionalCategoria = catRepo.findById(c.getNombre());
 			if(optionalCategoria.isEmpty())
 				throw new CategoriaException(CategoriaException.NotFoundException(c.getNombre()));
+			categorias.add(c);
 		}
 
 		// La query tira una excepción si retorna más de una tupla
 		try {
-			if (proRepo.findByNombre(menu.getNombre(), restaurante) == null)
+			if (proRepo.findByNombre(menu.getNombre(), restaurante) == null) {
+				menu.setCategorias(categorias);
 				menu.setRestaurante(restaurante);
-			restaurante.addProducto(menu);
-			resRepo.save(restaurante);
-
+				restaurante.addProducto(menu);
+				resRepo.save(restaurante);
+			} else {
+				throw new ProductoException(ProductoException.ProductoYaExiste(menu.getNombre()));
+			}
 		} catch (Exception e) {
-			menu.setRestaurante(restaurante);
-			restaurante.addProducto(menu);
-			resRepo.save(restaurante);
+			throw new ProductoException(ProductoException.ProductoYaExiste(menu.getNombre()));
 		}
 	}
 
