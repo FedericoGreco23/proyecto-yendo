@@ -14,23 +14,27 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.vpi.springboot.Modelo.Cliente;
+import com.vpi.springboot.Modelo.Categoria;
+import com.vpi.springboot.Modelo.GeoLocalizacion;
 import com.vpi.springboot.Modelo.Pedido;
 import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.dto.DTPedido;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
+import com.vpi.springboot.Repositorios.CategoriaRepositorio;
 import com.vpi.springboot.Repositorios.GeoLocalizacionRepositorio;
 import com.vpi.springboot.Repositorios.PedidoRepositorio;
 import com.vpi.springboot.Repositorios.ProductoRepositorio;
 import com.vpi.springboot.Repositorios.PromocionRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
+import com.vpi.springboot.exception.CategoriaException;
 import com.vpi.springboot.exception.ProductoException;
 import com.vpi.springboot.exception.RestauranteException;
 
 @Service
 public class RestauranteService implements RestauranteServicioInterfaz {
-	
+
 	@Autowired
 	private RestauranteRepositorio restauranteRepo;
 
@@ -39,16 +43,22 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 	@Autowired
 	private PedidoRepositorio pedidoRepo;
-	
+
 	@Autowired
 	private PromocionRepositorio promoRepo;
-	
+
+	@Autowired
+	private CategoriaRepositorio catRepo;
+
 	@Autowired
 	private ProductoRepositorio proRepo;
-	
+
+	@Autowired
+	private RestauranteRepositorio resRepo;
+
 	@Override
 	public void altaRestaurante(Restaurante rest) throws RestauranteException {
-		
+
 		//Seccion verificar que nombreRestaurante o restauranteMail no exista ya
 		Optional<Restaurante> busquedaMail = restauranteRepo.findById(rest.getMail());
 		Restaurante busquedaNombre = null;
@@ -59,7 +69,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			throw new RestauranteException(RestauranteException.RestauranteYaExiste(rest.getNombre()));
 		}
 		//Fin de seccion
-		
+
 		rest.setActivo(true);
 		rest.setBloqueado(false);
 		rest.setCalificacionPromedio(5.0f);
@@ -70,31 +80,41 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		rest.setReclamos(null);
 		rest.setPedidos(null);
 		rest.setAbierto(false);
-		
-		restauranteRepo.save(rest);	
+
+		restauranteRepo.save(rest);
 	}
-	
+
 	public void altaMenu(Producto menu, String varRestaurante)
-			throws ProductoException, RestauranteException, Exception {
-		Restaurante restaurante = restauranteRepo.findByNombre(varRestaurante);
-		if (restaurante == null) {
+			throws ProductoException, RestauranteException, CategoriaException, Exception {
+		Optional<Restaurante> optionalRestaurante = resRepo.findById(varRestaurante);
+		if (optionalRestaurante.isEmpty()) {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(varRestaurante));
+		}
+		Restaurante restaurante = optionalRestaurante.get();
+
+		List<Categoria> categorias = new ArrayList<>();
+		for(Categoria c: menu.getCategorias()) {
+			Optional<Categoria> optionalCategoria = catRepo.findById(c.getNombre());
+			if(optionalCategoria.isEmpty())
+				throw new CategoriaException(CategoriaException.NotFoundException(c.getNombre()));
+			categorias.add(c);
 		}
 
 		// La query tira una excepción si retorna más de una tupla
 		try {
-			if (proRepo.findByNombre(menu.getNombre(), restaurante) == null)
+			if (proRepo.findByNombre(menu.getNombre(), restaurante) == null) {
+				menu.setCategorias(categorias);
 				menu.setRestaurante(restaurante);
 				restaurante.addProducto(menu);
-				restauranteRepo.save(restaurante);
-				
+				resRepo.save(restaurante);
+			} else {
+				throw new ProductoException(ProductoException.ProductoYaExiste(menu.getNombre()));
+			}
 		} catch (Exception e) {
-			menu.setRestaurante(restaurante);
-			restaurante.addProducto(menu);
-			restauranteRepo.save(restaurante);
+			throw new ProductoException(ProductoException.ProductoYaExiste(menu.getNombre()));
 		}
 	}
-	
+
 	public void bajaMenu(int id) throws ProductoException {
 		Optional<Producto> optionalProducto = proRepo.findById(id);
 		if (optionalProducto.isPresent()) {
@@ -128,11 +148,12 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		proRepo.save(producto);
 	}
 
-	public Map<String, Object> listarPedidos(int page, int size, String nombreRestaurante) throws RestauranteException {
-		Restaurante restaurante = restauranteRepo.findByNombre(nombreRestaurante);
-		if (restaurante == null) {
-			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(nombreRestaurante));
+	public Map<String, Object> listarPedidos(int page, int size, String varRestaurante) throws RestauranteException {
+		Optional<Restaurante> optionalRestaurante = resRepo.findById(varRestaurante);
+		if (optionalRestaurante.isEmpty()) {
+			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(varRestaurante));
 		}
+		Restaurante restaurante = optionalRestaurante.get();
 
 		Map<String, Object> response = new HashMap<>();
 		Pageable paging = PageRequest.of(page, size);
@@ -150,14 +171,14 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		response.put("pedidos", pedidos);
 		return response;
 	}
-	
+
 	@Override
 	public void abrirRestaurante(String mail) {
 		Optional<Restaurante> restaurante = restauranteRepo.findById(mail);
 		restaurante.get().setAbierto(true);
 		restauranteRepo.save(restaurante.get());
 	}
-	
+
 	@Override
 	public void cerrarRestaurante(String mail) {
 		Optional<Restaurante> restaurante = restauranteRepo.findById(mail);

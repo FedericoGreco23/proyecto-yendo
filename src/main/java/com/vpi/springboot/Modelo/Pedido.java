@@ -1,6 +1,7 @@
 package com.vpi.springboot.Modelo;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -41,7 +42,7 @@ public class Pedido {
 	private Restaurante restaurante;
 	@OneToMany(mappedBy = "pedido", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JsonIgnore
-	private List<Reclamo> reclamos;
+	private List<Reclamo> reclamos = new ArrayList<>();
 
 	public Pedido(int id, LocalDateTime fecha, Double costoTotal, EnumEstadoPedido estadoPedido,
 			EnumMetodoDePago metodoDePago, Integer carrito) {

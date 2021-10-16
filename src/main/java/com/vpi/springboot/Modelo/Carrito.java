@@ -1,4 +1,5 @@
 package com.vpi.springboot.Modelo;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Id;
@@ -17,7 +18,7 @@ public class Carrito {
 	@NotNull(message = "mail no puede ser nulo")
 	private String mail;
 	@NotNull(message = "valoracion no puede ser nulo")
-	private List <DTProductoCarrito> productoCarrito;
+	private List <DTProductoCarrito> productoCarrito = new ArrayList<>();
 
 	private boolean activo;
 	

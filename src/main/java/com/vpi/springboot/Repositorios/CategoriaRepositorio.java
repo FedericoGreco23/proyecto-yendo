@@ -9,6 +9,6 @@ import com.vpi.springboot.Modelo.Categoria;
 
 
 @Repository
-public interface CategoriaRepositorio extends JpaRepository<Categoria, Integer>{
+public interface CategoriaRepositorio extends JpaRepository<Categoria, String>{
 
 }

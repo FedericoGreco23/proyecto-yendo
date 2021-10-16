@@ -2,6 +2,7 @@ package com.vpi.springboot.Logica;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import com.vpi.springboot.Modelo.*;
 import com.vpi.springboot.Modelo.dto.DTAdministrador;
 import com.vpi.springboot.Modelo.dto.DTCliente;
+import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
 import com.vpi.springboot.Modelo.dto.DTUsuario;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
@@ -43,7 +45,7 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 	private RestauranteRepositorio resRepo;
 
 	@Override
-	public void crearAdministrador(Administrador admin) throws AdministradorException {
+	public DTRespuesta crearAdministrador(Administrador admin) throws AdministradorException {
 		Optional<Administrador> optionalUser = adminRepo.findById(admin.getMail());
 		if (optionalUser.isPresent()) {
 			throw new AdministradorException(AdministradorException.AdministradorYaExiste(admin.getMail()));
@@ -53,7 +55,9 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 				admin.setActivo(true);
 				admin.setBloqueado(false);
 				admin.setContrasenia(passwordEncoder.encode(admin.getContrasenia()));
+				admin.setFechaCreacion(LocalDate.now());
 				adminRepo.save(admin);
+				return new DTRespuesta("Administrador creado con éxito.");
 			} else
 				throw new AdministradorException("Tiene que introducir un mail válido.");
 		}
@@ -134,7 +138,7 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 		response.put("usuarios", usuarios);
 		return response;
 	}
-	
+
 	// 2 -> administrador
 	// 1 -> restaurante
 	// 0 -> cliente
@@ -149,12 +153,12 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 		List<Administrador> administradores = new ArrayList<Administrador>();
 		List<Restaurante> restaurantes = new ArrayList<Restaurante>();
 		List<Cliente> clientes = new ArrayList<Cliente>();
-		
+
 		Map<String, Object> response = new HashMap<>();
 		//Page<DTUsuario> pageUsuario;
-		
+
 		Pageable paging = PageRequest.of(page, size);
-		
+
 		switch(tipoUsuario) {
 		case 2:
 			Page<Administrador> pageAdministradores;
@@ -163,7 +167,7 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 					//Aplico los 3 filtros
 					pageAdministradores = adminRepo.buscarAdministradorNombre(texto, paging);
 					administradores = pageAdministradores.getContent();
-					for (Administrador administrador : administradores) {				
+					for (Administrador administrador : administradores) {
 						long days = ChronoUnit.DAYS.between(administrador.getFechaCreacion(), LocalDate.now());
 						if (days > antiguedadUsuario) {
 							DTUsuarios.add(new DTUsuario(administrador, "Administrador"));
@@ -176,7 +180,7 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 					pageAdministradores = (Page<Administrador>) adminRepo.buscarAdministrador(paging);
 					administradores = pageAdministradores.getContent();
 					//administradores = adminRepo.buscarAdministrador();
-					for (Administrador administrador : administradores) {				
+					for (Administrador administrador : administradores) {
 						long days = ChronoUnit.DAYS.between(administrador.getFechaCreacion(), LocalDate.now());
 						if (days > antiguedadUsuario) {
 							DTUsuarios.add(new DTUsuario(administrador, "Administrador"));
@@ -206,11 +210,11 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 			response.put("currentPage", pageAdministradores.getNumber());
 			response.put("totalItems", pageAdministradores.getTotalElements());
 			response.put("usuarios", DTUsuarios);
-			
+
 			//listaTiposDeUsuarios.setAdministradores(DTAdministradores);
 			break;
-			
-			
+
+
 		case 1:
 			Page<Restaurante> pageRestaurantes;
 			if (antiguedadUsuario > 0) {
@@ -219,20 +223,20 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 					pageRestaurantes = (Page<Restaurante>) resRepo.buscarRestauranteNombre(texto, paging);
 					restaurantes = pageRestaurantes.getContent();
 					//restaurantes = restaRepo.buscarRestauranteNombre(texto);
-					for (Restaurante restaurante : restaurantes) {				
+					for (Restaurante restaurante : restaurantes) {
 						long days = ChronoUnit.DAYS.between(restaurante.getFechaCreacion(), LocalDate.now());
 						if (days > antiguedadUsuario) {
 							DTUsuarios.add(new DTUsuario(restaurante, "Restaurante"));
 							//DTRestaurantes.add(restaurante.getDatos());
 						}
 					}
-					
+
 				} else {
 					//Aplico tipo y antiguedad
 					pageRestaurantes = (Page<Restaurante>) resRepo.buscarRestaurante(paging);
 					restaurantes = pageRestaurantes.getContent();
 					//restaurantes = restaRepo.buscarRestaurante();
-					for (Restaurante restaurante : restaurantes) {				
+					for (Restaurante restaurante : restaurantes) {
 						long days = ChronoUnit.DAYS.between(restaurante.getFechaCreacion(), LocalDate.now());
 						if (days > antiguedadUsuario) {
 							DTUsuarios.add(new DTUsuario(restaurante, "Restaurante"));
@@ -259,15 +263,15 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 					//DTRestaurantes.add(restaurante.getDatos());
 				}
 			}
-			
+
 			response.put("currentPage", pageRestaurantes.getNumber());
 			response.put("totalItems", pageRestaurantes.getTotalElements());
 			response.put("usuarios", DTUsuarios);
-			
+
 			//listaTiposDeUsuarios.setRestaurantes(DTRestaurantes);
 			break;
-			
-			
+
+
 		case 0:
 			Page<Cliente> pageClientes;
 			if (antiguedadUsuario > 0) {
@@ -283,7 +287,7 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 							//DTClientes.add(cliente.getDatos());
 						}
 					}
-					
+
 				} else {
 					//Aplico tipo y antiguedad
 					pageClientes = (Page<Cliente>) clienteRepo.buscarCliente(paging);
@@ -316,7 +320,7 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 					//DTClientes.add(cliente.getDatos());
 				}
 			}
-			
+
 			response.put("currentPage", pageClientes.getNumber());
 			response.put("totalItems", pageClientes.getTotalElements());
 			response.put("usuarios", DTUsuarios);
@@ -324,7 +328,7 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 			//listaTiposDeUsuarios.setClientes(DTClientes);
 			break;
 		}
-		
+
 		return response;
 		//return DTUsuarios;
 	}
