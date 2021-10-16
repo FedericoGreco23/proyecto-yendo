@@ -2,6 +2,7 @@ package com.vpi.springboot.Logica;
 
 import java.util.List;
 import com.vpi.springboot.Modelo.Cliente;
+import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.exception.ProductoException;
@@ -23,4 +24,6 @@ public interface ClienteServicioInterfaz {
 	void eliminarDireccion(Integer id, String mail) throws UsuarioException;
 	
 	public void agregarACarrito(DTProductoCarrito c, String mail) throws ProductoException;
+	
+	public DTCarrito verCarrito(String mail);
 }

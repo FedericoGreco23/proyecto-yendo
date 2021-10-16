@@ -24,7 +24,7 @@ import com.vpi.springboot.Modelo.GeoLocalizacion;
 import com.vpi.springboot.Modelo.Producto;
 
 import com.vpi.springboot.Modelo.LastDireccioClientenMongo;
-
+import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
 import com.vpi.springboot.Modelo.dto.DTProducto;
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
@@ -277,9 +277,14 @@ public class ClienteService implements ClienteServicioInterfaz {
 			}
 		}else {
 			throw new ProductoException(ProductoException.NotFoundExceptionId(producto));
-		}
-		
-		
+		}	
+	}
+	
+	@Override
+	public DTCarrito verCarrito(String mail) {
+		Carrito optionalCarrito = mongoRepo.findByMailAndActivo(mail, true);
+		DTCarrito carrito = new DTCarrito(optionalCarrito.getId(), optionalCarrito.getProductoCarrito());
+		return carrito;
 		
 	}
 	

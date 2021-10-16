@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import com.vpi.springboot.Logica.ClienteService;
 import com.vpi.springboot.Logica.NextSequenceService;
 import com.vpi.springboot.Modelo.Carrito;
+import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
@@ -133,6 +134,16 @@ public class ClienteController {
 		}
 	}
 	
+	@GetMapping("/getCarrito")
+	public DTCarrito verCarrito() {
+		try {
+			String mail= getMailFromJwt();
+			return mail!=null? clienteService.verCarrito(mail): null;
+		} catch (Exception e) {
+			return null;
+		}
+		
+	}
 
 	private String getMailFromJwt() {
 		//obtenemos el token del header y le sacamos "Bearer "
