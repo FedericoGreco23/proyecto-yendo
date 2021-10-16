@@ -27,8 +27,5 @@ public class UsuarioException extends Exception {
 	public static String NicknameRepetido() {
 		return "Nickname en uso";
 	}
-	
-	public static String NoPermisosException (String userTypeRequerido) {
-		return "El acceso está restringido para usuarios "+userTypeRequerido;
-	}
+
 }

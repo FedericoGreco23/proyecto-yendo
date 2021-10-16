@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.vpi.springboot.Logica.AdministradorService;
 import com.vpi.springboot.Modelo.Administrador;
+import com.vpi.springboot.Modelo.dto.DTRespuesta;
+import com.vpi.springboot.exception.PermisosException;
 import com.vpi.springboot.exception.UsuarioException;
 import com.vpi.springboot.security.util.JwtUtil;
 import com.vpi.springboot.security.util.JwtUtil.keyInfoJWT;
@@ -50,7 +52,7 @@ public class AdministradorController {
 	@PostMapping("/crear")
 	public ResponseEntity<?> altaAdministrador(@RequestBody Administrador admin) {
 		if(!esAdmin()) {
-			return new ResponseEntity<>(new UsuarioException(UsuarioException.NoPermisosException("ADMIN")).getMessage(), HttpStatus.FORBIDDEN);
+			return new ResponseEntity<>(new UsuarioException(PermisosException.NoPermisosException("ADMIN")).getMessage(), HttpStatus.FORBIDDEN);
 		}
 		try {
 			service.crearAdministrador(admin);
@@ -66,7 +68,7 @@ public class AdministradorController {
 	@PostMapping("/eliminar")
 	public ResponseEntity<?> eliminarUsuario(@RequestParam String mail) {
 		if(!esAdmin()) {
-			return new ResponseEntity<>(new UsuarioException(UsuarioException.NoPermisosException("ADMIN")).getMessage(), HttpStatus.FORBIDDEN);
+			return new ResponseEntity<>(new UsuarioException(PermisosException.NoPermisosException("ADMIN")).getMessage(), HttpStatus.FORBIDDEN);
 		}
 		try {
 			service.eliminarUsuario(mail);
@@ -80,7 +82,7 @@ public class AdministradorController {
 	@PostMapping("/bloquear")
 	public ResponseEntity<?> bloquearUsuario(@RequestParam String mail, @RequestParam String clienteRestaurante) {
 		if(!esAdmin()) {
-			return new ResponseEntity<>(new UsuarioException(UsuarioException.NoPermisosException("ADMIN")).getMessage(), HttpStatus.FORBIDDEN);
+			return new ResponseEntity<>(new UsuarioException(PermisosException.NoPermisosException("ADMIN")).getMessage(), HttpStatus.FORBIDDEN);
 		}
 		try {
 			service.bloquearUsuario(mail, clienteRestaurante);
@@ -94,7 +96,7 @@ public class AdministradorController {
 	@PostMapping("/desbloquear")
 	public ResponseEntity<?> desbloquearUsuario(@RequestParam String mail, @RequestParam String clienteRestaurante) {
 		if(!esAdmin()) {
-			return new ResponseEntity<>(new UsuarioException(UsuarioException.NoPermisosException("ADMIN")).getMessage(), HttpStatus.FORBIDDEN);
+			return new ResponseEntity<>(new UsuarioException(PermisosException.NoPermisosException("ADMIN")).getMessage(), HttpStatus.FORBIDDEN);
 		}
 		try {
 			service.desbloquearUsuario(mail, clienteRestaurante);
@@ -108,7 +110,10 @@ public class AdministradorController {
 	@GetMapping("/getUsuarios")
 	public Map<String, Object> getUsuarios(@RequestParam(defaultValue = "0") int page,
 									  	   @RequestParam(defaultValue = "5") int size, 
-									       @RequestParam(defaultValue = "0") int tipoUsuario) {
+									       @RequestParam(defaultValue = "0") int tipoUsuario) throws UsuarioException {
+		if(!esAdmin()) {
+			throw new UsuarioException(PermisosException.NoPermisosException("ADMIN"));
+		}
 		return service.listarUsuariosRegistrados(page, size, tipoUsuario);
 	}
 	
@@ -116,7 +121,10 @@ public class AdministradorController {
 	@GetMapping("/getRestaurantes")
 	public Map<String, Object> getRestaurantes(@RequestParam(defaultValue = "0") int page,
 									  	   	   @RequestParam(defaultValue = "5") int size, 
-									           @RequestParam(defaultValue = "3") int tipo) {
+									           @RequestParam(defaultValue = "3") int tipo) throws UsuarioException {
+		if(!esAdmin()) {
+			throw new UsuarioException(PermisosException.NoPermisosException("ADMIN"));
+		}
 		return service.listarRestaurantes(page, size, tipo);
 	}
 	
@@ -124,7 +132,7 @@ public class AdministradorController {
 	@PostMapping("/cambiarEstado/{varRestaurante}")
 	public ResponseEntity<?> cambiarEstadoRestaurante(@PathVariable String varRestaurante, @RequestParam (required = true) int estado ) {
 		if(!esAdmin()) {
-			return new ResponseEntity<>(new UsuarioException(UsuarioException.NoPermisosException("ADMIN")).getMessage(), HttpStatus.FORBIDDEN);
+			return new ResponseEntity<>(new UsuarioException(PermisosException.NoPermisosException("ADMIN")).getMessage(), HttpStatus.FORBIDDEN);
 		}
 		try {
 			service.cambiarEstadoRestaurante(varRestaurante, estado);
