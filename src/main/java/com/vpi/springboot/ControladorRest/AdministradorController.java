@@ -55,8 +55,7 @@ public class AdministradorController {
 			return new ResponseEntity<>(new UsuarioException(PermisosException.NoPermisosException("ADMIN")).getMessage(), HttpStatus.FORBIDDEN);
 		}
 		try {
-			service.crearAdministrador(admin);
-			return new ResponseEntity<Administrador>(admin, HttpStatus.OK);
+			return new ResponseEntity<DTRespuesta>(service.crearAdministrador(admin), HttpStatus.OK);
 		} catch (ConstraintViolationException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {

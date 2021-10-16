@@ -1,5 +1,7 @@
 package com.vpi.springboot.Logica;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.vpi.springboot.Modelo.*;
+import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
 import com.vpi.springboot.Modelo.dto.DTUsuario;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
@@ -39,7 +42,7 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 	private RestauranteRepositorio resRepo;
 
 	@Override
-	public void crearAdministrador(Administrador admin) throws AdministradorException {
+	public DTRespuesta crearAdministrador(Administrador admin) throws AdministradorException {
 		Optional<Administrador> optionalUser = adminRepo.findById(admin.getMail());
 		if (optionalUser.isPresent()) {
 			throw new AdministradorException(AdministradorException.AdministradorYaExiste(admin.getMail()));
@@ -49,7 +52,9 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 				admin.setActivo(true);
 				admin.setBloqueado(false);
 				admin.setContrasenia(passwordEncoder.encode(admin.getContrasenia()));
+				admin.setFechaCreacion(LocalDate.now());
 				adminRepo.save(admin);
+				return new DTRespuesta("Administrador creado con éxito.");
 			} else
 				throw new AdministradorException("Tiene que introducir un mail válido.");
 		}

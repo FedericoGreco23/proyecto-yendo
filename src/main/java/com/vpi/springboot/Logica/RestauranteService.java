@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.vpi.springboot.Modelo.Categoria;
 import com.vpi.springboot.Modelo.GeoLocalizacion;
 import com.vpi.springboot.Modelo.Pedido;
 import com.vpi.springboot.Modelo.Restaurante;
@@ -20,6 +21,7 @@ import com.vpi.springboot.Modelo.dto.DTGeoLocalizacion;
 import com.vpi.springboot.Modelo.dto.DTPedido;
 import com.vpi.springboot.Modelo.dto.DTPromocion;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
+import com.vpi.springboot.Repositorios.CategoriaRepositorio;
 import com.vpi.springboot.Repositorios.GeoLocalizacionRepositorio;
 import com.vpi.springboot.Repositorios.PedidoRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
@@ -29,6 +31,7 @@ import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Repositorios.ProductoRepositorio;
 import com.vpi.springboot.Repositorios.PromocionRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
+import com.vpi.springboot.exception.CategoriaException;
 import com.vpi.springboot.exception.ProductoException;
 import com.vpi.springboot.exception.RestauranteException;
 
@@ -43,9 +46,12 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 	@Autowired
 	private PedidoRepositorio pedidoRepo;
-	
+
 	@Autowired
 	private PromocionRepositorio promoRepo;
+	
+	@Autowired
+	private CategoriaRepositorio catRepo;
 
 	@Override
 	public void altaRestaurante(Restaurante rest) throws RestauranteException {
@@ -80,26 +86,31 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	private RestauranteRepositorio resRepo;
 
 	public void altaMenu(Producto menu, String varRestaurante)
-			throws ProductoException, RestauranteException, Exception {
-		Restaurante restaurante = resRepo.findByNombre(varRestaurante);
-		if (restaurante == null) {
+			throws ProductoException, RestauranteException, CategoriaException, Exception {
+		Optional<Restaurante> optionalRestaurante = resRepo.findById(varRestaurante);
+		if (optionalRestaurante.isEmpty()) {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(varRestaurante));
+		}
+		Restaurante restaurante = optionalRestaurante.get();
+		
+		for(Categoria c: menu.getCategorias()) {			
+			Optional<Categoria> optionalCategoria = catRepo.findById(c.getNombre());
+			if(optionalCategoria.isEmpty())
+				throw new CategoriaException(CategoriaException.NotFoundException(c.getNombre()));
 		}
 
 		// La query tira una excepción si retorna más de una tupla
 		try {
 			if (proRepo.findByNombre(menu.getNombre(), restaurante) == null)
 				menu.setRestaurante(restaurante);
-				restaurante.addProducto(menu);
-				resRepo.save(restaurante);
-				
+			restaurante.addProducto(menu);
+			resRepo.save(restaurante);
+
 		} catch (Exception e) {
 			menu.setRestaurante(restaurante);
 			restaurante.addProducto(menu);
 			resRepo.save(restaurante);
 		}
-
-	
 	}
 
 	public void bajaMenu(int id) throws ProductoException {
@@ -135,11 +146,12 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		proRepo.save(producto);
 	}
 
-	public Map<String, Object> listarPedidos(int page, int size, String nombreRestaurante) throws RestauranteException {
-		Restaurante restaurante = resRepo.findByNombre(nombreRestaurante);
-		if (restaurante == null) {
-			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(nombreRestaurante));
+	public Map<String, Object> listarPedidos(int page, int size, String varRestaurante) throws RestauranteException {
+		Optional<Restaurante> optionalRestaurante = resRepo.findById(varRestaurante);
+		if (optionalRestaurante.isEmpty()) {
+			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(varRestaurante));
 		}
+		Restaurante restaurante = optionalRestaurante.get();
 
 		Map<String, Object> response = new HashMap<>();
 		Pageable paging = PageRequest.of(page, size);
