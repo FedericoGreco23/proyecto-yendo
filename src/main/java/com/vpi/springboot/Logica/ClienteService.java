@@ -65,7 +65,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 	@Autowired
 	private NextSequenceService nextSequence;
 	
-
+	@Autowired
 	private UltimaDireccionRepositorio ultimaDireccionRepo;
 
 	private static final int iterations = 20 * 1000;
