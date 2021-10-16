@@ -17,10 +17,12 @@ import org.springframework.stereotype.Service;
 import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Direccion;
 import com.vpi.springboot.Modelo.GeoLocalizacion;
+import com.vpi.springboot.Modelo.LastDireccioClientenMongo;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
 import com.vpi.springboot.Repositorios.ClienteRepositorio;
 import com.vpi.springboot.Repositorios.DireccionRepositorio;
 import com.vpi.springboot.Repositorios.GeoLocalizacionRepositorio;
+import com.vpi.springboot.Repositorios.mongo.UltimaDireccionRepositorio;
 import com.vpi.springboot.exception.UsuarioException;
 
 @Service
@@ -34,6 +36,9 @@ public class ClienteService implements ClienteServicioInterfaz {
 	private GeoLocalizacionRepositorio geoRepo;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+
+	@Autowired
+	private UltimaDireccionRepositorio ultimaDireccionRepo;
 
 	private static final int iterations = 20 * 1000;
 	private static final int saltLen = 32;
@@ -208,5 +213,15 @@ public class ClienteService implements ClienteServicioInterfaz {
 		} else {
 			throw new UsuarioException("No existe cliente");
 		}
+	}
+
+	public String getUltimaDireccionSeleccionada(String mail) {
+		Optional<LastDireccioClientenMongo> direccion= ultimaDireccionRepo.findById(mail);
+		return direccion.isPresent()? direccion.get().getIdDireccion().toString():null;
+	}
+
+	public void setUltimaDireccionSeleccionada(String idDireccion, String mail) {
+		LastDireccioClientenMongo actualDire= new LastDireccioClientenMongo(mail, Integer.valueOf(idDireccion));
+			ultimaDireccionRepo.save(actualDire);
 	}
 }
