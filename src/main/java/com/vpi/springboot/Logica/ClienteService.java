@@ -4,7 +4,9 @@ import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.crypto.SecretKey;
@@ -13,6 +15,9 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,20 +27,23 @@ import com.vpi.springboot.Modelo.Direccion;
 import com.vpi.springboot.Modelo.GeoLocalizacion;
 
 import com.vpi.springboot.Modelo.Producto;
-
+import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.LastDireccioClientenMongo;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
 import com.vpi.springboot.Modelo.dto.DTProducto;
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
+import com.vpi.springboot.Modelo.dto.DTRestaurante;
+import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Repositorios.ClienteRepositorio;
 import com.vpi.springboot.Repositorios.DireccionRepositorio;
 import com.vpi.springboot.Repositorios.GeoLocalizacionRepositorio;
 
 import com.vpi.springboot.Repositorios.MongoRepositorioCarrito;
 import com.vpi.springboot.Repositorios.ProductoRepositorio;
+import com.vpi.springboot.Repositorios.RestauranteRepositorio;
 import com.vpi.springboot.exception.ProductoException;
-
+import com.vpi.springboot.exception.RestauranteException;
 import com.vpi.springboot.Repositorios.mongo.UltimaDireccionRepositorio;
 
 import com.vpi.springboot.exception.UsuarioException;
@@ -61,6 +69,8 @@ public class ClienteService implements ClienteServicioInterfaz {
 	private MongoRepositorioCarrito mongoRepo;
 	@Autowired
 	private ProductoRepositorio productoRepo;
+	@Autowired
+	private RestauranteRepositorio restauranteRepo;
 
 	@Autowired
 	private NextSequenceService nextSequence;
@@ -143,6 +153,37 @@ public class ClienteService implements ClienteServicioInterfaz {
 	}
 	// --------------------------------------
 
+	@Override
+	public Map<String, Object> listarRestaurantes(int page, int size, int horarioApertura) throws RestauranteException {
+		Map<String, Object> response = new HashMap<>();
+		List<DTRestaurante> DTRestaurantes = new ArrayList<DTRestaurante>();
+		List<Restaurante> restaurantes = new ArrayList<Restaurante>();
+		Pageable paging = PageRequest.of(page, size);
+		Page<Restaurante> pageRestaurante;
+		
+		pageRestaurante = restauranteRepo.findByEstado(EnumEstadoRestaurante.ACEPTADO, paging);
+		
+		restaurantes = pageRestaurante.getContent();
+		//Si el horarioApertura en el filtro es menor o igual que el horarioApertura del restaurante se muestra
+		if (horarioApertura > 0) {
+			for (Restaurante r : restaurantes) {
+				if (r.getHorarioApertura().getHour() >= horarioApertura) {
+					DTRestaurantes.add(new DTRestaurante(r));
+				}
+			}
+		} else {
+			for (Restaurante r : restaurantes) {
+				DTRestaurantes.add(new DTRestaurante(r));
+			}
+		}
+		response.put("currentPage", pageRestaurante.getNumber());
+		response.put("totalItems", pageRestaurante.getTotalElements());
+		response.put("restaurantes", DTRestaurantes);
+		
+		return response;
+	}
+	
+	
 	@Override
 	public List<Cliente> obtenerClientes() {
 		Iterable<Cliente> usuario = userRepo.findAll();

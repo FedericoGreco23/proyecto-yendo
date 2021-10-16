@@ -106,6 +106,11 @@ public class AdministradorController {
 		}
 	}
 	
+	@GetMapping("/buscarUsuario")
+	public Map<String, Object> buscarUsuario(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "0") int tipoUsuario, @RequestParam Integer antiguedadUsuario, @RequestParam String texto) {
+		return service.buscarUsuario(page, size, tipoUsuario, antiguedadUsuario, texto);
+	}
+	
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@GetMapping("/getUsuarios")
 	public Map<String, Object> getUsuarios(@RequestParam(defaultValue = "0") int page,

@@ -3,6 +3,7 @@ package com.vpi.springboot.Modelo.dto;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.vpi.springboot.Modelo.GeoLocalizacion;
@@ -22,10 +23,10 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 	private LocalTime tiempoEstimadoMaximo;
 	private LocalDate fechaApertura;
 	private Integer costoDeEnvio;
-	private List<DTPedido> pedidos;
-	private List<DTReclamo> reclamos;
+	private List<DTPedido> pedidos = new ArrayList<>();
+	private List<DTReclamo> reclamos = new ArrayList<>();
 	private DTGeoLocalizacion geoLocalizacion;
-	private List<DTProducto> productos;
+	private List<String> productos = new ArrayList<>();
 	private String diasAbierto;
 	private Boolean abierto;
 
@@ -69,7 +70,7 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 		this.abierto = abierto;
 
 		for (Producto pro : productos) {
-			this.productos.add(new DTProducto(pro));
+			this.productos.add(pro.getNombre());
 		}
 	}
 	
@@ -102,12 +103,19 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 		this.horarioCierre = res.getHorarioCierre();
 		this.fechaApertura = res.getFechaApertura();
 		this.costoDeEnvio = res.getCostoDeEnvio();
-		this.geoLocalizacion = new DTGeoLocalizacion(res.getGeoLocalizacion());
 		this.diasAbierto = res.getDiasAbierto();
 		this.abierto = res.getAbierto();
 
-		for (Producto pro : res.getProductos()) {
-			this.productos.add(new DTProducto(pro));
+		if (res.getGeoLocalizacion() != null)
+			this.geoLocalizacion = new DTGeoLocalizacion(res.getGeoLocalizacion());
+		else
+			this.geoLocalizacion = new DTGeoLocalizacion();
+		this.diasAbierto = res.getDiasAbierto();
+
+		if (res.getProductos() != null || !res.getProductos().isEmpty()) {
+			for (Producto pro : res.getProductos()) {
+				this.productos.add(pro.getNombre());
+			}
 		}
 	}
 
@@ -219,11 +227,11 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 		this.geoLocalizacion = geoLocalizacion;
 	}
 
-	public List<DTProducto> getProductos() {
+	public List<String> getProductos() {
 		return productos;
 	}
 
-	public void setProductos(List<DTProducto> productos) {
+	public void setProductos(List<String> productos) {
 		this.productos = productos;
 	}
 

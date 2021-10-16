@@ -1,6 +1,7 @@
 package com.vpi.springboot.ControladorRest;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -43,11 +44,6 @@ public class UserController {
 		}
 	}
 	*/
-	
-	@GetMapping("/buscarUsuario")
-	public List<DTUsuario> buscarUsuario(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "0") int tipoUsuario, @RequestParam Integer antiguedadUsuario, @RequestParam String texto) {
-		return userService.buscarUsuario(page, size, tipoUsuario, antiguedadUsuario, texto);
-	}
 
 
 }

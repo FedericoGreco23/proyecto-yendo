@@ -28,16 +28,6 @@ public class GeneralController {
 	@Autowired
 	private GeneralService service;
 
-
-@CrossOrigin(origins = "*", allowedHeaders = "*")
-	@GetMapping("/getUsuarios")
-	public List<DTUsuario> getUsuarios(@RequestParam(defaultValue = "0") int page, 
-									@RequestParam(defaultValue = "5") int size,
-									@RequestParam(defaultValue = "0") int tipoUsuario) {
-		return service.listarUsuariosRegistrados(page, size, tipoUsuario);
-	}
-
-
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/activar")
 	public ResponseEntity<?> activarCuenta(@RequestParam(required = true) String mail, 

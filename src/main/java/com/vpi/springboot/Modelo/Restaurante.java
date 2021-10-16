@@ -235,5 +235,9 @@ public class Restaurante extends Usuario {
 	public void setAbierto(Boolean abierto) {
 		this.abierto = abierto;
 	}
+	
+	public void addProducto(Producto producto) {
+		this.productos.add(producto);
+	}
 
 }

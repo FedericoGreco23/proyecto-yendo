@@ -1,6 +1,7 @@
 package com.vpi.springboot.ControladorRest;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -16,6 +17,7 @@ import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
+import com.vpi.springboot.exception.RestauranteException;
 import com.vpi.springboot.exception.UsuarioException;
 import com.vpi.springboot.security.util.JwtUtil;
 
@@ -43,6 +45,16 @@ public class ClienteController {
 			return mail!=null? clienteService.getDireccionCliente(mail): null;
 			
 		} catch (UsuarioException e) {
+			return null;
+		}
+	}
+	
+	@GetMapping("/listarRestaurantes")
+	public Map<String, Object> listarRestaurantesAbiertos(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "0") int horarioApertura) {
+		try {
+			return clienteService.listarRestaurantes(page, size, horarioApertura);
+		} catch (RestauranteException e) {
+			e.printStackTrace();
 			return null;
 		}
 	}

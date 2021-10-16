@@ -19,6 +19,8 @@ public interface AdministradorServicioInterfaz {
 	
 	public Map<String, Object> listarUsuariosRegistrados(int page, int size, int tipoUsuario);
 	
+	public Map<String, Object> buscarUsuario(int page, int size, int tipoUsuario, Integer antiguedadUsuario, String nombreUsuario);
+	
 	public Map<String, Object> listarRestaurantes(int page, int size, int estado);
 	
 	public void cambiarEstadoRestaurante(String varRestaurante, int estado) throws RestauranteException;

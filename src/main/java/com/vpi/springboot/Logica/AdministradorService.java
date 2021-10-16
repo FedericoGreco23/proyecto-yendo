@@ -1,5 +1,7 @@
 package com.vpi.springboot.Logica;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +15,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.vpi.springboot.Modelo.*;
+import com.vpi.springboot.Modelo.dto.DTAdministrador;
+import com.vpi.springboot.Modelo.dto.DTCliente;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
 import com.vpi.springboot.Modelo.dto.DTUsuario;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
@@ -122,6 +126,200 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 
 		response.put("usuarios", usuarios);
 		return response;
+	}
+	
+	// 2 -> administrador
+	// 1 -> restaurante
+	// 0 -> cliente
+	//Retorna la lista de usuario (Administrador, restaurante o cliente) de elementos que cumplen con la busqueda
+	@SuppressWarnings("unused")
+	@Override
+	public Map<String, Object> buscarUsuario(int page, int size, int tipoUsuario, Integer antiguedadUsuario, String texto) {
+		List<DTAdministrador> DTAdministradores = new ArrayList<DTAdministrador>();
+		List<DTRestaurante> DTRestaurantes = new ArrayList<DTRestaurante>();
+		List<DTCliente> DTClientes = new ArrayList<DTCliente>();
+		List<DTUsuario> DTUsuarios = new ArrayList<DTUsuario>();
+		List<Administrador> administradores = new ArrayList<Administrador>();
+		List<Restaurante> restaurantes = new ArrayList<Restaurante>();
+		List<Cliente> clientes = new ArrayList<Cliente>();
+		
+		Map<String, Object> response = new HashMap<>();
+		//Page<DTUsuario> pageUsuario;
+		
+		Pageable paging = PageRequest.of(page, size);
+		
+		switch(tipoUsuario) {
+		case 2:
+			Page<Administrador> pageAdministradores;
+			if (antiguedadUsuario > 0) {
+				if (!texto.equalsIgnoreCase("")) {
+					//Aplico los 3 filtros
+					pageAdministradores = adminRepo.buscarAdministradorNombre(texto, paging);
+					administradores = pageAdministradores.getContent();
+					for (Administrador administrador : administradores) {				
+						long days = ChronoUnit.DAYS.between(administrador.getFechaCreacion(), LocalDate.now());
+						if (days > antiguedadUsuario) {
+							DTUsuarios.add(new DTUsuario(administrador, "Administrador"));
+							//DTAdministradores.add(administrador.getDatos());
+						}
+					}
+
+				} else {
+					//Aplico tipo y antiguedad
+					pageAdministradores = (Page<Administrador>) adminRepo.buscarAdministrador(paging);
+					administradores = pageAdministradores.getContent();
+					//administradores = adminRepo.buscarAdministrador();
+					for (Administrador administrador : administradores) {				
+						long days = ChronoUnit.DAYS.between(administrador.getFechaCreacion(), LocalDate.now());
+						if (days > antiguedadUsuario) {
+							DTUsuarios.add(new DTUsuario(administrador, "Administrador"));
+							//DTAdministradores.add(administrador.getDatos());
+						}
+					}
+				}
+			} else if (!texto.equalsIgnoreCase("")){
+				//tipo y nombreUsuario
+				pageAdministradores = (Page<Administrador>) adminRepo.buscarAdministradorNombre(texto, paging);
+				administradores = pageAdministradores.getContent();
+				//administradores = adminRepo.buscarAdministradorNombre(texto);
+				for (Administrador administrador : administradores) {
+					DTUsuarios.add(new DTUsuario(administrador, "Administrador"));
+					//DTAdministradores.add(administrador.getDatos());
+				}
+			} else {
+				//Solo tipo usuario
+				pageAdministradores = (Page<Administrador>) adminRepo.buscarAdministrador(paging);
+				administradores = pageAdministradores.getContent();
+				//administradores = adminRepo.buscarAdministrador();
+				for (Administrador administrador : administradores) {
+					DTUsuarios.add(new DTUsuario(administrador, "Administrador"));
+					//DTAdministradores.add(administrador.getDatos());
+				}
+			}
+			response.put("currentPage", pageAdministradores.getNumber());
+			response.put("totalItems", pageAdministradores.getTotalElements());
+			response.put("usuarios", DTUsuarios);
+			
+			//listaTiposDeUsuarios.setAdministradores(DTAdministradores);
+			break;
+			
+			
+		case 1:
+			Page<Restaurante> pageRestaurantes;
+			if (antiguedadUsuario > 0) {
+				if (!texto.equalsIgnoreCase("")) {
+					//Aplico los 3 filtros
+					pageRestaurantes = (Page<Restaurante>) resRepo.buscarRestauranteNombre(texto, paging);
+					restaurantes = pageRestaurantes.getContent();
+					//restaurantes = restaRepo.buscarRestauranteNombre(texto);
+					for (Restaurante restaurante : restaurantes) {				
+						long days = ChronoUnit.DAYS.between(restaurante.getFechaCreacion(), LocalDate.now());
+						if (days > antiguedadUsuario) {
+							DTUsuarios.add(new DTUsuario(restaurante, "Restaurante"));
+							//DTRestaurantes.add(restaurante.getDatos());
+						}
+					}
+					
+				} else {
+					//Aplico tipo y antiguedad
+					pageRestaurantes = (Page<Restaurante>) resRepo.buscarRestaurante(paging);
+					restaurantes = pageRestaurantes.getContent();
+					//restaurantes = restaRepo.buscarRestaurante();
+					for (Restaurante restaurante : restaurantes) {				
+						long days = ChronoUnit.DAYS.between(restaurante.getFechaCreacion(), LocalDate.now());
+						if (days > antiguedadUsuario) {
+							DTUsuarios.add(new DTUsuario(restaurante, "Restaurante"));
+							//DTRestaurantes.add(restaurante.getDatos());
+						}
+					}
+				}
+			} else if (!texto.equalsIgnoreCase("")){
+				//tipo y nombreUsuario
+				pageRestaurantes = (Page<Restaurante>) resRepo.buscarRestauranteNombre(texto, paging);
+				restaurantes = pageRestaurantes.getContent();
+				//restaurantes = restaRepo.buscarRestauranteNombre(texto);
+				for (Restaurante restaurante : restaurantes) {
+					DTUsuarios.add(new DTUsuario(restaurante, "Restaurante"));
+					//DTRestaurantes.add(restaurante.getDatos());
+				}
+			} else {
+				//Solo tipo usuario
+				pageRestaurantes = (Page<Restaurante>) resRepo.buscarRestaurante(paging);
+				restaurantes = pageRestaurantes.getContent();
+				//restaurantes = restaRepo.buscarRestaurante();
+				for (Restaurante restaurante : restaurantes) {
+					DTUsuarios.add(new DTUsuario(restaurante, "Restaurante"));
+					//DTRestaurantes.add(restaurante.getDatos());
+				}
+			}
+			
+			response.put("currentPage", pageRestaurantes.getNumber());
+			response.put("totalItems", pageRestaurantes.getTotalElements());
+			response.put("usuarios", DTUsuarios);
+			
+			//listaTiposDeUsuarios.setRestaurantes(DTRestaurantes);
+			break;
+			
+			
+		case 0:
+			Page<Cliente> pageClientes;
+			if (antiguedadUsuario > 0) {
+				if (!texto.equalsIgnoreCase("")) {
+					//Aplico los 3 filtros
+					pageClientes = (Page<Cliente>) clienteRepo.buscarClienteNombre(texto, paging);
+					clientes = pageClientes.getContent();
+					//clientes = clienteRepo.buscarClienteNombre(texto);
+					for (Cliente cliente : clientes) {
+						long days = ChronoUnit.DAYS.between(cliente.getFechaCreacion(), LocalDate.now());
+						if (days > antiguedadUsuario) {
+							DTUsuarios.add(new DTUsuario(cliente, "Cliente"));
+							//DTClientes.add(cliente.getDatos());
+						}
+					}
+					
+				} else {
+					//Aplico tipo y antiguedad
+					pageClientes = (Page<Cliente>) clienteRepo.buscarCliente(paging);
+					clientes = pageClientes.getContent();
+					//clientes = clienteRepo.buscarCliente();
+					for (Cliente cliente : clientes) {
+						long days = ChronoUnit.DAYS.between(cliente.getFechaCreacion(), LocalDate.now());
+						if (days > antiguedadUsuario) {
+							DTUsuarios.add(new DTUsuario(cliente, "Cliente"));
+							//DTClientes.add(cliente.getDatos());
+						}
+					}
+				}
+			} else if (!texto.equalsIgnoreCase("")){
+				//tipo y nombreUsuario
+				pageClientes = (Page<Cliente>) clienteRepo.buscarClienteNombre(texto, paging);
+				clientes = pageClientes.getContent();
+				//clientes = clienteRepo.buscarClienteNombre(texto);
+				for (Cliente cliente : clientes) {
+					DTUsuarios.add(new DTUsuario(cliente, "Cliente"));
+					//DTClientes.add(cliente.getDatos());
+				}
+			} else {
+				//Solo tipo usuario
+				pageClientes = (Page<Cliente>) clienteRepo.buscarCliente(paging);
+				clientes = pageClientes.getContent();
+				//clientes = clienteRepo.buscarCliente();
+				for (Cliente cliente : clientes) {
+					DTUsuarios.add(new DTUsuario(cliente, "Cliente"));
+					//DTClientes.add(cliente.getDatos());
+				}
+			}
+			
+			response.put("currentPage", pageClientes.getNumber());
+			response.put("totalItems", pageClientes.getTotalElements());
+			response.put("usuarios", DTUsuarios);
+
+			//listaTiposDeUsuarios.setClientes(DTClientes);
+			break;
+		}
+		
+		return response;
+		//return DTUsuarios;
 	}
 
 	@Override
