@@ -174,6 +174,9 @@ public class ClienteService implements ClienteServicioInterfaz {
 				cliente.addDireccion(dir);
 			}
 			userRepo.save(cliente);
+			
+			//actualiza ultima direccion en mongo
+			setUltimaDireccionSeleccionada(dir.getId(), mail);
 		} else {
 			throw new UsuarioException(UsuarioException.NotFoundException(mail));
 		}
@@ -207,6 +210,10 @@ public class ClienteService implements ClienteServicioInterfaz {
 				dirNueva.setCalleNro(nueva.getCalleNro());
 				dirNueva.setGeoLocalizacion(new GeoLocalizacion(nueva.getGeoLocalizacion()));
 				dirRepo.save(dirNueva);
+				
+
+				//actualiza ultima direccion en mongo
+				setUltimaDireccionSeleccionada(dirNueva.getId(), mail);
 			} else {
 				throw new UsuarioException("No existe direccion");
 			}
@@ -236,6 +243,9 @@ public class ClienteService implements ClienteServicioInterfaz {
 			if (optionalDireccion.isPresent()) {
 				Direccion dir = optionalDireccion.get();
 				dirRepo.delete(dir);
+
+				//actualiza ultima direccion en mongo
+				setUltimaDireccionSeleccionada(null, mail);
 			} else {
 				throw new UsuarioException("No existe direccion");
 			}

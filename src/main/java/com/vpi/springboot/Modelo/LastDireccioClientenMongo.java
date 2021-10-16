@@ -20,7 +20,7 @@ public class LastDireccioClientenMongo {
 	
 
 	@Id
-	private String _id;
+	private String _id;//mail
 	private Integer idDireccion;
 	
 	public String get_id() {
