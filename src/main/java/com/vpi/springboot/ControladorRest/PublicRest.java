@@ -73,9 +73,13 @@ public class PublicRest {
 		final MyDetails userDetails = (MyDetails) userDetailsService
 				.loadUserByUsername(authenticationRequest.getUsername());
 		
-		if(!userDetails.getUser().getActivo() && userDetails.getUser().getBloqueado()) {
+		if(!userDetails.getUser().getActivo()) {
 
-			throw new Exception("Este usuario se encuentra bloqueado o inactivo, comuniquese con un administrados");
+			throw new Exception("Este usuario se encuentra inactivo, comuniquese con un administrador");
+			
+		}else if (userDetails.getUser().getBloqueado()) {
+			
+			throw new Exception("Este usuario se encuentra bloqueado, comuniquese con un administrador");
 		}
 
 		final String jwt = jwtTokenUtil.generateToken(userDetails);

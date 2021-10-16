@@ -27,4 +27,5 @@ public class UsuarioException extends Exception {
 	public static String NicknameRepetido() {
 		return "Nickname en uso";
 	}
+
 }

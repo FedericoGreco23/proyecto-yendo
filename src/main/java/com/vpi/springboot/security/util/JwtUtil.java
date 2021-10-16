@@ -19,6 +19,8 @@ import java.util.function.Function;
 public class JwtUtil {
 
     private String SECRET_KEY = "secret";
+    
+	public enum keyInfoJWT{mail, user_type};
 
     /**
      * 
@@ -69,13 +71,13 @@ public class JwtUtil {
         claims.put("foto", userDetails.getUser().getFoto());
         
         if (userDetails.getUser().getClass() == Cliente.class) {
-        	claims.put("user_type", "CLIENTE");
+        	claims.put(keyInfoJWT.user_type.name(), "CLIENTE");
         } 
         else if (userDetails.getUser().getClass() == Restaurante.class) {
-        	claims.put("user_type", "RESTAURANTE");
+        	claims.put(keyInfoJWT.user_type.name(), "RESTAURANTE");
         } 
         else if (userDetails.getUser().getClass() == Administrador.class) {
-        	claims.put("user_type", "ADMIN");
+        	claims.put(keyInfoJWT.user_type.name(), "ADMIN");
         } 
         return createToken(claims, userDetails.getUsername());
     }
@@ -106,4 +108,10 @@ public class JwtUtil {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
+
+
+	public String extractUserType(String token) {
+		final Claims claims = extractAllClaims(token);
+		return (String) claims.get(keyInfoJWT.user_type.name());
+	}
 }
