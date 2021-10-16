@@ -1,15 +1,16 @@
 package com.vpi.springboot.Modelo.dto;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class DTListasTiposDeUsuarios implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private List<DTAdministrador> administradores;
-	private List<DTRestaurante> restaurantes;
-	private List<DTCliente> clientes;
+	private List<DTAdministrador> administradores = new ArrayList<>();
+	private List<DTRestaurante> restaurantes = new ArrayList<>();
+	private List<DTCliente> clientes = new ArrayList<>();
 
 	public DTListasTiposDeUsuarios() {
 		super();

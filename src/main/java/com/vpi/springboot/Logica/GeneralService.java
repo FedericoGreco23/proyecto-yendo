@@ -2,7 +2,9 @@ package com.vpi.springboot.Logica;
 
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.crypto.SecretKey;
@@ -30,8 +32,12 @@ public class GeneralService implements GeneralServicioInterfaz {
 	@Autowired
 	private AdministradorRepositorio adminRepo;
 	@Autowired
+	private ProductoRepositorio proRepo;
+	@Autowired
+	private PromocionRepositorio promoRepo;
+	@Autowired
 	private MailService mailSender;
-	
+
 	private static final int iterations = 20 * 1000;
 	private static final int desiredKeyLen = 256;
 
@@ -66,17 +72,17 @@ public class GeneralService implements GeneralServicioInterfaz {
 			}
 		}
 	}
-	
-	//Compara las contraseñas
+
+	// Compara las contraseñas
 	private Boolean decodePass(String passGuardada, String passIngresada) throws Exception {
 		String[] guardada = passGuardada.split("\\$");
 		String ingresada = hash(passIngresada, Base64.getDecoder().decode(guardada[0]));
-		if(ingresada.equals(guardada[1])) {
+		if (ingresada.equals(guardada[1])) {
 			return true;
-		}else
+		} else
 			return false;
 	}
-	
+
 	// METODO PARA HASHEAR CONTRASEÑA
 	private static String hash(String password, byte[] salt) throws Exception {
 		if (password == null || password.length() == 0)
@@ -86,13 +92,12 @@ public class GeneralService implements GeneralServicioInterfaz {
 		return Base64.getEncoder().encodeToString(key.getEncoded());
 	}
 //--------------------------------------------
-	
 
 	public void recuperarPassword(String mail) throws UsuarioException {
 		// Se tiene que ver cómo se genera la contraseña opcional
 		String pass = "passTemporal";
 		String to = "";
-		
+
 		Optional<Cliente> optionalCliente = clienteRepo.findById(mail);
 		if (optionalCliente.isPresent()) { // cliente
 			Cliente cliente = optionalCliente.get();
@@ -194,37 +199,53 @@ public class GeneralService implements GeneralServicioInterfaz {
 		}
 	}
 
-	// 0 -> cliente
-	// 1 -> restaurante
-	// 2 -> administrador
-	public List<DTUsuario> listarUsuariosRegistrados(int page, int size, int tipoUsuario) {
-		List<DTUsuario> usuarios = new ArrayList<DTUsuario>();
-		Pageable paging = PageRequest.of(page, size);
-
-		switch (tipoUsuario) {
-		case 0:
-			Page<Cliente> pageClientes = clienteRepo.findAll(paging);
-			List<Cliente> clientes = pageClientes.getContent();
-			for (Cliente c : clientes) {
-				usuarios.add(new DTUsuario(c, "Cliente"));
-			}
-			break;
-		case 1:
-			Page<Restaurante> pageRestaurantes = resRepo.findAll(paging);
-			List<Restaurante> restaurantes = pageRestaurantes.getContent();
-			for (Restaurante c : restaurantes) {
-				usuarios.add(new DTUsuario(c, "Restaurante"));
-			}
-			break;
-		case 2:
-			Page<Administrador> pageAdministradores = adminRepo.findAll(paging);
-			List<Administrador> administrador = pageAdministradores.getContent();
-			for (Administrador c : administrador) {
-				usuarios.add(new DTUsuario(c, "Administrador"));
-			}
-			break;
+	public Map<String, Object> listarMenusRestaurante(int page, int size, String mailRestaurante)
+			throws RestauranteException {
+		Optional<Restaurante> optionalRestaurante = resRepo.findById(mailRestaurante);
+		if (!optionalRestaurante.isPresent()) {
+			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(mailRestaurante));
 		}
 
-		return usuarios;
+		Restaurante restaurante = optionalRestaurante.get();
+		Map<String, Object> response = new HashMap<>();
+		Pageable paging = PageRequest.of(page, size);
+		Page<Producto> pageProducto = proRepo.findAllByRestaurante(restaurante, paging);
+		List<DTProducto> retorno = new ArrayList<DTProducto>();
+		List<Producto> productos = pageProducto.getContent();
+
+		response.put("currentPage", pageProducto.getNumber());
+		response.put("totalItems", pageProducto.getTotalElements());
+
+		for (Producto p : productos) {
+			retorno.add(new DTProducto(p));
+		}
+
+		response.put("productos", retorno);
+		return response;
+	}
+
+	public Map<String, Object> listarPromocionesRestaurante(int page, int size, String mailRestaurante)
+			throws RestauranteException {
+		Optional<Restaurante> optionalRestaurante = resRepo.findById(mailRestaurante);
+		if (!optionalRestaurante.isPresent()) {
+			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(mailRestaurante));
+		}
+
+		Restaurante restaurante = optionalRestaurante.get();
+		Map<String, Object> response = new HashMap<>();
+		Pageable paging = PageRequest.of(page, size);
+		Page<Promocion> promoPedido = promoRepo.findAllByRestaurante(restaurante, paging);
+		List<Promocion> promociones = promoPedido.getContent();
+		List<DTPromocion> retorno = new ArrayList<>();
+
+		response.put("currentPage", promoPedido.getNumber());
+		response.put("totalItems", promoPedido.getTotalElements());
+
+		for (Promocion p : promociones) {
+			retorno.add(new DTPromocion(p));
+		}
+
+		response.put("promociones", promociones);
+		return response;
 	}
 }

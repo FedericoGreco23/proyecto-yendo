@@ -2,43 +2,36 @@ package com.vpi.springboot.IdCompuestas;
 
 import java.io.Serializable;
 
-public class CalificacionClienteId implements Serializable{
-	
+public class CalificacionClienteId implements Serializable {
+
 	private static final long serialVersionUID = 1L;
 	private String restaurante;
 	private String cliente;
-	
-	
+
 	public CalificacionClienteId() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-
 	public String getRestaurante() {
 		return restaurante;
 	}
-
 
 	public void setRestaurante(String restaurante) {
 		this.restaurante = restaurante;
 	}
 
-
 	public String getCliente() {
 		return cliente;
 	}
-
 
 	public void setCliente(String cliente) {
 		this.cliente = cliente;
 	}
 
-
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
-
 
 	@Override
 	public int hashCode() {
@@ -48,7 +41,6 @@ public class CalificacionClienteId implements Serializable{
 		result = prime * result + ((restaurante == null) ? 0 : restaurante.hashCode());
 		return result;
 	}
-
 
 	@Override
 	public boolean equals(Object obj) {
@@ -71,11 +63,4 @@ public class CalificacionClienteId implements Serializable{
 			return false;
 		return true;
 	}
-
-
-
-	
-	
-	
-
 }

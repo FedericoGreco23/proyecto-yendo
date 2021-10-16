@@ -14,19 +14,20 @@ public class DTReclamo implements Serializable {
 	private EnumEstadoReclamo estado;
 	private String resolucion;
 	private DTPedido pedido;
-	private DTRestaurante restaurante;
+	private String restaurante;
 
 	public DTReclamo() {
 		super();
 	}
 
-	public DTReclamo(int id, String comentario, LocalDateTime fecha, EnumEstadoReclamo estado, String resolucion) {
+	public DTReclamo(int id, String comentario, LocalDateTime fecha, EnumEstadoReclamo estado, String resolucion, String restaurante) {
 		super();
 		this.id = id;
 		this.comentario = comentario;
 		this.fecha = fecha;
 		this.estado = estado;
 		this.resolucion = resolucion;
+		this.restaurante = restaurante;
 	}
 
 	public DTReclamo(Reclamo rec) {
@@ -36,6 +37,7 @@ public class DTReclamo implements Serializable {
 		this.fecha = rec.getFecha();
 		this.estado = rec.getEstado();
 		this.resolucion = rec.getResolucion();
+		this.restaurante = rec.getRestaurante().getNombre();
 	}
 
 	public int getId() {
@@ -86,11 +88,11 @@ public class DTReclamo implements Serializable {
 		this.pedido = pedido;
 	}
 
-	public DTRestaurante getRestaurante() {
+	public String getRestaurante() {
 		return restaurante;
 	}
 
-	public void setRestaurante(DTRestaurante restaurante) {
+	public void setRestaurante(String restaurante) {
 		this.restaurante = restaurante;
 	}
 }

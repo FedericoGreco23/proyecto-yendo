@@ -1,6 +1,7 @@
 package com.vpi.springboot.Modelo.dto;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.vpi.springboot.Modelo.Categoria;
@@ -16,15 +17,15 @@ public class DTProducto implements Serializable {
 	private String foto;
 	private int descuento;
 	private boolean activo;
-	private DTRestaurante restaurante;
-	private List<DTCategoria> categorias;
+	private String restaurante;
+	private List<DTCategoria> categorias = new ArrayList<>();
 
 	public DTProducto() {
 		super();
 	}
 
 	public DTProducto(int id, String nombre, String descripcion, double precio, String foto, int descuento,
-			boolean activo) {
+			boolean activo, String restaurante) {
 		this.id = id;
 		this.nombre = nombre;
 		this.descripcion = descripcion;
@@ -32,6 +33,7 @@ public class DTProducto implements Serializable {
 		this.foto = foto;
 		this.descuento = descuento;
 		this.activo = activo;
+		this.restaurante = restaurante;
 	}
 
 	public DTProducto(Producto pro) {
@@ -42,6 +44,7 @@ public class DTProducto implements Serializable {
 		this.foto = pro.getFoto();
 		this.descuento = pro.getDescuento();
 		this.activo = pro.isActivo();
+		this.restaurante = pro.getRestaurante().getNombre();
 
 		for (Categoria cat : pro.getCategorias()) {
 			this.categorias.add(new DTCategoria(cat));
@@ -104,11 +107,11 @@ public class DTProducto implements Serializable {
 		this.activo = activo;
 	}
 
-	public DTRestaurante getRestaurante() {
+	public String getRestaurante() {
 		return restaurante;
 	}
 
-	public void setRestaurante(DTRestaurante restaurante) {
+	public void setRestaurante(String restaurante) {
 		this.restaurante = restaurante;
 	}
 

@@ -9,13 +9,30 @@ public class DTCarrito implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	private long id;
 	private List<DTProductoCarrito> dtProductoCarritoList= new ArrayList<DTProductoCarrito>();
 
-    public DTCarrito(List<DTProductoCarrito> dtProductoCarritoList) {
-        this.dtProductoCarritoList = dtProductoCarritoList;
-    }
+  
+	 public DTCarrito(long id,List<DTProductoCarrito> dtProductoCarritoList) {
+	     this.id = id;   
+		 this.dtProductoCarritoList = dtProductoCarritoList;
+	        
+	    }
+	
+	 public DTCarrito(List<DTProductoCarrito> dtProductoCarritoList) {
+	        this.dtProductoCarritoList = dtProductoCarritoList;
+	    }
 
-    public List<DTProductoCarrito> getDtProductoCarritoList() {
+    public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public List<DTProductoCarrito> getDtProductoCarritoList() {
         return dtProductoCarritoList;
     }
 

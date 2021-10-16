@@ -10,20 +10,44 @@ import java.util.Optional;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import com.vpi.springboot.Modelo.Carrito;
 import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Direccion;
 import com.vpi.springboot.Modelo.GeoLocalizacion;
+
+import com.vpi.springboot.Modelo.Producto;
+
+import com.vpi.springboot.Modelo.LastDireccioClientenMongo;
+import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
+import com.vpi.springboot.Modelo.dto.DTProducto;
+import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.Repositorios.ClienteRepositorio;
 import com.vpi.springboot.Repositorios.DireccionRepositorio;
 import com.vpi.springboot.Repositorios.GeoLocalizacionRepositorio;
+
+import com.vpi.springboot.Repositorios.MongoRepositorioCarrito;
+import com.vpi.springboot.Repositorios.ProductoRepositorio;
+import com.vpi.springboot.exception.ProductoException;
+
+import com.vpi.springboot.Repositorios.mongo.UltimaDireccionRepositorio;
+
 import com.vpi.springboot.exception.UsuarioException;
+import org.springframework.beans.factory.ObjectFactory;
 
 @Service
 public class ClienteService implements ClienteServicioInterfaz {
+	
+	
+
+	@Autowired
+	ObjectFactory<HttpSession> httpSessionFactory;
 
 	@Autowired
 	private ClienteRepositorio userRepo;
@@ -31,7 +55,19 @@ public class ClienteService implements ClienteServicioInterfaz {
 	private DireccionRepositorio dirRepo;
 	@Autowired
 	private GeoLocalizacionRepositorio geoRepo;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+	@Autowired
+	private MongoRepositorioCarrito mongoRepo;
+	@Autowired
+	private ProductoRepositorio productoRepo;
+
+	@Autowired
+	private NextSequenceService nextSequence;
 	
+
+	private UltimaDireccionRepositorio ultimaDireccionRepo;
+
 	private static final int iterations = 20 * 1000;
 	private static final int saltLen = 32;
 	private static final int desiredKeyLen = 256;
@@ -42,12 +78,13 @@ public class ClienteService implements ClienteServicioInterfaz {
 		if (optionalUser.isPresent()) {
 			Cliente cliente = optionalUser.get();
 			List<DTDireccion> retorno = new ArrayList<DTDireccion>();
-			if(cliente.getDirecciones() != null) {
+			if (cliente.getDirecciones() != null) {
 				for (Direccion direccion : cliente.getDirecciones()) {
-					retorno.add(new DTDireccion(direccion.getId(), direccion.getCalleNro(), direccion.getGeoLocalizacion()));
+					retorno.add(new DTDireccion(direccion.getId(), direccion.getCalleNro(),
+							direccion.getGeoLocalizacion()));
 				}
 				return retorno;
-			}else {
+			} else {
 				throw new UsuarioException("El usuario no tiene direcciones");
 			}
 		} else {
@@ -57,31 +94,44 @@ public class ClienteService implements ClienteServicioInterfaz {
 
 	@Override
 	public void altaCliente(Cliente usuario) throws UsuarioException, Exception {
-		Optional<Cliente> optionalUser = userRepo.findById(usuario.getMail());
-		if(optionalUser.isPresent()) {
-			throw new UsuarioException(UsuarioException.UsuarioYaExiste());
-		}else {
-			String mail = usuario.getMail();
-			if(mail.contains("@") && mail.contains(".com")) {
-				String nick = usuario.getNickname();
-				if(nick != null) {
-					usuario.setActivo(true);
-					usuario.setBloqueado(false);
-					usuario.setSaldoBono(0.0f);
-					usuario.setCalificacionPromedio(5.0f);
-					usuario.setFechaCreacion(LocalDate.now());
-					byte[] salt = SecureRandom.getInstance("SHA1PRNG").generateSeed(saltLen);
-					//String contrasenia = Base64.getEncoder().encodeToString(salt) + "$" + hash(usuario.getContrasenia(), salt);
-					//usuario.setContrasenia(contrasenia);
-					userRepo.save(usuario);
-				}else {
-					throw new UsuarioException("Debe ingresar nickname");
-				}
-			}else
-				throw new UsuarioException("Tiene que introducir un mail válido.");
+
+		if (emailExist(usuario.getMail())) {
+			throw new UsuarioException(UsuarioException.UsuarioYaExiste(usuario.getMail()));
+		}
+		Cliente user = new Cliente();
+		String mail = usuario.getMail();
+
+		if (mail != null && !mail.isEmpty() && usuario.getNickname() != null) {
+			usuario.setActivo(true);
+			usuario.setBloqueado(false);
+			usuario.setSaldoBono(0.0f);
+			usuario.setCalificacionPromedio(5.0f);
+			usuario.setFechaCreacion(LocalDate.now());
+			// byte[] salt = SecureRandom.getInstance("SHA1PRNG").generateSeed(saltLen);
+			// String contrasenia = Base64.getEncoder().encodeToString(salt) + "$" +
+			// hash(usuario.getContrasenia(), salt);
+			// usuario.setContrasenia(contrasenia);
+
+			/**
+			 * se carga contraseña encode
+			 */
+			usuario.setContrasenia(passwordEncoder.encode(usuario.getContrasenia()));
+			try {
+
+				userRepo.save(usuario);
+			} catch (Exception e) {
+				throw new UsuarioException("Ya existe un usuario con el nickname " + usuario.getNickname());
+			}
+		} else {
+			throw new UsuarioException("Mail, nickname y contraseña son campos obligatorios");
 		}
 
 	}
+
+	private boolean emailExist(String mail) {
+		return userRepo.findById(mail).isPresent();
+	}
+
 	// METODO PARA HASHEAR CONTRASEÑA
 	private static String hash(String password, byte[] salt) throws Exception {
 		if (password == null || password.length() == 0)
@@ -106,24 +156,28 @@ public class ClienteService implements ClienteServicioInterfaz {
 	@Override
 	public void altaDireccion(DTDireccion direccion, String mail) throws UsuarioException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mail);
-		if(optionalCliente.isPresent()) {
+		if (optionalCliente.isPresent()) {
 			Cliente cliente = optionalCliente.get();
-			GeoLocalizacion geo = new GeoLocalizacion(direccion.getGeoLocalizacion().getLatitud(), direccion.getGeoLocalizacion().getLongitud());
+			GeoLocalizacion geo = new GeoLocalizacion(direccion.getGeoLocalizacion().getLatitud(),
+					direccion.getGeoLocalizacion().getLongitud());
 			geoRepo.save(geo);
-			Direccion dir = new Direccion(direccion.getCalleNro(),geo);	
-			if(mail != null) {
+			Direccion dir = new Direccion(direccion.getCalleNro(), geo);
+			if (mail != null) {
 				dir.setCliente(cliente);
 			}
 			dirRepo.save(dir);
-			if(cliente.getDirecciones() == null) {
+			if (cliente.getDirecciones() == null) {
 				List<Direccion> direcciones = new ArrayList<Direccion>();
 				direcciones.add(dir);
 				cliente.setDirecciones(direcciones);
-			}else {
+			} else {
 				cliente.addDireccion(dir);
 			}
 			userRepo.save(cliente);
-		}else {
+			
+			//actualiza ultima direccion en mongo
+			setUltimaDireccionSeleccionada(dir.getId(), mail);
+		} else {
 			throw new UsuarioException(UsuarioException.NotFoundException(mail));
 		}
 
@@ -144,57 +198,117 @@ public class ClienteService implements ClienteServicioInterfaz {
 			throw new UsuarioException("No existe usuario");
 		}
 	}
-	
+
 	@Override
 	public void modificarDireccion(int id, DTDireccion nueva, String mail) throws UsuarioException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mail);
-		if(optionalCliente.isPresent()) {
+		if (optionalCliente.isPresent()) {
 			Cliente cliente = optionalCliente.get();
 			Optional<Direccion> optionalDireccion = dirRepo.findById(id);
-			if(optionalDireccion.isPresent()) {
+			if (optionalDireccion.isPresent()) {
 				Direccion dirNueva = optionalDireccion.get();
 				dirNueva.setCalleNro(nueva.getCalleNro());
 				dirNueva.setGeoLocalizacion(new GeoLocalizacion(nueva.getGeoLocalizacion()));
 				dirRepo.save(dirNueva);
-			}else {
+				
+
+				//actualiza ultima direccion en mongo
+				setUltimaDireccionSeleccionada(dirNueva.getId(), mail);
+			} else {
 				throw new UsuarioException("No existe direccion");
 			}
-		}else {
+		} else {
 			throw new UsuarioException("No existe cliente");
 		}
 	}
-	
-	/*@Override
-	public void eliminarDireccion(Direccion direccion, String mail) throws UsuarioException {
+
+	/*
+	 * @Override public void eliminarDireccion(Direccion direccion, String mail)
+	 * throws UsuarioException { Optional<Cliente> optionalCliente =
+	 * userRepo.findById(mail); if(optionalCliente.isPresent()) { Cliente cliente =
+	 * optionalCliente.get(); Optional<Direccion> optionalDireccion =
+	 * dirRepo.findByStreetNumberandMail(direccion.getCalleNro(), cliente);
+	 * if(optionalDireccion.isPresent()) { Direccion dir = optionalDireccion.get();
+	 * dirRepo.delete(dir); }else { throw new
+	 * UsuarioException("No existe direccion"); } }else { throw new
+	 * UsuarioException("No existe cliente"); } }
+	 */
+
+	@Override
+	public void eliminarDireccion(Integer id, String mail) throws UsuarioException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mail);
-		if(optionalCliente.isPresent()) {
+		if (optionalCliente.isPresent()) {
 			Cliente cliente = optionalCliente.get();
-			Optional<Direccion> optionalDireccion = dirRepo.findByStreetNumberandMail(direccion.getCalleNro(), cliente);
-			if(optionalDireccion.isPresent()) {
+			Optional<Direccion> optionalDireccion = dirRepo.findById(id);
+			if (optionalDireccion.isPresent()) {
 				Direccion dir = optionalDireccion.get();
 				dirRepo.delete(dir);
-			}else {
+
+				//actualiza ultima direccion en mongo
+				setUltimaDireccionSeleccionada(null, mail);
+			} else {
 				throw new UsuarioException("No existe direccion");
 			}
-		}else {
+		} else {
 			throw new UsuarioException("No existe cliente");
+		}
+	}
+
+	
+	/*public void agregarACarrito(DTProducto p) {
+		HttpSession session = httpSessionFactory.getObject();
+		if(session.getAttribute("carrito") == null) {
+			List<DTProducto> carrito = new ArrayList<DTProducto>();
+			carrito.add(p);
+			session.setAttribute("carrito", carrito);
+		}else {
+			List<DTProducto> carrito = (List<DTProducto>) httpSessionFactory.getObject().getAttribute("carrito");
+			carrito.add(p);
+			session.setAttribute("carrito", carrito);
 		}
 	}*/
 	
 	@Override
-	public void eliminarDireccion(Integer id, String mail) throws UsuarioException {
-		Optional<Cliente> optionalCliente = userRepo.findById(mail);
-		if(optionalCliente.isPresent()) {
-			Cliente cliente = optionalCliente.get();
-			Optional<Direccion> optionalDireccion = dirRepo.findById(id);
-			if(optionalDireccion.isPresent()) {
-				Direccion dir = optionalDireccion.get();
-				dirRepo.delete(dir);
-			}else {
-				throw new UsuarioException("No existe direccion");
+	public void agregarACarrito(DTProductoCarrito c, String mail) throws ProductoException {
+		int producto = c.getidProducto();
+		Optional<Producto> optionalProducto = productoRepo.findById(producto);
+		if(optionalProducto.isPresent()) {
+			Carrito optionalCarrito = mongoRepo.findByMailAndActivo(mail, true);
+		if(optionalCarrito != null) { //TIENE CARRITO ACTIVO
+				Carrito carritoExiste = optionalCarrito;
+				carritoExiste.addProductoCarrito(c);
+				mongoRepo.save(carritoExiste);
+			}else { //TIENE CARRITO INACTIVO O NO TIEN
+				List<DTProductoCarrito> productos = new ArrayList<DTProductoCarrito>();
+				productos.add(c);
+				Carrito carrito = new Carrito(mail, productos,true);
+				carrito.setId(nextSequence.getNextSequence("customSequences"));
+				mongoRepo.save(carrito);
 			}
 		}else {
-			throw new UsuarioException("No existe cliente");
-		}
+			throw new ProductoException(ProductoException.NotFoundExceptionId(producto));
+		}	
+	}
+	
+	@Override
+	public DTCarrito verCarrito(String mail) {
+		Carrito optionalCarrito = mongoRepo.findByMailAndActivo(mail, true);
+		DTCarrito carrito = new DTCarrito(optionalCarrito.getId(), optionalCarrito.getProductoCarrito());
+		return carrito;
+		
+	}
+	
+
+	public String getUltimaDireccionSeleccionada(String mail) {
+		Optional<LastDireccioClientenMongo> direccion= ultimaDireccionRepo.findById(mail);
+		return direccion.isPresent()? direccion.get().getIdDireccion().toString():null;
+	}
+
+	public void setUltimaDireccionSeleccionada(Integer idDireccion, String mail) {
+		LastDireccioClientenMongo actualDire= new LastDireccioClientenMongo();
+		actualDire.setIdDireccion(idDireccion);
+		actualDire.set_id(mail);
+
+		ultimaDireccionRepo.save(actualDire);
 	}
 }

@@ -6,6 +6,10 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import com.vpi.springboot.Modelo.Administrador;
+import com.vpi.springboot.Modelo.Cliente;
+import com.vpi.springboot.Modelo.Restaurante;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,11 +19,13 @@ import java.util.function.Function;
 public class JwtUtil {
 
     private String SECRET_KEY = "secret";
+    
+	public enum keyInfoJWT{mail, user_type};
 
     /**
      * 
      * @param token: 
-     * @return nombre de ususario
+     * @return mail de ususario
      */
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -63,6 +69,16 @@ public class JwtUtil {
     public String generateToken(MyDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("foto", userDetails.getUser().getFoto());
+        
+        if (userDetails.getUser().getClass() == Cliente.class) {
+        	claims.put(keyInfoJWT.user_type.name(), "CLIENTE");
+        } 
+        else if (userDetails.getUser().getClass() == Restaurante.class) {
+        	claims.put(keyInfoJWT.user_type.name(), "RESTAURANTE");
+        } 
+        else if (userDetails.getUser().getClass() == Administrador.class) {
+        	claims.put(keyInfoJWT.user_type.name(), "ADMIN");
+        } 
         return createToken(claims, userDetails.getUsername());
     }
 
@@ -92,4 +108,10 @@ public class JwtUtil {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
+
+
+	public String extractUserType(String token) {
+		final Claims claims = extractAllClaims(token);
+		return (String) claims.get(keyInfoJWT.user_type.name());
+	}
 }

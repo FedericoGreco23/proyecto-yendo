@@ -1,5 +1,8 @@
 package com.vpi.springboot.Repositorios;
 
+import java.util.List;
+import java.util.Optional;
+
 import javax.transaction.Transactional;
 
 import org.springframework.data.domain.Page;
@@ -19,4 +22,7 @@ public interface ClienteRepositorio extends UserBaseRepository<Cliente> {
 
 	@Query("SELECT c FROM Cliente c")
 	public Page<Cliente> buscarCliente(@Param("page") Pageable page);
+	
+	@Query("SELECT c FROM Cliente c where c.nickname = :nickname")
+	Optional<Cliente> findByNickname(@Param("nickname") String nickname);
 }
