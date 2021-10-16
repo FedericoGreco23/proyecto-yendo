@@ -38,7 +38,7 @@ public class GeneralController {
 	}
 
 
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/activar")
 	public ResponseEntity<?> activarCuenta(@RequestParam(required = true) String mail, 
 										   @RequestParam(required = true) int tipoUsuario) {

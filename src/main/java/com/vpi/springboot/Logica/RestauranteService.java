@@ -6,11 +6,9 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.vpi.springboot.Modelo.GeoLocalizacion;
+import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Restaurante;
-import com.vpi.springboot.Modelo.dto.DTGeoLocalizacion;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
-import com.vpi.springboot.Repositorios.GeoLocalizacionRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
 import com.vpi.springboot.exception.RestauranteException;
 
@@ -19,9 +17,6 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	
 	@Autowired
 	private RestauranteRepositorio restauranteRepo;
-	
-	@Autowired
-	private GeoLocalizacionRepositorio geoRepo;
 	
 	@Override
 	public void altaRestaurante(Restaurante rest) throws RestauranteException {
@@ -46,7 +41,22 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		rest.setProductos(null);
 		rest.setReclamos(null);
 		rest.setPedidos(null);
+		rest.setAbierto(false);
 		
 		restauranteRepo.save(rest);	
+	}
+	
+	@Override
+	public void abrirRestaurante(String mail) {
+		Optional<Restaurante> restaurante = restauranteRepo.findById(mail);
+		restaurante.get().setAbierto(true);
+		restauranteRepo.save(restaurante.get());
+	}
+	
+	@Override
+	public void cerrarRestaurante(String mail) {
+		Optional<Restaurante> restaurante = restauranteRepo.findById(mail);
+		restaurante.get().setAbierto(false);
+		restauranteRepo.save(restaurante.get());
 	}
 }

@@ -47,6 +47,7 @@ public class Restaurante extends Usuario {
 	@OneToOne(cascade = CascadeType.ALL)
 	private GeoLocalizacion geoLocalizacion;
 	private String diasAbierto;
+	private Boolean abierto;
 
 	@OneToMany(mappedBy = "restaurante", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JsonIgnore
@@ -60,7 +61,7 @@ public class Restaurante extends Usuario {
 	public Restaurante(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado, Boolean activo,
 			String nombre, String direccion, Float calificacionPromedio, EnumEstadoRestaurante estado,
 			LocalTime horarioApertura, LocalTime horarioCierre, LocalDate fechaApertura, Integer costoDeEnvio,
-			GeoLocalizacion geoLocalizacion, List<Producto> productos, String diasAbierto) {
+			GeoLocalizacion geoLocalizacion, List<Producto> productos, String diasAbierto, Boolean abierto) {
 
 		super(mail, contrasenia, telefono, foto, bloqueado, activo);
 		this.nombre = nombre;
@@ -74,12 +75,13 @@ public class Restaurante extends Usuario {
 		this.geoLocalizacion = geoLocalizacion;
 		this.productos = productos;
 		this.diasAbierto = diasAbierto;
+		this.abierto = abierto;
 	}
 
 	public Restaurante(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado, Boolean activo, LocalDate fechaCreacion,
 			String nombre, String direccion, Float calificacionPromedio, EnumEstadoRestaurante estado,
 			LocalTime horarioApertura, LocalTime horarioCierre, LocalDate fechaApertura, Integer costoDeEnvio,
-			GeoLocalizacion geoLocalizacion, List<Producto> productos, String diasAbierto) {
+			GeoLocalizacion geoLocalizacion, List<Producto> productos, String diasAbierto, Boolean abierto) {
 
 		super(mail, contrasenia, telefono, foto, bloqueado, activo, fechaCreacion);
 		this.nombre = nombre;
@@ -93,12 +95,13 @@ public class Restaurante extends Usuario {
 		this.geoLocalizacion = geoLocalizacion;
 		this.productos = productos;
 		this.diasAbierto = diasAbierto;
+		this.abierto = abierto;
 	}
 	
 	//Funcion para buscarUsuario y otros
 	public DTRestaurante getDatos() {
 		return new DTRestaurante(this.getMail(), this.nombre, this.direccion, this.calificacionPromedio, this.estado, this.horarioApertura, this.horarioCierre, 
-				this.tiempoEstimadoMaximo, this.tiempoEstimadoMinimo, this.fechaApertura, this.costoDeEnvio, this.getFechaCreacion(), this.getDiasAbierto());
+				this.tiempoEstimadoMaximo, this.tiempoEstimadoMinimo, this.fechaApertura, this.costoDeEnvio, this.getFechaCreacion(), this.getDiasAbierto(), this.getAbierto());
 	}
 
 	
@@ -223,6 +226,14 @@ public class Restaurante extends Usuario {
 
 	public void setDiasAbierto(String diasAbierto) {
 		this.diasAbierto = diasAbierto;
+	}
+
+	public Boolean getAbierto() {
+		return abierto;
+	}
+
+	public void setAbierto(Boolean abierto) {
+		this.abierto = abierto;
 	}
 
 }

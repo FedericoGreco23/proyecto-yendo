@@ -5,6 +5,7 @@ import com.vpi.springboot.exception.RestauranteException;
 
 public interface RestauranteServicioInterfaz {
 
-	void altaRestaurante(Restaurante rest) throws RestauranteException;
-
+	public void altaRestaurante(Restaurante rest) throws RestauranteException;
+	public void abrirRestaurante(String mail);
+	public void cerrarRestaurante(String mail);
 }
