@@ -90,10 +90,12 @@ public class ClienteController {
 	
 
 	@GetMapping("/getLastDireccion")
-	public ResponseEntity<String> getLastDireccion() {
+	public ResponseEntity<?> getLastDireccion() {
 		try {
 			String mail= getMailFromJwt();
-			return mail!=null? new ResponseEntity<String>(clienteService.getUltimaDireccionSeleccionada(mail), HttpStatus.OK): null;
+			String respuesta = clienteService.getUltimaDireccionSeleccionada(mail);
+			System.out.println(respuesta);
+			return mail!=null? new ResponseEntity<String>(respuesta, HttpStatus.OK): null;
 		} catch (Exception e) {
 			return null;
 		}
