@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.vpi.springboot.Modelo.*;
@@ -24,6 +25,9 @@ import com.vpi.springboot.exception.RestauranteException;
 
 @Service
 public class AdministradorService implements AdministradorServicioInterfaz {
+
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	@Autowired
 	private AdministradorRepositorio adminRepo;
@@ -41,9 +45,12 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 			throw new AdministradorException(AdministradorException.AdministradorYaExiste(admin.getMail()));
 		} else {
 			String mail = admin.getMail();
-			if (mail.contains("@"))
+			if (mail.contains("@")) {
+				admin.setActivo(true);
+				admin.setBloqueado(false);
+				admin.setContrasenia(passwordEncoder.encode(admin.getContrasenia()));
 				adminRepo.save(admin);
-			else
+			} else
 				throw new AdministradorException("Tiene que introducir un mail válido.");
 		}
 	}
@@ -172,11 +179,10 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 
 	public void cambiarEstadoRestaurante(String varRestaurante, int estado) throws RestauranteException {
 		Restaurante restaurante = resRepo.findByNombre(varRestaurante);
-		if(restaurante == null) 
+		if (restaurante == null)
 			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(varRestaurante));
-		
-		
-		switch(estado) {
+
+		switch (estado) {
 		case 1:
 			restaurante.setEstado(EnumEstadoRestaurante.ACEPTADO);
 			break;
@@ -184,7 +190,7 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 			restaurante.setEstado(EnumEstadoRestaurante.RECHAZADO);
 			break;
 		}
-		
+
 		resRepo.save(restaurante);
 	}
 }
