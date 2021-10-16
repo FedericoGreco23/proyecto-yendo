@@ -217,8 +217,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 
 	public String getUltimaDireccionSeleccionada(String mail) {
 		Optional<LastDireccioClientenMongo> direccion= ultimaDireccionRepo.findById(mail);
-		System.out.println(direccion.get().toString());
-		return !direccion.isEmpty()? direccion.get().getIdDireccion().toString():null;
+		return direccion.isPresent()? direccion.get().getIdDireccion().toString():null;
 	}
 
 	public void setUltimaDireccionSeleccionada(Integer idDireccion, String mail) {
