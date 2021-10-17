@@ -26,6 +26,7 @@ import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.dto.AuthenticationRequest;
 import com.vpi.springboot.Modelo.dto.AuthenticationResponse;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
+import com.vpi.springboot.Modelo.dto.DTRestaurante;
 import com.vpi.springboot.exception.RestauranteException;
 import com.vpi.springboot.security.MyUserDetailsService;
 import com.vpi.springboot.security.util.JwtUtil;
@@ -130,6 +131,26 @@ public class PublicRest {
 			return new ResponseEntity<String>("Verificación enviada.", HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@GetMapping("/listarRestaurantes")
+	public Map<String, Object> listarRestaurantesAbiertos(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "0") int horarioApertura) {
+		try {
+			return service.listarRestaurantes(page, size, horarioApertura);
+		} catch (RestauranteException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	@GetMapping("consultarRestaurante")
+	public DTRestaurante consultarRestaurante(@RequestParam(defaultValue = "") String mail) {
+		try {
+			return service.consultarRestaurante(mail);
+		} catch (RestauranteException e) {
+			e.printStackTrace();
+			return null;
 		}
 	}
 	

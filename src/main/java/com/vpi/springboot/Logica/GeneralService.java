@@ -198,6 +198,46 @@ public class GeneralService implements GeneralServicioInterfaz {
 			break;
 		}
 	}
+	
+	@Override
+	public DTRestaurante consultarRestaurante(String mail) throws RestauranteException {
+		Optional<Restaurante> restaurante;
+		restaurante = resRepo.findById(mail);
+		DTRestaurante DTRestaurante = new DTRestaurante(restaurante.get());
+		
+		return DTRestaurante;
+	}
+	
+	@Override
+	public Map<String, Object> listarRestaurantes(int page, int size, int horarioApertura) throws RestauranteException {
+		Map<String, Object> response = new HashMap<>();
+		List<DTListarRestaurante> DTListarRestaurantes = new ArrayList<DTListarRestaurante>();
+		//List<DTRestaurante> DTRestaurantes = new ArrayList<DTRestaurante>();
+		List<Restaurante> restaurantes = new ArrayList<Restaurante>();
+		Pageable paging = PageRequest.of(page, size);
+		Page<Restaurante> pageRestaurante;
+		
+		pageRestaurante = resRepo.findByEstado(EnumEstadoRestaurante.ACEPTADO, paging);
+		
+		restaurantes = pageRestaurante.getContent();
+		//Si el horarioApertura en el filtro es menor o igual que el horarioApertura del restaurante se muestra
+		if (horarioApertura > 0) {
+			for (Restaurante r : restaurantes) {
+				if (r.getHorarioApertura().getHour() >= horarioApertura) {
+					DTListarRestaurantes.add(new DTListarRestaurante(r));
+				}
+			}
+		} else {
+			for (Restaurante r : restaurantes) {
+				DTListarRestaurantes.add(new DTListarRestaurante(r));
+			}
+		}
+		response.put("currentPage", pageRestaurante.getNumber());
+		response.put("totalItems", pageRestaurante.getTotalElements());
+		response.put("restaurantes", DTListarRestaurantes);
+		
+		return response;
+	}
 
 	public Map<String, Object> listarMenusRestaurante(int page, int size, String mailRestaurante)
 			throws RestauranteException {

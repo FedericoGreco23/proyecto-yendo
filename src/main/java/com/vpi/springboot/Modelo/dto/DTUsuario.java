@@ -69,6 +69,13 @@ public class DTUsuario implements Serializable {
 		this.fechaCreacion = fechaCreacion;
 	}
 	
+	//DT para DTListarRestaurante
+	public DTUsuario(String mail, String foto) {
+		super();
+		this.mail = mail;
+		this.foto = foto;
+	}
+	
 	//Funcion constructora necesaria de DTRestaurante para buscarUsuario
 	public DTUsuario(String mail, LocalDate fechaCreacion) {
 		super();

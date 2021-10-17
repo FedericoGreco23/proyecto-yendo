@@ -19,6 +19,8 @@ public class DTPedido implements Serializable {
 	private String cliente;
 	private String restaurante;
 	private List<DTReclamo> reclamos = new ArrayList<>();
+	private String direccion;
+	private String comentario;
 
 	public DTPedido() {
 		super();
@@ -45,6 +47,19 @@ public class DTPedido implements Serializable {
 		this.carrito = ped.getCarrito();
 		this.cliente = ped.getCliente().getMail();
 		this.restaurante = ped.getRestaurante().getNombre();
+	}
+	
+	public DTPedido(int id, LocalDateTime fecha, Double costoTotal, EnumEstadoPedido estadoPedidido,
+			EnumMetodoDePago metodoDePago, Integer carrito, String direccion, String comentario) {
+		super();
+		this.id = id;
+		this.fecha = fecha;
+		this.costoTotal = costoTotal;
+		this.estadoPedidido = estadoPedidido;
+		this.metodoDePago = metodoDePago;
+		this.carrito = carrito;
+		this.direccion = direccion;
+		this.comentario = comentario;
 	}
 
 	public int getId() {
@@ -117,5 +132,21 @@ public class DTPedido implements Serializable {
 
 	public void setReclamos(List<DTReclamo> reclamos) {
 		this.reclamos = reclamos;
+	}
+
+	public String getDireccion() {
+		return direccion;
+	}
+
+	public void setDireccion(String direccion) {
+		this.direccion = direccion;
+	}
+
+	public String getComentario() {
+		return comentario;
+	}
+
+	public void setComentario(String comentario) {
+		this.comentario = comentario;
 	}
 }
