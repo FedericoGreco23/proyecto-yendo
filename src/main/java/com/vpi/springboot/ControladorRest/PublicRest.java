@@ -128,10 +128,11 @@ public class PublicRest {
 
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@GetMapping("/getProductos/{restaurante}")
-	public Map<String, Object> listarMenusRestaurante(@RequestParam(defaultValue = "0") int page,
+	public Map<String, Object> listarMenusRestaurante(@RequestParam(required = false) String attr,
+			@RequestParam(defaultValue = "1") int order, @RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "5") int size, @PathVariable(required = true) String restaurante) {
 		try {
-			return service.listarMenusRestaurante(page, size, restaurante);
+			return service.listarMenusRestaurante(attr, order, page, size, restaurante);
 		} catch (RestauranteException e) {
 			e.printStackTrace();
 			return null;

@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.vpi.springboot.Modelo.*;
@@ -199,16 +200,27 @@ public class GeneralService implements GeneralServicioInterfaz {
 		}
 	}
 
-	public Map<String, Object> listarMenusRestaurante(int page, int size, String mailRestaurante)
+	public Map<String, Object> listarMenusRestaurante(String attr, int order, int page, int size, String mailRestaurante)
 			throws RestauranteException {
 		Optional<Restaurante> optionalRestaurante = resRepo.findById(mailRestaurante);
 		if (!optionalRestaurante.isPresent()) {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(mailRestaurante));
 		}
-
+		
+		Pageable paging;
+		if(attr == null || attr.isEmpty())
+			paging = PageRequest.of(page, size);
+		else {
+			Sort sort;
+			if(order == 1)
+				sort = Sort.by(attr).descending();
+			else 
+				sort = Sort.by(attr).ascending();
+			paging = PageRequest.of(page, size, sort);
+		}
+		
 		Restaurante restaurante = optionalRestaurante.get();
 		Map<String, Object> response = new HashMap<>();
-		Pageable paging = PageRequest.of(page, size);
 		Page<Producto> pageProducto = proRepo.findAllByRestaurante(restaurante, paging);
 		List<DTProducto> retorno = new ArrayList<DTProducto>();
 		List<Producto> productos = pageProducto.getContent();
