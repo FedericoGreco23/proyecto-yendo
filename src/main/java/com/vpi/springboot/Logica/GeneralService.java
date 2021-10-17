@@ -37,6 +37,8 @@ public class GeneralService implements GeneralServicioInterfaz {
 	private PromocionRepositorio promoRepo;
 	@Autowired
 	private MailService mailSender;
+	@Autowired
+	private CategoriaRepositorio catRepo;
 
 	private static final int iterations = 20 * 1000;
 	private static final int desiredKeyLen = 256;
@@ -208,6 +210,10 @@ public class GeneralService implements GeneralServicioInterfaz {
 		return DTRestaurante;
 	}
 	
+	
+	
+	
+	
 	@Override
 	public Map<String, Object> listarRestaurantes(int page, int size, int horarioApertura) throws RestauranteException {
 		Map<String, Object> response = new HashMap<>();
@@ -289,5 +295,11 @@ public class GeneralService implements GeneralServicioInterfaz {
 
 		response.put("promociones", promociones);
 		return response;
+	}
+
+	@Override
+	public List<Categoria> listarCategorias() {
+		return catRepo.findAll();
+		
 	}
 }

@@ -1,5 +1,6 @@
 package com.vpi.springboot.ControladorRest;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.vpi.springboot.Logica.ClienteService;
 import com.vpi.springboot.Logica.GeneralService;
 import com.vpi.springboot.Logica.RestauranteService;
+import com.vpi.springboot.Modelo.Categoria;
 import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.dto.AuthenticationRequest;
@@ -142,6 +144,11 @@ public class PublicRest {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	@GetMapping("/listarCategorias")
+	public List<Categoria> listarCategorias() {
+		return service.listarCategorias();
 	}
 	
 	@GetMapping("getRestaurante")
