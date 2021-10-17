@@ -19,7 +19,7 @@ public class DTCarrito implements Serializable {
 		 this.dtProductoCarritoList = dtProductoCarritoList;
 	        
 	    }
-	
+	 
 	 public DTCarrito(List<DTProductoCarrito> dtProductoCarritoList) {
 	        this.dtProductoCarritoList = dtProductoCarritoList;
 	    }

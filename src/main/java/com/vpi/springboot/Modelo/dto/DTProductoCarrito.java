@@ -9,21 +9,14 @@ public class DTProductoCarrito implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private int idProducto;
     private Integer cantidad;
-
-    public DTProductoCarrito(int idProducto, Integer cantidad) {
-        this.idProducto = idProducto;
+	private DTProducto producto;
+    
+    public DTProductoCarrito(DTProducto producto, Integer cantidad) {
+        this.producto = producto;
         this.cantidad = cantidad;
     }
 
-    public int getidProducto() {
-        return idProducto;
-    }
-
-    public void setidProducto(int producto) {
-        this.idProducto = producto;
-    }
 
     public Integer getCantidad() {
         return cantidad;
@@ -33,11 +26,19 @@ public class DTProductoCarrito implements Serializable {
         this.cantidad = cantidad;
     }
 
-    @Override
-    public String toString() {
-        return "DTProductoCarrito{" +
-                "producto=" + idProducto +
-                ", cantidad=" + cantidad +
-                '}';
-    }
+    public DTProducto getProducto() {
+		return producto;
+	}
+
+	public void setProducto(DTProducto producto) {
+		this.producto = producto;
+	}
+
+
+	@Override
+	public String toString() {
+		return "DTProductoCarrito [cantidad=" + cantidad + ", producto=" + producto + "]";
+	}
+
+	
 }

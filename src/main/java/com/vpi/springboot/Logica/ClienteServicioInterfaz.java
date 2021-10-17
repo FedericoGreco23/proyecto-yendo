@@ -28,7 +28,7 @@ public interface ClienteServicioInterfaz {
 
 	void eliminarDireccion(Integer id, String mail) throws UsuarioException;
 	
-	public void agregarACarrito(DTProductoCarrito c, String mail) throws ProductoException;
+	public void agregarACarrito(int producto, int cantidad, String mail) throws ProductoException;
 	
 	public DTCarrito verCarrito(String mail);
 }

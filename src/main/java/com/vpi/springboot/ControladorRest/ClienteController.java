@@ -111,8 +111,8 @@ public class ClienteController {
 	public ResponseEntity<?> agregarACarrito(@RequestParam int producto, Integer cantidad){
 		try {
 			String mail= getMailFromJwt();
-			DTProductoCarrito productoCarrito = new DTProductoCarrito(producto, cantidad);
-			clienteService.agregarACarrito(productoCarrito, mail);
+			//DTProductoCarrito productoCarrito = new DTProductoCarrito(producto, cantidad);
+			clienteService.agregarACarrito(producto,cantidad, mail);
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Producto agregado con éxito"), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);

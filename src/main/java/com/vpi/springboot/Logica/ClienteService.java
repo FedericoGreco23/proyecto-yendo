@@ -291,28 +291,20 @@ public class ClienteService implements ClienteServicioInterfaz {
 		}
 	}
 
-	/*
-	 * public void agregarACarrito(DTProducto p) { HttpSession session =
-	 * httpSessionFactory.getObject(); if(session.getAttribute("carrito") == null) {
-	 * List<DTProducto> carrito = new ArrayList<DTProducto>(); carrito.add(p);
-	 * session.setAttribute("carrito", carrito); }else { List<DTProducto> carrito =
-	 * (List<DTProducto>) httpSessionFactory.getObject().getAttribute("carrito");
-	 * carrito.add(p); session.setAttribute("carrito", carrito); } }
-	 */
 
 	@Override
-	public void agregarACarrito(DTProductoCarrito c, String mail) throws ProductoException {
-		int producto = c.getidProducto();
+	public void agregarACarrito(int producto,int cantidad, String mail) throws ProductoException {
 		Optional<Producto> optionalProducto = productoRepo.findById(producto);
 		if (optionalProducto.isPresent()) {
+			DTProducto dtProducto = new DTProducto(optionalProducto.get());
 			Carrito optionalCarrito = mongoRepo.findByMailAndActivo(mail, true);
+			DTProductoCarrito dtPC = new DTProductoCarrito(dtProducto, cantidad);
 			if (optionalCarrito != null) { // TIENE CARRITO ACTIVO
-				Carrito carritoExiste = optionalCarrito;
-				carritoExiste.addProductoCarrito(c);
-				mongoRepo.save(carritoExiste);
+				optionalCarrito.addProductoCarrito(dtPC);
+				mongoRepo.save(optionalCarrito);
 			} else { // TIENE CARRITO INACTIVO O NO TIEN
 				List<DTProductoCarrito> productos = new ArrayList<DTProductoCarrito>();
-				productos.add(c);
+				productos.add(dtPC);
 				Carrito carrito = new Carrito(mail, productos, true);
 				carrito.setId(nextSequence.getNextSequence("customSequences"));
 				mongoRepo.save(carrito);
@@ -328,9 +320,9 @@ public class ClienteService implements ClienteServicioInterfaz {
 		Carrito optionalCarrito = mongoRepo.findByMailAndActivo(mail, true);
 		DTCarrito carrito = new DTCarrito(optionalCarrito.getId(), optionalCarrito.getProductoCarrito());
 		return carrito;
-
+		
 	}
-
+	
 	public String getUltimaDireccionSeleccionada(String mail) {
 		Optional<LastDireccioClientenMongo> direccion = ultimaDireccionRepo.findById(mail);
 		return direccion.isPresent() ? direccion.get().getIdDireccion().toString() : null;
