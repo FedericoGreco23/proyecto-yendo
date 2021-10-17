@@ -31,6 +31,7 @@ import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.LastDireccioClientenMongo;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
+import com.vpi.springboot.Modelo.dto.DTListarRestaurante;
 import com.vpi.springboot.Modelo.dto.DTProducto;
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
@@ -150,36 +151,6 @@ public class ClienteService implements ClienteServicioInterfaz {
 
 	}
 	// --------------------------------------
-
-	@Override
-	public Map<String, Object> listarRestaurantes(int page, int size, int horarioApertura) throws RestauranteException {
-		Map<String, Object> response = new HashMap<>();
-		List<DTRestaurante> DTRestaurantes = new ArrayList<DTRestaurante>();
-		List<Restaurante> restaurantes = new ArrayList<Restaurante>();
-		Pageable paging = PageRequest.of(page, size);
-		Page<Restaurante> pageRestaurante;
-		
-		pageRestaurante = restauranteRepo.findByEstado(EnumEstadoRestaurante.ACEPTADO, paging);
-		
-		restaurantes = pageRestaurante.getContent();
-		//Si el horarioApertura en el filtro es menor o igual que el horarioApertura del restaurante se muestra
-		if (horarioApertura > 0) {
-			for (Restaurante r : restaurantes) {
-				if (r.getHorarioApertura().getHour() >= horarioApertura) {
-					DTRestaurantes.add(new DTRestaurante(r));
-				}
-			}
-		} else {
-			for (Restaurante r : restaurantes) {
-				DTRestaurantes.add(new DTRestaurante(r));
-			}
-		}
-		response.put("currentPage", pageRestaurante.getNumber());
-		response.put("totalItems", pageRestaurante.getTotalElements());
-		response.put("restaurantes", DTRestaurantes);
-		
-		return response;
-	}
 	
 	
 	@Override

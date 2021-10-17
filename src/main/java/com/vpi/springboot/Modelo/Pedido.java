@@ -43,6 +43,8 @@ public class Pedido {
 	@OneToMany(mappedBy = "pedido", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JsonIgnore
 	private List<Reclamo> reclamos = new ArrayList<>();
+	private String direccion;
+	private String comentario;
 
 	public Pedido(int id, LocalDateTime fecha, Double costoTotal, EnumEstadoPedido estadoPedido,
 			EnumMetodoDePago metodoDePago, Integer carrito) {
@@ -54,6 +56,23 @@ public class Pedido {
 		this.metodoDePago = metodoDePago;
 		this.carrito = carrito;
 	}
+	
+	public Pedido(int id, LocalDateTime fecha, Double costoTotal, EnumEstadoPedido estadoPedido,
+			EnumMetodoDePago metodoDePago, Integer carrito, String direccion, String comentario) {
+		super();
+		this.id = id;
+		this.fecha = fecha;
+		this.costoTotal = costoTotal;
+		this.estadoPedido = estadoPedido;
+		this.metodoDePago = metodoDePago;
+		this.carrito = carrito;
+		this.direccion = direccion;
+		this.comentario = comentario;
+	}
+	
+	
+//----------------------GETTERS Y SETTERS---------------------------------------------------------
+	
 
 	public int getId() {
 		return id;
@@ -125,5 +144,25 @@ public class Pedido {
 
 	public void setReclamos(List<Reclamo> reclamos) {
 		this.reclamos = reclamos;
+	}
+
+	public String getDireccion() {
+		return direccion;
+	}
+
+	public void setDireccion(String direccion) {
+		this.direccion = direccion;
+	}
+
+	public String getComentario() {
+		return comentario;
+	}
+
+	public void setComentario(String comentario) {
+		this.comentario = comentario;
+	}
+
+	public void setEstadoPedido(EnumEstadoPedido estadoPedido) {
+		this.estadoPedido = estadoPedido;
 	}
 }

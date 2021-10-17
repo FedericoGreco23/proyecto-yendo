@@ -94,7 +94,8 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 	}
 
 	public DTRestaurante(Restaurante res) {
-		super();
+		super(res.getMail(), res.getContrasenia(), res.getTelefono(), res.getFoto(), res.getBloqueado(),
+				res.getActivo(), res.getFechaCreacion());
 		this.nombre = res.getNombre();
 		this.direccion = res.getDireccion();
 		this.calificacionPromedio = res.getCalificacionPromedio();
@@ -116,6 +117,27 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 			for (Producto pro : res.getProductos()) {
 				this.productos.add(pro.getNombre());
 			}
+		}
+	}
+	
+	public DTRestaurante(String mail, String foto, String nombre, String direccion, Float calificacionPromedio,
+			LocalTime horarioApertura, LocalTime horarioCierre, LocalTime tiempoEstimadoMinimo, LocalTime tiempoEstimadoMaximo,
+			Integer costoDeEnvio, GeoLocalizacion geoLocalizacion, List<Producto> productos, String diasAbierto, Boolean abierto) {
+		super(mail, foto);
+		this.nombre = nombre;
+		this.direccion = direccion;
+		this.calificacionPromedio = calificacionPromedio;
+		this.horarioApertura = horarioApertura;
+		this.horarioCierre = horarioCierre;
+		this.tiempoEstimadoMinimo = tiempoEstimadoMinimo;
+		this.tiempoEstimadoMaximo = tiempoEstimadoMaximo;
+		this.costoDeEnvio = costoDeEnvio;
+		this.geoLocalizacion = new DTGeoLocalizacion(geoLocalizacion);
+		this.diasAbierto = diasAbierto;
+		this.abierto = abierto;
+		
+		for (Producto pro : productos) {
+			this.productos.add(pro.getNombre());
 		}
 	}
 
