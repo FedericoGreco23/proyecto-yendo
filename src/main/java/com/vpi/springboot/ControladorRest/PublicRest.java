@@ -144,10 +144,10 @@ public class PublicRest {
 		}
 	}
 	
-	@GetMapping("consultarRestaurante")
-	public DTRestaurante consultarRestaurante(@RequestParam(defaultValue = "") String mail) {
+	@GetMapping("getRestaurante")
+	public DTRestaurante getRestaurante(@RequestParam(defaultValue = "") String mail) {
 		try {
-			return service.consultarRestaurante(mail);
+			return service.getRestaurante(mail);
 		} catch (RestauranteException e) {
 			e.printStackTrace();
 			return null;

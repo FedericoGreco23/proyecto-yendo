@@ -18,7 +18,7 @@ public interface GeneralServicioInterfaz {
 
 	public void activarCuenta(String mail, int tipoUsuario);
 	
-	public DTRestaurante consultarRestaurante(String mail) throws RestauranteException;
+	public DTRestaurante getRestaurante(String mail) throws RestauranteException;
 	
 	public Map<String, Object> listarRestaurantes(int page, int size, int horarioApertura) throws RestauranteException;
 

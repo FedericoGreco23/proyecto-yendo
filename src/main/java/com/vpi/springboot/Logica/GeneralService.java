@@ -200,7 +200,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 	}
 	
 	@Override
-	public DTRestaurante consultarRestaurante(String mail) throws RestauranteException {
+	public DTRestaurante getRestaurante(String mail) throws RestauranteException {
 		Optional<Restaurante> restaurante;
 		restaurante = resRepo.findById(mail);
 		DTRestaurante DTRestaurante = new DTRestaurante(restaurante.get());
@@ -217,7 +217,9 @@ public class GeneralService implements GeneralServicioInterfaz {
 		Pageable paging = PageRequest.of(page, size);
 		Page<Restaurante> pageRestaurante;
 		
-		pageRestaurante = resRepo.findByEstado(EnumEstadoRestaurante.ACEPTADO, paging);
+		//pageRestaurante = resRepo.findByEstado(EnumEstadoRestaurante.ACEPTADO, paging);
+		//Devuelve los restaurantes aceptados no bloqueados y activos
+		pageRestaurante = resRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivos(EnumEstadoRestaurante.ACEPTADO, paging);
 		
 		restaurantes = pageRestaurante.getContent();
 		//Si el horarioApertura en el filtro es menor o igual que el horarioApertura del restaurante se muestra
