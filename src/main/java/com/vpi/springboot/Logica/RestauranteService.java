@@ -87,7 +87,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	public void altaMenu(Producto menu, String varRestaurante)
 			throws ProductoException, RestauranteException, CategoriaException, Exception {
 		Optional<Restaurante> optionalRestaurante = resRepo.findById(varRestaurante);
-		if (optionalRestaurante.isEmpty()) {
+		if (!optionalRestaurante.isPresent()) {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(varRestaurante));
 		}
 		Restaurante restaurante = optionalRestaurante.get();
@@ -95,7 +95,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		List<Categoria> categorias = new ArrayList<>();
 		for(Categoria c: menu.getCategorias()) {
 			Optional<Categoria> optionalCategoria = catRepo.findById(c.getNombre());
-			if(optionalCategoria.isEmpty())
+			if(!optionalCategoria.isPresent())
 				throw new CategoriaException(CategoriaException.NotFoundException(c.getNombre()));
 			categorias.add(c);
 		}
@@ -150,7 +150,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 	public Map<String, Object> listarPedidos(int page, int size, String varRestaurante) throws RestauranteException {
 		Optional<Restaurante> optionalRestaurante = resRepo.findById(varRestaurante);
-		if (optionalRestaurante.isEmpty()) {
+		if (!optionalRestaurante.isPresent()) {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(varRestaurante));
 		}
 		Restaurante restaurante = optionalRestaurante.get();
