@@ -1,5 +1,6 @@
 package com.vpi.springboot.Logica;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
@@ -203,7 +204,10 @@ public class GeneralService implements GeneralServicioInterfaz {
 	public DTRestaurante getRestaurante(String mail) throws RestauranteException {
 		Optional<Restaurante> restaurante;
 		restaurante = resRepo.findById(mail);
-		DTRestaurante DTRestaurante = new DTRestaurante(restaurante.get());
+		DTRestaurante DTRestaurante = new DTRestaurante(restaurante.get().getMail(), restaurante.get().getFoto(), restaurante.get().getNombre(), restaurante.get().getDireccion(), restaurante.get().getCalificacionPromedio(), 
+				restaurante.get().getHorarioApertura(), restaurante.get().getHorarioCierre(), restaurante.get().getTiempoEstimadoMinimo(), restaurante.get().getTiempoEstimadoMaximo(), 
+				restaurante.get().getCostoDeEnvio(), restaurante.get().getGeoLocalizacion(), restaurante.get().getProductos(), restaurante.get().getDiasAbierto(), restaurante.get().getAbierto());
+		//DTRestaurante DTRestaurante = new DTRestaurante(restaurante.get());
 		
 		return DTRestaurante;
 	}
