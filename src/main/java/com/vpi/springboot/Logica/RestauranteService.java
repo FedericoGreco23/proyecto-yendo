@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.vpi.springboot.Modelo.Cliente;
@@ -55,6 +56,10 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 	@Autowired
 	private RestauranteRepositorio resRepo;
+	
+
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	@Override
 	public void altaRestaurante(Restaurante rest) throws RestauranteException {
@@ -80,6 +85,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		rest.setReclamos(null);
 		rest.setPedidos(null);
 		rest.setAbierto(false);
+		rest.setContrasenia(passwordEncoder.encode(rest.getContrasenia()));
 
 		restauranteRepo.save(rest);
 	}
