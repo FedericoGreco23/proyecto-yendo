@@ -102,6 +102,8 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 		this.estado = res.getEstado();
 		this.horarioApertura = res.getHorarioApertura();
 		this.horarioCierre = res.getHorarioCierre();
+		this.tiempoEstimadoMaximo = res.getTiempoEstimadoMaximo();
+		this.tiempoEstimadoMinimo = res.getTiempoEstimadoMinimo();
 		this.fechaApertura = res.getFechaApertura();
 		this.costoDeEnvio = res.getCostoDeEnvio();
 		this.diasAbierto = res.getDiasAbierto();

@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.vpi.springboot.Modelo.*;
@@ -37,6 +38,8 @@ public class GeneralService implements GeneralServicioInterfaz {
 	private PromocionRepositorio promoRepo;
 	@Autowired
 	private MailService mailSender;
+	@Autowired
+	private CategoriaRepositorio catRepo;
 
 	private static final int iterations = 20 * 1000;
 	private static final int desiredKeyLen = 256;
@@ -200,13 +203,20 @@ public class GeneralService implements GeneralServicioInterfaz {
 	}
 	
 	@Override
-	public DTRestaurante consultarRestaurante(String mail) throws RestauranteException {
+	public DTRestaurante getRestaurante(String mail) throws RestauranteException {
 		Optional<Restaurante> restaurante;
 		restaurante = resRepo.findById(mail);
-		DTRestaurante DTRestaurante = new DTRestaurante(restaurante.get());
+		DTRestaurante DTRestaurante = new DTRestaurante(restaurante.get().getMail(), restaurante.get().getFoto(), restaurante.get().getNombre(), restaurante.get().getDireccion(), restaurante.get().getCalificacionPromedio(), 
+				restaurante.get().getHorarioApertura(), restaurante.get().getHorarioCierre(), restaurante.get().getTiempoEstimadoMinimo(), restaurante.get().getTiempoEstimadoMaximo(), 
+				restaurante.get().getCostoDeEnvio(), restaurante.get().getGeoLocalizacion(), restaurante.get().getProductos(), restaurante.get().getDiasAbierto(), restaurante.get().getAbierto());
+		//DTRestaurante DTRestaurante = new DTRestaurante(restaurante.get());
 		
 		return DTRestaurante;
 	}
+	
+	
+	
+	
 	
 	@Override
 	public Map<String, Object> listarRestaurantes(int page, int size, int horarioApertura) throws RestauranteException {
@@ -217,7 +227,9 @@ public class GeneralService implements GeneralServicioInterfaz {
 		Pageable paging = PageRequest.of(page, size);
 		Page<Restaurante> pageRestaurante;
 		
-		pageRestaurante = resRepo.findByEstado(EnumEstadoRestaurante.ACEPTADO, paging);
+		//pageRestaurante = resRepo.findByEstado(EnumEstadoRestaurante.ACEPTADO, paging);
+		//Devuelve los restaurantes aceptados no bloqueados y activos
+		pageRestaurante = resRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivos(EnumEstadoRestaurante.ACEPTADO, paging);
 		
 		restaurantes = pageRestaurante.getContent();
 		//Si el horarioApertura en el filtro es menor o igual que el horarioApertura del restaurante se muestra
@@ -239,16 +251,27 @@ public class GeneralService implements GeneralServicioInterfaz {
 		return response;
 	}
 
-	public Map<String, Object> listarMenusRestaurante(int page, int size, String mailRestaurante)
+	public Map<String, Object> listarMenusRestaurante(String attr, int order, int page, int size, String mailRestaurante)
 			throws RestauranteException {
 		Optional<Restaurante> optionalRestaurante = resRepo.findById(mailRestaurante);
 		if (!optionalRestaurante.isPresent()) {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(mailRestaurante));
 		}
-
+		
+		Pageable paging;
+		if(attr == null || attr.isEmpty())
+			paging = PageRequest.of(page, size);
+		else {
+			Sort sort;
+			if(order == 1)
+				sort = Sort.by(attr).descending();
+			else 
+				sort = Sort.by(attr).ascending();
+			paging = PageRequest.of(page, size, sort);
+		}
+		
 		Restaurante restaurante = optionalRestaurante.get();
 		Map<String, Object> response = new HashMap<>();
-		Pageable paging = PageRequest.of(page, size);
 		Page<Producto> pageProducto = proRepo.findAllByRestaurante(restaurante, paging);
 		List<DTProducto> retorno = new ArrayList<DTProducto>();
 		List<Producto> productos = pageProducto.getContent();
@@ -287,5 +310,11 @@ public class GeneralService implements GeneralServicioInterfaz {
 
 		response.put("promociones", promociones);
 		return response;
+	}
+
+	@Override
+	public List<Categoria> listarCategorias() {
+		return catRepo.findAll();
+		
 	}
 }
