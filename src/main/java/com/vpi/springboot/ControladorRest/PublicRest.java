@@ -29,6 +29,7 @@ import com.vpi.springboot.Modelo.dto.AuthenticationRequest;
 import com.vpi.springboot.Modelo.dto.AuthenticationResponse;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
+import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.exception.RestauranteException;
 import com.vpi.springboot.security.MyUserDetailsService;
 import com.vpi.springboot.security.util.JwtUtil;
@@ -78,8 +79,23 @@ public class PublicRest {
 			throw new Exception("Este usuario se encuentra inactivo, comuniquese con un administrador");
 
 		} else if (userDetails.getUser().getBloqueado()) {
+
 			throw new Exception("Este usuario se encuentra bloqueado, comuniquese con un administrador");
+
+		} else if (userDetails.getUser().getClass() == Restaurante.class) {
+
+			Restaurante r = (Restaurante) userDetails.getUser();
+			if (r.getEstado().name().contains(EnumEstadoRestaurante.EN_ESPERA.name())) {
+
+				throw new Exception("Este restaurante se encuentra en espera de aprobación");
+			} else if (r.getEstado().name().contains(EnumEstadoRestaurante.RECHAZADO.name())) {
+
+				throw new Exception("Este restaurante fue rechazado");
+			}
+
 		}
+			
+		
 
 		final String jwt = jwtTokenUtil.generateToken(userDetails);
 
