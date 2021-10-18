@@ -1,13 +1,12 @@
 package com.vpi.springboot.Logica;
 
 import java.util.List;
-import java.util.Map;
-
 import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
-import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
-import com.vpi.springboot.Modelo.dto.DTRestaurante;
+import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
+import com.vpi.springboot.exception.CarritoException;
+import com.vpi.springboot.exception.DireccionException;
 import com.vpi.springboot.exception.ProductoException;
 import com.vpi.springboot.exception.RestauranteException;
 import com.vpi.springboot.exception.UsuarioException;
@@ -30,4 +29,9 @@ public interface ClienteServicioInterfaz {
 	public void agregarACarrito(int producto, int cantidad, String mail) throws ProductoException;
 	
 	public DTCarrito verCarrito(String mail);
+
+	void altaPedido(String mailRestaurante, int idCarrito, EnumMetodoDePago pago, int idDireccion, String mail, String comentario)
+			throws RestauranteException, CarritoException, DireccionException;
+
+	
 }

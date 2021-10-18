@@ -241,4 +241,7 @@ public class Restaurante extends Usuario {
 		this.productos.add(producto);
 	}
 
+	public void addPedido(Pedido pedido) {
+		this.pedidos.add(pedido);
+	}
 }

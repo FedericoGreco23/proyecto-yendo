@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import com.vpi.springboot.Modelo.Carrito;
 
 	@Repository
-	public interface MongoRepositorioCarrito extends MongoRepository<Carrito, String> {
+	public interface MongoRepositorioCarrito extends MongoRepository<Carrito, Integer> {
 		
 		
 		@Query("{'mail': ?0, 'activo': ?1}")

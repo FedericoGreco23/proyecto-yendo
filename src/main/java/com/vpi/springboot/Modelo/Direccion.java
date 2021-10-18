@@ -77,8 +77,7 @@ public class Direccion {
 
 	@Override
 	public String toString() {
-		return "Direccion [id=" + id + ", calleNro=" + calleNro + ", geoLocalizacion=" + geoLocalizacion + ", cliente="
-				+ cliente + "]";
+		return "Direccion [calleNro=" + calleNro + ", geoLocalizacion=" + geoLocalizacion + "]";
 	}
 
 	public int getId() {

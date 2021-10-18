@@ -1,24 +1,16 @@
 package com.vpi.springboot.Logica;
 
-import java.security.SecureRandom;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import com.vpi.springboot.Modelo.Carrito;
@@ -29,20 +21,23 @@ import com.vpi.springboot.Modelo.GeoLocalizacion;
 import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.LastDireccioClientenMongo;
+import com.vpi.springboot.Modelo.Pedido;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
-import com.vpi.springboot.Modelo.dto.DTListarRestaurante;
 import com.vpi.springboot.Modelo.dto.DTProducto;
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
-import com.vpi.springboot.Modelo.dto.DTRestaurante;
-import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
+import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
+import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
 import com.vpi.springboot.Repositorios.ClienteRepositorio;
 import com.vpi.springboot.Repositorios.DireccionRepositorio;
 import com.vpi.springboot.Repositorios.GeoLocalizacionRepositorio;
 
 import com.vpi.springboot.Repositorios.MongoRepositorioCarrito;
+import com.vpi.springboot.Repositorios.PedidoRepositorio;
 import com.vpi.springboot.Repositorios.ProductoRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
+import com.vpi.springboot.exception.CarritoException;
+import com.vpi.springboot.exception.DireccionException;
 import com.vpi.springboot.exception.ProductoException;
 import com.vpi.springboot.exception.RestauranteException;
 import com.vpi.springboot.Repositorios.mongo.UltimaDireccionRepositorio;
@@ -69,6 +64,8 @@ public class ClienteService implements ClienteServicioInterfaz {
 	@Autowired
 	private ProductoRepositorio productoRepo;
 	@Autowired
+	private PedidoRepositorio pedidoRepo;
+	@Autowired
 	private RestauranteRepositorio restauranteRepo;
 
 	@Autowired
@@ -76,10 +73,6 @@ public class ClienteService implements ClienteServicioInterfaz {
 
 	@Autowired
 	private UltimaDireccionRepositorio ultimaDireccionRepo;
-
-	private static final int iterations = 20 * 1000;
-	private static final int saltLen = 32;
-	private static final int desiredKeyLen = 256;
 
 	@Override
 	public List<DTDireccion> getDireccionCliente(String mail) throws UsuarioException {
@@ -141,18 +134,6 @@ public class ClienteService implements ClienteServicioInterfaz {
 		return userRepo.findById(mail).isPresent();
 	}
 
-	// METODO PARA HASHEAR CONTRASEÑA
-	private static String hash(String password, byte[] salt) throws Exception {
-		if (password == null || password.length() == 0)
-			throw new IllegalArgumentException("Contraseña vacia.");
-		SecretKeyFactory f = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-		SecretKey key = f.generateSecret(new PBEKeySpec(password.toCharArray(), salt, iterations, desiredKeyLen));
-		return Base64.getEncoder().encodeToString(key.getEncoded());
-
-	}
-	// --------------------------------------
-	
-	
 	@Override
 	public List<Cliente> obtenerClientes() {
 		Iterable<Cliente> usuario = userRepo.findAll();
@@ -305,5 +286,60 @@ public class ClienteService implements ClienteServicioInterfaz {
 		actualDire.set_id(mail);
 
 		ultimaDireccionRepo.save(actualDire);
+	}
+	
+	@Override
+	public void altaPedido(String mailRestaurante, int idCarrito, EnumMetodoDePago pago, int idDireccion, String mail, String comentario) throws RestauranteException, CarritoException, DireccionException{
+		Optional<Cliente> optionalCliente = userRepo.findById(mail);
+		Cliente cliente = optionalCliente.get();
+		Optional<Restaurante> optionalRestaurante = restauranteRepo.findById(mailRestaurante);
+		if(optionalRestaurante.isPresent()) {
+			Restaurante restaurante = optionalRestaurante.get();
+			Optional<Carrito> optionalCarrito = mongoRepo.findById(idCarrito);
+			if(optionalCarrito.isPresent()) {
+			   Optional<Direccion> optionalDireccion = dirRepo.findById(idDireccion);
+			   if(optionalDireccion.isPresent()) {
+				   	String direccion = optionalDireccion.get().toString();
+					Carrito carrito = optionalCarrito.get();
+					EnumEstadoPedido estado =EnumEstadoPedido.PROCESADO;
+					double precioTotal = 0;
+					for (DTProductoCarrito DTpc : carrito.getProductoCarrito()) {
+						if(DTpc.getProducto().getDescuento() != 0) {
+							precioTotal = (precioTotal + ((DTpc.getProducto().getPrecio()) - ((DTpc.getProducto().getDescuento()/100) * DTpc.getProducto().getPrecio()))) * DTpc.getCantidad();
+						}else {
+							precioTotal = (precioTotal + DTpc.getProducto().getPrecio()) * DTpc.getCantidad() ;
+						}
+					}
+					Pedido pedido = new Pedido(LocalDateTime.now(),precioTotal,estado,pago, idCarrito, direccion, restaurante, cliente, comentario);
+					pedidoRepo.save(pedido);
+					//AGREGAR PEDIDO AL RESTAURANTE
+					if (restaurante.getPedidos() == null) {
+						List<Pedido> pedidos = new ArrayList<Pedido>();
+						pedidos.add(pedido);
+						restaurante.setPedidos(pedidos);
+					} else {
+						restaurante.addPedido(pedido);
+					}
+					restauranteRepo.save(restaurante);
+					//AGREGAR PEDIDO AL CLIENTE
+					if (cliente.getPedidos() == null) {
+						List<Pedido> pedidosCliente = new ArrayList<Pedido>();
+						pedidosCliente.add(pedido);
+						cliente.setPedidos(pedidosCliente);
+					} else {
+						cliente.addPedido(pedido);
+					}
+					userRepo.save(cliente);
+					carrito.setActivo(false);
+					mongoRepo.save(carrito);
+			   }else {
+				   throw new DireccionException(DireccionException.NotFoundExceptionId(idDireccion));
+			   }
+			}else {
+				throw new CarritoException(CarritoException.NotFoundExceptionId(idCarrito));
+			}
+		}else {
+			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(mailRestaurante));
+		}
 	}
 }

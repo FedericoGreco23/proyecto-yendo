@@ -18,6 +18,7 @@ import com.vpi.springboot.Modelo.dto.DTDireccion;
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
+import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
 import com.vpi.springboot.exception.RestauranteException;
 import com.vpi.springboot.exception.UsuarioException;
 import com.vpi.springboot.security.util.JwtUtil;
@@ -161,6 +162,25 @@ public class ClienteController {
             mail = jwtUtil.extractUsername(jwt);
         }
         return mail;
+	}
+	
+	@PostMapping("/altaPedido")
+	public ResponseEntity<DTRespuesta> altaPedido(@RequestParam String mailRestaurante, @RequestParam int idCarrito,
+													@RequestParam int metodoPago, @RequestParam int idDireccion, @RequestParam String comentario){
+		try {
+			String mail= getMailFromJwt();
+			EnumMetodoDePago pago;
+			if (metodoPago == 1) {
+				pago = EnumMetodoDePago.PAYPAL;
+			}else {
+				pago = EnumMetodoDePago.EFECTIVO;
+			}
+			clienteService.altaPedido(mailRestaurante, idCarrito, pago, idDireccion, mail, comentario);
+			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Pedido enviado con éxito"), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
 	}
 
 }
