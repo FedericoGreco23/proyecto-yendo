@@ -1,5 +1,6 @@
 package com.vpi.springboot.ControladorRest;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.vpi.springboot.Logica.ClienteService;
 import com.vpi.springboot.Logica.GeneralService;
 import com.vpi.springboot.Logica.RestauranteService;
+import com.vpi.springboot.Modelo.Categoria;
 import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.dto.AuthenticationRequest;
@@ -45,43 +47,37 @@ public class PublicRest {
 
 	@Autowired
 	private MyUserDetailsService userDetailsService;
-	
+
 	@Autowired
 	private GeneralService service;
 
 	@Autowired
 	private ClienteService clienteService;
-	
+
 	@Autowired
 	private RestauranteService restService;
-	
-	
 
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
-	public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception {
+	public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest)
+			throws Exception {
 
-		if(!authenticationRequest.getUsername().contains("admin")) {
-		try {
-			authenticationManager.authenticate(
-					new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword())
-			);
+		if (!authenticationRequest.getUsername().contains("admin")) {
+			try {
+				authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+						authenticationRequest.getUsername(), authenticationRequest.getPassword()));
+			} catch (BadCredentialsException e) {
+				throw new Exception("Usuario o contraseña son incorrectas", e);
+			}
 		}
-		catch (BadCredentialsException e) {
-			throw new Exception("Usuario o contraseña son incorrectas", e);
-		}
-		}
-
 
 		final MyDetails userDetails = (MyDetails) userDetailsService
 				.loadUserByUsername(authenticationRequest.getUsername());
-		
-		if(!userDetails.getUser().getActivo()) {
 
+		if (!userDetails.getUser().getActivo()) {
 			throw new Exception("Este usuario se encuentra inactivo, comuniquese con un administrador");
-			
-		}else if (userDetails.getUser().getBloqueado()) {
-			
+
+		} else if (userDetails.getUser().getBloqueado()) {
 			throw new Exception("Este usuario se encuentra bloqueado, comuniquese con un administrador");
 		}
 
@@ -89,7 +85,7 @@ public class PublicRest {
 
 		return ResponseEntity.ok(new AuthenticationResponse(jwt));
 	}
-	
+
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@RequestMapping(value = "/crearCliente", method = RequestMethod.POST)
 	public ResponseEntity<DTRespuesta> altaCliente(@RequestBody Cliente usuario) {
@@ -100,8 +96,7 @@ public class PublicRest {
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
-	
+
 	@PostMapping("/crearRestaurante")
 	public ResponseEntity<DTRespuesta> crearRestaurante(@RequestBody Restaurante rest) {
 		try {
@@ -111,7 +106,7 @@ public class PublicRest {
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@RequestMapping(value = "/recuperar", method = RequestMethod.POST)
 	public ResponseEntity<?> recuperarPassword(@RequestParam String mail) {
@@ -133,7 +128,7 @@ public class PublicRest {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@GetMapping("/listarRestaurantes")
 	public Map<String, Object> listarRestaurantesAbiertos(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "0") int horarioApertura) {
 		try {
@@ -143,7 +138,12 @@ public class PublicRest {
 			return null;
 		}
 	}
-	
+
+	@GetMapping("/listarCategorias")
+	public List<Categoria> listarCategorias() {
+		return service.listarCategorias();
+	}
+
 	@GetMapping("getRestaurante")
 	public DTRestaurante getRestaurante(@RequestParam(defaultValue = "") String mail) {
 		try {
@@ -153,25 +153,24 @@ public class PublicRest {
 			return null;
 		}
 	}
-	
+
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@GetMapping("/getProductos/{restaurante}")
-	public Map<String, Object> listarMenusRestaurante(@RequestParam(defaultValue = "0") int page,
-									  	   		@RequestParam(defaultValue = "5") int size, 
-									  	   		@PathVariable(required = true) String restaurante) {
+	public Map<String, Object> listarMenusRestaurante(@RequestParam(required = false) String attr,
+			@RequestParam(defaultValue = "1") int order, @RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "5") int size, @PathVariable(required = true) String restaurante) {
 		try {
-			return service.listarMenusRestaurante(page, size, restaurante);
+			return service.listarMenusRestaurante(attr, order, page, size, restaurante);
 		} catch (RestauranteException e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
-	
+
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@GetMapping("/getPromociones/{restaurante}")
 	public Map<String, Object> listarPromociones(@RequestParam(defaultValue = "0") int page,
-									  	   	 @RequestParam(defaultValue = "5") int size, 
-									  	   	 @PathVariable(required = true) String restaurante) {
+			@RequestParam(defaultValue = "5") int size, @PathVariable(required = true) String restaurante) {
 		try {
 			return service.listarPromocionesRestaurante(page, size, restaurante);
 		} catch (RestauranteException e) {

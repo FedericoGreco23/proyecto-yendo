@@ -3,6 +3,7 @@ package com.vpi.springboot.Logica;
 import java.util.List;
 import java.util.Map;
 
+import com.vpi.springboot.Modelo.Categoria;
 import com.vpi.springboot.Modelo.dto.DTProducto;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
 import com.vpi.springboot.Modelo.dto.DTUsuario;
@@ -20,9 +21,11 @@ public interface GeneralServicioInterfaz {
 	
 	public DTRestaurante getRestaurante(String mail) throws RestauranteException;
 	
+	public List<Categoria> listarCategorias();
+	
 	public Map<String, Object> listarRestaurantes(int page, int size, int horarioApertura) throws RestauranteException;
 
-	public Map<String, Object> listarMenusRestaurante(int page, int size, String nombreRestaurante)
+	public Map<String, Object> listarMenusRestaurante(String attr, int order, int page, int size, String nombreRestaurante)
 			throws RestauranteException;
 
 	public Map<String, Object> listarPromocionesRestaurante(int page, int size, String nombreRestaurante)
