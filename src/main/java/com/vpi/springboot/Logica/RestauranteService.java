@@ -15,16 +15,20 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.vpi.springboot.Modelo.Cliente;
+import com.vpi.springboot.Modelo.Carrito;
 import com.vpi.springboot.Modelo.Categoria;
 import com.vpi.springboot.Modelo.GeoLocalizacion;
 import com.vpi.springboot.Modelo.Pedido;
 import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.Modelo.Restaurante;
+import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTPedido;
+import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Repositorios.CategoriaRepositorio;
 import com.vpi.springboot.Repositorios.GeoLocalizacionRepositorio;
+import com.vpi.springboot.Repositorios.MongoRepositorioCarrito;
 import com.vpi.springboot.Repositorios.PedidoRepositorio;
 import com.vpi.springboot.Repositorios.ProductoRepositorio;
 import com.vpi.springboot.Repositorios.PromocionRepositorio;
@@ -57,10 +61,23 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	@Autowired
 	private RestauranteRepositorio resRepo;
 	
+	@Autowired
+	private MongoRepositorioCarrito mongoRepo;
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-
+	
+	private DTCarrito verCarrito(int id) {
+		Optional<Carrito> optionalCarrito = mongoRepo.findById(id);
+		if(optionalCarrito.isPresent()) {
+			Carrito carrito = optionalCarrito.get();
+			DTCarrito dt = new DTCarrito(carrito.getId(), carrito.getProductoCarrito());
+			return dt;
+		}
+		
+		return null;
+	}
+	
 	@Override
 	public void altaRestaurante(Restaurante rest) throws RestauranteException {
 
@@ -97,19 +114,14 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(varRestaurante));
 		}
 		Restaurante restaurante = optionalRestaurante.get();
-
-		List<Categoria> categorias = new ArrayList<>();
-		for(Categoria c: menu.getCategorias()) {
-			Optional<Categoria> optionalCategoria = catRepo.findById(c.getNombre());
-			if(!optionalCategoria.isPresent())
-				throw new CategoriaException(CategoriaException.NotFoundException(c.getNombre()));
-			categorias.add(c);
-		}
+		
+		Optional<Categoria> optionalCategoria = catRepo.findById(menu.getCategoria().getNombre());
+		if(!optionalCategoria.isPresent())
+			throw new CategoriaException(CategoriaException.NotFoundException(menu.getCategoria().getNombre()));
 
 		// La query tira una excepción si retorna más de una tupla
 		try {
 			if (proRepo.findByNombre(menu.getNombre(), restaurante) == null) {
-				menu.setCategorias(categorias);
 				menu.setRestaurante(restaurante);
 				restaurante.addProducto(menu);
 				resRepo.save(restaurante);
@@ -122,10 +134,27 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	}
 
 	public void bajaMenu(int id) throws ProductoException {
+		Boolean menuTomado = false;
+		
 		Optional<Producto> optionalProducto = proRepo.findById(id);
 		if (optionalProducto.isPresent()) {
+			// Busca entre todos los pedidos del restaurante si queda uno con el menú
 			Producto producto = optionalProducto.get();
-			proRepo.delete(producto);
+			List<Pedido> pedidos = producto.getRestaurante().getPedidos();
+			for(Pedido p : pedidos) {
+				DTCarrito dtcarrito = verCarrito(p.getCarrito());
+				for(DTProductoCarrito c : dtcarrito.getDtProductoCarritoList()) {
+					if(c.getProducto().getNombre() == producto.getNombre()) {
+						menuTomado = true;
+					}
+				}
+			}
+			
+			if(menuTomado) {
+				producto.setActivo(false);
+				proRepo.save(producto);
+			} else
+				proRepo.delete(producto);
 		} else {
 			throw new ProductoException(ProductoException.NotFoundExceptionId(id));
 		}
@@ -143,13 +172,11 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 		Producto producto = optionalProducto.get();
 
-		producto.setNombre(menu.getNombre());
 		producto.setDescripcion(menu.getDescripcion());
 		producto.setPrecio(menu.getPrecio());
 		producto.setFoto(menu.getFoto());
 		producto.setDescuento(menu.getDescuento());
 		producto.setActivo(menu.isActivo());
-		producto.setCategorias(menu.getCategorias());
 
 		proRepo.save(producto);
 	}

@@ -11,6 +11,7 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -47,6 +48,8 @@ public class Restaurante extends Usuario {
 	private List<Reclamo> reclamos = new ArrayList<>();
 	@OneToOne(cascade = CascadeType.ALL)
 	private GeoLocalizacion geoLocalizacion;
+	@ManyToMany
+	private List<Categoria> categorias = new ArrayList<>();
 	private String diasAbierto;
 	private Boolean abierto;
 
@@ -243,5 +246,17 @@ public class Restaurante extends Usuario {
 
 	public void addPedido(Pedido pedido) {
 		this.pedidos.add(pedido);
+	}
+
+	public List<Categoria> getCategorias() {
+		return categorias;
+	}
+
+	public void setCategorias(List<Categoria> categorias) {
+		this.categorias = categorias;
+	}
+	
+	public void addCategoria(Categoria cat) {
+		this.categorias.add(cat);
 	}
 }

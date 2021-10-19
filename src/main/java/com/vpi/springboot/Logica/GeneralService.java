@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.vpi.springboot.Modelo.*;
@@ -40,6 +41,8 @@ public class GeneralService implements GeneralServicioInterfaz {
 	private MailService mailSender;
 	@Autowired
 	private CategoriaRepositorio catRepo;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	private static final int iterations = 20 * 1000;
 	private static final int desiredKeyLen = 256;
@@ -98,7 +101,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 
 	public void recuperarPassword(String mail) throws UsuarioException {
 		// Se tiene que ver cómo se genera la contraseña opcional
-		String pass = "passTemporal";
+		String pass = passwordEncoder.encode("123456");
 		String to = "";
 
 		Optional<Cliente> optionalCliente = clienteRepo.findById(mail);
@@ -131,7 +134,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 		// Verificamos que tiene @ por si acaso
 		if (to.contains("@")) {
 			String topic = "Cambio de contraseña.";
-			String body = "Su contraseña fue cambiada a " + pass + ".\n"
+			String body = "Su contraseña fue cambiada a 123456.\n"
 					+ "Por favor cambie su contraseña al ingresar a su cuenta.";
 			mailSender.sendMail(to, body, topic);
 		}
@@ -201,38 +204,41 @@ public class GeneralService implements GeneralServicioInterfaz {
 			break;
 		}
 	}
-	
+
 	@Override
 	public DTRestaurante getRestaurante(String mail) throws RestauranteException {
 		Optional<Restaurante> restaurante;
 		restaurante = resRepo.findById(mail);
-		DTRestaurante DTRestaurante = new DTRestaurante(restaurante.get().getMail(), restaurante.get().getFoto(), restaurante.get().getNombre(), restaurante.get().getDireccion(), restaurante.get().getCalificacionPromedio(), 
-				restaurante.get().getHorarioApertura(), restaurante.get().getHorarioCierre(), restaurante.get().getTiempoEstimadoMinimo(), restaurante.get().getTiempoEstimadoMaximo(), 
-				restaurante.get().getCostoDeEnvio(), restaurante.get().getGeoLocalizacion(), restaurante.get().getProductos(), restaurante.get().getDiasAbierto(), restaurante.get().getAbierto());
-		//DTRestaurante DTRestaurante = new DTRestaurante(restaurante.get());
-		
+		DTRestaurante DTRestaurante = new DTRestaurante(restaurante.get().getMail(), restaurante.get().getFoto(),
+				restaurante.get().getNombre(), restaurante.get().getDireccion(),
+				restaurante.get().getCalificacionPromedio(), restaurante.get().getHorarioApertura(),
+				restaurante.get().getHorarioCierre(), restaurante.get().getTiempoEstimadoMinimo(),
+				restaurante.get().getTiempoEstimadoMaximo(), restaurante.get().getCostoDeEnvio(),
+				restaurante.get().getGeoLocalizacion(), restaurante.get().getProductos(),
+				restaurante.get().getDiasAbierto(), restaurante.get().getAbierto());
+		// DTRestaurante DTRestaurante = new DTRestaurante(restaurante.get());
+
 		return DTRestaurante;
 	}
-	
-	
-	
-	
-	
+
 	@Override
 	public Map<String, Object> listarRestaurantes(int page, int size, int horarioApertura) throws RestauranteException {
 		Map<String, Object> response = new HashMap<>();
 		List<DTListarRestaurante> DTListarRestaurantes = new ArrayList<DTListarRestaurante>();
-		//List<DTRestaurante> DTRestaurantes = new ArrayList<DTRestaurante>();
+		// List<DTRestaurante> DTRestaurantes = new ArrayList<DTRestaurante>();
 		List<Restaurante> restaurantes = new ArrayList<Restaurante>();
 		Pageable paging = PageRequest.of(page, size);
 		Page<Restaurante> pageRestaurante;
-		
-		//pageRestaurante = resRepo.findByEstado(EnumEstadoRestaurante.ACEPTADO, paging);
-		//Devuelve los restaurantes aceptados no bloqueados y activos
-		pageRestaurante = resRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivos(EnumEstadoRestaurante.ACEPTADO, paging);
-		
+
+		// pageRestaurante = resRepo.findByEstado(EnumEstadoRestaurante.ACEPTADO,
+		// paging);
+		// Devuelve los restaurantes aceptados no bloqueados y activos
+		pageRestaurante = resRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivos(EnumEstadoRestaurante.ACEPTADO,
+				paging);
+
 		restaurantes = pageRestaurante.getContent();
-		//Si el horarioApertura en el filtro es menor o igual que el horarioApertura del restaurante se muestra
+		// Si el horarioApertura en el filtro es menor o igual que el horarioApertura
+		// del restaurante se muestra
 		if (horarioApertura > 0) {
 			for (Restaurante r : restaurantes) {
 				if (r.getHorarioApertura().getHour() >= horarioApertura) {
@@ -247,29 +253,29 @@ public class GeneralService implements GeneralServicioInterfaz {
 		response.put("currentPage", pageRestaurante.getNumber());
 		response.put("totalItems", pageRestaurante.getTotalElements());
 		response.put("restaurantes", DTListarRestaurantes);
-		
+
 		return response;
 	}
 
-	public Map<String, Object> listarMenusRestaurante(String attr, int order, int page, int size, String mailRestaurante)
-			throws RestauranteException {
+	public Map<String, Object> listarMenusRestaurante(String attr, int order, int page, int size,
+			String mailRestaurante) throws RestauranteException {
 		Optional<Restaurante> optionalRestaurante = resRepo.findById(mailRestaurante);
 		if (!optionalRestaurante.isPresent()) {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(mailRestaurante));
 		}
-		
+
 		Pageable paging;
-		if(attr == null || attr.isEmpty())
+		if (attr == null || attr.isEmpty())
 			paging = PageRequest.of(page, size);
 		else {
 			Sort sort;
-			if(order == 1)
+			if (order == 1)
 				sort = Sort.by(attr).descending();
-			else 
+			else
 				sort = Sort.by(attr).ascending();
 			paging = PageRequest.of(page, size, sort);
 		}
-		
+
 		Restaurante restaurante = optionalRestaurante.get();
 		Map<String, Object> response = new HashMap<>();
 		Page<Producto> pageProducto = proRepo.findAllByRestaurante(restaurante, paging);
@@ -315,6 +321,6 @@ public class GeneralService implements GeneralServicioInterfaz {
 	@Override
 	public List<Categoria> listarCategorias() {
 		return catRepo.findAll();
-		
+
 	}
 }
