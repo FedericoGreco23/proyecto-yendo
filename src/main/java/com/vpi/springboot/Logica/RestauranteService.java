@@ -185,4 +185,11 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		restaurante.get().setAbierto(false);
 		restauranteRepo.save(restaurante.get());
 	}
+	
+	/*@Override
+	public void confirmarPedido(int idPedido) {
+		Optional<Pedido> pedido = pedidoRepo.findById(idPedido);
+		
+		
+	}*/
 }

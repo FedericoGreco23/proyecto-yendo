@@ -12,11 +12,13 @@ public class DTCarrito implements Serializable {
 	
 	private long id;
 	private List<DTProductoCarrito> dtProductoCarritoList= new ArrayList<DTProductoCarrito>();
+	private String mailRestaurante;
 
   
-	 public DTCarrito(long id,List<DTProductoCarrito> dtProductoCarritoList) {
+	 public DTCarrito(long id,List<DTProductoCarrito> dtProductoCarritoList, String mailRestaurante) {
 	     this.id = id;   
 		 this.dtProductoCarritoList = dtProductoCarritoList;
+		 this.mailRestaurante = mailRestaurante;
 	        
 	    }
 	 
@@ -40,7 +42,15 @@ public class DTCarrito implements Serializable {
         this.dtProductoCarritoList = dtProductoCarritoList;
     }
 
-    @Override
+    public String getMailRestaurante() {
+		return mailRestaurante;
+	}
+
+	public void setMailRestaurante(String mailRestaurante) {
+		this.mailRestaurante = mailRestaurante;
+	}
+
+	@Override
     public String toString() {
         return "DTCarrito{" +
                 "dtProductoCarritoList=" + dtProductoCarritoList +

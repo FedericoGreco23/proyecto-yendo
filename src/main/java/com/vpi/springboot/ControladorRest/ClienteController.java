@@ -100,11 +100,11 @@ public class ClienteController {
 	
 
 	@PostMapping("agregarACarrito")
-	public ResponseEntity<?> agregarACarrito(@RequestParam int producto, Integer cantidad){
+	public ResponseEntity<?> agregarACarrito(@RequestParam int producto, Integer cantidad, String mailRestaurante){
 		try {
 			String mail= getMailFromJwt();
 			//DTProductoCarrito productoCarrito = new DTProductoCarrito(producto, cantidad);
-			clienteService.agregarACarrito(producto,cantidad, mail);
+			clienteService.agregarACarrito(producto,cantidad, mail,mailRestaurante);
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Producto agregado con éxito"), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -165,7 +165,7 @@ public class ClienteController {
 	}
 	
 	@PostMapping("/altaPedido")
-	public ResponseEntity<DTRespuesta> altaPedido(@RequestParam String mailRestaurante, @RequestParam int idCarrito,
+	public ResponseEntity<DTRespuesta> altaPedido(@RequestParam int idCarrito,
 													@RequestParam int metodoPago, @RequestParam int idDireccion, @RequestParam String comentario){
 		try {
 			String mail= getMailFromJwt();
@@ -175,7 +175,7 @@ public class ClienteController {
 			}else {
 				pago = EnumMetodoDePago.EFECTIVO;
 			}
-			clienteService.altaPedido(mailRestaurante, idCarrito, pago, idDireccion, mail, comentario);
+			clienteService.altaPedido(idCarrito, pago, idDireccion, mail, comentario);
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Pedido enviado con éxito"), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);

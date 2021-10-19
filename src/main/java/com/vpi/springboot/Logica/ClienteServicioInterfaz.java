@@ -26,11 +26,11 @@ public interface ClienteServicioInterfaz {
 
 	void eliminarDireccion(Integer id, String mail) throws UsuarioException;
 	
-	public void agregarACarrito(int producto, int cantidad, String mail) throws ProductoException;
+	public void agregarACarrito(int producto, int cantidad, String mail, String mailRestaurante) throws ProductoException;
 	
 	public DTCarrito verCarrito(String mail);
 
-	void altaPedido(String mailRestaurante, int idCarrito, EnumMetodoDePago pago, int idDireccion, String mail, String comentario)
+	void altaPedido(int idCarrito, EnumMetodoDePago pago, int idDireccion, String mail, String comentario)
 			throws RestauranteException, CarritoException, DireccionException;
 
 	
