@@ -272,7 +272,6 @@ public class ClienteService implements ClienteServicioInterfaz {
 		Carrito optionalCarrito = mongoRepo.findByMailAndActivo(mail, true);
 		DTCarrito carrito = new DTCarrito(optionalCarrito.getId(), optionalCarrito.getProductoCarrito());
 		return carrito;
-		
 	}
 	
 	public String getUltimaDireccionSeleccionada(String mail) {
