@@ -79,7 +79,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	}
 	
 	@Override
-	public void altaRestaurante(Restaurante rest) throws RestauranteException {
+	public void altaRestaurante(Restaurante rest) throws RestauranteException, CategoriaException {
 
 		//Seccion verificar que nombreRestaurante o restauranteMail no exista ya
 		Optional<Restaurante> busquedaMail = restauranteRepo.findById(rest.getMail());
@@ -90,7 +90,19 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		} else if (busquedaNombre != null) {
 			throw new RestauranteException(RestauranteException.RestauranteYaExiste(rest.getNombre()));
 		}
-		//Fin de seccion
+		
+		if(rest.getCategorias().size() > 0) {
+			for(Categoria c : rest.getCategorias()) {
+				Optional<Categoria> optionalCategoria = catRepo.findById(c.getNombre());
+				if(!optionalCategoria.isPresent())
+					throw new CategoriaException(CategoriaException.NotFoundException(c.getNombre()));
+				else {
+					// Se añaden categorías al restaurante
+					Categoria categoria = optionalCategoria.get();
+					rest.addCategoria(categoria);
+				}
+			}
+		}
 
 		rest.setActivo(true);
 		rest.setBloqueado(false);
@@ -98,9 +110,9 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		rest.setFechaCreacion(LocalDate.now());
 		rest.setEstado(EnumEstadoRestaurante.EN_ESPERA);
 		rest.setFechaApertura(null);
-		rest.setProductos(null);
-		rest.setReclamos(null);
-		rest.setPedidos(null);
+//		rest.setProductos(null);
+//		rest.setReclamos(null);
+//		rest.setPedidos(null);
 		rest.setAbierto(false);
 		rest.setContrasenia(passwordEncoder.encode(rest.getContrasenia()));
 
@@ -115,15 +127,21 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		}
 		Restaurante restaurante = optionalRestaurante.get();
 		
-		Optional<Categoria> optionalCategoria = catRepo.findById(menu.getCategoria().getNombre());
-		if(!optionalCategoria.isPresent())
-			throw new CategoriaException(CategoriaException.NotFoundException(menu.getCategoria().getNombre()));
+		if(menu.getCategoria() != null) {
+			Optional<Categoria> optionalCategoria = catRepo.findById(menu.getCategoria().getNombre());
+			if(!optionalCategoria.isPresent())
+				throw new CategoriaException(CategoriaException.NotFoundException(menu.getCategoria().getNombre()));
+			else {
+				Categoria categoria = optionalCategoria.get();
+				restaurante.addCategoria(categoria);
+				menu.setCategoria(categoria);
+			}
+		}
 
 		// La query tira una excepción si retorna más de una tupla
 		try {
 			if (proRepo.findByNombre(menu.getNombre(), restaurante) == null) {
 				menu.setRestaurante(restaurante);
-				restaurante.addCategoria(menu.getCategoria());
 				restaurante.addProducto(menu);
 				resRepo.save(restaurante);
 			} else {

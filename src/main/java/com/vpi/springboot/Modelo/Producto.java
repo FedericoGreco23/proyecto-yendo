@@ -26,6 +26,7 @@ public class Producto {
 	@JoinColumn(name = "restauranteMail")
 	private Restaurante restaurante;
 	@ManyToOne
+	@JoinColumn(name = "categoriaNombre")
 	private Categoria categoria;
 
 	public Producto() {

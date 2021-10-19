@@ -55,7 +55,7 @@ public class Restaurante extends Usuario {
 
 	@OneToMany(mappedBy = "restaurante", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JsonIgnore
-	private List<Producto> productos;
+	private List<Producto> productos = new ArrayList<>();
 
 	public Restaurante() {
 		super();
