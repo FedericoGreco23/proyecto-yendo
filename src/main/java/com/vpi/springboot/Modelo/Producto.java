@@ -25,8 +25,9 @@ public class Producto {
 	@ManyToOne
 	@JoinColumn(name = "restauranteMail")
 	private Restaurante restaurante;
-	@ManyToMany
-	private List<Categoria> categorias = new ArrayList<>();
+	@ManyToOne
+	@JoinColumn(name = "categoriaNombre")
+	private Categoria categoria;
 
 	public Producto() {
 		super();
@@ -107,11 +108,11 @@ public class Producto {
 		this.restaurante = restaurante;
 	}
 
-	public List<Categoria> getCategorias() {
-		return categorias;
+	public Categoria getCategoria() {
+		return categoria;
 	}
 
-	public void setCategorias(List<Categoria> categorias) {
-		this.categorias = categorias;
+	public void setCategoria(Categoria categoria) {
+		this.categoria = categoria;
 	}
 }

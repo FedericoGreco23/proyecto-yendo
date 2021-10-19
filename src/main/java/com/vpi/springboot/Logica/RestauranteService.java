@@ -11,19 +11,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.vpi.springboot.Modelo.Cliente;
+import com.vpi.springboot.Modelo.Carrito;
 import com.vpi.springboot.Modelo.Categoria;
 import com.vpi.springboot.Modelo.GeoLocalizacion;
 import com.vpi.springboot.Modelo.Pedido;
 import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.Modelo.Restaurante;
+import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTPedido;
+import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Repositorios.CategoriaRepositorio;
 import com.vpi.springboot.Repositorios.GeoLocalizacionRepositorio;
+import com.vpi.springboot.Repositorios.MongoRepositorioCarrito;
 import com.vpi.springboot.Repositorios.PedidoRepositorio;
 import com.vpi.springboot.Repositorios.ProductoRepositorio;
 import com.vpi.springboot.Repositorios.PromocionRepositorio;
@@ -55,9 +60,26 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 	@Autowired
 	private RestauranteRepositorio resRepo;
+	
+	@Autowired
+	private MongoRepositorioCarrito mongoRepo;
 
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+	
+	private DTCarrito verCarrito(int id) {
+		Optional<Carrito> optionalCarrito = mongoRepo.findById(id);
+		if(optionalCarrito.isPresent()) {
+			Carrito carrito = optionalCarrito.get();
+			DTCarrito dt = new DTCarrito(carrito.getId(), carrito.getProductoCarrito(), carrito.getMailRestaurante());
+			return dt;
+		}
+		
+		return null;
+	}
+	
 	@Override
-	public void altaRestaurante(Restaurante rest) throws RestauranteException {
+	public void altaRestaurante(Restaurante rest) throws RestauranteException, CategoriaException {
 
 		//Seccion verificar que nombreRestaurante o restauranteMail no exista ya
 		Optional<Restaurante> busquedaMail = restauranteRepo.findById(rest.getMail());
@@ -68,7 +90,19 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		} else if (busquedaNombre != null) {
 			throw new RestauranteException(RestauranteException.RestauranteYaExiste(rest.getNombre()));
 		}
-		//Fin de seccion
+		
+		if(rest.getCategorias().size() > 0) {
+			for(Categoria c : rest.getCategorias()) {
+				Optional<Categoria> optionalCategoria = catRepo.findById(c.getNombre());
+				if(!optionalCategoria.isPresent())
+					throw new CategoriaException(CategoriaException.NotFoundException(c.getNombre()));
+				else {
+					// Se añaden categorías al restaurante
+					Categoria categoria = optionalCategoria.get();
+					rest.addCategoria(categoria);
+				}
+			}
+		}
 
 		rest.setActivo(true);
 		rest.setBloqueado(false);
@@ -76,10 +110,11 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		rest.setFechaCreacion(LocalDate.now());
 		rest.setEstado(EnumEstadoRestaurante.EN_ESPERA);
 		rest.setFechaApertura(null);
-		rest.setProductos(null);
-		rest.setReclamos(null);
-		rest.setPedidos(null);
+//		rest.setProductos(null);
+//		rest.setReclamos(null);
+//		rest.setPedidos(null);
 		rest.setAbierto(false);
+		rest.setContrasenia(passwordEncoder.encode(rest.getContrasenia()));
 
 		restauranteRepo.save(rest);
 	}
@@ -91,19 +126,21 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(varRestaurante));
 		}
 		Restaurante restaurante = optionalRestaurante.get();
-
-		List<Categoria> categorias = new ArrayList<>();
-		for(Categoria c: menu.getCategorias()) {
-			Optional<Categoria> optionalCategoria = catRepo.findById(c.getNombre());
+		
+		if(menu.getCategoria() != null) {
+			Optional<Categoria> optionalCategoria = catRepo.findById(menu.getCategoria().getNombre());
 			if(!optionalCategoria.isPresent())
-				throw new CategoriaException(CategoriaException.NotFoundException(c.getNombre()));
-			categorias.add(c);
+				throw new CategoriaException(CategoriaException.NotFoundException(menu.getCategoria().getNombre()));
+			else {
+				Categoria categoria = optionalCategoria.get();
+				restaurante.addCategoria(categoria);
+				menu.setCategoria(categoria);
+			}
 		}
 
 		// La query tira una excepción si retorna más de una tupla
 		try {
 			if (proRepo.findByNombre(menu.getNombre(), restaurante) == null) {
-				menu.setCategorias(categorias);
 				menu.setRestaurante(restaurante);
 				restaurante.addProducto(menu);
 				resRepo.save(restaurante);
@@ -116,9 +153,29 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	}
 
 	public void bajaMenu(int id) throws ProductoException {
+//		Boolean menuTomado = false;
+		
 		Optional<Producto> optionalProducto = proRepo.findById(id);
 		if (optionalProducto.isPresent()) {
+			// Busca entre todos los pedidos del restaurante si queda uno con el menú
 			Producto producto = optionalProducto.get();
+//			List<Pedido> pedidos = producto.getRestaurante().getPedidos();
+//			for(Pedido p : pedidos) {
+//				DTCarrito dtcarrito = verCarrito(p.getCarrito());
+//				for(DTProductoCarrito c : dtcarrito.getDtProductoCarritoList()) {
+//					if(c.getProducto().getNombre() == producto.getNombre()) {
+//						menuTomado = true;
+//					}
+//				}
+//			}
+//			
+//			if(menuTomado) {
+//				producto.setActivo(false);
+//				proRepo.save(producto);
+//			} else
+//				proRepo.delete(producto);
+			
+			producto.setActivo(false);
 			proRepo.delete(producto);
 		} else {
 			throw new ProductoException(ProductoException.NotFoundExceptionId(id));
@@ -137,13 +194,11 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 		Producto producto = optionalProducto.get();
 
-		producto.setNombre(menu.getNombre());
 		producto.setDescripcion(menu.getDescripcion());
 		producto.setPrecio(menu.getPrecio());
 		producto.setFoto(menu.getFoto());
 		producto.setDescuento(menu.getDescuento());
 		producto.setActivo(menu.isActivo());
-		producto.setCategorias(menu.getCategorias());
 
 		proRepo.save(producto);
 	}

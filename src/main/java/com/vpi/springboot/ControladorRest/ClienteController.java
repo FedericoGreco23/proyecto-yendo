@@ -182,5 +182,19 @@ public class ClienteController {
 		}
 		
 	}
+	
+	
+	@PostMapping("/altaReclamo")
+	public ResponseEntity<DTRespuesta> altaReclamo(@RequestParam int idPedidoReclamado, @RequestParam String Comentario){
+		try {
+			String mail= getMailFromJwt();
+
+			clienteService.altaReclamo(idPedidoReclamado, mail, Comentario);
+			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Reclamo ingresado con éxito. Le llegará un mail con la resulución. Disculpe las molestias."), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+	}
 
 }

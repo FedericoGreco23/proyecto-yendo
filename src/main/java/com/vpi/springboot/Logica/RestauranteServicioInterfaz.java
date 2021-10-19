@@ -19,7 +19,7 @@ public interface RestauranteServicioInterfaz {
 
 	public Map<String, Object> listarPedidos(int page, int size, String nombreRestaurante) throws RestauranteException;
 
-	public void altaRestaurante(Restaurante rest) throws RestauranteException;
+	public void altaRestaurante(Restaurante rest) throws RestauranteException, CategoriaException;
 	public void abrirRestaurante(String mail);
 	public void cerrarRestaurante(String mail);
 }

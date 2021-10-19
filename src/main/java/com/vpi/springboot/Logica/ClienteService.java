@@ -19,6 +19,7 @@ import com.vpi.springboot.Modelo.Direccion;
 import com.vpi.springboot.Modelo.GeoLocalizacion;
 
 import com.vpi.springboot.Modelo.Producto;
+import com.vpi.springboot.Modelo.Reclamo;
 import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.LastDireccioClientenMongo;
 import com.vpi.springboot.Modelo.Pedido;
@@ -27,6 +28,7 @@ import com.vpi.springboot.Modelo.dto.DTDireccion;
 import com.vpi.springboot.Modelo.dto.DTProducto;
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
+import com.vpi.springboot.Modelo.dto.EnumEstadoReclamo;
 import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
 import com.vpi.springboot.Repositorios.ClienteRepositorio;
 import com.vpi.springboot.Repositorios.DireccionRepositorio;
@@ -39,6 +41,7 @@ import com.vpi.springboot.Repositorios.RestauranteRepositorio;
 import com.vpi.springboot.exception.CarritoException;
 import com.vpi.springboot.exception.DireccionException;
 import com.vpi.springboot.exception.ProductoException;
+import com.vpi.springboot.exception.ReclamoException;
 import com.vpi.springboot.exception.RestauranteException;
 import com.vpi.springboot.Repositorios.mongo.UltimaDireccionRepositorio;
 
@@ -243,8 +246,8 @@ public class ClienteService implements ClienteServicioInterfaz {
 		}
 	}
 
-
 	@Override
+
 	public void agregarACarrito(int producto,int cantidad, String mail, String mailRestaurante) throws ProductoException {
 		Optional<Producto> optionalProducto = productoRepo.findById(producto);
 		if (optionalProducto.isPresent()) {
@@ -272,9 +275,8 @@ public class ClienteService implements ClienteServicioInterfaz {
 		Carrito optionalCarrito = mongoRepo.findByMailAndActivo(mail, true);
 		DTCarrito carrito = new DTCarrito(optionalCarrito.getId(), optionalCarrito.getProductoCarrito(), optionalCarrito.getMailRestaurante());
 		return carrito;
-		
 	}
-	
+
 	public String getUltimaDireccionSeleccionada(String mail) {
 		Optional<LastDireccioClientenMongo> direccion = ultimaDireccionRepo.findById(mail);
 		return direccion.isPresent() ? direccion.get().getIdDireccion().toString() : null;
@@ -287,7 +289,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 
 		ultimaDireccionRepo.save(actualDire);
 	}
-	
+
 	@Override
 	public void altaPedido(int idCarrito, EnumMetodoDePago pago, int idDireccion, String mail, String comentario) throws RestauranteException, CarritoException, DireccionException{
 		Optional<Cliente> optionalCliente = userRepo.findById(mail);
@@ -344,4 +346,34 @@ public class ClienteService implements ClienteServicioInterfaz {
 			
 		}
 	}
+
+	@Override
+	public void altaReclamo(int idPedido, String mailCliente, String comentario) throws ReclamoException {
+
+		Optional<Pedido> pedidoOptional = pedidoRepo.findById(idPedido);
+		LocalDateTime now = LocalDateTime.now();
+		if (pedidoOptional.isPresent()) {
+			
+			Pedido pedido = pedidoOptional.get();
+			
+			if (pedido.getFecha().plusHours(24).isBefore(now)) {
+
+				throw new ReclamoException(ReclamoException.TooOldPedido(idPedido));
+			}else if(!pedido.getCliente().getMail().contains(mailCliente)){
+
+				throw new ReclamoException(ReclamoException.UserPedidoException(idPedido, mailCliente));
+			}
+			/**
+			 * guarda el reclamo y envia mail
+			 */
+
+			List<Reclamo> reclamos = pedido.getReclamos();
+			reclamos.add(new Reclamo(comentario, now, EnumEstadoReclamo.ENVIADO, ""));
+			pedido.setReclamos(reclamos);
+
+		} else {
+			throw new ReclamoException(ReclamoException.PedidoNotFound(idPedido));
+		}
+	}
+
 }
