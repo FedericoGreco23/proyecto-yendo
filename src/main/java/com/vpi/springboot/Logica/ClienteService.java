@@ -370,6 +370,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 			List<Reclamo> reclamos = pedido.getReclamos();
 			reclamos.add(new Reclamo(comentario, now, EnumEstadoReclamo.ENVIADO, ""));
 			pedido.setReclamos(reclamos);
+			pedidoRepo.save(pedido);
 
 		} else {
 			throw new ReclamoException(ReclamoException.PedidoNotFound(idPedido));
