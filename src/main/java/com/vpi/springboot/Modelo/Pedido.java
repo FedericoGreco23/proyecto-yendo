@@ -45,6 +45,13 @@ public class Pedido {
 	private List<Reclamo> reclamos = new ArrayList<>();
 	private String direccion;
 	private String comentario;
+	
+	
+
+	public Pedido() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
 
 	public Pedido(int id, LocalDateTime fecha, Double costoTotal, EnumEstadoPedido estadoPedido,
 			EnumMetodoDePago metodoDePago, Integer carrito) {

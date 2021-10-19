@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.exception.CategoriaException;
+import com.vpi.springboot.exception.PedidoException;
 import com.vpi.springboot.exception.ProductoException;
 import com.vpi.springboot.exception.RestauranteException;
 
@@ -22,4 +23,5 @@ public interface RestauranteServicioInterfaz {
 	public void altaRestaurante(Restaurante rest) throws RestauranteException, CategoriaException;
 	public void abrirRestaurante(String mail);
 	public void cerrarRestaurante(String mail);
+	public void confirmarPedido(int idPedido) throws PedidoException;
 }

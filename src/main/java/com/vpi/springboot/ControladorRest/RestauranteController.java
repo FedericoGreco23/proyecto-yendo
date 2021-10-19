@@ -111,6 +111,18 @@ public class RestauranteController {
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@PostMapping("/confirmarPedido")
+	ResponseEntity<?> cerrarRestaurante(@RequestParam int idPedido) {
+		try {
+			service.confirmarPedido(idPedido);
+			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Pedido aceptado"), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	
 
 	private Boolean esRestaurante() {
 		return getInfoFromJwt(keyInfoJWT.user_type.name()).contains("RESTAURANTE");

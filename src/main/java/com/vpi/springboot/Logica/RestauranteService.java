@@ -25,6 +25,7 @@ import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTPedido;
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
+import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Repositorios.CategoriaRepositorio;
 import com.vpi.springboot.Repositorios.GeoLocalizacionRepositorio;
@@ -34,6 +35,7 @@ import com.vpi.springboot.Repositorios.ProductoRepositorio;
 import com.vpi.springboot.Repositorios.PromocionRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
 import com.vpi.springboot.exception.CategoriaException;
+import com.vpi.springboot.exception.PedidoException;
 import com.vpi.springboot.exception.ProductoException;
 import com.vpi.springboot.exception.RestauranteException;
 
@@ -241,10 +243,17 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		restauranteRepo.save(restaurante.get());
 	}
 	
-	/*@Override
-	public void confirmarPedido(int idPedido) {
-		Optional<Pedido> pedido = pedidoRepo.findById(idPedido);
+	@Override
+	public void confirmarPedido(int idPedido) throws PedidoException {
+		Optional<Pedido> optionalPedido = pedidoRepo.findById(idPedido);
+		if(optionalPedido.isPresent()) {
+			Pedido pedido = optionalPedido.get();
+			pedido.setEstadoPedido(EnumEstadoPedido.ACEPTADO);
+			pedidoRepo.save(pedido);
+		}else {
+			throw new PedidoException(PedidoException.NotFoundExceptionId(idPedido));
+		}
 		
 		
-	}*/
+	}
 }
