@@ -257,6 +257,8 @@ public class Restaurante extends Usuario {
 	}
 	
 	public void addCategoria(Categoria cat) {
-		this.categorias.add(cat);
+		// El restaurante no puede tener más de 3 categorías
+		if(!this.categorias.contains(cat) || this.categorias.size() > 3)
+			this.categorias.add(cat);
 	}
 }

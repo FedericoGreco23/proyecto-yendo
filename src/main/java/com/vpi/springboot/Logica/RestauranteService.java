@@ -123,6 +123,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		try {
 			if (proRepo.findByNombre(menu.getNombre(), restaurante) == null) {
 				menu.setRestaurante(restaurante);
+				restaurante.addCategoria(menu.getCategoria());
 				restaurante.addProducto(menu);
 				resRepo.save(restaurante);
 			} else {
@@ -134,27 +135,30 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	}
 
 	public void bajaMenu(int id) throws ProductoException {
-		Boolean menuTomado = false;
+//		Boolean menuTomado = false;
 		
 		Optional<Producto> optionalProducto = proRepo.findById(id);
 		if (optionalProducto.isPresent()) {
 			// Busca entre todos los pedidos del restaurante si queda uno con el menú
 			Producto producto = optionalProducto.get();
-			List<Pedido> pedidos = producto.getRestaurante().getPedidos();
-			for(Pedido p : pedidos) {
-				DTCarrito dtcarrito = verCarrito(p.getCarrito());
-				for(DTProductoCarrito c : dtcarrito.getDtProductoCarritoList()) {
-					if(c.getProducto().getNombre() == producto.getNombre()) {
-						menuTomado = true;
-					}
-				}
-			}
+//			List<Pedido> pedidos = producto.getRestaurante().getPedidos();
+//			for(Pedido p : pedidos) {
+//				DTCarrito dtcarrito = verCarrito(p.getCarrito());
+//				for(DTProductoCarrito c : dtcarrito.getDtProductoCarritoList()) {
+//					if(c.getProducto().getNombre() == producto.getNombre()) {
+//						menuTomado = true;
+//					}
+//				}
+//			}
+//			
+//			if(menuTomado) {
+//				producto.setActivo(false);
+//				proRepo.save(producto);
+//			} else
+//				proRepo.delete(producto);
 			
-			if(menuTomado) {
-				producto.setActivo(false);
-				proRepo.save(producto);
-			} else
-				proRepo.delete(producto);
+			producto.setActivo(false);
+			proRepo.delete(producto);
 		} else {
 			throw new ProductoException(ProductoException.NotFoundExceptionId(id));
 		}
