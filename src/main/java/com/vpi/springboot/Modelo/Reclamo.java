@@ -33,9 +33,8 @@ public class Reclamo {
 	@JoinColumn(name = "restauranteMail")
 	private Restaurante restaurante;
 
-	public Reclamo(int id, String comentario, LocalDateTime fecha, EnumEstadoReclamo estado, String resolucion) {
+	public Reclamo(String comentario, LocalDateTime fecha, EnumEstadoReclamo estado, String resolucion) {
 		super();
-		this.id = id;
 		this.comentario = comentario;
 		this.fecha = fecha;
 		this.estado = estado;

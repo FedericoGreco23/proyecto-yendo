@@ -19,6 +19,7 @@ import com.vpi.springboot.Modelo.Direccion;
 import com.vpi.springboot.Modelo.GeoLocalizacion;
 
 import com.vpi.springboot.Modelo.Producto;
+import com.vpi.springboot.Modelo.Reclamo;
 import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.LastDireccioClientenMongo;
 import com.vpi.springboot.Modelo.Pedido;
@@ -27,6 +28,7 @@ import com.vpi.springboot.Modelo.dto.DTDireccion;
 import com.vpi.springboot.Modelo.dto.DTProducto;
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
+import com.vpi.springboot.Modelo.dto.EnumEstadoReclamo;
 import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
 import com.vpi.springboot.Repositorios.ClienteRepositorio;
 import com.vpi.springboot.Repositorios.DireccionRepositorio;
@@ -39,6 +41,7 @@ import com.vpi.springboot.Repositorios.RestauranteRepositorio;
 import com.vpi.springboot.exception.CarritoException;
 import com.vpi.springboot.exception.DireccionException;
 import com.vpi.springboot.exception.ProductoException;
+import com.vpi.springboot.exception.ReclamoException;
 import com.vpi.springboot.exception.RestauranteException;
 import com.vpi.springboot.Repositorios.mongo.UltimaDireccionRepositorio;
 
@@ -243,9 +246,8 @@ public class ClienteService implements ClienteServicioInterfaz {
 		}
 	}
 
-
 	@Override
-	public void agregarACarrito(int producto,int cantidad, String mail) throws ProductoException {
+	public void agregarACarrito(int producto, int cantidad, String mail) throws ProductoException {
 		Optional<Producto> optionalProducto = productoRepo.findById(producto);
 		if (optionalProducto.isPresent()) {
 			DTProducto dtProducto = new DTProducto(optionalProducto.get());
@@ -273,7 +275,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 		DTCarrito carrito = new DTCarrito(optionalCarrito.getId(), optionalCarrito.getProductoCarrito());
 		return carrito;
 	}
-	
+
 	public String getUltimaDireccionSeleccionada(String mail) {
 		Optional<LastDireccioClientenMongo> direccion = ultimaDireccionRepo.findById(mail);
 		return direccion.isPresent() ? direccion.get().getIdDireccion().toString() : null;
@@ -286,32 +288,36 @@ public class ClienteService implements ClienteServicioInterfaz {
 
 		ultimaDireccionRepo.save(actualDire);
 	}
-	
+
 	@Override
-	public void altaPedido(String mailRestaurante, int idCarrito, EnumMetodoDePago pago, int idDireccion, String mail, String comentario) throws RestauranteException, CarritoException, DireccionException{
+	public void altaPedido(String mailRestaurante, int idCarrito, EnumMetodoDePago pago, int idDireccion, String mail,
+			String comentario) throws RestauranteException, CarritoException, DireccionException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mail);
 		Cliente cliente = optionalCliente.get();
 		Optional<Restaurante> optionalRestaurante = restauranteRepo.findById(mailRestaurante);
-		if(optionalRestaurante.isPresent()) {
+		if (optionalRestaurante.isPresent()) {
 			Restaurante restaurante = optionalRestaurante.get();
 			Optional<Carrito> optionalCarrito = mongoRepo.findById(idCarrito);
-			if(optionalCarrito.isPresent()) {
-			   Optional<Direccion> optionalDireccion = dirRepo.findById(idDireccion);
-			   if(optionalDireccion.isPresent()) {
-				   	String direccion = optionalDireccion.get().toString();
+			if (optionalCarrito.isPresent()) {
+				Optional<Direccion> optionalDireccion = dirRepo.findById(idDireccion);
+				if (optionalDireccion.isPresent()) {
+					String direccion = optionalDireccion.get().toString();
 					Carrito carrito = optionalCarrito.get();
-					EnumEstadoPedido estado =EnumEstadoPedido.PROCESADO;
+					EnumEstadoPedido estado = EnumEstadoPedido.PROCESADO;
 					double precioTotal = 0;
 					for (DTProductoCarrito DTpc : carrito.getProductoCarrito()) {
-						if(DTpc.getProducto().getDescuento() != 0) {
-							precioTotal = (precioTotal + ((DTpc.getProducto().getPrecio()) - ((DTpc.getProducto().getDescuento()/100) * DTpc.getProducto().getPrecio()))) * DTpc.getCantidad();
-						}else {
-							precioTotal = (precioTotal + DTpc.getProducto().getPrecio()) * DTpc.getCantidad() ;
+						if (DTpc.getProducto().getDescuento() != 0) {
+							precioTotal = (precioTotal + ((DTpc.getProducto().getPrecio())
+									- ((DTpc.getProducto().getDescuento() / 100) * DTpc.getProducto().getPrecio())))
+									* DTpc.getCantidad();
+						} else {
+							precioTotal = (precioTotal + DTpc.getProducto().getPrecio()) * DTpc.getCantidad();
 						}
 					}
-					Pedido pedido = new Pedido(LocalDateTime.now(),precioTotal,estado,pago, idCarrito, direccion, restaurante, cliente, comentario);
+					Pedido pedido = new Pedido(LocalDateTime.now(), precioTotal, estado, pago, idCarrito, direccion,
+							restaurante, cliente, comentario);
 					pedidoRepo.save(pedido);
-					//AGREGAR PEDIDO AL RESTAURANTE
+					// AGREGAR PEDIDO AL RESTAURANTE
 					if (restaurante.getPedidos() == null) {
 						List<Pedido> pedidos = new ArrayList<Pedido>();
 						pedidos.add(pedido);
@@ -320,7 +326,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 						restaurante.addPedido(pedido);
 					}
 					restauranteRepo.save(restaurante);
-					//AGREGAR PEDIDO AL CLIENTE
+					// AGREGAR PEDIDO AL CLIENTE
 					if (cliente.getPedidos() == null) {
 						List<Pedido> pedidosCliente = new ArrayList<Pedido>();
 						pedidosCliente.add(pedido);
@@ -331,14 +337,44 @@ public class ClienteService implements ClienteServicioInterfaz {
 					userRepo.save(cliente);
 					carrito.setActivo(false);
 					mongoRepo.save(carrito);
-			   }else {
-				   throw new DireccionException(DireccionException.NotFoundExceptionId(idDireccion));
-			   }
-			}else {
+				} else {
+					throw new DireccionException(DireccionException.NotFoundExceptionId(idDireccion));
+				}
+			} else {
 				throw new CarritoException(CarritoException.NotFoundExceptionId(idCarrito));
 			}
-		}else {
+		} else {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(mailRestaurante));
 		}
 	}
+
+	@Override
+	public void altaReclamo(int idPedido, String mailCliente, String comentario) throws ReclamoException {
+
+		Optional<Pedido> pedidoOptional = pedidoRepo.findById(idPedido);
+		LocalDateTime now = LocalDateTime.now();
+		if (pedidoOptional.isPresent()) {
+			
+			Pedido pedido = pedidoOptional.get();
+			
+			if (pedido.getFecha().plusHours(24).isBefore(now)) {
+
+				throw new ReclamoException(ReclamoException.TooOldPedido(idPedido));
+			}else if(!pedido.getCliente().getMail().contains(mailCliente)){
+
+				throw new ReclamoException(ReclamoException.UserPedidoException(idPedido, mailCliente));
+			}
+			/**
+			 * guarda el reclamo y envia mail
+			 */
+
+			List<Reclamo> reclamos = pedido.getReclamos();
+			reclamos.add(new Reclamo(comentario, now, EnumEstadoReclamo.ENVIADO, ""));
+			pedido.setReclamos(reclamos);
+
+		} else {
+			throw new ReclamoException(ReclamoException.PedidoNotFound(idPedido));
+		}
+	}
+
 }
