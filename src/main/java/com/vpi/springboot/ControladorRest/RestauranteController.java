@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,18 +25,27 @@ import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
 import com.vpi.springboot.exception.RestauranteException;
+import com.vpi.springboot.security.util.JwtUtil;
+import com.vpi.springboot.security.util.JwtUtil.keyInfoJWT;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("api/restaurante/")
 public class RestauranteController {
-	
+
 	@Autowired
 	private RestauranteService service;
-	
+
+	@Autowired
+	private JwtUtil jwtUtil;
+
+	@Autowired
+	private HttpServletRequest request;
+
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/crearMenu/{varRestaurante}")
-	public ResponseEntity<?> altaMenu(@RequestBody Producto menu, @PathVariable (required = true) String varRestaurante) {
+	public ResponseEntity<?> altaMenu(@RequestBody Producto menu,
+			@PathVariable(required = true) String varRestaurante) {
 		try {
 			service.altaMenu(menu, varRestaurante);
 			return new ResponseEntity<Producto>(menu, HttpStatus.OK);
@@ -69,12 +79,11 @@ public class RestauranteController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@GetMapping("/getPedidos/{restaurante}")
 	public Map<String, Object> listarPedidos(@RequestParam(defaultValue = "0") int page,
-									  	   	 @RequestParam(defaultValue = "5") int size, 
-									  	   	 @PathVariable(required = true) String restaurante) {
+			@RequestParam(defaultValue = "5") int size, @PathVariable(required = true) String restaurante) {
 		try {
 			return service.listarPedidos(page, size, restaurante);
 		} catch (RestauranteException e) {
@@ -84,7 +93,7 @@ public class RestauranteController {
 	}
 
 	@PostMapping("/abrirRestaurante")
-	ResponseEntity<?> abrirRestaurante(@RequestParam String mail){
+	ResponseEntity<?> abrirRestaurante(@RequestParam String mail) {
 		try {
 			service.abrirRestaurante(mail);
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Restaurante abierto"), HttpStatus.OK);
@@ -92,7 +101,7 @@ public class RestauranteController {
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@PostMapping("/cerrarRestaurante")
 	ResponseEntity<?> cerrarRestaurante(@RequestParam String mail) {
 		try {
@@ -101,5 +110,29 @@ public class RestauranteController {
 		} catch (Exception e) {
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
+
+	private Boolean esRestaurante() {
+		return getInfoFromJwt(keyInfoJWT.user_type.name()).contains("RESTAURANTE");
+	}
+
+	private String getInfoFromJwt(String infoName) {
+		// obtenemos el token del header y le sacamos "Bearer "
+		final String authorizationHeader = request.getHeader("Authorization");
+
+		String infoSolicitada = null;
+		String jwt = null;
+
+		if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+			jwt = authorizationHeader.substring(7);
+			switch (infoName) {
+			case "mail":
+				infoSolicitada = jwtUtil.extractUsername(jwt);
+			case "user_type":
+				infoSolicitada = jwtUtil.extractUserType(jwt);
+			}
+		}
+		
+		return infoSolicitada;
 	}
 }

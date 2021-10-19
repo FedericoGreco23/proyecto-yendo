@@ -77,13 +77,9 @@ public class PublicRest {
 
 		if (!userDetails.getUser().getActivo()) {
 			throw new Exception("Este usuario se encuentra inactivo, comuniquese con un administrador");
-
 		} else if (userDetails.getUser().getBloqueado()) {
-
 			throw new Exception("Este usuario se encuentra bloqueado, comuniquese con un administrador");
-
 		} else if (userDetails.getUser().getClass() == Restaurante.class) {
-
 			Restaurante r = (Restaurante) userDetails.getUser();
 			if (r.getEstado().name().contains(EnumEstadoRestaurante.EN_ESPERA.name())) {
 
@@ -92,13 +88,9 @@ public class PublicRest {
 
 				throw new Exception("Este restaurante fue rechazado");
 			}
-
 		}
-			
-		
 
 		final String jwt = jwtTokenUtil.generateToken(userDetails);
-
 		return ResponseEntity.ok(new AuthenticationResponse(jwt));
 	}
 
@@ -146,7 +138,8 @@ public class PublicRest {
 	}
 
 	@GetMapping("/listarRestaurantes")
-	public Map<String, Object> listarRestaurantesAbiertos(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "0") int horarioApertura) {
+	public Map<String, Object> listarRestaurantesAbiertos(@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "0") int horarioApertura) {
 		try {
 			return service.listarRestaurantes(page, size, horarioApertura);
 		} catch (RestauranteException e) {
