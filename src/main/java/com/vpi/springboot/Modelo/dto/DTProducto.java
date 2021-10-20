@@ -44,8 +44,8 @@ public class DTProducto implements Serializable {
 		this.foto = pro.getFoto();
 		this.descuento = pro.getDescuento();
 		this.activo = pro.isActivo();
-		this.restaurante = pro.getRestaurante().getNombre();
-		this.categoria = pro.getCategoria().getNombre();
+		this.restaurante = pro.getRestaurante().getMail();
+		this.categoria = pro.getCategoria() != null ? pro.getCategoria().getNombre() : null;
 	}
 
 	public int getId() {

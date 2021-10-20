@@ -382,9 +382,11 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 	}
 
 	public void cambiarEstadoRestaurante(String varRestaurante, int estado) throws RestauranteException {
-		Restaurante restaurante = resRepo.findByNombre(varRestaurante);
-		if (restaurante == null)
+		Optional<Restaurante> optionalRestaurante = resRepo.findById(varRestaurante);
+		if (!optionalRestaurante.isPresent()) {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(varRestaurante));
+		}
+		Restaurante restaurante = optionalRestaurante.get();
 
 		switch (estado) {
 		case 1:
