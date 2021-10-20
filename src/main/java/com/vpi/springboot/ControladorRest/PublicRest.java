@@ -145,12 +145,12 @@ public class PublicRest {
 	}
 
 	@GetMapping("getRestaurante")
-	public DTRestaurante getRestaurante(@RequestParam(defaultValue = "") String mail) {
+	public ResponseEntity<DTRestaurante> getRestaurante(@RequestParam(defaultValue = "") String mail) {
 		try {
-			return service.getRestaurante(mail);
-		} catch (RestauranteException e) {
-			e.printStackTrace();
-			return null;
+			DTRestaurante respuesta = service.getRestaurante(mail);
+			return new ResponseEntity<DTRestaurante>(respuesta, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<DTRestaurante>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 

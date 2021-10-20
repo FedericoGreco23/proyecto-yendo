@@ -215,9 +215,6 @@ public class GeneralService implements GeneralServicioInterfaz {
 	}
 	
 	
-	
-	
-	
 	@Override
 	public Map<String, Object> listarRestaurantes(int page, int size, int horarioApertura) throws RestauranteException {
 		Map<String, Object> response = new HashMap<>();
