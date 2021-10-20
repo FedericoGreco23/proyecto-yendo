@@ -20,6 +20,7 @@ import com.vpi.springboot.Modelo.Categoria;
 import com.vpi.springboot.Modelo.GeoLocalizacion;
 import com.vpi.springboot.Modelo.Pedido;
 import com.vpi.springboot.Modelo.Producto;
+import com.vpi.springboot.Modelo.Promocion;
 import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTPedido;
@@ -38,6 +39,7 @@ import com.vpi.springboot.Repositorios.RestauranteRepositorio;
 import com.vpi.springboot.exception.CategoriaException;
 import com.vpi.springboot.exception.PedidoException;
 import com.vpi.springboot.exception.ProductoException;
+import com.vpi.springboot.exception.PromocionException;
 import com.vpi.springboot.exception.RestauranteException;
 
 @Service
@@ -181,7 +183,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 //				proRepo.delete(producto);
 			
 			producto.setActivo(false);
-			proRepo.delete(producto);
+			proRepo.save(producto);
 			return new DTRespuesta("Menú dado de baja correctamente.");
 		} else {
 			throw new ProductoException(ProductoException.NotFoundExceptionId(id));
@@ -261,7 +263,69 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		}else {
 			throw new PedidoException(PedidoException.NotFoundExceptionId(idPedido));
 		}
+	}
+	
+	@Override
+	public DTRespuesta modificarDescuentoProducto(int idProducto, int descuento) throws ProductoException {
+		Optional<Producto> optionalProducto = proRepo.findById(idProducto);
+		if (optionalProducto.isPresent()) {
+			// Busca entre todos los pedidos del restaurante si queda uno con el menú
+			Producto producto = optionalProducto.get();
+			producto.setDescuento(descuento);
+			proRepo.save(producto);
+			return new DTRespuesta("Menú modificado correctamente.");
+		} else {
+			throw new ProductoException(ProductoException.NotFoundExceptionId(idProducto));
+		}
+	}
+	
+	@Override
+	public DTRespuesta modificarPromocion(Promocion promo) throws PromocionException, ProductoException {
+		if (promo.getRestaurante() != null) {
+			throw new PromocionException("No puede cambiar el restaurante de un menú.");
+		}
+
+		Optional<Promocion> optionalPromocion = promoRepo.findById(promo.getId());
+		if (!optionalPromocion.isPresent()) {
+			throw new PromocionException(PromocionException.NotFoundExceptionId(promo.getId()));
+		}
+
+		Promocion promocion = optionalPromocion.get();
+
+		promocion.setNombre(promo.getNombre());
+		promocion.setDescripcion(promo.getDescripcion());
+		promocion.setPrecio(promo.getPrecio());
+		promocion.setFoto(promo.getFoto());
+		promocion.setDescuento(promo.getDescuento());
+		promocion.setActivo(promo.isActivo());
 		
+		List<Producto> productos = new ArrayList<>();
+		if(promocion.getProductos().size() > 0) {
+			for(Producto p : promocion.getProductos()) {
+				Optional<Producto> optionalProducto = proRepo.findById(p.getId());
+				if (!optionalProducto.isPresent()) 
+					throw new ProductoException(ProductoException.NotFoundExceptionId(p.getId()));
+				else 
+					productos.add(optionalProducto.get());
+			}
+		}
 		
+		promocion.setProductos(productos);
+
+		promoRepo.save(promocion);
+		return new DTRespuesta("Promoción modificada correctamente.");
+	}
+
+	public DTRespuesta bajaPromocion(int idPromo) throws PromocionException {
+		Optional<Promocion> optionalPromocion = promoRepo.findById(idPromo);
+		if (optionalPromocion.isPresent()) {
+			Promocion promocion = optionalPromocion.get();
+			
+			promocion.setActivo(false);
+			proRepo.save(promocion);
+			return new DTRespuesta("Promocion dada de baja correctamente.");
+		} else {
+			throw new PromocionException(PromocionException.NotFoundExceptionId(idPromo));
+		}
 	}
 }
