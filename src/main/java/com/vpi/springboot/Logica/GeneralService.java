@@ -100,7 +100,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 	}
 //--------------------------------------------
 
-	public void recuperarPassword(String mail) throws UsuarioException {
+	public DTRespuesta recuperarPassword(String mail) throws UsuarioException {
 		// Se tiene que ver cómo se genera la contraseña opcional
 		String pass = passwordEncoder.encode("123456");
 		String to = "";
@@ -138,10 +138,14 @@ public class GeneralService implements GeneralServicioInterfaz {
 			String body = "Su contraseña fue cambiada a 123456.\n"
 					+ "Por favor cambie su contraseña al ingresar a su cuenta.";
 			mailSender.sendMail(to, body, topic);
+			return new DTRespuesta("Mail enviado con contraseña.");
+		} else {
+			return new DTRespuesta("Mail de usuario inválido.");
 		}
+
 	}
 
-	public void verificarMail(String mail) throws UsuarioException {
+	public DTRespuesta verificarMail(String mail) throws UsuarioException {
 		String to = "";
 		int tipo;
 
@@ -176,6 +180,9 @@ public class GeneralService implements GeneralServicioInterfaz {
 			String topic = "Verificación de mail.";
 			String body = "Para verificar su mail, por favor use el siguiente link: \n" + servicio;
 			mailSender.sendMail(to, body, topic);
+			return new DTRespuesta("Mail enviado con contraseña.");
+		} else {
+			return new DTRespuesta("Mail de usuario inválido.");
 		}
 	}
 
@@ -183,7 +190,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 	// 0 -> cliente
 	// 1 -> restaurante
 	// 2 -> administrador
-	public void activarCuenta(String mail, int tipoUsuario) {
+	public DTRespuesta activarCuenta(String mail, int tipoUsuario) {
 		switch (tipoUsuario) {
 		case 0:
 			Optional<Cliente> optionalCliente = clienteRepo.findById(mail);
@@ -204,6 +211,8 @@ public class GeneralService implements GeneralServicioInterfaz {
 			adminRepo.save(admin);
 			break;
 		}
+
+		return new DTRespuesta("Cuenta activada");
 	}
 
 	@Override
@@ -320,10 +329,8 @@ public class GeneralService implements GeneralServicioInterfaz {
 				map.get(sinCategoria).add(p);
 		}
 
-		response = map.entrySet()
-					.stream()
-					.map(e -> new DTCategoriaProducto(e.getKey(), e.getValue()))
-					.collect(Collectors.toList());
+		response = map.entrySet().stream().map(e -> new DTCategoriaProducto(e.getKey(), e.getValue()))
+				.collect(Collectors.toList());
 
 		return response;
 	}

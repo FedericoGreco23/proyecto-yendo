@@ -54,8 +54,7 @@ public class RestauranteController {
 		}
 
 		try {
-			service.altaMenu(menu, getMailFromJwt());
-			return new ResponseEntity<Producto>(menu, HttpStatus.OK);
+			return new ResponseEntity<>(service.altaMenu(menu, getMailFromJwt()), HttpStatus.OK);
 		} catch (ConstraintViolationException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {
@@ -73,8 +72,7 @@ public class RestauranteController {
 		}
 
 		try {
-			service.bajaMenu(id);
-			return new ResponseEntity<String>("Eliminado correctamente", HttpStatus.OK);
+			return new ResponseEntity<>(service.bajaMenu(id), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -90,8 +88,7 @@ public class RestauranteController {
 		}
 
 		try {
-			service.modificarMenu(menu);
-			return new ResponseEntity<Producto>(menu, HttpStatus.OK);
+			return new ResponseEntity<>(service.modificarMenu(menu), HttpStatus.OK);
 		} catch (ConstraintViolationException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {
@@ -110,9 +107,7 @@ public class RestauranteController {
 		}
 
 		try {
-			
-			return new ResponseEntity<Map<String, Object>>(service.listarPedidos(page, size, getMailFromJwt()),
-					HttpStatus.OK);
+			return new ResponseEntity<>(service.listarPedidos(page, size, getMailFromJwt()), HttpStatus.OK);
 		} catch (RestauranteException e) {
 			e.printStackTrace();
 			return null;
@@ -128,10 +123,9 @@ public class RestauranteController {
 		}
 
 		try {
-			service.abrirRestaurante(getMailFromJwt());
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Restaurante abierto"), HttpStatus.OK);
+			return new ResponseEntity<>(service.abrirRestaurante(getMailFromJwt()), HttpStatus.OK);
 		} catch (Exception e) {
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -144,24 +138,26 @@ public class RestauranteController {
 		}
 
 		try {
-			service.cerrarRestaurante(getMailFromJwt());
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Restaurante cerrado"), HttpStatus.OK);
+			return new ResponseEntity<>(service.abrirRestaurante(getMailFromJwt()), HttpStatus.OK);
 		} catch (Exception e) {
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@PostMapping("/confirmarPedido")
-	ResponseEntity<?> cerrarRestaurante(@RequestParam int idPedido) {
+	ResponseEntity<?> confirmarPedido(@RequestParam int idPedido) {
+		if (!esRestaurante()) {
+			return new ResponseEntity<>(
+					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
+					HttpStatus.FORBIDDEN);
+		}
+
 		try {
-			service.confirmarPedido(idPedido);
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Pedido aceptado"), HttpStatus.OK);
+			return new ResponseEntity<>(service.confirmarPedido(idPedido), HttpStatus.OK);
 		} catch (Exception e) {
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
-	
 
 	/// PRIVADAS PARA JWT ///
 	/////////////////////////

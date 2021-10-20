@@ -24,6 +24,7 @@ import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTPedido;
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
+import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
 import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
@@ -81,7 +82,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	}
 	
 	@Override
-	public void altaRestaurante(Restaurante rest) throws RestauranteException, CategoriaException {
+	public DTRespuesta altaRestaurante(Restaurante rest) throws RestauranteException, CategoriaException {
 
 		//Seccion verificar que nombreRestaurante o restauranteMail no exista ya
 		Optional<Restaurante> busquedaMail = restauranteRepo.findById(rest.getMail());
@@ -119,9 +120,10 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		rest.setContrasenia(passwordEncoder.encode(rest.getContrasenia()));
 
 		restauranteRepo.save(rest);
+		return new DTRespuesta("Restaurante " + rest.getNombre() + " dado de alta correctamente.");
 	}
 
-	public void altaMenu(Producto menu, String varRestaurante)
+	public DTRespuesta altaMenu(Producto menu, String varRestaurante)
 			throws ProductoException, RestauranteException, CategoriaException, Exception {
 		Optional<Restaurante> optionalRestaurante = resRepo.findById(varRestaurante);
 		if (!optionalRestaurante.isPresent()) {
@@ -146,6 +148,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				menu.setRestaurante(restaurante);
 				restaurante.addProducto(menu);
 				resRepo.save(restaurante);
+				return new DTRespuesta("Menú agregado correctamente.");
 			} else {
 				throw new ProductoException(ProductoException.ProductoYaExiste(menu.getNombre()));
 			}
@@ -154,7 +157,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		}
 	}
 
-	public void bajaMenu(int id) throws ProductoException {
+	public DTRespuesta bajaMenu(int id) throws ProductoException {
 //		Boolean menuTomado = false;
 		
 		Optional<Producto> optionalProducto = proRepo.findById(id);
@@ -179,12 +182,13 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			
 			producto.setActivo(false);
 			proRepo.delete(producto);
+			return new DTRespuesta("Menú dado de baja correctamente.");
 		} else {
 			throw new ProductoException(ProductoException.NotFoundExceptionId(id));
 		}
 	}
 
-	public void modificarMenu(Producto menu) throws ProductoException {
+	public DTRespuesta modificarMenu(Producto menu) throws ProductoException {
 		if (menu.getRestaurante() != null) {
 			throw new ProductoException("No puede cambiar el restaurante de un menú.");
 		}
@@ -203,6 +207,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		producto.setActivo(menu.isActivo());
 
 		proRepo.save(producto);
+		return new DTRespuesta("Menú modificado correctamente.");
 	}
 
 	public Map<String, Object> listarPedidos(int page, int size, String varRestaurante) throws RestauranteException {
@@ -230,26 +235,29 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	}
 
 	@Override
-	public void abrirRestaurante(String mail) {
+	public DTRespuesta abrirRestaurante(String mail) {
 		Optional<Restaurante> restaurante = restauranteRepo.findById(mail);
 		restaurante.get().setAbierto(true);
 		restauranteRepo.save(restaurante.get());
+		return new DTRespuesta("Restaurante abierto.");
 	}
 
 	@Override
-	public void cerrarRestaurante(String mail) {
+	public DTRespuesta cerrarRestaurante(String mail) {
 		Optional<Restaurante> restaurante = restauranteRepo.findById(mail);
 		restaurante.get().setAbierto(false);
 		restauranteRepo.save(restaurante.get());
+		return new DTRespuesta("Restaurante cerrado.");
 	}
 	
 	@Override
-	public void confirmarPedido(int idPedido) throws PedidoException {
+	public DTRespuesta confirmarPedido(int idPedido) throws PedidoException {
 		Optional<Pedido> optionalPedido = pedidoRepo.findById(idPedido);
 		if(optionalPedido.isPresent()) {
 			Pedido pedido = optionalPedido.get();
 			pedido.setEstadoPedido(EnumEstadoPedido.ACEPTADO);
 			pedidoRepo.save(pedido);
+			return new DTRespuesta("Pedido " + idPedido + " confirmado.");
 		}else {
 			throw new PedidoException(PedidoException.NotFoundExceptionId(idPedido));
 		}

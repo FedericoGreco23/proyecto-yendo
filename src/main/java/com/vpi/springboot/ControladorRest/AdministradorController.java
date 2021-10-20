@@ -72,8 +72,7 @@ public class AdministradorController {
 					HttpStatus.FORBIDDEN);
 		}
 		try {
-			service.eliminarUsuario(mail);
-			return new ResponseEntity<String>("Eliminado correctamente", HttpStatus.OK);
+			return new ResponseEntity<>(service.eliminarUsuario(mail), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -88,8 +87,7 @@ public class AdministradorController {
 					HttpStatus.FORBIDDEN);
 		}
 		try {
-			service.bloquearUsuario(mail, clienteRestaurante);
-			return new ResponseEntity<String>("Bloqueado correctamente", HttpStatus.OK);
+			return new ResponseEntity<>(service.bloquearUsuario(mail, clienteRestaurante), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -104,8 +102,7 @@ public class AdministradorController {
 					HttpStatus.FORBIDDEN);
 		}
 		try {
-			service.desbloquearUsuario(mail, clienteRestaurante);
-			return new ResponseEntity<String>("Desbloqueado correctamente", HttpStatus.OK);
+			return new ResponseEntity<>(service.desbloquearUsuario(mail, clienteRestaurante), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -151,8 +148,7 @@ public class AdministradorController {
 					HttpStatus.FORBIDDEN);
 		}
 		try {
-			service.cambiarEstadoRestaurante(varRestaurante, estado);
-			return new ResponseEntity<String>("Cambio de estado exitoso", HttpStatus.OK);
+			return new ResponseEntity<>(service.cambiarEstadoRestaurante(varRestaurante, estado), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}

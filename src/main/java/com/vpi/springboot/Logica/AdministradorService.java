@@ -29,6 +29,7 @@ import com.vpi.springboot.Repositorios.ClienteRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
 import com.vpi.springboot.exception.AdministradorException;
 import com.vpi.springboot.exception.RestauranteException;
+import com.vpi.springboot.exception.UsuarioException;
 
 @Service
 public class AdministradorService implements AdministradorServicioInterfaz {
@@ -65,36 +66,56 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 	}
 
 	@Override
-	public void eliminarUsuario(String mail) {
+	public DTRespuesta eliminarUsuario(String mail) throws UsuarioException {
 		Optional<Cliente> cliente = clienteRepo.findById(mail);
-		cliente.get().setActivo(false);
-		clienteRepo.save(cliente.get());
+		if (cliente.isPresent()) {
+			cliente.get().setActivo(false);
+			clienteRepo.save(cliente.get());
+			return new DTRespuesta("Cliente eliminado con éxito.");
+		} else
+			throw new UsuarioException(UsuarioException.NotFoundException(mail));
 	}
 
 	@Override
-	public void bloquearUsuario(String mail, String clienteRestaurante) {
+	public DTRespuesta bloquearUsuario(String mail, String clienteRestaurante) throws UsuarioException {
 		if (clienteRestaurante.equals("Cliente")) {
 			Optional<Cliente> cliente = clienteRepo.findById(mail);
-			cliente.get().setBloqueado(true);
-			clienteRepo.save(cliente.get());
+			if (cliente.isPresent()) {
+				cliente.get().setBloqueado(true);
+				clienteRepo.save(cliente.get());
+			} else
+				throw new UsuarioException(UsuarioException.NotFoundException(mail));
 		} else if (clienteRestaurante.equals("Restaurante")) {
 			Optional<Restaurante> restaurante = resRepo.findById(mail);
-			restaurante.get().setBloqueado(true);
-			resRepo.save(restaurante.get());
+			if (restaurante.isPresent()) {
+				restaurante.get().setBloqueado(true);
+				resRepo.save(restaurante.get());
+			} else
+				throw new UsuarioException(UsuarioException.NotFoundException(mail));
 		}
+
+		return new DTRespuesta("Usuario bloqueado con éxito.");
 	}
 
 	@Override
-	public void desbloquearUsuario(String mail, String clienteRestaurante) {
+	public DTRespuesta desbloquearUsuario(String mail, String clienteRestaurante) throws UsuarioException {
 		if (clienteRestaurante.equals("Cliente")) {
 			Optional<Cliente> cliente = clienteRepo.findById(mail);
-			cliente.get().setBloqueado(false);
-			clienteRepo.save(cliente.get());
+			if (cliente.isPresent()) {
+				cliente.get().setBloqueado(false);
+				clienteRepo.save(cliente.get());
+			} else
+				throw new UsuarioException(UsuarioException.NotFoundException(mail));
 		} else if (clienteRestaurante.equals("Restaurante")) {
 			Optional<Restaurante> restaurante = resRepo.findById(mail);
-			restaurante.get().setBloqueado(false);
-			resRepo.save(restaurante.get());
+			if (restaurante.isPresent()) {
+				restaurante.get().setBloqueado(false);
+				resRepo.save(restaurante.get());
+			} else
+				throw new UsuarioException(UsuarioException.NotFoundException(mail));
 		}
+
+		return new DTRespuesta("Usuario desbloqueado con éxito.");
 	}
 
 	// 0 -> cliente
@@ -381,22 +402,26 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 		return response;
 	}
 
-	public void cambiarEstadoRestaurante(String varRestaurante, int estado) throws RestauranteException {
+	public DTRespuesta cambiarEstadoRestaurante(String varRestaurante, int estado) throws RestauranteException {
 		Optional<Restaurante> optionalRestaurante = resRepo.findById(varRestaurante);
 		if (!optionalRestaurante.isPresent()) {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(varRestaurante));
 		}
 		Restaurante restaurante = optionalRestaurante.get();
+		String est = "";
 
 		switch (estado) {
 		case 1:
 			restaurante.setEstado(EnumEstadoRestaurante.ACEPTADO);
+			est = "ACEPTADO";
 			break;
 		case 2:
 			restaurante.setEstado(EnumEstadoRestaurante.RECHAZADO);
+			est = "RECHAZADO";
 			break;
 		}
 
 		resRepo.save(restaurante);
+		return new DTRespuesta("Estado de restaurante cambiado a " + est + ".");
 	}
 }
