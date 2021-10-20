@@ -4,6 +4,7 @@ import java.util.List;
 import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
+import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
 import com.vpi.springboot.exception.CarritoException;
 import com.vpi.springboot.exception.DireccionException;
@@ -15,26 +16,26 @@ import com.vpi.springboot.exception.UsuarioException;
 public interface ClienteServicioInterfaz {
 	public List<DTDireccion> getDireccionCliente(String mail) throws UsuarioException;
 	
-	public void altaCliente(Cliente usuario) throws UsuarioException, Exception;
+	public DTRespuesta altaCliente(Cliente usuario) throws UsuarioException, Exception;
 	
 	public List<Cliente> obtenerClientes();
 	
-	public void altaDireccion(DTDireccion direccion, String mail) throws UsuarioException;
+	public DTRespuesta altaDireccion(DTDireccion direccion, String mail) throws UsuarioException;
 	
-	public void bajaCuenta(String mail) throws UsuarioException;
+	public DTRespuesta bajaCuenta(String mail) throws UsuarioException;
 
-	void modificarDireccion(int id, DTDireccion nueva, String mail) throws UsuarioException;
+	public DTRespuesta modificarDireccion(int id, DTDireccion nueva, String mail) throws UsuarioException;
 
-	void eliminarDireccion(Integer id, String mail) throws UsuarioException;
+	public DTRespuesta eliminarDireccion(Integer id, String mail) throws UsuarioException;
 	
-	public void agregarACarrito(int producto, int cantidad, String mail, String mailRestaurante) throws ProductoException;
+	public DTRespuesta agregarACarrito(int producto, int cantidad, String mail, String mailRestaurante) throws ProductoException;
 	
 	public DTCarrito verCarrito(String mail);
 
-	void altaPedido(int idCarrito, EnumMetodoDePago pago, int idDireccion, String mail, String comentario)
+	public DTRespuesta altaPedido(int idCarrito, EnumMetodoDePago pago, int idDireccion, String mail, String comentario)
 			throws RestauranteException, CarritoException, DireccionException;
 
-	void altaReclamo(int idPedido, String mailCliente, String comentario) throws ReclamoException;
+	public DTRespuesta altaReclamo(int idPedido, String mailCliente, String comentario) throws ReclamoException;
 
 	
 }

@@ -8,15 +8,16 @@ import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
 import com.vpi.springboot.exception.AdministradorException;
 import com.vpi.springboot.exception.RestauranteException;
+import com.vpi.springboot.exception.UsuarioException;
 
 public interface AdministradorServicioInterfaz {
 	public DTRespuesta crearAdministrador(Administrador admin) throws AdministradorException;
 
-	public void eliminarUsuario(String mail);
+	public DTRespuesta eliminarUsuario(String mail) throws UsuarioException;
 
-	public void bloquearUsuario(String mail, String clienteRestaurante);
+	public DTRespuesta bloquearUsuario(String mail, String clienteRestaurante) throws UsuarioException;
 
-	public void desbloquearUsuario(String mail, String clienteRestaurante);
+	public DTRespuesta desbloquearUsuario(String mail, String clienteRestaurante) throws UsuarioException;
 	
 	public Map<String, Object> listarUsuariosRegistrados(int page, int size, int tipoUsuario);
 	
@@ -24,5 +25,5 @@ public interface AdministradorServicioInterfaz {
 	
 	public Map<String, Object> listarRestaurantes(int page, int size, int estado);
 	
-	public void cambiarEstadoRestaurante(String varRestaurante, int estado) throws RestauranteException;
+	public DTRespuesta cambiarEstadoRestaurante(String varRestaurante, int estado) throws RestauranteException;
 }
