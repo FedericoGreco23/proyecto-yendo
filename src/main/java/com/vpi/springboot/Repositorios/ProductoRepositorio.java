@@ -1,5 +1,7 @@
 package com.vpi.springboot.Repositorios;
 
+import java.util.List;
+
 import javax.transaction.Transactional;
 
 import org.springframework.data.domain.Page;
@@ -24,4 +26,12 @@ public interface ProductoRepositorio extends ProductoBaseRepository<Producto> {
 	
 	@Query("SELECT u FROM Producto u WHERE u.restaurante = :restaurante")
 	Page<Producto> findAllByRestaurante(@Param("restaurante") Restaurante restaurante, Pageable pageable);
+	
+	
+	@Query("SELECT u FROM Producto u WHERE u.id = :id and u.restaurante = :restaurante")
+	Producto findByIdAndRest(@Param("id") Integer integer, 
+						  @Param("restaurante") String mail);
+						  
+	@Query("SELECT u FROM Producto u WHERE u.restaurante = :restaurante")
+	List<Producto> findAllByRestaurante(@Param("restaurante") Restaurante restaurante);
 }

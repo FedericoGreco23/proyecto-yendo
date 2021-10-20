@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -99,7 +100,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 	}
 //--------------------------------------------
 
-	public void recuperarPassword(String mail) throws UsuarioException {
+	public DTRespuesta recuperarPassword(String mail) throws UsuarioException {
 		// Se tiene que ver cómo se genera la contraseña opcional
 		String pass = passwordEncoder.encode("123456");
 		String to = "";
@@ -137,10 +138,14 @@ public class GeneralService implements GeneralServicioInterfaz {
 			String body = "Su contraseña fue cambiada a 123456.\n"
 					+ "Por favor cambie su contraseña al ingresar a su cuenta.";
 			mailSender.sendMail(to, body, topic);
+			return new DTRespuesta("Mail enviado con contraseña.");
+		} else {
+			return new DTRespuesta("Mail de usuario inválido.");
 		}
+
 	}
 
-	public void verificarMail(String mail) throws UsuarioException {
+	public DTRespuesta verificarMail(String mail) throws UsuarioException {
 		String to = "";
 		int tipo;
 
@@ -175,6 +180,9 @@ public class GeneralService implements GeneralServicioInterfaz {
 			String topic = "Verificación de mail.";
 			String body = "Para verificar su mail, por favor use el siguiente link: \n" + servicio;
 			mailSender.sendMail(to, body, topic);
+			return new DTRespuesta("Mail enviado con contraseña.");
+		} else {
+			return new DTRespuesta("Mail de usuario inválido.");
 		}
 	}
 
@@ -182,7 +190,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 	// 0 -> cliente
 	// 1 -> restaurante
 	// 2 -> administrador
-	public void activarCuenta(String mail, int tipoUsuario) {
+	public DTRespuesta activarCuenta(String mail, int tipoUsuario) {
 		switch (tipoUsuario) {
 		case 0:
 			Optional<Cliente> optionalCliente = clienteRepo.findById(mail);
@@ -203,6 +211,8 @@ public class GeneralService implements GeneralServicioInterfaz {
 			adminRepo.save(admin);
 			break;
 		}
+
+		return new DTRespuesta("Cuenta activada");
 	}
 
 	@Override
@@ -290,6 +300,38 @@ public class GeneralService implements GeneralServicioInterfaz {
 		}
 
 		response.put("productos", retorno);
+		return response;
+	}
+
+	public List<DTCategoriaProducto> listarMenus(String mailRestaurante) throws RestauranteException {
+		Optional<Restaurante> optionalRestaurante = resRepo.findById(mailRestaurante);
+		if (!optionalRestaurante.isPresent()) {
+			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(mailRestaurante));
+		}
+		Restaurante restaurante = optionalRestaurante.get();
+
+		List<DTCategoriaProducto> response = new ArrayList<>();
+		Map<Categoria, List<Producto>> map = new HashMap<>();
+
+		Categoria sinCategoria = new Categoria("sinCategoria");
+		map.put(sinCategoria, new ArrayList<>());
+
+		List<Producto> productos = proRepo.findAllByRestaurante(restaurante);
+		for (Producto p : productos) {
+			Categoria categoria = p.getCategoria();
+			if (categoria != null) {
+				if (!map.containsKey(categoria)) {
+					map.put(categoria, new ArrayList<>());
+					map.get(categoria).add(p);
+				} else
+					map.get(categoria).add(p);
+			} else
+				map.get(sinCategoria).add(p);
+		}
+
+		response = map.entrySet().stream().map(e -> new DTCategoriaProducto(e.getKey(), e.getValue()))
+				.collect(Collectors.toList());
+
 		return response;
 	}
 

@@ -96,22 +96,20 @@ public class PublicRest {
 
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@RequestMapping(value = "/crearCliente", method = RequestMethod.POST)
-	public ResponseEntity<DTRespuesta> altaCliente(@RequestBody Cliente usuario) {
+	public ResponseEntity<?> altaCliente(@RequestBody Cliente usuario) {
 		try {
-			clienteService.altaCliente(usuario);
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Cliente agregado con éxito"), HttpStatus.OK);
+			return new ResponseEntity<>(clienteService.altaCliente(usuario), HttpStatus.OK);
 		} catch (Exception e) {
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	@PostMapping("/crearRestaurante")
-	public ResponseEntity<DTRespuesta> crearRestaurante(@RequestBody Restaurante rest) {
+	public ResponseEntity<?> crearRestaurante(@RequestBody Restaurante rest) {
 		try {
-			restService.altaRestaurante(rest);
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Restaurante agregado con éxito"), HttpStatus.OK);
+			return new ResponseEntity<>(restService.altaRestaurante(rest), HttpStatus.OK);
 		} catch (Exception e) {
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -119,8 +117,7 @@ public class PublicRest {
 	@RequestMapping(value = "/recuperar", method = RequestMethod.POST)
 	public ResponseEntity<?> recuperarPassword(@RequestParam String mail) {
 		try {
-			service.recuperarPassword(mail);
-			return new ResponseEntity<String>(mail, HttpStatus.OK);
+			return new ResponseEntity<>(service.recuperarPassword(mail), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -130,8 +127,7 @@ public class PublicRest {
 	@RequestMapping(value = "/verificar", method = RequestMethod.POST)
 	public ResponseEntity<?> verificarMail(@RequestParam String mail) {
 		try {
-			service.verificarMail(mail);
-			return new ResponseEntity<String>("Verificación enviada.", HttpStatus.OK);
+			return new ResponseEntity<>(service.verificarMail(mail), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -174,6 +170,19 @@ public class PublicRest {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
+	@GetMapping("/getMenus/{restaurante}")
+	public ResponseEntity<?> listarMenus(@PathVariable(required = true) String restaurante) {
+		try {
+			return new ResponseEntity<>(service.listarMenus(restaurante), HttpStatus.OK);
+		} catch (RestauranteException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
 	}
 
 	@CrossOrigin(origins = "*", allowedHeaders = "*")

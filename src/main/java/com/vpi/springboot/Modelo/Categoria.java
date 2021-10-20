@@ -14,16 +14,19 @@ public class Categoria {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	
+
+	public Categoria(String nombre) {
+		super();
+		this.nombre = nombre;
+	}
+
 	public Categoria(String nombre, String foto) {
 		super();
 		this.nombre = nombre;
 		this.foto = foto;
 	}
 
-	
 //----------------------GETTERS Y SETTERS---------------------------------------------------------
-	
 
 	public String getNombre() {
 		return nombre;
