@@ -179,7 +179,7 @@ public class RestauranteController {
 					HttpStatus.FORBIDDEN);
 		}
 		try {
-			String mail= getInfoFromJwt(keyInfoJWT.mail.name());
+			String mail= getInfoFromJwt("mail");
 
 			service.altaPromocion(promocion, mail);
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Promocion ingresada con éxito"), HttpStatus.OK);
@@ -207,8 +207,10 @@ public class RestauranteController {
 			switch (infoName) {
 			case "mail":
 				infoSolicitada = jwtUtil.extractUsername(jwt);
+				break;
 			case "user_type":
 				infoSolicitada = jwtUtil.extractUserType(jwt);
+				break;
 			}
 		}
 
