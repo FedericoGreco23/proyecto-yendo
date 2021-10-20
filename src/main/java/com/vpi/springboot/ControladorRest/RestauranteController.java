@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.vpi.springboot.Logica.RestauranteService;
 import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.Modelo.dto.DTPromocionConPrecio;
+import com.vpi.springboot.Modelo.Promocion;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
 import com.vpi.springboot.exception.PermisosException;
@@ -157,6 +158,55 @@ public class RestauranteController {
 			return new ResponseEntity<>(service.confirmarPedido(idPedido), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping("/modificarDescuento/{idProducto}")
+	ResponseEntity<?> modificarDescuento(@PathVariable int idProducto, @RequestParam int descuento) {
+		if (!esRestaurante()) {
+			return new ResponseEntity<>(
+					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
+					HttpStatus.FORBIDDEN);
+		}
+
+		try {
+			return new ResponseEntity<>(service.modificarDescuentoProducto(idProducto, descuento), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
+	@PostMapping("/modificarPromocion")
+	public ResponseEntity<?> modificarPromocion(@RequestBody Promocion promo) {
+		if (!esRestaurante()) {
+			return new ResponseEntity<>(
+					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
+					HttpStatus.FORBIDDEN);
+		}
+
+		try {
+			return new ResponseEntity<>(service.modificarPromocion(promo), HttpStatus.OK);
+		} catch (ConstraintViolationException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
+	@PostMapping("/eliminarPromocion/{id}")
+	public ResponseEntity<?> bajaPromocion(@PathVariable int idPromo) {
+		if (!esRestaurante()) {
+			return new ResponseEntity<>(
+					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
+					HttpStatus.FORBIDDEN);
+		}
+
+		try {
+			return new ResponseEntity<>(service.bajaPromocion(idPromo), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
