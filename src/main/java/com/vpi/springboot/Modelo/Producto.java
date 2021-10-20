@@ -33,9 +33,8 @@ public class Producto {
 		super();
 	}
 	
-	public Producto(int id, String nombre, String descripcion, double precio, String foto, int descuento,
+	public Producto(String nombre, String descripcion, double precio, String foto, int descuento,
 			boolean activo) {
-		this.id = id;
 		this.nombre = nombre;
 		this.descripcion = descripcion;
 		this.precio = precio;

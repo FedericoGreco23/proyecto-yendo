@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.vpi.springboot.Logica.RestauranteService;
 import com.vpi.springboot.Modelo.Producto;
+import com.vpi.springboot.Modelo.dto.DTPromocionConPrecio;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
 import com.vpi.springboot.exception.PermisosException;
@@ -150,7 +151,8 @@ public class RestauranteController {
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
+
 	@PostMapping("/confirmarPedido")
 	ResponseEntity<?> cerrarRestaurante(@RequestParam int idPedido) {
 		try {
@@ -163,9 +165,32 @@ public class RestauranteController {
 	
 	
 
+
+
+
+	
+	
+	
+	@PostMapping("/altaPromocion")
+	public ResponseEntity<?> altaPromocion(@RequestBody DTPromocionConPrecio promocion){
+		if (!esRestaurante()) {
+			return new ResponseEntity<>(
+					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
+					HttpStatus.FORBIDDEN);
+		}
+		try {
+			String mail= getInfoFromJwt(keyInfoJWT.mail.name());
+
+			service.altaPromocion(promocion, mail);
+			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Promocion ingresada con éxito"), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+	}
+	
 	/// PRIVADAS PARA JWT ///
 	/////////////////////////
-
 	private Boolean esRestaurante() {
 		return getInfoFromJwt(keyInfoJWT.user_type.name()).contains("RESTAURANTE");
 	}
