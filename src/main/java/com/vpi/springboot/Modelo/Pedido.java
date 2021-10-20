@@ -45,6 +45,13 @@ public class Pedido {
 	private List<Reclamo> reclamos = new ArrayList<>();
 	private String direccion;
 	private String comentario;
+	
+	
+
+	public Pedido() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
 
 	public Pedido(int id, LocalDateTime fecha, Double costoTotal, EnumEstadoPedido estadoPedido,
 			EnumMetodoDePago metodoDePago, Integer carrito) {
@@ -56,6 +63,22 @@ public class Pedido {
 		this.metodoDePago = metodoDePago;
 		this.carrito = carrito;
 	}
+	
+	public Pedido(LocalDateTime fecha, Double costoTotal, EnumEstadoPedido estadoPedido,
+			EnumMetodoDePago metodoDePago, Integer carrito, String direccion, Restaurante resto, Cliente cliente, String comentario) {
+		super();
+		this.fecha = fecha;
+		this.costoTotal = costoTotal;
+		this.estadoPedido = estadoPedido;
+		this.metodoDePago = metodoDePago;
+		this.carrito = carrito;
+		this.direccion = direccion;
+		this.restaurante = resto;
+		this.cliente = cliente;
+		this.comentario = comentario;
+		
+	}
+	
 	
 	public Pedido(int id, LocalDateTime fecha, Double costoTotal, EnumEstadoPedido estadoPedido,
 			EnumMetodoDePago metodoDePago, Integer carrito, String direccion, String comentario) {

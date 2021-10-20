@@ -18,7 +18,7 @@ public class DTProducto implements Serializable {
 	private int descuento;
 	private boolean activo;
 	private String restaurante;
-	private List<DTCategoria> categorias = new ArrayList<>();
+	private String categoria;
 
 	public DTProducto() {
 		super();
@@ -44,11 +44,8 @@ public class DTProducto implements Serializable {
 		this.foto = pro.getFoto();
 		this.descuento = pro.getDescuento();
 		this.activo = pro.isActivo();
-		this.restaurante = pro.getRestaurante().getNombre();
-
-		for (Categoria cat : pro.getCategorias()) {
-			this.categorias.add(new DTCategoria(cat));
-		}
+		this.restaurante = pro.getRestaurante().getMail();
+		this.categoria = pro.getCategoria() != null ? pro.getCategoria().getNombre() : null;
 	}
 
 	public int getId() {
@@ -115,11 +112,11 @@ public class DTProducto implements Serializable {
 		this.restaurante = restaurante;
 	}
 
-	public List<DTCategoria> getCategorias() {
-		return categorias;
+	public String getCategoria() {
+		return categoria;
 	}
 
-	public void setCategorias(List<DTCategoria> categorias) {
-		this.categorias = categorias;
+	public void setCategoria(String categoria) {
+		this.categoria = categoria;
 	}
 }

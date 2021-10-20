@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,24 +22,41 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.vpi.springboot.Logica.RestauranteService;
 import com.vpi.springboot.Modelo.Producto;
+import com.vpi.springboot.Modelo.dto.DTPromocionConPrecio;
+import com.vpi.springboot.Modelo.Promocion;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
+import com.vpi.springboot.exception.PermisosException;
 import com.vpi.springboot.exception.RestauranteException;
+import com.vpi.springboot.exception.UsuarioException;
+import com.vpi.springboot.security.util.JwtUtil;
+import com.vpi.springboot.security.util.JwtUtil.keyInfoJWT;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("api/restaurante/")
 public class RestauranteController {
-	
+
 	@Autowired
 	private RestauranteService service;
-	
+
+	@Autowired
+	private JwtUtil jwtUtil;
+
+	@Autowired
+	private HttpServletRequest request;
+
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
-	@PostMapping("/crearMenu/{varRestaurante}")
-	public ResponseEntity<?> altaMenu(@RequestBody Producto menu, @PathVariable (required = true) String varRestaurante) {
+	@PostMapping("/crearMenu")
+	public ResponseEntity<?> altaMenu(@RequestBody Producto menu) {
+		if (!esRestaurante()) {
+			return new ResponseEntity<>(
+					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
+					HttpStatus.FORBIDDEN);
+		}
+
 		try {
-			service.altaMenu(menu, varRestaurante);
-			return new ResponseEntity<Producto>(menu, HttpStatus.OK);
+			return new ResponseEntity<>(service.altaMenu(menu, getMailFromJwt()), HttpStatus.OK);
 		} catch (ConstraintViolationException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {
@@ -49,9 +67,14 @@ public class RestauranteController {
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/eliminarMenu/{id}")
 	public ResponseEntity<?> bajaMenu(@PathVariable int id) {
+		if (!esRestaurante()) {
+			return new ResponseEntity<>(
+					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
+					HttpStatus.FORBIDDEN);
+		}
+
 		try {
-			service.bajaMenu(id);
-			return new ResponseEntity<String>("Eliminado correctamente", HttpStatus.OK);
+			return new ResponseEntity<>(service.bajaMenu(id), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -59,24 +82,34 @@ public class RestauranteController {
 
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/modificarMenu")
-	public ResponseEntity<?> modificarMenus(@RequestBody Producto menu) {
+	public ResponseEntity<?> modificarMenu(@RequestBody Producto menu) {
+		if (!esRestaurante()) {
+			return new ResponseEntity<>(
+					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
+					HttpStatus.FORBIDDEN);
+		}
+
 		try {
-			service.modificarMenu(menu);
-			return new ResponseEntity<Producto>(menu, HttpStatus.OK);
+			return new ResponseEntity<>(service.modificarMenu(menu), HttpStatus.OK);
 		} catch (ConstraintViolationException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
-	@GetMapping("/getPedidos/{restaurante}")
-	public Map<String, Object> listarPedidos(@RequestParam(defaultValue = "0") int page,
-									  	   	 @RequestParam(defaultValue = "5") int size, 
-									  	   	 @PathVariable(required = true) String restaurante) {
+	@GetMapping("/getPedidos")
+	public ResponseEntity<?> listarPedidos(@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "5") int size) {
+		if (!esRestaurante()) {
+			return new ResponseEntity<>(
+					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
+					HttpStatus.FORBIDDEN);
+		}
+
 		try {
-			return service.listarPedidos(page, size, restaurante);
+			return new ResponseEntity<>(service.listarPedidos(page, size, getMailFromJwt()), HttpStatus.OK);
 		} catch (RestauranteException e) {
 			e.printStackTrace();
 			return null;
@@ -84,22 +117,156 @@ public class RestauranteController {
 	}
 
 	@PostMapping("/abrirRestaurante")
-	ResponseEntity<?> abrirRestaurante(@RequestParam String mail){
+	ResponseEntity<?> abrirRestaurante() {
+		if (!esRestaurante()) {
+			return new ResponseEntity<>(
+					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
+					HttpStatus.FORBIDDEN);
+		}
+
 		try {
-			service.abrirRestaurante(mail);
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Restaurante abierto"), HttpStatus.OK);
+			return new ResponseEntity<>(service.abrirRestaurante(getMailFromJwt()), HttpStatus.OK);
 		} catch (Exception e) {
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@PostMapping("/cerrarRestaurante")
-	ResponseEntity<?> cerrarRestaurante(@RequestParam String mail) {
+	ResponseEntity<?> cerrarRestaurante() {
+		if (!esRestaurante()) {
+			return new ResponseEntity<>(
+					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
+					HttpStatus.FORBIDDEN);
+		}
+
 		try {
-			service.cerrarRestaurante(mail);
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Restaurante cerrado"), HttpStatus.OK);
+			return new ResponseEntity<>(service.abrirRestaurante(getMailFromJwt()), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping("/confirmarPedido")
+	ResponseEntity<?> confirmarPedido(@RequestParam int idPedido) {
+		if (!esRestaurante()) {
+			return new ResponseEntity<>(
+					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
+					HttpStatus.FORBIDDEN);
+		}
+
+		try {
+			return new ResponseEntity<>(service.confirmarPedido(idPedido), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping("/modificarDescuento/{idProducto}")
+	ResponseEntity<?> modificarDescuento(@PathVariable int idProducto, @RequestParam int descuento) {
+		if (!esRestaurante()) {
+			return new ResponseEntity<>(
+					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
+					HttpStatus.FORBIDDEN);
+		}
+
+		try {
+			return new ResponseEntity<>(service.modificarDescuentoProducto(idProducto, descuento), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
+	@PostMapping("/modificarPromocion")
+	public ResponseEntity<?> modificarPromocion(@RequestBody Promocion promo) {
+		if (!esRestaurante()) {
+			return new ResponseEntity<>(
+					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
+					HttpStatus.FORBIDDEN);
+		}
+
+		try {
+			return new ResponseEntity<>(service.modificarPromocion(promo), HttpStatus.OK);
+		} catch (ConstraintViolationException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
+	@PostMapping("/eliminarPromocion/{id}")
+	public ResponseEntity<?> bajaPromocion(@PathVariable int idPromo) {
+		if (!esRestaurante()) {
+			return new ResponseEntity<>(
+					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
+					HttpStatus.FORBIDDEN);
+		}
+
+		try {
+			return new ResponseEntity<>(service.bajaPromocion(idPromo), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping("/altaPromocion")
+	public ResponseEntity<?> altaPromocion(@RequestBody DTPromocionConPrecio promocion){
+		if (!esRestaurante()) {
+			return new ResponseEntity<>(
+					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
+					HttpStatus.FORBIDDEN);
+		}
+		try {
+			String mail= getInfoFromJwt("mail");
+
+			service.altaPromocion(promocion, mail);
+			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Promocion ingresada con éxito"), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+
+	}
+
+	/// PRIVADAS PARA JWT ///
+	/////////////////////////
+	private Boolean esRestaurante() {
+		return getInfoFromJwt(keyInfoJWT.user_type.name()).contains("RESTAURANTE");
+	}
+
+	private String getInfoFromJwt(String infoName) {
+		// obtenemos el token del header y le sacamos "Bearer "
+		final String authorizationHeader = request.getHeader("Authorization");
+
+		String infoSolicitada = null;
+		String jwt = null;
+
+		if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+			jwt = authorizationHeader.substring(7);
+			switch (infoName) {
+			case "mail":
+				infoSolicitada = jwtUtil.extractUsername(jwt);
+				break;
+			case "user_type":
+				infoSolicitada = jwtUtil.extractUserType(jwt);
+				break;
+			}
+		}
+
+		return infoSolicitada;
+	}
+
+	private String getMailFromJwt() {
+		// obtenemos el token del header y le sacamos "Bearer "
+		final String authorizationHeader = request.getHeader("Authorization");
+
+		String mail = null;
+		String jwt = null;
+
+		if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+			jwt = authorizationHeader.substring(7);
+			mail = jwtUtil.extractUsername(jwt);
+		}
+		return mail;
 	}
 }
