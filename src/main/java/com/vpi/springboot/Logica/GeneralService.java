@@ -293,6 +293,32 @@ public class GeneralService implements GeneralServicioInterfaz {
 		return response;
 	}
 
+	public Map<String, List<DTProducto>> listarMenus(String mailRestaurante) throws RestauranteException {
+		Optional<Restaurante> optionalRestaurante = resRepo.findById(mailRestaurante);
+		if (!optionalRestaurante.isPresent()) {
+			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(mailRestaurante));
+		}
+
+		Map<String, List<DTProducto>> response = new HashMap<>();
+		
+		List<Categoria> categorias = catRepo.findAll();
+		for (Categoria c : categorias) {
+			response.put(c.getNombre(), new ArrayList<DTProducto>());
+		}
+		response.put("sinCategoria", new ArrayList<DTProducto>());
+
+		List<Producto> productos = proRepo.findAll();
+		for (Producto p : productos) {
+			if (p.getCategoria() == null) {
+				response.get("sinCategoria").add(new DTProducto(p));
+			} else {
+				response.get(p.getCategoria().getNombre()).add(new DTProducto(p));
+			}
+		}
+
+		return response;
+	}
+
 	public Map<String, Object> listarPromocionesRestaurante(int page, int size, String mailRestaurante)
 			throws RestauranteException {
 		Optional<Restaurante> optionalRestaurante = resRepo.findById(mailRestaurante);

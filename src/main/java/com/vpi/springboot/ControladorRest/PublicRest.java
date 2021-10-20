@@ -175,6 +175,19 @@ public class PublicRest {
 			return null;
 		}
 	}
+	
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
+	@GetMapping("/getMenus/{restaurante}")
+	public ResponseEntity<?> listarMenus(@PathVariable(required = true) String restaurante) {
+		try {
+			return new ResponseEntity<>(service.listarMenus(restaurante), HttpStatus.OK);
+		} catch (RestauranteException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+	}
 
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@GetMapping("/getPromociones/{restaurante}")

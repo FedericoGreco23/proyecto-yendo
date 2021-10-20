@@ -88,7 +88,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		Restaurante busquedaNombre = null;
 		busquedaNombre = restauranteRepo.existeRestauranteNombre(rest.getNombre());
 		if (busquedaMail.isPresent()) {
-			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(rest.getMail()));
+			throw new RestauranteException(RestauranteException.RestauranteYaExiste(rest.getMail()));
 		} else if (busquedaNombre != null) {
 			throw new RestauranteException(RestauranteException.RestauranteYaExiste(rest.getNombre()));
 		}

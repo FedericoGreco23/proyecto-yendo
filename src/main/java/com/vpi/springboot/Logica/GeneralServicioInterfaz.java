@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.vpi.springboot.Modelo.Categoria;
+import com.vpi.springboot.Modelo.Producto;
+import com.vpi.springboot.Modelo.dto.DTCategoriaProducto;
 import com.vpi.springboot.Modelo.dto.DTProducto;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
 import com.vpi.springboot.Modelo.dto.DTUsuario;
@@ -26,6 +28,9 @@ public interface GeneralServicioInterfaz {
 	public Map<String, Object> listarRestaurantes(int page, int size, int horarioApertura) throws RestauranteException;
 
 	public Map<String, Object> listarMenusRestaurante(String attr, int order, int page, int size, String nombreRestaurante)
+			throws RestauranteException;
+	
+	public Map<String, List<DTProducto>> listarMenus(String nombreRestaurante)
 			throws RestauranteException;
 
 	public Map<String, Object> listarPromocionesRestaurante(int page, int size, String nombreRestaurante)
