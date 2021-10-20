@@ -286,6 +286,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 			Promocion promocionNueva = new Promocion(promocion.getNombre(), promocion.getDescripcion(),
 					promocion.getPrecio(), promocion.getFoto(), promocion.getDescuento(), true);
+			promocionNueva.setRestaurante(restaurante);
 
 			for (Entry<Integer, Integer> entry : promocion.getProductos().entrySet()) {
 
