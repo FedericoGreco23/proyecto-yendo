@@ -252,6 +252,13 @@ public class ClienteService implements ClienteServicioInterfaz {
 		Optional<Producto> optionalProducto = productoRepo.findById(producto);
 		if (optionalProducto.isPresent()) {
 			DTProducto dtProducto = new DTProducto(optionalProducto.get());
+			int descuento = dtProducto.getDescuento();
+			double precioInicial = dtProducto.getPrecio();
+			double precio = 0;
+			if( descuento > 0) {
+				precio =  precioInicial - ((precioInicial*descuento) / 100);
+				dtProducto.setPrecio(precio);
+			}
 			Carrito optionalCarrito = mongoRepo.findByMailAndActivo(mail, true);
 			DTProductoCarrito dtPC = new DTProductoCarrito(dtProducto, cantidad);
 			if (optionalCarrito != null) { // TIENE CARRITO ACTIVO
@@ -302,16 +309,11 @@ public class ClienteService implements ClienteServicioInterfaz {
 				Restaurante restaurante = optionalRestaurante.get();
 				   Optional<Direccion> optionalDireccion = dirRepo.findById(idDireccion);
 				   if(optionalDireccion.isPresent()) {
-					   	String direccion = optionalDireccion.get().toString();
-						
+					   	String direccion = optionalDireccion.get().toString();				
 						EnumEstadoPedido estado =EnumEstadoPedido.PROCESADO;
 						double precioTotal = 0;
 						for (DTProductoCarrito DTpc : carrito.getProductoCarrito()) {
-							if(DTpc.getProducto().getDescuento() != 0) {
-								precioTotal = (precioTotal + ((DTpc.getProducto().getPrecio()) - ((DTpc.getProducto().getDescuento()/100) * DTpc.getProducto().getPrecio()))) * DTpc.getCantidad();
-							}else {
-								precioTotal = (precioTotal + DTpc.getProducto().getPrecio()) * DTpc.getCantidad() ;
-							}
+							precioTotal = precioTotal + (DTpc.getProducto().getPrecio()*DTpc.getCantidad());
 						}
 						Pedido pedido = new Pedido(LocalDateTime.now(),precioTotal,estado,pago, idCarrito, direccion, restaurante, cliente, comentario);
 						pedidoRepo.save(pedido);
