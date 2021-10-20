@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -293,28 +294,36 @@ public class GeneralService implements GeneralServicioInterfaz {
 		return response;
 	}
 
-	public Map<String, List<DTProducto>> listarMenus(String mailRestaurante) throws RestauranteException {
+	public List<DTCategoriaProducto> listarMenus(String mailRestaurante) throws RestauranteException {
 		Optional<Restaurante> optionalRestaurante = resRepo.findById(mailRestaurante);
 		if (!optionalRestaurante.isPresent()) {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(mailRestaurante));
 		}
+		Restaurante restaurante = optionalRestaurante.get();
 
-		Map<String, List<DTProducto>> response = new HashMap<>();
-		
-		List<Categoria> categorias = catRepo.findAll();
-		for (Categoria c : categorias) {
-			response.put(c.getNombre(), new ArrayList<DTProducto>());
-		}
-		response.put("sinCategoria", new ArrayList<DTProducto>());
+		List<DTCategoriaProducto> response = new ArrayList<>();
+		Map<Categoria, List<Producto>> map = new HashMap<>();
 
-		List<Producto> productos = proRepo.findAll();
+		Categoria sinCategoria = new Categoria("sinCategoria");
+		map.put(sinCategoria, new ArrayList<>());
+
+		List<Producto> productos = proRepo.findAllByRestaurante(restaurante);
 		for (Producto p : productos) {
-			if (p.getCategoria() == null) {
-				response.get("sinCategoria").add(new DTProducto(p));
-			} else {
-				response.get(p.getCategoria().getNombre()).add(new DTProducto(p));
-			}
+			Categoria categoria = p.getCategoria();
+			if (categoria != null) {
+				if (!map.containsKey(categoria)) {
+					map.put(categoria, new ArrayList<>());
+					map.get(categoria).add(p);
+				} else
+					map.get(categoria).add(p);
+			} else
+				map.get(sinCategoria).add(p);
 		}
+
+		response = map.entrySet()
+					.stream()
+					.map(e -> new DTCategoriaProducto(e.getKey(), e.getValue()))
+					.collect(Collectors.toList());
 
 		return response;
 	}
