@@ -224,32 +224,36 @@ public class GeneralService implements GeneralServicioInterfaz {
 				restaurante.get().getCalificacionPromedio(), restaurante.get().getHorarioApertura(),
 				restaurante.get().getHorarioCierre(), restaurante.get().getTiempoEstimadoMinimo(),
 				restaurante.get().getTiempoEstimadoMaximo(), restaurante.get().getCostoDeEnvio(),
-				restaurante.get().getGeoLocalizacion(),
-				restaurante.get().getDiasAbierto(), restaurante.get().getAbierto());
+				restaurante.get().getGeoLocalizacion(), restaurante.get().getDiasAbierto(),
+				restaurante.get().getAbierto());
 		// DTRestaurante DTRestaurante = new DTRestaurante(restaurante.get());
 
 		return DTRestaurante;
 	}
-	
+
 	@Override
-	public List<DTBuscarRestaurante> buscarRestaurante(String texto, String nombreCategoria) throws RestauranteException {
+	public List<DTBuscarRestaurante> buscarRestaurante(String texto, String nombreCategoria)
+			throws RestauranteException {
 		List<Restaurante> restaurantes = new ArrayList<Restaurante>();
 		List<DTBuscarRestaurante> DTBuscarRestaurantes = new ArrayList<DTBuscarRestaurante>();
 		if (!texto.equalsIgnoreCase("")) {
 			if (!nombreCategoria.equalsIgnoreCase("")) {
-				//Aplico los 2 filtros
-				restaurantes = resRepo.buscarRestauranteDesdeClientePorNombreYCategoria(texto, nombreCategoria, EnumEstadoRestaurante.ACEPTADO);
+				// Aplico los 2 filtros
+				restaurantes = resRepo.buscarRestauranteDesdeClientePorNombreYCategoria(texto, nombreCategoria,
+						EnumEstadoRestaurante.ACEPTADO);
 			} else {
-				//Aplico solo nombre
+				// Aplico solo nombre
 				restaurantes = resRepo.buscarRestauranteDesdeClientePorNombre(texto, EnumEstadoRestaurante.ACEPTADO);
 			}
 		} else if (!nombreCategoria.equalsIgnoreCase("")) {
-			//Aplico solo categoria
-			restaurantes = resRepo.buscarRestauranteDesdeClientePorCategoria(nombreCategoria, EnumEstadoRestaurante.ACEPTADO);
+			// Aplico solo categoria
+			restaurantes = resRepo.buscarRestauranteDesdeClientePorCategoria(nombreCategoria,
+					EnumEstadoRestaurante.ACEPTADO);
 		}
 		if (restaurantes != null) {
 			for (Restaurante restaurante : restaurantes) {
-				DTBuscarRestaurantes.add(new DTBuscarRestaurante(restaurante.getNombre(), restaurante.getFoto(), restaurante.getDireccion()));
+				DTBuscarRestaurantes.add(new DTBuscarRestaurante(restaurante.getNombre(), restaurante.getFoto(),
+						restaurante.getDireccion()));
 			}
 		}
 		return DTBuscarRestaurantes;
@@ -320,7 +324,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 		response.put("totalItems", pageProducto.getTotalElements());
 
 		for (Producto p : productos) {
-			if(!(p.getClass()==Promocion.class)) {
+			if (!(p.getClass() == Promocion.class)) {
 				retorno.add(new DTProducto(p));
 			}
 		}
@@ -345,18 +349,49 @@ public class GeneralService implements GeneralServicioInterfaz {
 		List<Producto> productos = proRepo.findAllByRestaurante(restaurante);
 		for (Producto p : productos) {
 			Categoria categoria = p.getCategoria();
-			if (categoria != null) {
-				if (!map.containsKey(categoria)) {
-					map.put(categoria, new ArrayList<>());
-					map.get(categoria).add(p);
+			// Debería prevenir que retorne promociones
+			if(!(p instanceof Promocion)) {
+				if (categoria != null) {
+					if (!map.containsKey(categoria)) {
+						map.put(categoria, new ArrayList<>());
+						map.get(categoria).add(p);
+					} else
+						map.get(categoria).add(p);
 				} else
-					map.get(categoria).add(p);
-			} else
-				map.get(sinCategoria).add(p);
+					map.get(sinCategoria).add(p);
+			}
 		}
 
 		response = map.entrySet().stream().map(e -> new DTCategoriaProducto(e.getKey(), e.getValue()))
 				.collect(Collectors.toList());
+
+		for (int x = 0; x < response.size(); x++) {
+			for (int i = x + 1; i < response.size(); i++) {
+				// Ordeno por cantidad de productos
+				if (response.get(x).getProductos().size() < response.get(i).getProductos().size()) {
+					DTCategoriaProducto aux = new DTCategoriaProducto();
+					aux.setCategoria(response.get(x).getCategoria());
+					aux.setProductos(response.get(x).getProductos());
+					response.get(x).setCategoria(response.get(i).getCategoria());
+					response.get(x).setProductos(response.get(i).getProductos());
+					response.get(i).setCategoria(aux.getCategoria());
+					response.get(i).setProductos(aux.getProductos());
+					// Cuando la cantidad de productos es igual
+				} else if (response.get(x).getProductos().size() == response.get(i).getProductos().size()) {
+					// Ordeno por órden alfabético
+					if (response.get(x).getCategoria().getNombre()
+							.compareTo(response.get(i).getCategoria().getNombre()) > 0) {
+						DTCategoriaProducto aux = new DTCategoriaProducto();
+						aux.setCategoria(response.get(x).getCategoria());
+						aux.setProductos(response.get(x).getProductos());
+						response.get(x).setCategoria(response.get(i).getCategoria());
+						response.get(x).setProductos(response.get(i).getProductos());
+						response.get(i).setCategoria(aux.getCategoria());
+						response.get(i).setProductos(aux.getProductos());
+					}
+				}
+			}
+		}
 
 		return response;
 	}

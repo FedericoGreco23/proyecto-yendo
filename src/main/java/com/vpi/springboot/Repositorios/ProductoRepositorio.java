@@ -32,6 +32,6 @@ public interface ProductoRepositorio extends ProductoBaseRepository<Producto> {
 	Producto findByIdAndRest(@Param("ids") Integer ids, 
 						  @Param("mail") Restaurante mail);
 						  
-	@Query("SELECT u FROM Producto u WHERE u.restaurante = :restaurante")
+	@Query("SELECT u FROM Producto u WHERE u.restaurante = :restaurante and u.activo = true")
 	List<Producto> findAllByRestaurante(@Param("restaurante") Restaurante restaurante);
 }
