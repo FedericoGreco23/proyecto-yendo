@@ -14,7 +14,7 @@ public class DTPromocionConPrecio implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 
-    private Map<Integer, Integer> productos = new HashMap<Integer, Integer>();// id producto, cantidad
+    private List<DTProductoIdCantidad> productos;// id producto, cantidad
     private Integer precio; 
     private Integer descuento; 
     private String nombre;
@@ -25,11 +25,11 @@ public class DTPromocionConPrecio implements Serializable {
 		super();
 	}
 
-	public Map<Integer, Integer> getProductos() {
+	public List<DTProductoIdCantidad> getProductos() {
 		return productos;
 	}
 
-	public void setProductos(Map<Integer, Integer> productos) {
+	public void setProductos(List<DTProductoIdCantidad> productos) {
 		this.productos = productos;
 	}
 
