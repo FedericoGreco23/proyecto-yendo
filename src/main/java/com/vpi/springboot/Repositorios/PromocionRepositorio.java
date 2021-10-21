@@ -19,11 +19,12 @@ import com.vpi.springboot.Modelo.Restaurante;
  */
 @Transactional
 public interface PromocionRepositorio extends ProductoBaseRepository<Promocion> {
-	@Query("SELECT u FROM Promocion u WHERE u.restaurante = :restaurante")
+	@Query("SELECT u FROM Promocion u WHERE u.restaurante = :restaurante and u.activo = true")
 	Page<Promocion> findAllByRestaurante(@Param("restaurante") Restaurante restaurante, Pageable pageable);
 	
+	@Query("SELECT u FROM Promocion u WHERE u.restaurante = :restaurante and u.activo = true")
+	List<Promocion> findAllByRestaurante(@Param("restaurante") Restaurante restaurante);
 	
-
 	@Query("SELECT u FROM Promocion u WHERE u.restaurante = :restaurante")
 	List<Promocion> findAllByRestauranteSimple(@Param("restaurante") Restaurante restaurante);
 }

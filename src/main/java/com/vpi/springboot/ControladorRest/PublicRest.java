@@ -171,18 +171,18 @@ public class PublicRest {
 		}
 	}
 
-	@CrossOrigin(origins = "*", allowedHeaders = "*")
-	@GetMapping("/getProductos/{restaurante}")
-	public Map<String, Object> listarMenusRestaurante(@RequestParam(required = false) String attr,
-			@RequestParam(defaultValue = "1") int order, @RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "5") int size, @PathVariable(required = true) String restaurante) {
-		try {
-			return service.listarMenusRestaurante(attr, order, page, size, restaurante);
-		} catch (RestauranteException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
+//	@CrossOrigin(origins = "*", allowedHeaders = "*")
+//	@GetMapping("/getProductos/{restaurante}")
+//	public Map<String, Object> listarMenusRestaurante(@RequestParam(required = false) String attr,
+//			@RequestParam(defaultValue = "1") int order, @RequestParam(defaultValue = "0") int page,
+//			@RequestParam(defaultValue = "5") int size, @PathVariable(required = true) String restaurante) {
+//		try {
+//			return service.listarMenusRestaurante(attr, order, page, size, restaurante);
+//		} catch (RestauranteException e) {
+//			e.printStackTrace();
+//			return null;
+//		}
+//	}
 	
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@GetMapping("/getMenus/{restaurante}")
@@ -194,18 +194,17 @@ public class PublicRest {
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		
 	}
 
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@GetMapping("/getPromociones/{restaurante}")
-	public Map<String, Object> listarPromociones(@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "5") int size, @PathVariable(required = true) String restaurante) {
+	public ResponseEntity<?> listarPromociones(@PathVariable(required = true) String restaurante) {
 		try {
-			return service.listarPromocionesRestaurante(page, size, restaurante);
+			return new ResponseEntity<>(service.listarPromocionesRestaurante(restaurante), HttpStatus.OK);
 		} catch (RestauranteException e) {
-			e.printStackTrace();
-			return null;
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 }
