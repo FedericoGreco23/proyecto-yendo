@@ -404,7 +404,7 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 		restaurantes = pageRestaurante.getContent();
 
 		for (Restaurante r : restaurantes) {
-			retorno.add(new DTRestaurante(r));
+			retorno.add(new DTRestaurante(r, r.getProductos()));
 		}
 
 		response.put("currentPage", pageRestaurante.getNumber());

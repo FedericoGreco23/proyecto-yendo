@@ -25,6 +25,7 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 	private LocalDate fechaApertura;
 	private Integer costoDeEnvio;
 	private DTGeoLocalizacion geoLocalizacion;
+	private List<DTProducto> productosAdmin = new ArrayList<>();
 	private List<String> productos = new ArrayList<>();
 	private List<String> categorias = new ArrayList<>();
 	private String diasAbierto;
@@ -71,8 +72,10 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 		this.diasAbierto = diasAbierto;
 		this.abierto = abierto;
 
+		this.productosAdmin = null;
+		
 		for (Categoria cat : categorias) {
-			this.productos.add(cat.getNombre());
+			this.categorias.add(cat.getNombre());
 		}
 		
 		for (Producto pro : productos) {
@@ -123,9 +126,49 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 			this.geoLocalizacion = new DTGeoLocalizacion();
 		this.diasAbierto = res.getDiasAbierto();
 
+		this.productosAdmin = null;
+		
 		if (res.getProductos() != null || !res.getProductos().isEmpty()) {
 			for (Producto pro : res.getProductos()) {
 				this.productos.add(pro.getNombre());
+			}
+		}
+
+		if (res.getCategorias() != null || !res.getCategorias().isEmpty()) {
+			for (Categoria cat : res.getCategorias()) {
+				this.categorias.add(cat.getNombre());
+			}
+		}
+	}
+
+	// Para listar restaurantes desde el administrador
+	public DTRestaurante(Restaurante res, List<Producto> productosAdmin) {
+		super(res.getMail(), res.getContrasenia(), res.getTelefono(), res.getFoto(), res.getBloqueado(),
+				res.getActivo(), res.getFechaCreacion());
+		this.nombre = res.getNombre();
+		this.direccion = res.getDireccion();
+		this.calificacionPromedio = res.getCalificacionPromedio();
+		this.estado = res.getEstado();
+		this.horarioApertura = res.getHorarioApertura();
+		this.horarioCierre = res.getHorarioCierre();
+		this.tiempoEstimadoMaximo = res.getTiempoEstimadoMaximo();
+		this.tiempoEstimadoMinimo = res.getTiempoEstimadoMinimo();
+		this.fechaApertura = res.getFechaApertura();
+		this.costoDeEnvio = res.getCostoDeEnvio();
+		this.diasAbierto = res.getDiasAbierto();
+		this.abierto = res.getAbierto();
+
+		if (res.getGeoLocalizacion() != null)
+			this.geoLocalizacion = new DTGeoLocalizacion(res.getGeoLocalizacion());
+		else
+			this.geoLocalizacion = new DTGeoLocalizacion();
+		this.diasAbierto = res.getDiasAbierto();
+
+		this.productos = null;
+		
+		if (!productosAdmin.isEmpty()) {
+			for (Producto pro : productosAdmin) {
+				this.productosAdmin.add(new DTProducto(pro));
 			}
 		}
 
@@ -152,10 +195,6 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 		this.geoLocalizacion = new DTGeoLocalizacion(geoLocalizacion);
 		this.diasAbierto = diasAbierto;
 		this.abierto = abierto;
-
-		/*for (Producto pro : productos) {
-			this.productos.add(pro.getNombre());
-		}*/
 	}
 
 //----------------------GETTERS Y SETTERS---------------------------------------------------------
@@ -254,6 +293,14 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 
 	public void setProductos(List<String> productos) {
 		this.productos = productos;
+	}
+
+	public List<DTProducto> getProductosAdmin() {
+		return productosAdmin;
+	}
+
+	public void setProductosAdmin(List<DTProducto> productosAdmin) {
+		this.productosAdmin = productosAdmin;
 	}
 
 	public String getDiasAbierto() {
