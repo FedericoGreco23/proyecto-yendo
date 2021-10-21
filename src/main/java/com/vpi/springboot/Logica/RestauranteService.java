@@ -88,7 +88,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		Optional<Carrito> optionalCarrito = mongoRepo.findById(id);
 		if (optionalCarrito.isPresent()) {
 			Carrito carrito = optionalCarrito.get();
-			DTCarrito dt = new DTCarrito(carrito.getId(), carrito.getProductoCarrito(), carrito.getMailRestaurante());
+			DTCarrito dt = new DTCarrito(carrito.getId(), carrito.getProductoCarrito(), carrito.getMailRestaurante(),carrito.getCostoEnvio());
 			return dt;
 		}
 

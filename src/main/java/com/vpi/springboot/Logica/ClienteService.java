@@ -245,13 +245,14 @@ public class ClienteService implements ClienteServicioInterfaz {
 			}
 			Carrito optionalCarrito = mongoRepo.findByMailAndActivo(mail, true);
 			DTProductoCarrito dtPC = new DTProductoCarrito(dtProducto, cantidad);
+			Restaurante restaurante = restauranteRepo.getById(mailRestaurante);
 			if (optionalCarrito != null) { // TIENE CARRITO ACTIVO
 				optionalCarrito.addProductoCarrito(dtPC);
 				mongoRepo.save(optionalCarrito);
 			} else { // TIENE CARRITO INACTIVO O NO TIENE
 				List<DTProductoCarrito> productos = new ArrayList<DTProductoCarrito>();
 				productos.add(dtPC);
-				Carrito carrito = new Carrito(mail, mailRestaurante, productos, true);
+				Carrito carrito = new Carrito(restaurante.getCostoDeEnvio(),mail, mailRestaurante, productos, true);
 				carrito.setId(nextSequence.getNextSequence("customSequences"));
 				mongoRepo.save(carrito);
 			}
@@ -264,7 +265,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 	@Override
 	public DTCarrito verCarrito(String mail) {
 		Carrito optionalCarrito = mongoRepo.findByMailAndActivo(mail, true);
-		DTCarrito carrito = new DTCarrito(optionalCarrito.getId(), optionalCarrito.getProductoCarrito(), optionalCarrito.getMailRestaurante());
+		DTCarrito carrito = new DTCarrito(optionalCarrito.getId(), optionalCarrito.getProductoCarrito(), optionalCarrito.getMailRestaurante(), optionalCarrito.getCostoEnvio());
 		return carrito;
 	}
 

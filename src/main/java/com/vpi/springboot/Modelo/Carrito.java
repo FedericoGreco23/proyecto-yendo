@@ -15,6 +15,7 @@ public class Carrito {
 	@Id
 	private long id;
 	
+	private Integer costoEnvio;
 	@NotNull(message = "mail no puede ser nulo")
 	private String mail;
 	@NotNull(message = "mail del restaurante no puede ser nulo")
@@ -33,9 +34,10 @@ public class Carrito {
 	}
 
 
-	public Carrito(@NotNull(message = "mail no puede ser nulo") String mail,@NotNull(message = "mail del restaurante no puede ser nulo") String mailRestaurante,
+	public Carrito(Integer costoEnvio, @NotNull(message = "mail no puede ser nulo") String mail,@NotNull(message = "mail del restaurante no puede ser nulo") String mailRestaurante,
 			@NotNull(message = "valoracion no puede ser nulo") List<DTProductoCarrito> productoCarrito, boolean activo) {
 		super();
+		this.costoEnvio = costoEnvio;
 		this.mail = mail;
 		this.mailRestaurante = mailRestaurante;
 		this.productoCarrito = productoCarrito;
@@ -48,6 +50,16 @@ public class Carrito {
 	}
 	public void setId(long l) {
 		this.id = l;
+	}
+
+
+	public Integer getCostoEnvio() {
+		return costoEnvio;
+	}
+
+
+	public void setCostoEnvio(Integer costoEnvio) {
+		this.costoEnvio = costoEnvio;
 	}
 
 
