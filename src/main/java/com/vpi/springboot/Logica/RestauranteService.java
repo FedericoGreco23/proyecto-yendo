@@ -375,5 +375,18 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		}
 
 	}
+	
+	@Override
+	public DTRespuesta rechazarPedido(int idPedido) throws PedidoException{
+		Optional<Pedido> optionalPedido = pedidoRepo.findById(idPedido);
+		if (optionalPedido.isPresent()) {
+			Pedido pedido = optionalPedido.get();
+			pedido.setEstadoPedido(EnumEstadoPedido.RECHAZADO);
+			pedidoRepo.save(pedido);
+			return new DTRespuesta("Pedido " + idPedido + " rechazado.");
+		} else {
+			throw new PedidoException(PedidoException.NotFoundExceptionId(idPedido));
+		}
+	}
 
 }
