@@ -160,6 +160,21 @@ public class RestauranteController {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@PostMapping("/rechazarPedido")
+	ResponseEntity<?> rechazarPedido(@RequestParam int idPedido) {
+		if (!esRestaurante()) {
+			return new ResponseEntity<>(
+					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
+					HttpStatus.FORBIDDEN);
+		}
+
+		try {
+			return new ResponseEntity<>(service.rechazarPedido(idPedido), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 	@PostMapping("/modificarDescuento/{idProducto}")
 	ResponseEntity<?> modificarDescuento(@PathVariable int idProducto, @RequestParam int descuento) {
