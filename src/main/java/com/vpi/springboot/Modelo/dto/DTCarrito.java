@@ -13,13 +13,14 @@ public class DTCarrito implements Serializable {
 	private long id;
 	private List<DTProductoCarrito> dtProductoCarritoList= new ArrayList<DTProductoCarrito>();
 	private String mailRestaurante;
+	private Integer costoEnvio;
 
   
-	 public DTCarrito(long id,List<DTProductoCarrito> dtProductoCarritoList, String mailRestaurante) {
+	 public DTCarrito(long id,List<DTProductoCarrito> dtProductoCarritoList, String mailRestaurante, Integer costoEnvio) {
 	     this.id = id;   
 		 this.dtProductoCarritoList = dtProductoCarritoList;
 		 this.mailRestaurante = mailRestaurante;
-	        
+	     this.costoEnvio = costoEnvio;
 	    }
 	 
 	 public DTCarrito(List<DTProductoCarrito> dtProductoCarritoList) {
@@ -48,6 +49,14 @@ public class DTCarrito implements Serializable {
 
 	public void setMailRestaurante(String mailRestaurante) {
 		this.mailRestaurante = mailRestaurante;
+	}
+
+	public Integer getCostoEnvio() {
+		return costoEnvio;
+	}
+
+	public void setCostoEnvio(Integer costoEnvio) {
+		this.costoEnvio = costoEnvio;
 	}
 
 	@Override

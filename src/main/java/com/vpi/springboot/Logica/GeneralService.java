@@ -320,7 +320,9 @@ public class GeneralService implements GeneralServicioInterfaz {
 		response.put("totalItems", pageProducto.getTotalElements());
 
 		for (Producto p : productos) {
-			retorno.add(new DTProducto(p));
+			if(!(p.getClass()==Promocion.class)) {
+				retorno.add(new DTProducto(p));
+			}
 		}
 
 		response.put("productos", retorno);

@@ -30,6 +30,7 @@ import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTPedido;
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
+import com.vpi.springboot.Modelo.dto.DTProductoIdCantidad;
 import com.vpi.springboot.Modelo.dto.DTPromocionConPrecio;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
@@ -88,7 +89,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		Optional<Carrito> optionalCarrito = mongoRepo.findById(id);
 		if (optionalCarrito.isPresent()) {
 			Carrito carrito = optionalCarrito.get();
-			DTCarrito dt = new DTCarrito(carrito.getId(), carrito.getProductoCarrito(), carrito.getMailRestaurante());
+			DTCarrito dt = new DTCarrito(carrito.getId(), carrito.getProductoCarrito(), carrito.getMailRestaurante(),carrito.getCostoEnvio());
 			return dt;
 		}
 
@@ -358,11 +359,12 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 					promocion.getPrecio(), promocion.getFoto(), promocion.getDescuento(), true);
 			promocionNueva.setRestaurante(restaurante);
 
-			for (Entry<Integer, Integer> entry : promocion.getProductos().entrySet()) {
+			for (DTProductoIdCantidad entry : promocion.getProductos()) {
 
-				Producto prod = productoRepo.findByIdAndRest(entry.getKey(), mail);
 
-				for (int i = 0; i < entry.getValue(); i++) {
+				Producto prod = productoRepo.findByIdAndRest(entry.getId(), restaurante);
+
+				for (int i = 0; i < entry.getCantidad(); i++) {
 					List<Producto> prodList = promocionNueva.getProductos();
 					prodList.add(prod);
 					promocionNueva.setProductos(prodList);
@@ -371,9 +373,22 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			promoRepo.save(promocionNueva);
 
 		} catch (Exception e) {
-			throw new Exception();
+			throw new PromocionException(PromocionException.NotFoundException());
 		}
 
+	}
+	
+	@Override
+	public DTRespuesta rechazarPedido(int idPedido) throws PedidoException{
+		Optional<Pedido> optionalPedido = pedidoRepo.findById(idPedido);
+		if (optionalPedido.isPresent()) {
+			Pedido pedido = optionalPedido.get();
+			pedido.setEstadoPedido(EnumEstadoPedido.RECHAZADO);
+			pedidoRepo.save(pedido);
+			return new DTRespuesta("Pedido " + idPedido + " rechazado.");
+		} else {
+			throw new PedidoException(PedidoException.NotFoundExceptionId(idPedido));
+		}
 	}
 
 }

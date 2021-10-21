@@ -36,4 +36,6 @@ public interface RestauranteServicioInterfaz {
 	public DTRespuesta modificarPromocion(Promocion promo) throws PromocionException, ProductoException;
 	
 	public DTRespuesta bajaPromocion(int idPromo) throws PromocionException;
+	
+	public DTRespuesta rechazarPedido(int idPedido) throws PedidoException;
 }

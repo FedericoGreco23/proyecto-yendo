@@ -245,15 +245,23 @@ public class ClienteService implements ClienteServicioInterfaz {
 		Optional<Producto> optionalProducto = productoRepo.findById(producto);
 		if (optionalProducto.isPresent()) {
 			DTProducto dtProducto = new DTProducto(optionalProducto.get());
+			int descuento = dtProducto.getDescuento();
+			double precioInicial = dtProducto.getPrecio();
+			double precio = 0;
+			if( descuento > 0) {
+				precio =  precioInicial - ((precioInicial*descuento) / 100);
+				dtProducto.setPrecio(precio);
+			}
 			Carrito optionalCarrito = mongoRepo.findByMailAndActivo(mail, true);
 			DTProductoCarrito dtPC = new DTProductoCarrito(dtProducto, cantidad);
+			Restaurante restaurante = restauranteRepo.getById(mailRestaurante);
 			if (optionalCarrito != null) { // TIENE CARRITO ACTIVO
 				optionalCarrito.addProductoCarrito(dtPC);
 				mongoRepo.save(optionalCarrito);
 			} else { // TIENE CARRITO INACTIVO O NO TIENE
 				List<DTProductoCarrito> productos = new ArrayList<DTProductoCarrito>();
 				productos.add(dtPC);
-				Carrito carrito = new Carrito(mail, mailRestaurante, productos, true);
+				Carrito carrito = new Carrito(restaurante.getCostoDeEnvio(),mail, mailRestaurante, productos, true);
 				carrito.setId(nextSequence.getNextSequence("customSequences"));
 				mongoRepo.save(carrito);
 			}
@@ -266,7 +274,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 	@Override
 	public DTCarrito verCarrito(String mail) {
 		Carrito optionalCarrito = mongoRepo.findByMailAndActivo(mail, true);
-		DTCarrito carrito = new DTCarrito(optionalCarrito.getId(), optionalCarrito.getProductoCarrito(), optionalCarrito.getMailRestaurante());
+		DTCarrito carrito = new DTCarrito(optionalCarrito.getId(), optionalCarrito.getProductoCarrito(), optionalCarrito.getMailRestaurante(), optionalCarrito.getCostoEnvio());
 		return carrito;
 	}
 
@@ -295,16 +303,11 @@ public class ClienteService implements ClienteServicioInterfaz {
 				Restaurante restaurante = optionalRestaurante.get();
 				   Optional<Direccion> optionalDireccion = dirRepo.findById(idDireccion);
 				   if(optionalDireccion.isPresent()) {
-					   	String direccion = optionalDireccion.get().toString();
-						
+					   	String direccion = optionalDireccion.get().toString();				
 						EnumEstadoPedido estado =EnumEstadoPedido.PROCESADO;
 						double precioTotal = 0;
 						for (DTProductoCarrito DTpc : carrito.getProductoCarrito()) {
-							if(DTpc.getProducto().getDescuento() != 0) {
-								precioTotal = (precioTotal + ((DTpc.getProducto().getPrecio()) - ((DTpc.getProducto().getDescuento()/100) * DTpc.getProducto().getPrecio()))) * DTpc.getCantidad();
-							}else {
-								precioTotal = (precioTotal + DTpc.getProducto().getPrecio()) * DTpc.getCantidad() ;
-							}
+							precioTotal = precioTotal + (DTpc.getProducto().getPrecio()*DTpc.getCantidad());
 						}
 						Pedido pedido = new Pedido(LocalDateTime.now(),precioTotal,estado,pago, idCarrito, direccion, restaurante, cliente, comentario);
 						pedidoRepo.save(pedido);
