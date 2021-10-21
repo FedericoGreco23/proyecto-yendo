@@ -13,7 +13,7 @@ import com.vpi.springboot.exception.UsuarioException;
 public interface AdministradorServicioInterfaz {
 	public DTRespuesta crearAdministrador(Administrador admin) throws AdministradorException;
 
-	public DTRespuesta eliminarUsuario(String mail) throws UsuarioException;
+	public DTRespuesta eliminarUsuario(String mail, String clienteRestaurante) throws UsuarioException;
 
 	public DTRespuesta bloquearUsuario(String mail, String clienteRestaurante) throws UsuarioException;
 

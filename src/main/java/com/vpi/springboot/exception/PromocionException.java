@@ -19,4 +19,8 @@ public class PromocionException extends Exception {
 	public static String PromocionYaExiste(String nombre) {
 		return "Promocion " + nombre + " ya existe en el sistema.";
 	}
+
+	public static String NotFoundException() {
+		return "Error al obtener los productos de la pormocion";
+	}
 }

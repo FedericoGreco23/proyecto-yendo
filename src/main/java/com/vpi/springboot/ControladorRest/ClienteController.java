@@ -1,7 +1,6 @@
 package com.vpi.springboot.ControladorRest;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -11,13 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.vpi.springboot.Logica.ClienteService;
-import com.vpi.springboot.Logica.NextSequenceService;
-import com.vpi.springboot.Modelo.Carrito;
+import com.vpi.springboot.Modelo.dto.DTBuscarRestaurante;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
-import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
-import com.vpi.springboot.Modelo.dto.DTRestaurante;
 import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
 import com.vpi.springboot.exception.RestauranteException;
 import com.vpi.springboot.exception.UsuarioException;
@@ -177,4 +173,5 @@ public class ClienteController {
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
 }

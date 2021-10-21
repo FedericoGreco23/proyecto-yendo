@@ -27,6 +27,7 @@ import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.dto.AuthenticationRequest;
 import com.vpi.springboot.Modelo.dto.AuthenticationResponse;
+import com.vpi.springboot.Modelo.dto.DTBuscarRestaurante;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
@@ -150,27 +151,38 @@ public class PublicRest {
 	}
 
 	@GetMapping("getRestaurante")
-	public DTRestaurante getRestaurante(@RequestParam(defaultValue = "") String mail) {
+	public ResponseEntity<DTRestaurante> getRestaurante(@RequestParam(defaultValue = "") String mail) {
 		try {
-			return service.getRestaurante(mail);
+			DTRestaurante respuesta = service.getRestaurante(mail);
+			return new ResponseEntity<DTRestaurante>(respuesta, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<DTRestaurante>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@GetMapping("/buscarRestaurante")
+	public ResponseEntity<?> buscarRestaurante(@RequestParam(defaultValue = "") String texto, @RequestParam(defaultValue = "") String nombreCategoria) {
+		try {
+			List<DTBuscarRestaurante> respuesta = service.buscarRestaurante(texto, nombreCategoria);
+			return new ResponseEntity<>(respuesta, HttpStatus.OK);
 		} catch (RestauranteException e) {
 			e.printStackTrace();
-			return null;
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
-	@CrossOrigin(origins = "*", allowedHeaders = "*")
-	@GetMapping("/getProductos/{restaurante}")
-	public Map<String, Object> listarMenusRestaurante(@RequestParam(required = false) String attr,
-			@RequestParam(defaultValue = "1") int order, @RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "5") int size, @PathVariable(required = true) String restaurante) {
-		try {
-			return service.listarMenusRestaurante(attr, order, page, size, restaurante);
-		} catch (RestauranteException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
+//	@CrossOrigin(origins = "*", allowedHeaders = "*")
+//	@GetMapping("/getProductos/{restaurante}")
+//	public Map<String, Object> listarMenusRestaurante(@RequestParam(required = false) String attr,
+//			@RequestParam(defaultValue = "1") int order, @RequestParam(defaultValue = "0") int page,
+//			@RequestParam(defaultValue = "5") int size, @PathVariable(required = true) String restaurante) {
+//		try {
+//			return service.listarMenusRestaurante(attr, order, page, size, restaurante);
+//		} catch (RestauranteException e) {
+//			e.printStackTrace();
+//			return null;
+//		}
+//	}
 	
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@GetMapping("/getMenus/{restaurante}")
@@ -182,18 +194,17 @@ public class PublicRest {
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		
 	}
 
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@GetMapping("/getPromociones/{restaurante}")
-	public Map<String, Object> listarPromociones(@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "5") int size, @PathVariable(required = true) String restaurante) {
+	public ResponseEntity<?> listarPromociones(@PathVariable(required = true) String restaurante) {
 		try {
-			return service.listarPromocionesRestaurante(page, size, restaurante);
+			return new ResponseEntity<>(service.listarPromocionesRestaurante(restaurante), HttpStatus.OK);
 		} catch (RestauranteException e) {
-			e.printStackTrace();
-			return null;
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 }

@@ -65,14 +65,14 @@ public class AdministradorController {
 
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/eliminar")
-	public ResponseEntity<?> eliminarUsuario(@RequestParam String mail) {
+	public ResponseEntity<?> eliminarUsuario(@RequestParam String mail, @RequestParam String clienteRestaurante) {
 		if (!esAdmin()) {
 			return new ResponseEntity<>(
 					new UsuarioException(PermisosException.NoPermisosException("ADMIN")).getMessage(),
 					HttpStatus.FORBIDDEN);
 		}
 		try {
-			return new ResponseEntity<>(service.eliminarUsuario(mail), HttpStatus.OK);
+			return new ResponseEntity<>(service.eliminarUsuario(mail, clienteRestaurante), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}

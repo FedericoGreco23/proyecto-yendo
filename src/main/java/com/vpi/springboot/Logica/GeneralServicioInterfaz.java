@@ -5,8 +5,10 @@ import java.util.Map;
 
 import com.vpi.springboot.Modelo.Categoria;
 import com.vpi.springboot.Modelo.Producto;
+import com.vpi.springboot.Modelo.dto.DTBuscarRestaurante;
 import com.vpi.springboot.Modelo.dto.DTCategoriaProducto;
 import com.vpi.springboot.Modelo.dto.DTProducto;
+import com.vpi.springboot.Modelo.dto.DTPromocion;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
 import com.vpi.springboot.Modelo.dto.DTUsuario;
@@ -24,16 +26,18 @@ public interface GeneralServicioInterfaz {
 	
 	public DTRestaurante getRestaurante(String mail) throws RestauranteException;
 	
+	public List<DTBuscarRestaurante> buscarRestaurante(String nombre, String nombreCategoria) throws RestauranteException;
+	
 	public List<Categoria> listarCategorias();
 	
 	public Map<String, Object> listarRestaurantes(int page, int size, int horarioApertura) throws RestauranteException;
 
-	public Map<String, Object> listarMenusRestaurante(String attr, int order, int page, int size, String nombreRestaurante)
-			throws RestauranteException;
+//	public Map<String, Object> listarMenusRestaurante(String attr, int order, int page, int size, String nombreRestaurante)
+//			throws RestauranteException;
 	
 	public List<DTCategoriaProducto> listarMenus(String nombreRestaurante)
 			throws RestauranteException;
 
-	public Map<String, Object> listarPromocionesRestaurante(int page, int size, String nombreRestaurante)
+	public List<DTPromocion> listarPromocionesRestaurante(String nombreRestaurante)
 			throws RestauranteException;
 }

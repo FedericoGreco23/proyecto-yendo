@@ -361,7 +361,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 			for (DTProductoIdCantidad entry : promocion.getProductos()) {
 
-				Producto prod = productoRepo.findByIdAndRest(entry.getId(), mail);
+
+				Producto prod = productoRepo.findByIdAndRest(entry.getId(), restaurante);
 
 				for (int i = 0; i < entry.getCantidad(); i++) {
 					List<Producto> prodList = promocionNueva.getProductos();
@@ -372,7 +373,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			promoRepo.save(promocionNueva);
 
 		} catch (Exception e) {
-			throw new Exception();
+			throw new PromocionException(PromocionException.NotFoundException());
 		}
 
 	}
