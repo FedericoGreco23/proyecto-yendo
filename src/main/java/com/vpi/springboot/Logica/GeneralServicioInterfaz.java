@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.vpi.springboot.Modelo.Categoria;
 import com.vpi.springboot.Modelo.Producto;
+import com.vpi.springboot.Modelo.dto.DTBuscarRestaurante;
 import com.vpi.springboot.Modelo.dto.DTCategoriaProducto;
 import com.vpi.springboot.Modelo.dto.DTProducto;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
@@ -23,6 +24,8 @@ public interface GeneralServicioInterfaz {
 	public DTRespuesta activarCuenta(String mail, int tipoUsuario);
 	
 	public DTRestaurante getRestaurante(String mail) throws RestauranteException;
+	
+	public List<DTBuscarRestaurante> buscarRestaurante(String nombre, String nombreCategoria) throws RestauranteException;
 	
 	public List<Categoria> listarCategorias();
 	

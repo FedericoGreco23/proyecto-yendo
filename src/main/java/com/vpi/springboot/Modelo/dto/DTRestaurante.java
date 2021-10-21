@@ -139,7 +139,7 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 	public DTRestaurante(String mail, String foto, String nombre, String direccion, Float calificacionPromedio,
 			LocalTime horarioApertura, LocalTime horarioCierre, LocalTime tiempoEstimadoMinimo,
 			LocalTime tiempoEstimadoMaximo, Integer costoDeEnvio, GeoLocalizacion geoLocalizacion,
-			List<Producto> productos, String diasAbierto, Boolean abierto) {
+			String diasAbierto, Boolean abierto) {
 		super(mail, foto);
 		this.nombre = nombre;
 		this.direccion = direccion;
@@ -153,9 +153,9 @@ public class DTRestaurante extends DTUsuario implements Serializable {
 		this.diasAbierto = diasAbierto;
 		this.abierto = abierto;
 
-		for (Producto pro : productos) {
+		/*for (Producto pro : productos) {
 			this.productos.add(pro.getNombre());
-		}
+		}*/
 	}
 
 //----------------------GETTERS Y SETTERS---------------------------------------------------------

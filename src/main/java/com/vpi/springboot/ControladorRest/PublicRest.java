@@ -27,8 +27,10 @@ import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.dto.AuthenticationRequest;
 import com.vpi.springboot.Modelo.dto.AuthenticationResponse;
+import com.vpi.springboot.Modelo.dto.DTBuscarRestaurante;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
+import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.exception.RestauranteException;
 import com.vpi.springboot.security.MyUserDetailsService;
 import com.vpi.springboot.security.util.JwtUtil;
@@ -76,34 +78,39 @@ public class PublicRest {
 
 		if (!userDetails.getUser().getActivo()) {
 			throw new Exception("Este usuario se encuentra inactivo, comuniquese con un administrador");
-
 		} else if (userDetails.getUser().getBloqueado()) {
 			throw new Exception("Este usuario se encuentra bloqueado, comuniquese con un administrador");
+		} else if (userDetails.getUser().getClass() == Restaurante.class) {
+			Restaurante r = (Restaurante) userDetails.getUser();
+			if (r.getEstado().name().contains(EnumEstadoRestaurante.EN_ESPERA.name())) {
+
+				throw new Exception("Este restaurante se encuentra en espera de aprobación");
+			} else if (r.getEstado().name().contains(EnumEstadoRestaurante.RECHAZADO.name())) {
+
+				throw new Exception("Este restaurante fue rechazado");
+			}
 		}
 
 		final String jwt = jwtTokenUtil.generateToken(userDetails);
-
 		return ResponseEntity.ok(new AuthenticationResponse(jwt));
 	}
 
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@RequestMapping(value = "/crearCliente", method = RequestMethod.POST)
-	public ResponseEntity<DTRespuesta> altaCliente(@RequestBody Cliente usuario) {
+	public ResponseEntity<?> altaCliente(@RequestBody Cliente usuario) {
 		try {
-			clienteService.altaCliente(usuario);
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Cliente agregado con éxito"), HttpStatus.OK);
+			return new ResponseEntity<>(clienteService.altaCliente(usuario), HttpStatus.OK);
 		} catch (Exception e) {
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	@PostMapping("/crearRestaurante")
-	public ResponseEntity<DTRespuesta> crearRestaurante(@RequestBody Restaurante rest) {
+	public ResponseEntity<?> crearRestaurante(@RequestBody Restaurante rest) {
 		try {
-			restService.altaRestaurante(rest);
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Restaurante agregado con éxito"), HttpStatus.OK);
+			return new ResponseEntity<>(restService.altaRestaurante(rest), HttpStatus.OK);
 		} catch (Exception e) {
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -111,8 +118,7 @@ public class PublicRest {
 	@RequestMapping(value = "/recuperar", method = RequestMethod.POST)
 	public ResponseEntity<?> recuperarPassword(@RequestParam String mail) {
 		try {
-			service.recuperarPassword(mail);
-			return new ResponseEntity<String>(mail, HttpStatus.OK);
+			return new ResponseEntity<>(service.recuperarPassword(mail), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -122,15 +128,15 @@ public class PublicRest {
 	@RequestMapping(value = "/verificar", method = RequestMethod.POST)
 	public ResponseEntity<?> verificarMail(@RequestParam String mail) {
 		try {
-			service.verificarMail(mail);
-			return new ResponseEntity<String>("Verificación enviada.", HttpStatus.OK);
+			return new ResponseEntity<>(service.verificarMail(mail), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	@GetMapping("/listarRestaurantes")
-	public Map<String, Object> listarRestaurantesAbiertos(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "0") int horarioApertura) {
+	public Map<String, Object> listarRestaurantesAbiertos(@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "0") int horarioApertura) {
 		try {
 			return service.listarRestaurantes(page, size, horarioApertura);
 		} catch (RestauranteException e) {
@@ -153,6 +159,17 @@ public class PublicRest {
 			return new ResponseEntity<DTRestaurante>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@GetMapping("/buscarRestaurante")
+	public ResponseEntity<?> buscarRestaurante(@RequestParam(defaultValue = "") String texto, @RequestParam(defaultValue = "") String nombreCategoria) {
+		try {
+			List<DTBuscarRestaurante> respuesta = service.buscarRestaurante(texto, nombreCategoria);
+			return new ResponseEntity<>(respuesta, HttpStatus.OK);
+		} catch (RestauranteException e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@GetMapping("/getProductos/{restaurante}")
@@ -165,6 +182,19 @@ public class PublicRest {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
+	@GetMapping("/getMenus/{restaurante}")
+	public ResponseEntity<?> listarMenus(@PathVariable(required = true) String restaurante) {
+		try {
+			return new ResponseEntity<>(service.listarMenus(restaurante), HttpStatus.OK);
+		} catch (RestauranteException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
 	}
 
 	@CrossOrigin(origins = "*", allowedHeaders = "*")

@@ -1,5 +1,8 @@
 package com.vpi.springboot.Repositorios;
 
+import java.util.Collection;
+import java.util.List;
+
 import javax.transaction.Transactional;
 
 import org.springframework.data.domain.Page;
@@ -7,9 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-
-import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.Modelo.Restaurante;
+import com.vpi.springboot.Modelo.Categoria;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 
 @Transactional
@@ -41,4 +43,13 @@ public interface RestauranteRepositorio extends UserBaseRepository<Restaurante> 
 //	User findUserByStatusAndNameNamedParams(
 //	  @Param("status") Integer status, 
 //	  @Param("name") String name);
+	
+	@Query("SELECT r FROM Restaurante r WHERE UPPER(r.nombre) LIKE CONCAT('%',UPPER(:texto),'%') AND r.estado = :estado AND r.bloqueado = FALSE AND r.activo = TRUE")
+	List<Restaurante> buscarRestauranteDesdeClientePorNombre(@Param("texto") String texto, @Param("estado") EnumEstadoRestaurante estado);
+	
+	@Query("SELECT r FROM Restaurante r INNER JOIN r.categorias c WHERE UPPER(c.nombre) LIKE UPPER(:categoria) AND UPPER(r.nombre) LIKE CONCAT('%',UPPER(:texto),'%') AND r.estado = :estado AND r.bloqueado = FALSE AND r.activo = TRUE")
+	List<Restaurante> buscarRestauranteDesdeClientePorNombreYCategoria(@Param("texto") String texto, @Param("categoria") String categoria, @Param("estado") EnumEstadoRestaurante estado);
+	
+	@Query("SELECT r FROM Restaurante r INNER JOIN r.categorias c WHERE UPPER(c.nombre) LIKE UPPER(:categoria) AND r.estado = :estado AND r.bloqueado = FALSE AND r.activo = TRUE")
+	List<Restaurante> buscarRestauranteDesdeClientePorCategoria(@Param("categoria") String categoria, @Param("estado") EnumEstadoRestaurante estado);
 }

@@ -66,26 +66,38 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 	}
 
 	@Override
-	public DTRespuesta eliminarUsuario(String mail) throws UsuarioException {
-		Optional<Cliente> cliente = clienteRepo.findById(mail);
-		if (cliente.isPresent()) {
-			cliente.get().setActivo(false);
-			clienteRepo.save(cliente.get());
-			return new DTRespuesta("Cliente eliminado con éxito.");
-		} else
-			throw new UsuarioException(UsuarioException.NotFoundException(mail));
+	public DTRespuesta eliminarUsuario(String mail, String clienteRestaurante) throws UsuarioException {
+		if (clienteRestaurante.equalsIgnoreCase("Cliente")) {
+			Optional<Cliente> cliente = clienteRepo.findById(mail);
+			if (cliente.isPresent()) {
+				cliente.get().setActivo(false);
+				clienteRepo.save(cliente.get());
+				return new DTRespuesta("Cliente eliminado con éxito.");
+			} else {
+				throw new UsuarioException(UsuarioException.NotFoundException(mail));
+			}
+		} else if (clienteRestaurante.equalsIgnoreCase("Restaurante")) {
+			Optional<Restaurante> restaurante = resRepo.findById(mail);
+			if (restaurante.isPresent()) {
+				restaurante.get().setActivo(true);
+				resRepo.save(restaurante.get());
+			} else
+				throw new UsuarioException(UsuarioException.NotFoundException(mail));
+		}
+		
+		return new DTRespuesta("Usuario eliminado con éxito");
 	}
 
 	@Override
 	public DTRespuesta bloquearUsuario(String mail, String clienteRestaurante) throws UsuarioException {
-		if (clienteRestaurante.equals("Cliente")) {
+		if (clienteRestaurante.equalsIgnoreCase("Cliente")) {
 			Optional<Cliente> cliente = clienteRepo.findById(mail);
 			if (cliente.isPresent()) {
 				cliente.get().setBloqueado(true);
 				clienteRepo.save(cliente.get());
 			} else
 				throw new UsuarioException(UsuarioException.NotFoundException(mail));
-		} else if (clienteRestaurante.equals("Restaurante")) {
+		} else if (clienteRestaurante.equalsIgnoreCase("Restaurante")) {
 			Optional<Restaurante> restaurante = resRepo.findById(mail);
 			if (restaurante.isPresent()) {
 				restaurante.get().setBloqueado(true);
@@ -99,14 +111,14 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 
 	@Override
 	public DTRespuesta desbloquearUsuario(String mail, String clienteRestaurante) throws UsuarioException {
-		if (clienteRestaurante.equals("Cliente")) {
+		if (clienteRestaurante.equalsIgnoreCase("Cliente")) {
 			Optional<Cliente> cliente = clienteRepo.findById(mail);
 			if (cliente.isPresent()) {
 				cliente.get().setBloqueado(false);
 				clienteRepo.save(cliente.get());
 			} else
 				throw new UsuarioException(UsuarioException.NotFoundException(mail));
-		} else if (clienteRestaurante.equals("Restaurante")) {
+		} else if (clienteRestaurante.equalsIgnoreCase("Restaurante")) {
 			Optional<Restaurante> restaurante = resRepo.findById(mail);
 			if (restaurante.isPresent()) {
 				restaurante.get().setBloqueado(false);
