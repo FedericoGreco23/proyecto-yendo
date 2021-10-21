@@ -246,8 +246,17 @@ public class ClienteService implements ClienteServicioInterfaz {
 			Carrito optionalCarrito = mongoRepo.findByMailAndActivo(mail, true);
 			DTProductoCarrito dtPC = new DTProductoCarrito(dtProducto, cantidad);
 			Restaurante restaurante = restauranteRepo.getById(mailRestaurante);
+			Boolean existeProd = false;
 			if (optionalCarrito != null) { // TIENE CARRITO ACTIVO
-				optionalCarrito.addProductoCarrito(dtPC);
+				for (DTProductoCarrito dtp : optionalCarrito.getProductoCarrito()) {
+					if(dtp.getProducto().getId() == producto) {
+						existeProd = true;
+						dtp.setCantidad(cantidad + dtp.getCantidad());
+					}	
+				}
+				if(existeProd == false) {
+					optionalCarrito.addProductoCarrito(dtPC);
+				}
 				mongoRepo.save(optionalCarrito);
 			} else { // TIENE CARRITO INACTIVO O NO TIENE
 				List<DTProductoCarrito> productos = new ArrayList<DTProductoCarrito>();

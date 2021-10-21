@@ -32,6 +32,11 @@ public class DTProductoCarrito implements Serializable {
 	public void setProducto(DTProducto producto) {
 		this.producto = producto;
 	}
+	
+	
+	public void sumarCantidad(int cant) {
+		this.cantidad = cantidad + cant;
+	}
 
 	@Override
 	public String toString() {

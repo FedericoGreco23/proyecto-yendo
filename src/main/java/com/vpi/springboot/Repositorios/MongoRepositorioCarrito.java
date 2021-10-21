@@ -12,6 +12,7 @@ import com.vpi.springboot.Modelo.Carrito;
 		
 		@Query("{'mail': ?0, 'activo': ?1}")
 		Carrito findByMailAndActivo(String mail, boolean activo);
+	
 
 
 	}

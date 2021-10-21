@@ -91,6 +91,7 @@ public class Carrito {
 	} 
 
 
+
 	public boolean isActivo() {
 		return activo;
 	}
