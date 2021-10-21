@@ -30,6 +30,7 @@ import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTPedido;
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
+import com.vpi.springboot.Modelo.dto.DTProductoIdCantidad;
 import com.vpi.springboot.Modelo.dto.DTPromocionConPrecio;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
@@ -358,11 +359,11 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 					promocion.getPrecio(), promocion.getFoto(), promocion.getDescuento(), true);
 			promocionNueva.setRestaurante(restaurante);
 
-			for (Entry<Integer, Integer> entry : promocion.getProductos().entrySet()) {
+			for (DTProductoIdCantidad entry : promocion.getProductos()) {
 
-				Producto prod = productoRepo.findByIdAndRest(entry.getKey(), mail);
+				Producto prod = productoRepo.findByIdAndRest(entry.getId(), mail);
 
-				for (int i = 0; i < entry.getValue(); i++) {
+				for (int i = 0; i < entry.getCantidad(); i++) {
 					List<Producto> prodList = promocionNueva.getProductos();
 					prodList.add(prod);
 					promocionNueva.setProductos(prodList);
