@@ -384,16 +384,15 @@ public class ClienteService implements ClienteServicioInterfaz {
 	}
 	
 	@Override
-	public void eliminarProductoCarrito(int idProducto, String mail) {
+	public void eliminarProductoCarrito(int idProducto, int cantABorrar, String mail) {
 		Carrito optionalCarrito = mongoRepo.findByMailAndActivo(mail, true);
-	//	DTProducto productoBorrar = new DTProducto(productoRepo.getById(idProducto));
 		List<DTProductoCarrito> dtp = optionalCarrito.getProductoCarrito();
 		DTProductoCarrito dtpcBorrar = null;
 		for (DTProductoCarrito dt : dtp) {
-			if(dt.getProducto().getId() == idProducto) {
+			if(dt.getProducto().getId() == idProducto && dt.getCantidad() == cantABorrar) {
 				 dtpcBorrar = dt;
-			//	dtp.deleteProducto(productoBorrar);
-			//	
+			}else if(dt.getProducto().getId() == idProducto) {
+				dt.setCantidad(dt.getCantidad() - cantABorrar);
 			}
 		}
 		optionalCarrito.deleteDTProductoCarrito(dtpcBorrar);

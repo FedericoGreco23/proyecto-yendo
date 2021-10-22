@@ -39,7 +39,7 @@ public interface ClienteServicioInterfaz {
 
 	public DTRespuesta altaReclamo(int idPedido, String mailCliente, String comentario) throws ReclamoException;
 	
-	public void eliminarProductoCarrito(int idProducto, String mail);
+	public void eliminarProductoCarrito(int idProducto,int cantABorrar, String mail);
 	
 	public void eliminarCarrito(int idCarrito, String mail) throws CarritoException;
 

@@ -176,9 +176,9 @@ public class ClienteController {
 	}
 	
 	@PostMapping("/eliminarProductoCarrito")
-	public ResponseEntity<DTRespuesta> eliminarProductoCarrito(@RequestParam int idProducto){
+	public ResponseEntity<DTRespuesta> eliminarProductoCarrito(@RequestParam int idProducto, @RequestParam int cantABorrar){
 		try {
-			clienteService.eliminarProductoCarrito(idProducto, getMailFromJwt());
+			clienteService.eliminarProductoCarrito(idProducto, cantABorrar, getMailFromJwt());
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Producto eliminado con éxito")
 					, HttpStatus.OK);
 		} catch (Exception e) {
