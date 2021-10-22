@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,7 @@ import com.vpi.springboot.Modelo.dto.DTBuscarRestaurante;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
 import com.vpi.springboot.Modelo.dto.DTListarRestaurante;
+import com.vpi.springboot.Modelo.dto.DTPedido;
 import com.vpi.springboot.Modelo.dto.DTProducto;
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
@@ -209,7 +211,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 				// actualiza ultima direccion en mongo
 				setUltimaDireccionSeleccionada(dirNueva.getId(), mail);
 				return new DTRespuesta("Dirección modificada.");
-				
+
 			} else {
 				throw new UsuarioException("No existe direccion");
 			}
@@ -241,15 +243,16 @@ public class ClienteService implements ClienteServicioInterfaz {
 
 	@Override
 
-	public DTRespuesta agregarACarrito(int producto,int cantidad, String mail, String mailRestaurante) throws ProductoException {
+	public DTRespuesta agregarACarrito(int producto, int cantidad, String mail, String mailRestaurante)
+			throws ProductoException {
 		Optional<Producto> optionalProducto = productoRepo.findById(producto);
 		if (optionalProducto.isPresent()) {
 			DTProducto dtProducto = new DTProducto(optionalProducto.get());
 			int descuento = dtProducto.getDescuento();
 			double precioInicial = dtProducto.getPrecio();
 			double precio = 0;
-			if( descuento > 0) {
-				precio =  precioInicial - ((precioInicial*descuento) / 100);
+			if (descuento > 0) {
+				precio = precioInicial - ((precioInicial * descuento) / 100);
 				dtProducto.setPrecio(precio);
 			}
 			Carrito optionalCarrito = mongoRepo.findByMailAndActivo(mail, true);
@@ -258,19 +261,19 @@ public class ClienteService implements ClienteServicioInterfaz {
 			Boolean existeProd = false;
 			if (optionalCarrito != null) { // TIENE CARRITO ACTIVO
 				for (DTProductoCarrito dtp : optionalCarrito.getProductoCarrito()) {
-					if(dtp.getProducto().getId() == producto) {
+					if (dtp.getProducto().getId() == producto) {
 						existeProd = true;
 						dtp.setCantidad(cantidad + dtp.getCantidad());
-					}	
+					}
 				}
-				if(existeProd == false) {
+				if (existeProd == false) {
 					optionalCarrito.addProductoCarrito(dtPC);
 				}
 				mongoRepo.save(optionalCarrito);
 			} else { // TIENE CARRITO INACTIVO O NO TIENE
 				List<DTProductoCarrito> productos = new ArrayList<DTProductoCarrito>();
 				productos.add(dtPC);
-				Carrito carrito = new Carrito(restaurante.getCostoDeEnvio(),mail, mailRestaurante, productos, true);
+				Carrito carrito = new Carrito(restaurante.getCostoDeEnvio(), mail, mailRestaurante, productos, true);
 				carrito.setId(nextSequence.getNextSequence("customSequences"));
 				mongoRepo.save(carrito);
 			}
@@ -283,7 +286,8 @@ public class ClienteService implements ClienteServicioInterfaz {
 	@Override
 	public DTCarrito verCarrito(String mail) {
 		Carrito optionalCarrito = mongoRepo.findByMailAndActivo(mail, true);
-		DTCarrito carrito = new DTCarrito(optionalCarrito.getId(), optionalCarrito.getProductoCarrito(), optionalCarrito.getMailRestaurante(), optionalCarrito.getCostoEnvio());
+		DTCarrito carrito = new DTCarrito(optionalCarrito.getId(), optionalCarrito.getProductoCarrito(),
+				optionalCarrito.getMailRestaurante(), optionalCarrito.getCostoEnvio());
 		return carrito;
 	}
 
@@ -301,55 +305,58 @@ public class ClienteService implements ClienteServicioInterfaz {
 	}
 
 	@Override
-	public DTRespuesta altaPedido(int idCarrito, EnumMetodoDePago pago, int idDireccion, String mail, String comentario) throws RestauranteException, CarritoException, DireccionException{
+	public DTRespuesta altaPedido(int idCarrito, EnumMetodoDePago pago, int idDireccion, String mail, String comentario)
+			throws RestauranteException, CarritoException, DireccionException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mail);
 		Cliente cliente = optionalCliente.get();
 		Optional<Carrito> optionalCarrito = mongoRepo.findById(idCarrito);
 		Carrito carrito = optionalCarrito.get();
-		if(optionalCarrito.isPresent()) {
+		if (optionalCarrito.isPresent()) {
 			Optional<Restaurante> optionalRestaurante = restauranteRepo.findById(carrito.getMailRestaurante());
-			if(optionalRestaurante.isPresent()) {
+			if (optionalRestaurante.isPresent()) {
 				Restaurante restaurante = optionalRestaurante.get();
-				   Optional<Direccion> optionalDireccion = dirRepo.findById(idDireccion);
-				   if(optionalDireccion.isPresent()) {
-					   	String direccion = optionalDireccion.get().toString();				
-						EnumEstadoPedido estado =EnumEstadoPedido.PROCESADO;
-						double precioTotal = 0;
-						for (DTProductoCarrito DTpc : carrito.getProductoCarrito()) {
-							precioTotal = precioTotal + (DTpc.getProducto().getPrecio()*DTpc.getCantidad());
-						}
-						Pedido pedido = new Pedido(LocalDateTime.now(),precioTotal,estado,pago, idCarrito, direccion, restaurante, cliente, comentario);
-						pedidoRepo.save(pedido);
-						//AGREGAR PEDIDO AL RESTAURANTE
-						if (restaurante.getPedidos() == null) {
-							List<Pedido> pedidos = new ArrayList<Pedido>();
-							pedidos.add(pedido);
-							restaurante.setPedidos(pedidos);
-						} else {
-							restaurante.addPedido(pedido);
-						}
-						restauranteRepo.save(restaurante);
-						//AGREGAR PEDIDO AL CLIENTE
-						if (cliente.getPedidos() == null) {
-							List<Pedido> pedidosCliente = new ArrayList<Pedido>();
-							pedidosCliente.add(pedido);
-							cliente.setPedidos(pedidosCliente);
-						} else {
-							cliente.addPedido(pedido);
-						}
-						userRepo.save(cliente);
-						carrito.setActivo(false);
-						mongoRepo.save(carrito);
-						return new DTRespuesta("Pedido agregado correctamente.");
-				   }else {
-					   throw new DireccionException(DireccionException.NotFoundExceptionId(idDireccion));
-				   }
-				}else {
-					throw new RestauranteException(RestauranteException.NotFoundExceptionMail(carrito.getMailRestaurante()));
+				Optional<Direccion> optionalDireccion = dirRepo.findById(idDireccion);
+				if (optionalDireccion.isPresent()) {
+					String direccion = optionalDireccion.get().toString();
+					EnumEstadoPedido estado = EnumEstadoPedido.PROCESADO;
+					double precioTotal = 0;
+					for (DTProductoCarrito DTpc : carrito.getProductoCarrito()) {
+						precioTotal = precioTotal + (DTpc.getProducto().getPrecio() * DTpc.getCantidad());
+					}
+					Pedido pedido = new Pedido(LocalDateTime.now(), precioTotal, estado, pago, idCarrito, direccion,
+							restaurante, cliente, comentario);
+					pedidoRepo.save(pedido);
+					// AGREGAR PEDIDO AL RESTAURANTE
+					if (restaurante.getPedidos() == null) {
+						List<Pedido> pedidos = new ArrayList<Pedido>();
+						pedidos.add(pedido);
+						restaurante.setPedidos(pedidos);
+					} else {
+						restaurante.addPedido(pedido);
+					}
+					restauranteRepo.save(restaurante);
+					// AGREGAR PEDIDO AL CLIENTE
+					if (cliente.getPedidos() == null) {
+						List<Pedido> pedidosCliente = new ArrayList<Pedido>();
+						pedidosCliente.add(pedido);
+						cliente.setPedidos(pedidosCliente);
+					} else {
+						cliente.addPedido(pedido);
+					}
+					userRepo.save(cliente);
+					carrito.setActivo(false);
+					mongoRepo.save(carrito);
+					return new DTRespuesta("Pedido agregado correctamente.");
+				} else {
+					throw new DireccionException(DireccionException.NotFoundExceptionId(idDireccion));
 				}
-		}else {
+			} else {
+				throw new RestauranteException(
+						RestauranteException.NotFoundExceptionMail(carrito.getMailRestaurante()));
+			}
+		} else {
 			throw new CarritoException(CarritoException.NotFoundExceptionId(idCarrito));
-			
+
 		}
 	}
 
@@ -359,13 +366,13 @@ public class ClienteService implements ClienteServicioInterfaz {
 		Optional<Pedido> pedidoOptional = pedidoRepo.findById(idPedido);
 		LocalDateTime now = LocalDateTime.now();
 		if (pedidoOptional.isPresent()) {
-			
+
 			Pedido pedido = pedidoOptional.get();
-			
+
 			if (pedido.getFecha().plusHours(24).isBefore(now)) {
 
 				throw new ReclamoException(ReclamoException.TooOldPedido(idPedido));
-			}else if(!pedido.getCliente().getMail().contains(mailCliente)){
+			} else if (!pedido.getCliente().getMail().contains(mailCliente)) {
 
 				throw new ReclamoException(ReclamoException.UserPedidoException(idPedido, mailCliente));
 			}
@@ -377,21 +384,22 @@ public class ClienteService implements ClienteServicioInterfaz {
 			reclamos.add(new Reclamo(comentario, now, EnumEstadoReclamo.ENVIADO, ""));
 			pedido.setReclamos(reclamos);
 			pedidoRepo.save(pedido);
-			return new DTRespuesta("Reclamo ingresado con éxito. Le llegará un mail con la resulución. Disculpe las molestias.");
+			return new DTRespuesta(
+					"Reclamo ingresado con éxito. Le llegará un mail con la resulución. Disculpe las molestias.");
 		} else {
 			throw new ReclamoException(ReclamoException.PedidoNotFound(idPedido));
 		}
 	}
-	
+
 	@Override
 	public void eliminarProductoCarrito(int idProducto, int cantABorrar, String mail) {
 		Carrito optionalCarrito = mongoRepo.findByMailAndActivo(mail, true);
 		List<DTProductoCarrito> dtp = optionalCarrito.getProductoCarrito();
 		DTProductoCarrito dtpcBorrar = null;
 		for (DTProductoCarrito dt : dtp) {
-			if(dt.getProducto().getId() == idProducto && dt.getCantidad() == cantABorrar) {
-				 dtpcBorrar = dt;
-			}else if(dt.getProducto().getId() == idProducto) {
+			if (dt.getProducto().getId() == idProducto && dt.getCantidad() == cantABorrar) {
+				dtpcBorrar = dt;
+			} else if (dt.getProducto().getId() == idProducto) {
 				dt.setCantidad(dt.getCantidad() - cantABorrar);
 			}
 		}
@@ -402,14 +410,50 @@ public class ClienteService implements ClienteServicioInterfaz {
 			mongoRepo.save(optionalCarrito);
 		
 	}
-	
-	
+
 	public void eliminarCarrito(int idCarrito, String mail) throws CarritoException {
 		Carrito optionalCarrito = mongoRepo.findByMailAndActivo(mail, true);
-		if(optionalCarrito != null) {
+		if (optionalCarrito != null) {
 			mongoRepo.delete(optionalCarrito);
-		}else {
+		} else {
 			throw new CarritoException(CarritoException.NotFoundExceptionId(idCarrito));
 		}
+	}
+
+	public Map<String, Object> listarPedidos(int size, int page, String sort, int order, String mailUsuario)
+			throws UsuarioException {
+		Optional<Cliente> optionalCliente = userRepo.findById(mailUsuario);
+		if (!optionalCliente.isPresent())
+			throw new UsuarioException(UsuarioException.NotFoundException(mailUsuario));
+
+		Cliente cliente = optionalCliente.get();
+		
+		Sort sorting;
+		Pageable paging;
+		// En caso de no haber argumentos para el sort
+		if(sort == "" || sort == null) {
+			paging = PageRequest.of(page, size);
+		} else {
+			if (order == 1)
+				sorting = Sort.by(Sort.Direction.DESC, sort);
+			else
+				sorting = Sort.by(Sort.Direction.ASC, sort);
+			paging = PageRequest.of(page, size, sorting);
+		}
+		
+		Map<String, Object> response = new HashMap<>();
+		Page<Pedido> pagePedido = pedidoRepo.findAllByCliente(cliente, paging);
+		List<Pedido> pedidos = pagePedido.getContent();
+		List<DTPedido> retorno = new ArrayList<>();
+		
+		for(Pedido p: pedidos) {
+			retorno.add(new DTPedido(p));
+		}
+		
+		response.put("currentPage", pagePedido.getNumber());
+		response.put("totalItems", pagePedido.getTotalElements());
+		response.put("pedidos", retorno);
+		
+		return response;
 	}
 }

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Pedido;
 import com.vpi.springboot.Modelo.Restaurante;
 
@@ -17,4 +18,7 @@ import com.vpi.springboot.Modelo.Restaurante;
 public interface PedidoRepositorio extends JpaRepository<Pedido, Integer>{
 	@Query("SELECT u FROM Pedido u WHERE u.restaurante = :restaurante")
 	Page<Pedido> findAllByRestaurante(@Param("restaurante") Restaurante restaurante, Pageable pageable);
+	
+	@Query("SELECT u FROM Pedido u WHERE u.cliente = :cliente")
+	Page<Pedido> findAllByCliente(@Param("cliente") Cliente restaurante, Pageable pageable);
 }
