@@ -396,7 +396,11 @@ public class ClienteService implements ClienteServicioInterfaz {
 			}
 		}
 		optionalCarrito.deleteDTProductoCarrito(dtpcBorrar);
-		mongoRepo.save(optionalCarrito);
+		if(optionalCarrito.getProductoCarrito().isEmpty()) {
+			mongoRepo.delete(optionalCarrito);
+		}else
+			mongoRepo.save(optionalCarrito);
+		
 	}
 	
 	
