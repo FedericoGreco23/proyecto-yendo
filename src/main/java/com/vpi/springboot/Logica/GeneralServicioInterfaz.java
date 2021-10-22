@@ -30,7 +30,7 @@ public interface GeneralServicioInterfaz {
 	
 	public List<Categoria> listarCategorias();
 	
-	public Map<String, Object> listarRestaurantes(int page, int size, int horarioApertura) throws RestauranteException;
+	public Map<String, Object> listarRestaurantes(int page, int size, int horarioApertura, String nombre) throws RestauranteException;
 
 //	public Map<String, Object> listarMenusRestaurante(String attr, int order, int page, int size, String nombreRestaurante)
 //			throws RestauranteException;
