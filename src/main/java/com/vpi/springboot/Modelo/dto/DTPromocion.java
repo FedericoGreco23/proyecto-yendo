@@ -25,9 +25,12 @@ public class DTPromocion extends DTProducto implements Serializable {
 		
 		Map<String, Integer> duplicateMap = new HashMap<>();
 		for (Producto p : promocion.getProductos()) {
-			if(!this.productos.contains(p.getNombre()))
+			int index;
+			if(!this.productos.contains(p.getNombre())) {
 				this.productos.add(p.getNombre());
+			}
 			else {
+				index = this.productos.indexOf(p.getNombre());
 				if(duplicateMap.containsKey(p.getNombre())) {
 					duplicateMap.put(p.getNombre(), duplicateMap.get(p.getNombre()) + 1);
 				} else {
@@ -35,7 +38,7 @@ public class DTPromocion extends DTProducto implements Serializable {
 				}
 				
 				String nombreProducto = p.getNombre() + " x" + duplicateMap.get(p.getNombre());
-				this.productos.remove(p.getNombre());
+				this.productos.remove(index);
 				this.productos.add(nombreProducto);
 			}
 		}
