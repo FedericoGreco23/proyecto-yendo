@@ -33,17 +33,22 @@ public class DTPromocion extends DTProducto implements Serializable {
 			}
 
 			String nombreProducto;
-			if (items.get(p.getNombre()) == 1)
+			String nombreAnterior = "";
+			if (items.get(p.getNombre()) == 1) {
 				nombreProducto = p.getNombre();
-			else
-				nombreProducto = p.getNombre() + " x" + items.get(p.getNombre());
-			String nombreAnterior = p.getNombre() + " x" + (items.get(p.getNombre()) - 1);
+			} else if (items.get(p.getNombre()) == 2){
+				nombreAnterior = p.getNombre() + " x" + items.get(p.getNombre());
+				nombreProducto = p.getNombre();
+			} else {
+				nombreAnterior = p.getNombre() + " x" + items.get(p.getNombre());
+				nombreProducto = p.getNombre() + " x" + (items.get(p.getNombre()) - 1);
+			}
 
 			if (!this.productos.contains(nombreProducto)) {
 				this.productos.add(nombreProducto);
-			} else if (this.productos.contains(nombreAnterior)) {
-				this.productos.remove(nombreAnterior);
-				this.productos.add(nombreProducto);
+			} else {
+				this.productos.remove(nombreProducto);
+				this.productos.add(nombreAnterior);
 			}
 		}
 	}
