@@ -38,6 +38,10 @@ public interface ClienteServicioInterfaz {
 			throws RestauranteException, CarritoException, DireccionException;
 
 	public DTRespuesta altaReclamo(int idPedido, String mailCliente, String comentario) throws ReclamoException;
+	
+	public void eliminarProductoCarrito(int idProducto, String mail);
+	
+	public void eliminarCarrito(int idCarrito, String mail) throws CarritoException;
 
 	
 }

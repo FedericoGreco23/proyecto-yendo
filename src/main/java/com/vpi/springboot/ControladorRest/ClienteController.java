@@ -15,6 +15,7 @@ import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
+import com.vpi.springboot.exception.CarritoException;
 import com.vpi.springboot.exception.RestauranteException;
 import com.vpi.springboot.exception.UsuarioException;
 import com.vpi.springboot.security.util.JwtUtil;
@@ -169,6 +170,28 @@ public class ClienteController {
 		try {
 			return new ResponseEntity<DTRespuesta>(
 					clienteService.altaReclamo(idPedidoReclamado, getMailFromJwt(), Comentario), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@PostMapping("/eliminarProductoCarrito")
+	public ResponseEntity<DTRespuesta> eliminarProductoCarrito(@RequestParam int idProducto){
+		try {
+			clienteService.eliminarProductoCarrito(idProducto, getMailFromJwt());
+			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Producto eliminado con éxito")
+					, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@PostMapping("/eliminarCarrito")
+	public ResponseEntity<DTRespuesta> eliminarCarrito(@RequestParam int idCarrito) {
+		try {
+			clienteService.eliminarCarrito(idCarrito, getMailFromJwt());
+			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Carrito eliminado con éxito")
+					, HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}

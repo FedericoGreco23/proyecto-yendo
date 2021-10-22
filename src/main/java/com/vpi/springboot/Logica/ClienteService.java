@@ -382,4 +382,31 @@ public class ClienteService implements ClienteServicioInterfaz {
 			throw new ReclamoException(ReclamoException.PedidoNotFound(idPedido));
 		}
 	}
+	
+	@Override
+	public void eliminarProductoCarrito(int idProducto, String mail) {
+		Carrito optionalCarrito = mongoRepo.findByMailAndActivo(mail, true);
+	//	DTProducto productoBorrar = new DTProducto(productoRepo.getById(idProducto));
+		List<DTProductoCarrito> dtp = optionalCarrito.getProductoCarrito();
+		DTProductoCarrito dtpcBorrar = null;
+		for (DTProductoCarrito dt : dtp) {
+			if(dt.getProducto().getId() == idProducto) {
+				 dtpcBorrar = dt;
+			//	dtp.deleteProducto(productoBorrar);
+			//	
+			}
+		}
+		optionalCarrito.deleteDTProductoCarrito(dtpcBorrar);
+		mongoRepo.save(optionalCarrito);
+	}
+	
+	
+	public void eliminarCarrito(int idCarrito, String mail) throws CarritoException {
+		Carrito optionalCarrito = mongoRepo.findByMailAndActivo(mail, true);
+		if(optionalCarrito != null) {
+			mongoRepo.delete(optionalCarrito);
+		}else {
+			throw new CarritoException(CarritoException.NotFoundExceptionId(idCarrito));
+		}
+	}
 }

@@ -96,6 +96,9 @@ public class Carrito {
 		return activo;
 	}
 
+	public void deleteDTProductoCarrito(DTProductoCarrito dtp) {
+		this.productoCarrito.remove(dtp);
+	}
 
 	public void setActivo(boolean activo) {
 		this.activo = activo;
