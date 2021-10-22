@@ -15,6 +15,7 @@ public class DTUsuario implements Serializable {
 	private Boolean activo;
 	private String tipoUsuario;
 	protected LocalDate fechaCreacion;
+	private Float calificacionPromedio;
 
 	public DTUsuario() {
 		super();
@@ -60,6 +61,18 @@ public class DTUsuario implements Serializable {
 		this.activo = user.getActivo();
 		this.tipoUsuario = tipoUsuario;
 		this.fechaCreacion = user.getFechaCreacion();
+	}
+	
+	public DTUsuario(Usuario user, String tipoUsuario, Float calificacionPromedio) {
+		super();
+		this.mail = user.getMail();
+		this.telefono = user.getTelefono();
+		this.foto = user.getFoto();
+		this.bloqueado = user.getBloqueado();
+		this.activo = user.getActivo();
+		this.tipoUsuario = tipoUsuario;
+		this.fechaCreacion = user.getFechaCreacion();
+		this.calificacionPromedio = calificacionPromedio;
 	}
 	
 	public DTUsuario(String mail, String foto, LocalDate fechaCreacion) {
@@ -151,5 +164,13 @@ public class DTUsuario implements Serializable {
 
 	public void setFechaCreacion(LocalDate fechaCreacion) {
 		this.fechaCreacion = fechaCreacion;
+	}
+
+	public Float getCalificacionPromedio() {
+		return calificacionPromedio;
+	}
+
+	public void setCalificacionPromedio(Float calificacionPromedio) {
+		this.calificacionPromedio = calificacionPromedio;
 	}
 }

@@ -2,7 +2,9 @@ package com.vpi.springboot.Modelo.dto;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.Modelo.Promocion;
@@ -21,8 +23,24 @@ public class DTPromocion extends DTProducto implements Serializable {
 		super(promocion.getId(), promocion.getNombre(), promocion.getDescripcion(), promocion.getPrecio(),
 				promocion.getFoto(), promocion.getDescuento(), promocion.isActivo(), promocion.getRestaurante().getNombre());
 		
+		Map<String, Integer> duplicateMap = new HashMap<>();
 		for (Producto p : promocion.getProductos()) {
-			this.productos.add(p.getNombre());
+			int index;
+			if(!this.productos.contains(p.getNombre())) {
+				this.productos.add(p.getNombre());
+			}
+			else {
+				index = this.productos.indexOf(p.getNombre());
+				if(duplicateMap.containsKey(p.getNombre())) {
+					duplicateMap.put(p.getNombre(), duplicateMap.get(p.getNombre()) + 1);
+				} else {
+					duplicateMap.put(p.getNombre(), 2);
+				}
+				
+				String nombreProducto = p.getNombre() + " x" + duplicateMap.get(p.getNombre());
+				this.productos.remove(index);
+				this.productos.add(nombreProducto);
+			}
 		}
 	}
 

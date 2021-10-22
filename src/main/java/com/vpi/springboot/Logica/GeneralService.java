@@ -253,26 +253,31 @@ public class GeneralService implements GeneralServicioInterfaz {
 		if (restaurantes != null) {
 			for (Restaurante restaurante : restaurantes) {
 				DTBuscarRestaurantes.add(new DTBuscarRestaurante(restaurante.getNombre(), restaurante.getFoto(),
-						restaurante.getDireccion()));
+						restaurante.getDireccion(), restaurante.getMail()));
 			}
 		}
 		return DTBuscarRestaurantes;
 	}
 
 	@Override
-	public Map<String, Object> listarRestaurantes(int page, int size, int horarioApertura) throws RestauranteException {
+	public Map<String, Object> listarRestaurantes(int page, int size, int horarioApertura, String nombre) throws RestauranteException {
 		Map<String, Object> response = new HashMap<>();
 		List<DTListarRestaurante> DTListarRestaurantes = new ArrayList<DTListarRestaurante>();
 		// List<DTRestaurante> DTRestaurantes = new ArrayList<DTRestaurante>();
 		List<Restaurante> restaurantes = new ArrayList<Restaurante>();
-		Pageable paging = PageRequest.of(page, size);
+		
+		Sort sort = Sort.by(Sort.Order.desc("calificacionPromedio"), Sort.Order.asc("nombre"));
+		Pageable paging = PageRequest.of(page, size, sort);
 		Page<Restaurante> pageRestaurante;
 
-		// pageRestaurante = resRepo.findByEstado(EnumEstadoRestaurante.ACEPTADO,
-		// paging);
 		// Devuelve los restaurantes aceptados no bloqueados y activos
-		pageRestaurante = resRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivos(EnumEstadoRestaurante.ACEPTADO,
-				paging);
+		if (!nombre.equalsIgnoreCase("")) {
+			//Aplico nombre
+			pageRestaurante = resRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivosPorNombre(nombre, EnumEstadoRestaurante.ACEPTADO, paging);
+		} else {
+			pageRestaurante = resRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivos(EnumEstadoRestaurante.ACEPTADO, paging);
+		}
+		
 
 		restaurantes = pageRestaurante.getContent();
 		// Si el horarioApertura en el filtro es menor o igual que el horarioApertura

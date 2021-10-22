@@ -39,7 +39,11 @@ public interface RestauranteRepositorio extends UserBaseRepository<Restaurante> 
 	
 	@Query("SELECT u FROM Restaurante u WHERE u.estado = :estado AND u.bloqueado = FALSE AND u.activo = TRUE")
 	Page<Restaurante> buscarRestaurantesPorEstadoNoBloqueadosYActivos(@Param("estado") EnumEstadoRestaurante estado, Pageable pageable);
-//	@Query("SELECT u FROM User u WHERE u.status = :status and u.name = :name")
+
+	@Query("SELECT u FROM Restaurante u WHERE UPPER(u.nombre) LIKE CONCAT('%',UPPER(:nombre),'%') AND u.estado = :estado AND u.bloqueado = FALSE AND u.activo = TRUE")
+	Page<Restaurante> buscarRestaurantesPorEstadoNoBloqueadosYActivosPorNombre(@Param("nombre") String nombre, @Param("estado") EnumEstadoRestaurante estado, Pageable pageable);
+	
+	//	@Query("SELECT u FROM User u WHERE u.status = :status and u.name = :name")
 //	User findUserByStatusAndNameNamedParams(
 //	  @Param("status") Integer status, 
 //	  @Param("name") String name);

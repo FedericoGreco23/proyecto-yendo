@@ -9,17 +9,19 @@ public class DTBuscarRestaurante implements Serializable {
 	private String nombre;
 	private String foto;
 	private String direccion;
+	private String mail;
 	
 	
 	public DTBuscarRestaurante() {
 		// TODO Auto-generated constructor stub
 	}
 
-	public DTBuscarRestaurante(String nombre, String foto, String direccion) {
+	public DTBuscarRestaurante(String nombre, String foto, String direccion, String mail) {
 		super();
 		this.nombre = nombre;
 		this.foto = foto;
 		this.direccion = direccion;
+		this.mail = mail;
 	}
 
 	
@@ -48,6 +50,14 @@ public class DTBuscarRestaurante implements Serializable {
 
 	public void setDireccion(String direccion) {
 		this.direccion = direccion;
+	}
+
+	public String getMail() {
+		return mail;
+	}
+
+	public void setMail(String mail) {
+		this.mail = mail;
 	}
 	
 }
