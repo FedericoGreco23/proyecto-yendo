@@ -174,27 +174,36 @@ public class ClienteController {
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@PostMapping("/eliminarProductoCarrito")
-	public ResponseEntity<DTRespuesta> eliminarProductoCarrito(@RequestParam int idProducto, @RequestParam int cantABorrar){
+	public ResponseEntity<DTRespuesta> eliminarProductoCarrito(@RequestParam int idProducto,
+			@RequestParam int cantABorrar) {
 		try {
 			clienteService.eliminarProductoCarrito(idProducto, cantABorrar, getMailFromJwt());
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Producto eliminado con éxito")
-					, HttpStatus.OK);
+			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Producto eliminado con éxito"), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@PostMapping("/eliminarCarrito")
 	public ResponseEntity<DTRespuesta> eliminarCarrito(@RequestParam int idCarrito) {
 		try {
 			clienteService.eliminarCarrito(idCarrito, getMailFromJwt());
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Carrito eliminado con éxito")
-					, HttpStatus.OK);
+			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Carrito eliminado con éxito"), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
+	@GetMapping("/getPedidos")
+	public ResponseEntity<?> listarPedidos(@RequestParam(defaultValue = "5") int size,
+			@RequestParam(defaultValue = "0") int page, @RequestParam(required = false) String sort,
+			@RequestParam(defaultValue = "1") int order) {
+		try {
+			return new ResponseEntity<>(clienteService.listarPedidos(size, page, sort, order, getMailFromJwt()), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }
