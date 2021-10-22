@@ -21,24 +21,28 @@ public class DTPromocion extends DTProducto implements Serializable {
 
 	public DTPromocion(Promocion promocion) {
 		super(promocion.getId(), promocion.getNombre(), promocion.getDescripcion(), promocion.getPrecio(),
-				promocion.getFoto(), promocion.getDescuento(), promocion.isActivo(), promocion.getRestaurante().getNombre());
-		
-		Map<String, Integer> duplicateMap = new HashMap<>();
+				promocion.getFoto(), promocion.getDescuento(), promocion.isActivo(),
+				promocion.getRestaurante().getNombre());
+
+		Map<String, Integer> items = new HashMap<>();
 		for (Producto p : promocion.getProductos()) {
-			int index;
-			if(!this.productos.contains(p.getNombre())) {
-				this.productos.add(p.getNombre());
+			if (items.containsKey(p.getNombre())) {
+				items.put(p.getNombre(), items.get(p.getNombre()) + 1);
+			} else {
+				items.put(p.getNombre(), 1);
 			}
-			else {
-				index = this.productos.indexOf(p.getNombre());
-				if(duplicateMap.containsKey(p.getNombre())) {
-					duplicateMap.put(p.getNombre(), duplicateMap.get(p.getNombre()) + 1);
-				} else {
-					duplicateMap.put(p.getNombre(), 2);
-				}
-				
-				String nombreProducto = p.getNombre() + " x" + duplicateMap.get(p.getNombre());
-				this.productos.remove(index);
+
+			String nombreProducto;
+			if (items.get(p.getNombre()) == 1)
+				nombreProducto = p.getNombre();
+			else
+				nombreProducto = p.getNombre() + " x" + items.get(p.getNombre());
+			String nombreAnterior = p.getNombre() + " x" + (items.get(p.getNombre()) - 1);
+
+			if (!this.productos.contains(nombreProducto)) {
+				this.productos.add(nombreProducto);
+			} else if (this.productos.contains(nombreAnterior)) {
+				this.productos.remove(nombreAnterior);
 				this.productos.add(nombreProducto);
 			}
 		}
