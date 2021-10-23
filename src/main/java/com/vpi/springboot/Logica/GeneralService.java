@@ -260,14 +260,25 @@ public class GeneralService implements GeneralServicioInterfaz {
 	}
 
 	@Override
-	public Map<String, Object> listarRestaurantes(int page, int size, int horarioApertura, String nombre) throws RestauranteException {
+	public Map<String, Object> listarRestaurantes(int page, int size, int horarioApertura, String nombre, String sort, int order) throws RestauranteException {
 		Map<String, Object> response = new HashMap<>();
 		List<DTListarRestaurante> DTListarRestaurantes = new ArrayList<DTListarRestaurante>();
-		// List<DTRestaurante> DTRestaurantes = new ArrayList<DTRestaurante>();
 		List<Restaurante> restaurantes = new ArrayList<Restaurante>();
+
+		Sort sorting;
+		Pageable paging;
 		
-		Sort sort = Sort.by(Sort.Order.desc("calificacionPromedio"), Sort.Order.asc("nombre"));
-		Pageable paging = PageRequest.of(page, size, sort);
+		if (!sort.equalsIgnoreCase("")) {
+			if (order == 1) {
+				sorting = Sort.by(Sort.Order.desc(sort));
+			} else {
+				sorting = Sort.by(Sort.Order.asc(sort));
+			}
+			paging = PageRequest.of(page, size, sorting);
+		} else {
+			paging = PageRequest.of(page, size);
+		}
+		
 		Page<Restaurante> pageRestaurante;
 
 		// Devuelve los restaurantes aceptados no bloqueados y activos

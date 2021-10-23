@@ -55,6 +55,7 @@ import com.vpi.springboot.exception.DireccionException;
 import com.vpi.springboot.exception.ProductoException;
 import com.vpi.springboot.exception.ReclamoException;
 import com.vpi.springboot.exception.RestauranteException;
+import com.vpi.springboot.exception.PedidoException;
 import com.vpi.springboot.Repositorios.mongo.UltimaDireccionRepositorio;
 
 import com.vpi.springboot.exception.UsuarioException;
@@ -456,5 +457,27 @@ public class ClienteService implements ClienteServicioInterfaz {
 		response.put("pedidos", retorno);
 		
 		return response;
+	}
+	
+	@Override
+	public DTPedido buscarPedidoRealizado(int numeroPedido, String mail) throws PedidoException, UsuarioException {
+		Optional<Cliente> optionalCliente = userRepo.findById(mail);
+		DTPedido DTpedido = null;
+		if (!optionalCliente.isPresent()) {
+			throw new UsuarioException(UsuarioException.NotFoundException(mail));
+		}
+		
+		if (numeroPedido > 0) {
+			Pedido pedido = pedidoRepo.buscarPedidoRealizadoPorNumero(numeroPedido);
+			if (pedido == null) {
+				throw new PedidoException(PedidoException.NotFoundExceptionId(numeroPedido));
+			} else {
+				DTpedido = new DTPedido(pedido);
+			}
+		} else {
+			throw new PedidoException(PedidoException.NotValidId());
+		}
+
+		return DTpedido;
 	}
 }

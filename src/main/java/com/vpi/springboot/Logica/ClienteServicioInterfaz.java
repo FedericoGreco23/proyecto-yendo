@@ -1,5 +1,6 @@
 package com.vpi.springboot.Logica;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
 import com.vpi.springboot.exception.CarritoException;
 import com.vpi.springboot.exception.DireccionException;
+import com.vpi.springboot.exception.PedidoException;
 import com.vpi.springboot.exception.ProductoException;
 import com.vpi.springboot.exception.ReclamoException;
 import com.vpi.springboot.exception.RestauranteException;
@@ -49,4 +51,7 @@ public interface ClienteServicioInterfaz {
 
 	public Map<String, Object> listarPedidos(int size, int page, String sort, int order, String mailUsuario)
 			throws UsuarioException;
+	
+	public DTPedido buscarPedidoRealizado(int numeroPedido, String mail) throws PedidoException, UsuarioException;
+
 }

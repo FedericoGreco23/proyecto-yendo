@@ -1,5 +1,6 @@
 package com.vpi.springboot.ControladorRest;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -214,6 +215,15 @@ public class ClienteController {
 		try {
 			return new ResponseEntity<>(clienteService.listarPedidos(size, page, sort, order, getMailFromJwt()), HttpStatus.OK);
 		} catch (Exception e) {
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@GetMapping("/buscarPedido")
+	public ResponseEntity<?> buscarPedidoRealizado(@RequestParam(defaultValue = "0") int numeroPedido, @RequestParam(defaultValue = "") String mail) {
+		try {
+			return new ResponseEntity<>(clienteService.buscarPedidoRealizado(numeroPedido, mail), HttpStatus.OK);
+		} catch (Exception e ) {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
