@@ -7,12 +7,15 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import com.vpi.springboot.Logica.ClienteService;
+import com.vpi.springboot.Modelo.Pedido;
 import com.vpi.springboot.Modelo.dto.DTBuscarRestaurante;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
+import com.vpi.springboot.Modelo.dto.DTPedido;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
 import com.vpi.springboot.exception.CarritoException;
@@ -33,6 +36,9 @@ public class ClienteController {
 
 	@Autowired
 	private HttpServletRequest request;
+	
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
 
 	@GetMapping("/getDireccion")
 	public List<DTDireccion> getDireccionUsuario() {
@@ -156,7 +162,12 @@ public class ClienteController {
 			} else {
 				pago = EnumMetodoDePago.EFECTIVO;
 			}
-			clienteService.altaPedido(idCarrito, pago, idDireccion, mail, comentario);
+			DTPedido pedidoDTO= clienteService.altaPedido(idCarrito, pago, idDireccion, mail, comentario);
+			
+			//notificamos al restaurante
+	        // Push notifications to front-end
+			simpMessagingTemplate.convertAndSend("/topic/pedido", pedidoDTO);
+	        
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Pedido enviado con éxito"), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
