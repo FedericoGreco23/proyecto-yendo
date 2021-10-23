@@ -305,7 +305,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 	}
 
 	@Override
-	public DTRespuesta altaPedido(int idCarrito, EnumMetodoDePago pago, int idDireccion, String mail, String comentario)
+	public DTPedido altaPedido(int idCarrito, EnumMetodoDePago pago, int idDireccion, String mail, String comentario)
 			throws RestauranteException, CarritoException, DireccionException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mail);
 		Cliente cliente = optionalCliente.get();
@@ -346,7 +346,8 @@ public class ClienteService implements ClienteServicioInterfaz {
 					userRepo.save(cliente);
 					carrito.setActivo(false);
 					mongoRepo.save(carrito);
-					return new DTRespuesta("Pedido agregado correctamente.");
+					//return new DTRespuesta("Pedido agregado correctamente.");
+					return new DTPedido(pedido);
 				} else {
 					throw new DireccionException(DireccionException.NotFoundExceptionId(idDireccion));
 				}

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.vpi.springboot.Modelo.Cliente;
+import com.vpi.springboot.Modelo.Pedido;
 import com.vpi.springboot.Modelo.dto.DTBuscarRestaurante;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
@@ -37,7 +38,7 @@ public interface ClienteServicioInterfaz {
 
 	public DTCarrito verCarrito(String mail);
 
-	public DTRespuesta altaPedido(int idCarrito, EnumMetodoDePago pago, int idDireccion, String mail, String comentario)
+	public DTPedido altaPedido(int idCarrito, EnumMetodoDePago pago, int idDireccion, String mail, String comentario)
 			throws RestauranteException, CarritoException, DireccionException;
 
 	public DTRespuesta altaReclamo(int idPedido, String mailCliente, String comentario) throws ReclamoException;
