@@ -135,7 +135,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 
 	}
 
-	private boolean emailExist(String mail) {
+	public boolean emailExist(String mail) {
 		return userRepo.findById(mail).isPresent();
 	}
 
