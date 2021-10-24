@@ -167,7 +167,7 @@ public class ClienteController {
 			
 			//notificamos al restaurante
 	        // Push notifications to front-end
-			simpMessagingTemplate.convertAndSend("/topic/pedido", pedidoDTO);
+			//simpMessagingTemplate.convertAndSend("/topic/pedido", pedidoDTO);
 	        
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Pedido enviado con éxito"), HttpStatus.OK);
 		} catch (Exception e) {

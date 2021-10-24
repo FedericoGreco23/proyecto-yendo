@@ -17,7 +17,7 @@ public class WebSocketConfiguration extends AbstractWebSocketMessageBrokerConfig
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry stompEndpointRegistry) {
 		stompEndpointRegistry.addEndpoint("/public/socket")
-				.setAllowedOrigins("http://localhost:4200", "http://localhost:4201", "https://prueba-concepto-backend.herokuapp.com:443")
+				.setAllowedOrigins("http://localhost:4200", "http://localhost:4201", "https://prueba-concepto-frontend.herokuapp.com")
 				.withSockJS();//aca tiene que ir host (no *)
 	}
 

@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -58,6 +59,11 @@ public class PublicRest {
 
 	@Autowired
 	private RestauranteService restService;
+	
+
+	
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
 
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
@@ -208,5 +214,15 @@ public class PublicRest {
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
+	
+	
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
+	@PostMapping("/prueba")
+	public String probar() {
+		//notificamos al restaurante
+        // Push notifications to front-end
+		simpMessagingTemplate.convertAndSend("/topic/pedido", "Pedido esperando respuesta");
+		return "todo ok";
 	}
 }
