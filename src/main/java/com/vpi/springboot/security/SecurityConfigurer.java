@@ -81,7 +81,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 		httpSecurity.csrf().disable()
-				.authorizeRequests().antMatchers("/public/*", "/public/**", "/public/login", "/public/crear", "/public/recuperar").permitAll().
+				.authorizeRequests().antMatchers("/public/*", "/public/**", "/public/login", "/public/crear", "/public/recuperar", "/public/socket", "/public/socket/*", "/public/socket/**").permitAll().
 						anyRequest().authenticated().and().
 						exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().cors();
@@ -128,8 +128,13 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
         corsConfigMap.put("/public/*", configuration);
         corsConfigMap.put("/public/**", configuration);
         corsConfigMap.put("/public/login", configuration);
-        corsConfigMap.put("/public/crear", configuration);
-        corsConfigMap.put("/public/recuperar", configuration);
+        corsConfigMap.put("/public/crear", configuration); 
+        corsConfigMap.put("/public/socket", configuration); 
+        corsConfigMap.put("/public/socket/*", configuration); 
+        corsConfigMap.put("/public/socket/**", configuration); 
+        
+        
+        
         source.setCorsConfigurations(corsConfigMap);
         return source;
     }
