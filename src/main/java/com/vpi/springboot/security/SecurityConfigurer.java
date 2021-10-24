@@ -81,7 +81,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 		httpSecurity.csrf().disable()
-				.authorizeRequests().antMatchers("/public/*", "/public/**", "/public/login", "/public/crear", "/public/recuperar", "/public/socket", "/public/socket/*", "/public/socket/**").permitAll().
+				.authorizeRequests().antMatchers("/public/*", "/public/**", "/public/login", "/public/crear", "/public/recuperar", "/public/socket", "/public/socket/*", "/public/socket/**", "/public/socket/info", "/public/socket/info/*").permitAll().
 						anyRequest().authenticated().and().
 						exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().cors();
@@ -116,12 +116,12 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
 	@Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "http://localhost:4201", "https://prueba-concepto-backend.herokuapp.com:443"));//aca va host 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD", "CONNECT"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         //res.header('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
         configuration.setExposedHeaders(Arrays.asList("*"));
-        //configuration.setAllowCredentials(true);
+        configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         Map<String, CorsConfiguration> corsConfigMap= new HashMap<String, CorsConfiguration>();
         corsConfigMap.put("/**", configuration);
@@ -132,6 +132,8 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
         corsConfigMap.put("/public/socket", configuration); 
         corsConfigMap.put("/public/socket/*", configuration); 
         corsConfigMap.put("/public/socket/**", configuration); 
+        corsConfigMap.put("/public/socket/info", configuration); 
+        corsConfigMap.put("/public/socket/info/*", configuration); 
         
         
         
