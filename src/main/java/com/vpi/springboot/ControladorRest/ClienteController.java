@@ -215,7 +215,7 @@ public class ClienteController {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@PostMapping("/calificarRestaurante/{mailRestaurante}")
 	public ResponseEntity<?> calificarRestaurante(@PathVariable String mailRestaurante,
 			@RequestBody Calificacion calificacion) {
@@ -226,7 +226,7 @@ public class ClienteController {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@PostMapping("/eliminarCalificacion/{mailRestaurante}")
 	public ResponseEntity<?> bajaCalificacionRestaurante(@PathVariable String mailRestaurante) {
 		try {
