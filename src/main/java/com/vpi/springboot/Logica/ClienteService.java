@@ -325,12 +325,13 @@ public class ClienteService implements ClienteServicioInterfaz {
 				Restaurante restaurante = optionalRestaurante.get();
 				Optional<Direccion> optionalDireccion = dirRepo.findById(idDireccion);
 				if (optionalDireccion.isPresent()) {
-					String direccion = optionalDireccion.get().toString();
+					String direccion = optionalDireccion.get().getCalleNro();
 					EnumEstadoPedido estado = EnumEstadoPedido.PROCESADO;
 					double precioTotal = 0;
 					for (DTProductoCarrito DTpc : carrito.getProductoCarrito()) {
 						precioTotal = precioTotal + (DTpc.getProducto().getPrecio() * DTpc.getCantidad());
 					}
+					precioTotal = precioTotal + restaurante.getCostoDeEnvio();
 					Pedido pedido = new Pedido(LocalDateTime.now(), precioTotal, estado, pago, idCarrito, direccion,
 							restaurante, cliente, comentario);
 					pedidoRepo.save(pedido);
