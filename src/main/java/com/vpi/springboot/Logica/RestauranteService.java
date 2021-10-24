@@ -220,6 +220,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 		Producto producto = optionalProducto.get();
 
+		producto.setNombre(menu.getNombre());
 		producto.setDescripcion(menu.getDescripcion());
 		producto.setPrecio(menu.getPrecio());
 		producto.setFoto(menu.getFoto());
@@ -459,9 +460,9 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				avg += c.getPuntaje();
 			}
 			avg /= calificaciones.size();
-		} else 
+		} else
 			avg = 5.0f;
-		
+
 		cliente.setCalificacionPromedio(avg);
 		clienteRepo.save(cliente);
 
