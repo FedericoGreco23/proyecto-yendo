@@ -22,16 +22,20 @@ public class CalificacionRestaurante extends Calificacion {
 
 	public CalificacionRestaurante() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
-	public CalificacionRestaurante(int id, int puntaje, String comentario, String foto, LocalDateTime fecha) {
-		super(id, puntaje, comentario, foto, fecha);
-		// TODO Auto-generated constructor stub
+	public CalificacionRestaurante(int puntaje, String comentario, String foto, LocalDateTime fecha) {
+		super(puntaje, comentario, foto, fecha);
 	}
 	
-	public CalificacionRestaurante(int id, int puntaje, String comentario, String foto, LocalDateTime fecha, Restaurante restaurante, Cliente cliente) {
-		super(id, puntaje, comentario, foto, fecha);
+	public CalificacionRestaurante(int puntaje, String comentario, String foto, LocalDateTime fecha, Restaurante restaurante, Cliente cliente) {
+		super(puntaje, comentario, foto, fecha);
+		this.restaurante = restaurante;
+		this.cliente = cliente;
+	}
+	
+	public CalificacionRestaurante(Calificacion calificacion, Cliente cliente, Restaurante restaurante) {
+		super(calificacion.getPuntaje(), calificacion.getComentario(), calificacion.getFoto(), calificacion.getFecha());
 		this.restaurante = restaurante;
 		this.cliente = cliente;
 	}

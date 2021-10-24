@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import com.vpi.springboot.Modelo.Calificacion;
 import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Pedido;
 import com.vpi.springboot.Modelo.dto.DTBuscarRestaurante;
@@ -45,13 +46,19 @@ public interface ClienteServicioInterfaz {
 
 	public DTRespuesta altaReclamo(int idPedido, String mailCliente, String comentario) throws ReclamoException;
 
-	public void eliminarProductoCarrito(int idProducto, int cantABorrar, String mail);
+	public DTRespuesta eliminarProductoCarrito(int idProducto, int cantABorrar, String mail);
 
-	public void eliminarCarrito(int idCarrito, String mail) throws CarritoException;
+	public DTRespuesta eliminarCarrito(int idCarrito, String mail) throws CarritoException;
 
 	public Map<String, Object> listarPedidos(int size, int page, String sort, int order, String mailUsuario)
 			throws UsuarioException;
 	
 	public DTPedido buscarPedidoRealizado(int numeroPedido, String mail) throws PedidoException, UsuarioException;
+	
+	public DTRespuesta calificarRestaurante(String mailCliente, String mailRestaurante, Calificacion calificacion)
+			throws UsuarioException, RestauranteException;
+	
+	public DTRespuesta bajaCalificacionRestaurante(String mailCliente, String mailRestaurante)
+			throws UsuarioException, RestauranteException;
 
 }
