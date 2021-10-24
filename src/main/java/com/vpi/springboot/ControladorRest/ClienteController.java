@@ -1,6 +1,8 @@
 package com.vpi.springboot.ControladorRest;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.util.Base64;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -152,7 +154,11 @@ public class ClienteController {
 
 			// notificamos al restaurante
 			// Push notifications to front-end
-			simpMessagingTemplate.convertAndSend("/topic/pedido", pedidoDTO);
+			//simpMessagingTemplate.convertAndSend("/topic/pedido", pedidoDTO);
+			
+	        String base64EncodedEmail = Base64.getEncoder().encodeToString("restotest@test".getBytes(StandardCharsets.UTF_8));
+	        simpMessagingTemplate.convertAndSendToUser(base64EncodedEmail, "/topic/pedido",
+	        		pedidoDTO);
 
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Pedido enviado con éxito"), HttpStatus.OK);
 		} catch (Exception e) {
