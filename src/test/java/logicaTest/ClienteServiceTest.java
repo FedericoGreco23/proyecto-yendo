@@ -72,6 +72,7 @@ class ClienteServiceTest {
 	private DTDireccion dtDir;
 	private Optional<Direccion> optionalDireccion;
 	private LastDireccioClientenMongo actualDire = new LastDireccioClientenMongo();
+	private Optional<LastDireccioClientenMongo> optionalLastDir;
 	private Optional<Producto> optionalProducto;
 	private Producto producto;
 	private Carrito carrito;
@@ -109,6 +110,7 @@ class ClienteServiceTest {
 		dtProductoCarrito = new DTProductoCarrito(new DTProducto(producto), 2);
 		listProductoCarrito.add(dtProductoCarrito);
 		carrito = new Carrito(50, cliente.getMail(), restaurante.getMail(), listProductoCarrito, true);
+		optionalLastDir = Optional.of(actualDire);
 		
 	}
 	
@@ -176,5 +178,11 @@ class ClienteServiceTest {
 		Mockito.when(mongoRepo.findByMailAndActivo(Mockito.anyString(), Mockito.anyBoolean())).thenReturn(carrito);
 		mockCliente.verCarrito(cliente.getMail());
 	}
-
+	
+	@Test
+	public void testGetUltimaDireccionSeleccionada() {
+		Mockito.doReturn(optionalLastDir).when(ultimaDireccionRepo).findById(Mockito.anyString());
+		mockCliente.getUltimaDireccionSeleccionada(cliente.getMail());
+		
+	}
 }

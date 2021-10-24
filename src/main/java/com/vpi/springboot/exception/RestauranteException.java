@@ -20,4 +20,8 @@ public class RestauranteException extends Exception {
 	public static String RestauranteYaExiste(String mail) {
 		return "Restaurante " + mail + " ya existe.";
 	}
+	
+	public static String SinCalificacion(String mail) {
+		return "Restaurante no calificó a cliente " + mail + ".";
+	}
 }

@@ -21,4 +21,7 @@ public interface PedidoRepositorio extends JpaRepository<Pedido, Integer>{
 	
 	@Query("SELECT u FROM Pedido u WHERE u.cliente = :cliente")
 	Page<Pedido> findAllByCliente(@Param("cliente") Cliente restaurante, Pageable pageable);
+	
+	@Query("SELECT u FROM Pedido u WHERE u.id = :numeroPedido")
+	Pedido buscarPedidoRealizadoPorNumero(@Param("numeroPedido") int numeroPedido);
 }

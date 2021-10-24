@@ -1,5 +1,6 @@
 package com.vpi.springboot.ControladorRest;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,6 +12,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import com.vpi.springboot.Logica.ClienteService;
+import com.vpi.springboot.Modelo.Calificacion;
 import com.vpi.springboot.Modelo.Pedido;
 import com.vpi.springboot.Modelo.dto.DTBuscarRestaurante;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
@@ -19,6 +21,7 @@ import com.vpi.springboot.Modelo.dto.DTPedido;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
 import com.vpi.springboot.exception.CarritoException;
+import com.vpi.springboot.exception.PermisosException;
 import com.vpi.springboot.exception.RestauranteException;
 import com.vpi.springboot.exception.UsuarioException;
 import com.vpi.springboot.security.util.JwtUtil;
@@ -30,15 +33,12 @@ public class ClienteController {
 
 	@Autowired
 	private ClienteService clienteService;
-
 	@Autowired
 	private JwtUtil jwtUtil;
-
 	@Autowired
 	private HttpServletRequest request;
-	
-    @Autowired
-    private SimpMessagingTemplate simpMessagingTemplate;
+	@Autowired
+	private SimpMessagingTemplate simpMessagingTemplate;
 
 	@GetMapping("/getDireccion")
 	public List<DTDireccion> getDireccionUsuario() {
@@ -137,20 +137,6 @@ public class ClienteController {
 		}
 	}
 
-	private String getMailFromJwt() {
-		// obtenemos el token del header y le sacamos "Bearer "
-		final String authorizationHeader = request.getHeader("Authorization");
-
-		String mail = null;
-		String jwt = null;
-
-		if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-			jwt = authorizationHeader.substring(7);
-			mail = jwtUtil.extractUsername(jwt);
-		}
-		return mail;
-	}
-
 	@PostMapping("/altaPedido")
 	public ResponseEntity<DTRespuesta> altaPedido(@RequestParam int idCarrito, @RequestParam int metodoPago,
 			@RequestParam int idDireccion, @RequestParam String comentario) {
@@ -162,12 +148,12 @@ public class ClienteController {
 			} else {
 				pago = EnumMetodoDePago.EFECTIVO;
 			}
-			DTPedido pedidoDTO= clienteService.altaPedido(idCarrito, pago, idDireccion, mail, comentario);
-			
-			//notificamos al restaurante
-	        // Push notifications to front-end
+			DTPedido pedidoDTO = clienteService.altaPedido(idCarrito, pago, idDireccion, mail, comentario);
+
+			// notificamos al restaurante
+			// Push notifications to front-end
 			simpMessagingTemplate.convertAndSend("/topic/pedido", pedidoDTO);
-	        
+
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Pedido enviado con éxito"), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -187,23 +173,24 @@ public class ClienteController {
 	}
 
 	@PostMapping("/eliminarProductoCarrito")
-	public ResponseEntity<DTRespuesta> eliminarProductoCarrito(@RequestParam int idProducto,
+	public ResponseEntity<?> eliminarProductoCarrito(@RequestParam int idProducto,
 			@RequestParam int cantABorrar) {
 		try {
-			clienteService.eliminarProductoCarrito(idProducto, cantABorrar, getMailFromJwt());
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Producto eliminado con éxito"), HttpStatus.OK);
+			;
+			return new ResponseEntity<>(
+					clienteService.eliminarProductoCarrito(idProducto, cantABorrar, getMailFromJwt()), HttpStatus.OK);
 		} catch (Exception e) {
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	@PostMapping("/eliminarCarrito")
-	public ResponseEntity<DTRespuesta> eliminarCarrito(@RequestParam int idCarrito) {
+	public ResponseEntity<?> eliminarCarrito(@RequestParam int idCarrito) {
 		try {
-			clienteService.eliminarCarrito(idCarrito, getMailFromJwt());
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Carrito eliminado con éxito"), HttpStatus.OK);
+			return new ResponseEntity<>(clienteService.eliminarCarrito(idCarrito, getMailFromJwt()),
+					HttpStatus.OK);
 		} catch (Exception e) {
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -212,9 +199,55 @@ public class ClienteController {
 			@RequestParam(defaultValue = "0") int page, @RequestParam(required = false) String sort,
 			@RequestParam(defaultValue = "1") int order) {
 		try {
-			return new ResponseEntity<>(clienteService.listarPedidos(size, page, sort, order, getMailFromJwt()), HttpStatus.OK);
+			return new ResponseEntity<>(clienteService.listarPedidos(size, page, sort, order, getMailFromJwt()),
+					HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
+
+	@GetMapping("/buscarPedido")
+	public ResponseEntity<?> buscarPedidoRealizado(@RequestParam(defaultValue = "0") int numeroPedido,
+			@RequestParam(defaultValue = "") String mail) {
+		try {
+			return new ResponseEntity<>(clienteService.buscarPedidoRealizado(numeroPedido, mail), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping("/calificarRestaurante/{mailRestaurante}")
+	public ResponseEntity<?> calificarRestaurante(@PathVariable String mailRestaurante,
+			@RequestBody Calificacion calificacion) {
+		try {
+			return new ResponseEntity<>(
+					clienteService.calificarRestaurante(getMailFromJwt(), mailRestaurante, calificacion), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping("/eliminarCalificacion/{mailRestaurante}")
+	public ResponseEntity<?> bajaCalificacionRestaurante(@PathVariable String mailRestaurante) {
+		try {
+			return new ResponseEntity<>(
+					clienteService.bajaCalificacionRestaurante(getMailFromJwt(), mailRestaurante), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	private String getMailFromJwt() {
+		// obtenemos el token del header y le sacamos "Bearer "
+		final String authorizationHeader = request.getHeader("Authorization");
+
+		String mail = null;
+		String jwt = null;
+
+		if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+			jwt = authorizationHeader.substring(7);
+			mail = jwtUtil.extractUsername(jwt);
+		}
+		return mail;
 	}
 }

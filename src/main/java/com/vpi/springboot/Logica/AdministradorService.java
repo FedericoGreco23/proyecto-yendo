@@ -182,7 +182,7 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 //	@SuppressWarnings("unused")
 	@Override
 	public Map<String, Object> buscarUsuario(int page, int size, int tipoUsuario, Integer antiguedadUsuario,
-			String texto) {
+			String texto, String sort, int order) {
 		List<DTUsuario> DTUsuarios = new ArrayList<DTUsuario>();
 		List<Administrador> administradores = new ArrayList<Administrador>();
 		List<Restaurante> restaurantes = new ArrayList<Restaurante>();
@@ -190,9 +190,22 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 
 		Map<String, Object> response = new HashMap<>();
 
-		Sort sort = Sort.by(Sort.Order.desc("calificacionPromedio"), Sort.Order.asc("mail"));
-		Pageable paging = PageRequest.of(page, size, sort);
-
+		//Sort sorting = Sort.by(Sort.Order.desc("calificacionPromedio"), Sort.Order.asc("mail"));
+		Sort sorting;
+		Pageable paging;
+		
+		if (!sort.equalsIgnoreCase("")) {
+			if (order == 1) {
+				sorting = Sort.by(Sort.Order.desc(sort));
+			} else {
+				sorting = Sort.by(Sort.Order.asc(sort));
+			}
+			paging = PageRequest.of(page, size, sorting);
+		} else {
+			paging = PageRequest.of(page, size);
+		}
+		
+		
 		switch (tipoUsuario) {
 		case 2:
 			Page<Administrador> pageAdministradores;

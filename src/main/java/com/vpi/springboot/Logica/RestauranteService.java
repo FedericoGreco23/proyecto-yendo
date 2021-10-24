@@ -19,6 +19,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.vpi.springboot.Modelo.Cliente;
+import com.vpi.springboot.IdCompuestas.CalificacionClienteId;
+import com.vpi.springboot.Modelo.Calificacion;
+import com.vpi.springboot.Modelo.CalificacionCliente;
 import com.vpi.springboot.Modelo.Carrito;
 import com.vpi.springboot.Modelo.Categoria;
 import com.vpi.springboot.Modelo.GeoLocalizacion;
@@ -37,7 +40,9 @@ import com.vpi.springboot.Modelo.dto.DTRestaurante;
 import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoReclamo;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
+import com.vpi.springboot.Repositorios.CalificacionClienteRepositorio;
 import com.vpi.springboot.Repositorios.CategoriaRepositorio;
+import com.vpi.springboot.Repositorios.ClienteRepositorio;
 import com.vpi.springboot.Repositorios.GeoLocalizacionRepositorio;
 import com.vpi.springboot.Repositorios.MongoRepositorioCarrito;
 import com.vpi.springboot.Repositorios.PedidoRepositorio;
@@ -50,6 +55,7 @@ import com.vpi.springboot.exception.ProductoException;
 import com.vpi.springboot.exception.ReclamoException;
 import com.vpi.springboot.exception.PromocionException;
 import com.vpi.springboot.exception.RestauranteException;
+import com.vpi.springboot.exception.UsuarioException;
 import com.vpi.springboot.security.util.JwtUtil.keyInfoJWT;
 
 @Service
@@ -57,39 +63,35 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 	@Autowired
 	private RestauranteRepositorio restauranteRepo;
-
 	@Autowired
 	private GeoLocalizacionRepositorio geoRepo;
-
 	@Autowired
 	private PedidoRepositorio pedidoRepo;
-
 	@Autowired
 	private PromocionRepositorio promoRepo;
-
 	@Autowired
 	private CategoriaRepositorio catRepo;
-
 	@Autowired
 	private ProductoRepositorio proRepo;
-
 	@Autowired
 	private RestauranteRepositorio resRepo;
-
 	@Autowired
 	private MongoRepositorioCarrito mongoRepo;
-
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-
 	@Autowired
 	private ProductoRepositorio productoRepo;
+	@Autowired
+	private ClienteRepositorio clienteRepo;
+	@Autowired
+	private CalificacionClienteRepositorio calClienteRepo;
 
 	private DTCarrito verCarrito(int id) {
 		Optional<Carrito> optionalCarrito = mongoRepo.findById(id);
 		if (optionalCarrito.isPresent()) {
 			Carrito carrito = optionalCarrito.get();
-			DTCarrito dt = new DTCarrito(carrito.getId(), carrito.getProductoCarrito(), carrito.getMailRestaurante(),carrito.getCostoEnvio());
+			DTCarrito dt = new DTCarrito(carrito.getId(), carrito.getProductoCarrito(), carrito.getMailRestaurante(),
+					carrito.getCostoEnvio());
 			return dt;
 		}
 
@@ -138,6 +140,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		return new DTRespuesta("Restaurante " + rest.getNombre() + " dado de alta correctamente.");
 	}
 
+	@Override
 	public DTRespuesta altaMenu(Producto menu, String varRestaurante)
 			throws ProductoException, RestauranteException, CategoriaException, Exception {
 		Optional<Restaurante> optionalRestaurante = resRepo.findById(varRestaurante);
@@ -172,6 +175,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		}
 	}
 
+	@Override
 	public DTRespuesta bajaMenu(int id) throws ProductoException {
 //		Boolean menuTomado = false;
 
@@ -203,6 +207,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		}
 	}
 
+	@Override
 	public DTRespuesta modificarMenu(Producto menu) throws ProductoException {
 		if (menu.getRestaurante() != null) {
 			throw new ProductoException("No puede cambiar el restaurante de un menú.");
@@ -215,6 +220,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 		Producto producto = optionalProducto.get();
 
+		producto.setNombre(menu.getNombre());
 		producto.setDescripcion(menu.getDescripcion());
 		producto.setPrecio(menu.getPrecio());
 		producto.setFoto(menu.getFoto());
@@ -225,6 +231,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		return new DTRespuesta("Menú modificado correctamente.");
 	}
 
+	@Override
 	public Map<String, Object> listarPedidos(int page, int size, String varRestaurante) throws RestauranteException {
 		Optional<Restaurante> optionalRestaurante = resRepo.findById(varRestaurante);
 		if (!optionalRestaurante.isPresent()) {
@@ -329,6 +336,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		return new DTRespuesta("Promoción modificada correctamente.");
 	}
 
+	@Override
 	public DTRespuesta bajaPromocion(int idPromo) throws PromocionException {
 		Optional<Promocion> optionalPromocion = promoRepo.findById(idPromo);
 		if (optionalPromocion.isPresent()) {
@@ -342,8 +350,9 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		}
 	}
 
-	public void altaPromocion(DTPromocionConPrecio promocion, String mail) throws Exception {
-
+	@Override
+	public DTRespuesta altaPromocion(DTPromocionConPrecio promocion, String mail)
+			throws RestauranteException, PromocionException {
 		Optional<Restaurante> restauranteOp = restauranteRepo.findById(mail);
 		if (!restauranteOp.isPresent()) {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(mail));
@@ -361,7 +370,6 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 			for (DTProductoIdCantidad entry : promocion.getProductos()) {
 
-
 				Producto prod = productoRepo.findByIdAndRest(entry.getId(), restaurante);
 
 				for (int i = 0; i < entry.getCantidad(); i++) {
@@ -372,14 +380,15 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			}
 			promoRepo.save(promocionNueva);
 
+			return new DTRespuesta("Promocion ingresada con éxito.");
+
 		} catch (Exception e) {
 			throw new PromocionException(PromocionException.NotFoundException());
 		}
-
 	}
-	
+
 	@Override
-	public DTRespuesta rechazarPedido(int idPedido) throws PedidoException{
+	public DTRespuesta rechazarPedido(int idPedido) throws PedidoException {
 		Optional<Pedido> optionalPedido = pedidoRepo.findById(idPedido);
 		if (optionalPedido.isPresent()) {
 			Pedido pedido = optionalPedido.get();
@@ -391,4 +400,72 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		}
 	}
 
+	@Override
+	public DTRespuesta calificarCliente(String mailCliente, String mailRestaurante, Calificacion calificacion)
+			throws UsuarioException, RestauranteException {
+		Optional<Restaurante> optionalRestaurante = restauranteRepo.findById(mailRestaurante);
+		if (!optionalRestaurante.isPresent()) {
+			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(mailRestaurante));
+		}
+		Restaurante restaurante = optionalRestaurante.get();
+
+		Optional<Cliente> optionalCliente = clienteRepo.findById(mailCliente);
+		if (!optionalCliente.isPresent())
+			throw new UsuarioException(UsuarioException.NotFoundException(mailCliente));
+		Cliente cliente = optionalCliente.get();
+
+		calificacion.setFecha(LocalDateTime.now());
+		CalificacionCliente calCliente = new CalificacionCliente(calificacion, restaurante, cliente);
+		calClienteRepo.save(calCliente);
+
+		// Calculamos la calificación del cliente y la guardamos
+		List<CalificacionCliente> calificaciones = calClienteRepo.findByCliente(cliente);
+		float avg = 0f;
+		for (CalificacionCliente c : calificaciones) {
+			avg += c.getPuntaje();
+		}
+		avg /= calificaciones.size();
+		cliente.setCalificacionPromedio(avg);
+		clienteRepo.save(cliente);
+
+		return new DTRespuesta("Cliente " + mailCliente + " calificado correctamente");
+	}
+
+	@Override
+	public DTRespuesta bajaCalificacionCliente(String mailCliente, String mailRestaurante)
+			throws UsuarioException, RestauranteException {
+		Optional<Restaurante> optionalRestaurante = restauranteRepo.findById(mailRestaurante);
+		if (!optionalRestaurante.isPresent()) {
+			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(mailRestaurante));
+		}
+		Restaurante restaurante = optionalRestaurante.get();
+
+		Optional<Cliente> optionalCliente = clienteRepo.findById(mailCliente);
+		if (!optionalCliente.isPresent())
+			throw new UsuarioException(UsuarioException.NotFoundException(mailCliente));
+		Cliente cliente = optionalCliente.get();
+
+		Optional<CalificacionCliente> optionalCalificacion = calClienteRepo
+				.findById(new CalificacionClienteId(cliente, restaurante));
+		if (!optionalCalificacion.isPresent())
+			throw new RestauranteException(RestauranteException.SinCalificacion(mailCliente));
+		CalificacionCliente calCliente = optionalCalificacion.get();
+		calClienteRepo.delete(calCliente);
+
+		// Calculamos la calificación del cliente y la guardamos
+		List<CalificacionCliente> calificaciones = calClienteRepo.findByCliente(cliente);
+		float avg = 0f;
+		if(calificaciones.size() > 0) {
+			for (CalificacionCliente c : calificaciones) {
+				avg += c.getPuntaje();
+			}
+			avg /= calificaciones.size();
+		} else
+			avg = 5.0f;
+
+		cliente.setCalificacionPromedio(avg);
+		clienteRepo.save(cliente);
+
+		return new DTRespuesta("Calificación de cliente " + mailCliente + " eliminada correctamente");
+	}
 }

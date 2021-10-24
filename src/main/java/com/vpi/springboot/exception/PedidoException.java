@@ -12,5 +12,9 @@ public class PedidoException extends Exception {
 	public static String NotFoundExceptionId(int id) {
 		return "Pedido " + id + " no se pudo encontrar.";
 	}
+	
+	public static String NotValidId() {
+		return "Inserte un id valido de pedido.";
+	}
 
 }

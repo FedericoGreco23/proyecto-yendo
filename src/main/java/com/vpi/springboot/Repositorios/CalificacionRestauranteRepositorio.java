@@ -1,13 +1,14 @@
 package com.vpi.springboot.Repositorios;
 
-
-
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.vpi.springboot.IdCompuestas.CalificacionRestauranteId;
 import com.vpi.springboot.Modelo.CalificacionRestaurante;
+import com.vpi.springboot.Modelo.Restaurante;
 
 /**
  * Repository for the entity Person.
@@ -15,6 +16,9 @@ import com.vpi.springboot.Modelo.CalificacionRestaurante;
  * @see netgloo.models.UserBaseRepository
  */
 @Repository
-public interface CalificacionRestauranteRepositorio extends JpaRepository<CalificacionRestaurante, CalificacionRestauranteId> {
+public interface CalificacionRestauranteRepositorio
+		extends JpaRepository<CalificacionRestaurante, CalificacionRestauranteId> {
 	
+	@Query("SELECT u FROM CalificacionRestaurante u WHERE u.restaurante = :restaurante")
+	List<CalificacionRestaurante> findByRestaurante(Restaurante restaurante);
 }
