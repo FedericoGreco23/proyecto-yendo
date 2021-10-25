@@ -24,7 +24,7 @@ public interface RestauranteServicioInterfaz {
 
 	public DTRespuesta modificarMenu(Producto menu) throws ProductoException;
 
-	public Map<String, Object> listarPedidos(int page, int size, String nombreRestaurante) throws RestauranteException;
+	public Map<String, Object> listarPedidos(int page, int size, String mailRestaurante) throws RestauranteException;
 
 	public DTRespuesta altaRestaurante(Restaurante rest) throws RestauranteException, CategoriaException;
 
@@ -50,4 +50,6 @@ public interface RestauranteServicioInterfaz {
 
 	public DTRespuesta bajaCalificacionCliente(String mailCliente, String mailRestaurante)
 			throws UsuarioException, RestauranteException;
+	
+	public Map<String, Object> listarReclamos(int page, int size, String mailRestaurante) throws RestauranteException;
 }

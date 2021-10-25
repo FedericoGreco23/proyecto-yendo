@@ -205,7 +205,6 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 			paging = PageRequest.of(page, size);
 		}
 		
-		
 		switch (tipoUsuario) {
 		case 2:
 			Page<Administrador> pageAdministradores;
@@ -220,10 +219,9 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 							DTUsuarios.add(new DTUsuario(administrador, "Administrador"));
 						}
 					}
-
 				} else {
 					// Aplico tipo y antiguedad
-					pageAdministradores = (Page<Administrador>) adminRepo.buscarAdministrador(paging);
+					pageAdministradores = adminRepo.buscarAdministrador(paging);
 					administradores = pageAdministradores.getContent();
 					for (Administrador administrador : administradores) {
 						long days = ChronoUnit.DAYS.between(administrador.getFechaCreacion(), LocalDate.now());
@@ -234,14 +232,14 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 				}
 			} else if (!texto.equalsIgnoreCase("")) {
 				// tipo y nombreUsuario
-				pageAdministradores = (Page<Administrador>) adminRepo.buscarAdministradorNombre(texto, paging);
+				pageAdministradores = adminRepo.buscarAdministradorNombre(texto, paging);
 				administradores = pageAdministradores.getContent();
 				for (Administrador administrador : administradores) {
 					DTUsuarios.add(new DTUsuario(administrador, "Administrador"));
 				}
 			} else {
 				// Solo tipo usuario
-				pageAdministradores = (Page<Administrador>) adminRepo.buscarAdministrador(paging);
+				pageAdministradores = adminRepo.buscarAdministrador(paging);
 				administradores = pageAdministradores.getContent();
 				for (Administrador administrador : administradores) {
 					DTUsuarios.add(new DTUsuario(administrador, "Administrador"));
@@ -258,7 +256,7 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 			if (antiguedadUsuario > 0) {
 				if (!texto.equalsIgnoreCase("")) {
 					// Aplico los 3 filtros
-					pageRestaurantes = (Page<Restaurante>) resRepo.buscarRestauranteNombre(texto, paging);
+					pageRestaurantes = resRepo.buscarRestauranteNombre(texto, paging);
 					restaurantes = pageRestaurantes.getContent();
 					for (Restaurante restaurante : restaurantes) {
 						long days = ChronoUnit.DAYS.between(restaurante.getFechaCreacion(), LocalDate.now());
@@ -269,7 +267,7 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 
 				} else {
 					// Aplico tipo y antiguedad
-					pageRestaurantes = (Page<Restaurante>) resRepo.buscarRestaurante(paging);
+					pageRestaurantes = resRepo.buscarRestaurante(paging);
 					restaurantes = pageRestaurantes.getContent();
 					for (Restaurante restaurante : restaurantes) {
 						long days = ChronoUnit.DAYS.between(restaurante.getFechaCreacion(), LocalDate.now());
@@ -280,14 +278,14 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 				}
 			} else if (!texto.equalsIgnoreCase("")) {
 				// tipo y nombreUsuario
-				pageRestaurantes = (Page<Restaurante>) resRepo.buscarRestauranteNombre(texto, paging);
+				pageRestaurantes = resRepo.buscarRestauranteNombre(texto, paging);
 				restaurantes = pageRestaurantes.getContent();
 				for (Restaurante restaurante : restaurantes) {
 					DTUsuarios.add(new DTUsuario(restaurante, "Restaurante", restaurante.getCalificacionPromedio()));
 				}
 			} else {
 				// Solo tipo usuario
-				pageRestaurantes = (Page<Restaurante>) resRepo.buscarRestaurante(paging);
+				pageRestaurantes = resRepo.buscarRestaurante(paging);
 				restaurantes = pageRestaurantes.getContent();
 				for (Restaurante restaurante : restaurantes) {
 					DTUsuarios.add(new DTUsuario(restaurante, "Restaurante", restaurante.getCalificacionPromedio()));

@@ -475,9 +475,9 @@ public class ClienteService implements ClienteServicioInterfaz {
 			paging = PageRequest.of(page, size);
 		} else {
 			if (order == 1)
-				sorting = Sort.by(Sort.Direction.DESC, sort);
+				sorting = Sort.by(Sort.Order.desc(sort));
 			else
-				sorting = Sort.by(Sort.Direction.ASC, sort);
+				sorting = Sort.by(Sort.Order.asc(sort));
 			paging = PageRequest.of(page, size, sorting);
 		}
 

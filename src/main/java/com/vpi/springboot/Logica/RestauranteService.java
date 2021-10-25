@@ -35,6 +35,7 @@ import com.vpi.springboot.Modelo.dto.DTPedido;
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.Modelo.dto.DTProductoIdCantidad;
 import com.vpi.springboot.Modelo.dto.DTPromocionConPrecio;
+import com.vpi.springboot.Modelo.dto.DTReclamo;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
 import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
@@ -48,6 +49,7 @@ import com.vpi.springboot.Repositorios.MongoRepositorioCarrito;
 import com.vpi.springboot.Repositorios.PedidoRepositorio;
 import com.vpi.springboot.Repositorios.ProductoRepositorio;
 import com.vpi.springboot.Repositorios.PromocionRepositorio;
+import com.vpi.springboot.Repositorios.ReclamoRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
 import com.vpi.springboot.exception.CategoriaException;
 import com.vpi.springboot.exception.PedidoException;
@@ -85,6 +87,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	private ClienteRepositorio clienteRepo;
 	@Autowired
 	private CalificacionClienteRepositorio calClienteRepo;
+	@Autowired
+	private ReclamoRepositorio recRepo;
 
 	private DTCarrito verCarrito(int id) {
 		Optional<Carrito> optionalCarrito = mongoRepo.findById(id);
@@ -455,7 +459,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		// Calculamos la calificación del cliente y la guardamos
 		List<CalificacionCliente> calificaciones = calClienteRepo.findByCliente(cliente);
 		float avg = 0f;
-		if(calificaciones.size() > 0) {
+		if (calificaciones.size() > 0) {
 			for (CalificacionCliente c : calificaciones) {
 				avg += c.getPuntaje();
 			}
@@ -467,5 +471,31 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		clienteRepo.save(cliente);
 
 		return new DTRespuesta("Calificación de cliente " + mailCliente + " eliminada correctamente");
+	}
+
+	public Map<String, Object> listarReclamos(int page, int size, String mailRestaurante)
+			throws RestauranteException {
+		Optional<Restaurante> optionalRestaurante = restauranteRepo.findById(mailRestaurante);
+		if (!optionalRestaurante.isPresent()) {
+			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(mailRestaurante));
+		}
+		Restaurante restaurante = optionalRestaurante.get();
+		
+		Pageable paging = PageRequest.of(page, size);
+		Page<Reclamo> pageReclamo = recRepo.findAllByRestaurante(restaurante, paging);
+		
+		List<Reclamo> reclamos = pageReclamo.getContent();
+		List<DTReclamo> retorno = new ArrayList<>();
+		Map<String, Object> response = new HashMap<>();
+		
+		for(Reclamo r : reclamos) {
+			retorno.add(new DTReclamo(r));
+		}
+		
+		response.put("currentPage", pageReclamo.getTotalPages());
+		response.put("totalItems", pageReclamo.getTotalElements());
+		response.put("reclamos", retorno);
+		
+		return response;
 	}
 }
