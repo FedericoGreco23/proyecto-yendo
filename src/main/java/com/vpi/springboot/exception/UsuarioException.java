@@ -27,5 +27,8 @@ public class UsuarioException extends Exception {
 	public static String NicknameRepetido() {
 		return "Nickname en uso";
 	}
-
+	
+	public static String SinCalificacion(String nombre) {
+		return "Cliente no calificó a restaurante " + nombre + ".";
+	}
 }

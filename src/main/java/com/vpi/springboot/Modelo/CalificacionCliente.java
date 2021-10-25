@@ -24,13 +24,19 @@ public class CalificacionCliente extends Calificacion {
 		super();
 	}
 
-	public CalificacionCliente(int id, int puntaje, String comentario, String foto, LocalDateTime fecha) {
-		super(id, puntaje, comentario, foto, fecha);
+	public CalificacionCliente(int puntaje, String comentario, String foto, LocalDateTime fecha) {
+		super(puntaje, comentario, foto, fecha);
 	}
 	
-	public CalificacionCliente(int id, int puntaje, String comentario, String foto, LocalDateTime fecha,
+	public CalificacionCliente(int puntaje, String comentario, String foto, LocalDateTime fecha,
 			Restaurante restaurante, Cliente cliente) {
-		super(id, puntaje, comentario, foto, fecha);
+		super(puntaje, comentario, foto, fecha);
+		this.restaurante = restaurante;
+		this.cliente = cliente;
+	}
+	
+	public CalificacionCliente(Calificacion calificacion, Restaurante restaurante, Cliente cliente) {
+		super(calificacion.getPuntaje(), calificacion.getComentario(), calificacion.getFoto(), calificacion.getFecha());
 		this.restaurante = restaurante;
 		this.cliente = cliente;
 	}

@@ -2,6 +2,9 @@ package com.vpi.springboot.IdCompuestas;
 
 import java.io.Serializable;
 
+import com.vpi.springboot.Modelo.Cliente;
+import com.vpi.springboot.Modelo.Restaurante;
+
 public class CalificacionRestauranteId implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -10,7 +13,11 @@ public class CalificacionRestauranteId implements Serializable {
 
 	public CalificacionRestauranteId() {
 		super();
-		// TODO Auto-generated constructor stub
+	}
+	
+	public CalificacionRestauranteId(Cliente cliente, Restaurante restaurante) {
+		this.cliente = cliente.getMail();
+		this.restaurante = restaurante.getMail();
 	}
 
 	public String getRestaurante() {

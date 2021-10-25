@@ -22,12 +22,10 @@ public class Calificacion {
 
 	public Calificacion() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
-	public Calificacion(int id, int puntaje, String comentario, String foto, LocalDateTime fecha) {
+	public Calificacion(int puntaje, String comentario, String foto, LocalDateTime fecha) {
 		super();
-		this.id = id;
 		this.puntaje = puntaje;
 		this.comentario = comentario;
 		this.foto = foto;
