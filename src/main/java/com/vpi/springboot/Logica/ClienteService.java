@@ -1,8 +1,10 @@
 package com.vpi.springboot.Logica;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
@@ -98,6 +101,10 @@ public class ClienteService implements ClienteServicioInterfaz {
 	@Autowired
 	private UltimaDireccionRepositorio ultimaDireccionRepo;
 
+
+	@Autowired
+	private SimpMessagingTemplate simpMessagingTemplate;
+	
 	@Override
 	public List<DTDireccion> getDireccionCliente(String mail) throws UsuarioException {
 		Optional<Cliente> optionalUser = userRepo.findById(mail);
@@ -356,6 +363,17 @@ public class ClienteService implements ClienteServicioInterfaz {
 					carrito.setActivo(false);
 					mongoRepo.save(carrito);
 					// return new DTRespuesta("Pedido agregado correctamente.");
+					
+					// notificamos al restaurante
+					// Push notifications to front-end
+
+			        String base64EncodedEmail = Base64.getEncoder().encodeToString(pedido.getRestaurante().getMail().getBytes(StandardCharsets.UTF_8));
+					simpMessagingTemplate.convertAndSend("/topic/"+base64EncodedEmail, new DTPedido(pedido));
+					
+			        //System.out.println(base64EncodedEmail);
+			        
+			        //simpMessagingTemplate.convertAndSendToUser(base64EncodedEmail, "/topic/pedido", pedidoDTO);
+					
 					return new DTPedido(pedido);
 				} else {
 					throw new DireccionException(DireccionException.NotFoundExceptionId(idDireccion));

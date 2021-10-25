@@ -39,8 +39,6 @@ public class ClienteController {
 	private JwtUtil jwtUtil;
 	@Autowired
 	private HttpServletRequest request;
-	@Autowired
-	private SimpMessagingTemplate simpMessagingTemplate;
 
 	@GetMapping("/getDireccion")
 	public List<DTDireccion> getDireccionUsuario() {
@@ -152,14 +150,7 @@ public class ClienteController {
 			}
 			DTPedido pedidoDTO = clienteService.altaPedido(idCarrito, pago, idDireccion, mail, comentario);
 
-			// notificamos al restaurante
-			// Push notifications to front-end
-			simpMessagingTemplate.convertAndSend("/topic/"+"restotest@test", pedidoDTO);
-			
-	        //String base64EncodedEmail = Base64.getEncoder().encodeToString("restotest@test".getBytes(StandardCharsets.UTF_8));
-	        //System.out.println(base64EncodedEmail);
-	        
-	        //simpMessagingTemplate.convertAndSendToUser(base64EncodedEmail, "/topic/pedido", pedidoDTO);
+
 
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Pedido enviado con éxito"), HttpStatus.OK);
 		} catch (Exception e) {
