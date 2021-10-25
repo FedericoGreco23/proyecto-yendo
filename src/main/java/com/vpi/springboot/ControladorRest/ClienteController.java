@@ -154,11 +154,12 @@ public class ClienteController {
 
 			// notificamos al restaurante
 			// Push notifications to front-end
-			//simpMessagingTemplate.convertAndSend("/topic/pedido", pedidoDTO);
+			simpMessagingTemplate.convertAndSend("/topic/"+"restotest@test", pedidoDTO);
 			
-	        String base64EncodedEmail = Base64.getEncoder().encodeToString("restotest@test".getBytes(StandardCharsets.UTF_8));
-	        simpMessagingTemplate.convertAndSendToUser(base64EncodedEmail, "/topic/pedido",
-	        		pedidoDTO);
+	        //String base64EncodedEmail = Base64.getEncoder().encodeToString("restotest@test".getBytes(StandardCharsets.UTF_8));
+	        //System.out.println(base64EncodedEmail);
+	        
+	        //simpMessagingTemplate.convertAndSendToUser(base64EncodedEmail, "/topic/pedido", pedidoDTO);
 
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Pedido enviado con éxito"), HttpStatus.OK);
 		} catch (Exception e) {
