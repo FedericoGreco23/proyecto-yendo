@@ -117,7 +117,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
-        configuration.setAllowedOrigins(Arrays.asList("/**", "http://localhost:4200", "http://localhost:4201", "https://prueba-concepto-frontend.herokuapp.com", "http://190.134.71.243:4200", "https://190.134.71.243:4200"
+        configuration.setAllowedOrigins(Arrays.asList("/**", "http://localhost:8100", "https://localhost:443","http://localhost:4200", "http://localhost:4201", "https://prueba-concepto-frontend.herokuapp.com", "http://190.134.71.243:4200", "https://190.134.71.243:4200"
         		, "http://190.134.71.243:8080", "https://190.134.71.243:8080"));//aca va host 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD", "CONNECT"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
