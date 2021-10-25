@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vpi.springboot.Logica.RestauranteService;
+import com.vpi.springboot.Modelo.Calificacion;
 import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.Modelo.dto.DTPromocionConPrecio;
 import com.vpi.springboot.Modelo.Promocion;
@@ -160,7 +161,7 @@ public class RestauranteController {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@PostMapping("/rechazarPedido")
 	ResponseEntity<?> rechazarPedido(@RequestParam int idPedido) {
 		if (!esRestaurante()) {
@@ -226,21 +227,51 @@ public class RestauranteController {
 	}
 
 	@PostMapping("/altaPromocion")
-	public ResponseEntity<?> altaPromocion(@RequestBody DTPromocionConPrecio promocion){
+	public ResponseEntity<?> altaPromocion(@RequestBody DTPromocionConPrecio promocion) {
 		if (!esRestaurante()) {
 			return new ResponseEntity<>(
 					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
 					HttpStatus.FORBIDDEN);
 		}
-		try {
-			String mail= getInfoFromJwt("mail");
 
-			service.altaPromocion(promocion, mail);
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Promocion ingresada con éxito"), HttpStatus.OK);
+		try {
+			return new ResponseEntity<>(service.altaPromocion(promocion, getInfoFromJwt("mail")), HttpStatus.OK);
 		} catch (Exception e) {
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping("/calificarCliente/{mailCliente}")
+	public ResponseEntity<?> calificarCliente(@PathVariable String mailCliente,
+			@RequestBody Calificacion calificacion) {
+		if (!esRestaurante()) {
+			return new ResponseEntity<>(
+					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
+					HttpStatus.FORBIDDEN);
 		}
 
+		try {
+			return new ResponseEntity<>(
+					service.calificarCliente(mailCliente, getInfoFromJwt("mail"), calificacion), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@PostMapping("/eliminarCalificacion/{mailCliente}")
+	public ResponseEntity<?> bajaCalificacionCliente(@PathVariable String mailCliente) {
+		if (!esRestaurante()) {
+			return new ResponseEntity<>(
+					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
+					HttpStatus.FORBIDDEN);
+		}
+
+		try {
+			return new ResponseEntity<>(
+					service.bajaCalificacionCliente(mailCliente, getInfoFromJwt("mail")), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	@GetMapping("/buscarPedido")

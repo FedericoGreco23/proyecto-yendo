@@ -2,10 +2,12 @@ package com.vpi.springboot.Logica;
 
 import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.dto.DTPedido;
+import com.vpi.springboot.Modelo.dto.DTPromocionConPrecio;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 
 import java.util.Map;
 
+import com.vpi.springboot.Modelo.Calificacion;
 import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.Modelo.Promocion;
 import com.vpi.springboot.exception.CategoriaException;
@@ -13,6 +15,7 @@ import com.vpi.springboot.exception.PedidoException;
 import com.vpi.springboot.exception.ProductoException;
 import com.vpi.springboot.exception.PromocionException;
 import com.vpi.springboot.exception.RestauranteException;
+import com.vpi.springboot.exception.UsuarioException;
 
 public interface RestauranteServicioInterfaz {
 	public DTRespuesta altaMenu(Producto menu, String varRestaurante)
@@ -31,14 +34,23 @@ public interface RestauranteServicioInterfaz {
 	public DTRespuesta cerrarRestaurante(String mail);
 
 	public DTRespuesta confirmarPedido(int idPedido) throws PedidoException;
-	
+
 	public DTRespuesta modificarDescuentoProducto(int idProducto, int descuento) throws ProductoException;
-	
+
 	public DTRespuesta modificarPromocion(Promocion promo) throws PromocionException, ProductoException;
-	
+
+	public DTRespuesta altaPromocion(DTPromocionConPrecio promocion, String mail)
+			throws RestauranteException, PromocionException;
+
 	public DTRespuesta bajaPromocion(int idPromo) throws PromocionException;
-	
+
 	public DTRespuesta rechazarPedido(int idPedido) throws PedidoException;
+
+	public DTRespuesta calificarCliente(String mailCliente, String mailRestaurante, Calificacion calificacion)
+			throws UsuarioException, RestauranteException;
+
+	public DTRespuesta bajaCalificacionCliente(String mailCliente, String mailRestaurante)
+			throws UsuarioException, RestauranteException;
 	
 	public DTPedido buscarPedidoRecibido(int numeroPedido) throws PedidoException;
 }

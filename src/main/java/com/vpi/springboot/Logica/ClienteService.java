@@ -1,8 +1,10 @@
 package com.vpi.springboot.Logica;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,11 +17,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.vpi.springboot.IdCompuestas.CalificacionRestauranteId;
+import com.vpi.springboot.Modelo.Calificacion;
+import com.vpi.springboot.Modelo.CalificacionRestaurante;
 import com.vpi.springboot.Modelo.Carrito;
 import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Direccion;
@@ -32,9 +38,11 @@ import com.vpi.springboot.Modelo.LastDireccioClientenMongo;
 import com.vpi.springboot.Modelo.Pedido;
 import com.vpi.springboot.Modelo.dto.DTBuscarRestaurante;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
+import com.vpi.springboot.Modelo.dto.DTCliente;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
 import com.vpi.springboot.Modelo.dto.DTListarRestaurante;
 import com.vpi.springboot.Modelo.dto.DTPedido;
+import com.vpi.springboot.Modelo.dto.DTPedidoParaAprobar;
 import com.vpi.springboot.Modelo.dto.DTProducto;
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
@@ -42,6 +50,7 @@ import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoReclamo;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
+import com.vpi.springboot.Repositorios.CalificacionRestauranteRepositorio;
 import com.vpi.springboot.Repositorios.ClienteRepositorio;
 import com.vpi.springboot.Repositorios.DireccionRepositorio;
 import com.vpi.springboot.Repositorios.GeoLocalizacionRepositorio;
@@ -83,6 +92,8 @@ public class ClienteService implements ClienteServicioInterfaz {
 	private PedidoRepositorio pedidoRepo;
 	@Autowired
 	private RestauranteRepositorio restauranteRepo;
+	@Autowired
+	private CalificacionRestauranteRepositorio calRestauranteRepo;
 
 	@Autowired
 	private NextSequenceService nextSequence;
@@ -90,6 +101,10 @@ public class ClienteService implements ClienteServicioInterfaz {
 	@Autowired
 	private UltimaDireccionRepositorio ultimaDireccionRepo;
 
+
+	@Autowired
+	private SimpMessagingTemplate simpMessagingTemplate;
+	
 	@Override
 	public List<DTDireccion> getDireccionCliente(String mail) throws UsuarioException {
 		Optional<Cliente> optionalUser = userRepo.findById(mail);
@@ -136,7 +151,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 
 	}
 
-	public boolean emailExist(String mail) {
+	private boolean emailExist(String mail) {
 		return userRepo.findById(mail).isPresent();
 	}
 
@@ -243,7 +258,6 @@ public class ClienteService implements ClienteServicioInterfaz {
 	}
 
 	@Override
-
 	public DTRespuesta agregarACarrito(int producto, int cantidad, String mail, String mailRestaurante)
 			throws ProductoException {
 		Optional<Producto> optionalProducto = productoRepo.findById(producto);
@@ -318,12 +332,13 @@ public class ClienteService implements ClienteServicioInterfaz {
 				Restaurante restaurante = optionalRestaurante.get();
 				Optional<Direccion> optionalDireccion = dirRepo.findById(idDireccion);
 				if (optionalDireccion.isPresent()) {
-					String direccion = optionalDireccion.get().toString();
+					String direccion = optionalDireccion.get().getCalleNro();
 					EnumEstadoPedido estado = EnumEstadoPedido.PROCESADO;
 					double precioTotal = 0;
 					for (DTProductoCarrito DTpc : carrito.getProductoCarrito()) {
 						precioTotal = precioTotal + (DTpc.getProducto().getPrecio() * DTpc.getCantidad());
 					}
+					precioTotal = precioTotal + restaurante.getCostoDeEnvio();
 					Pedido pedido = new Pedido(LocalDateTime.now(), precioTotal, estado, pago, idCarrito, direccion,
 							restaurante, cliente, comentario);
 					pedidoRepo.save(pedido);
@@ -347,7 +362,24 @@ public class ClienteService implements ClienteServicioInterfaz {
 					userRepo.save(cliente);
 					carrito.setActivo(false);
 					mongoRepo.save(carrito);
-					//return new DTRespuesta("Pedido agregado correctamente.");
+					// return new DTRespuesta("Pedido agregado correctamente.");
+					
+					// notificamos al restaurante
+					// Push notifications to front-end
+
+			        String base64EncodedEmail = Base64.getEncoder().encodeToString(pedido.getRestaurante().getMail().getBytes(StandardCharsets.UTF_8));
+			        DTPedidoParaAprobar pedidoDT= new DTPedidoParaAprobar(pedido);
+			        pedidoDT.setComentario(comentario);
+			        pedidoDT.setDireccion(pedido.getDireccion());
+			        pedidoDT.setCarrito(carrito.getProductoCarrito());
+			        pedidoDT.setCliente(new DTCliente(pedido.getCliente()));
+			        
+					simpMessagingTemplate.convertAndSend("/topic/"+base64EncodedEmail, pedidoDT);
+					
+			        //System.out.println(base64EncodedEmail);
+			        
+			        //simpMessagingTemplate.convertAndSendToUser(base64EncodedEmail, "/topic/pedido", pedidoDTO);
+					
 					return new DTPedido(pedido);
 				} else {
 					throw new DireccionException(DireccionException.NotFoundExceptionId(idDireccion));
@@ -394,7 +426,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 	}
 
 	@Override
-	public void eliminarProductoCarrito(int idProducto, int cantABorrar, String mail) {
+	public DTRespuesta eliminarProductoCarrito(int idProducto, int cantABorrar, String mail) {
 		Carrito optionalCarrito = mongoRepo.findByMailAndActivo(mail, true);
 		List<DTProductoCarrito> dtp = optionalCarrito.getProductoCarrito();
 		DTProductoCarrito dtpcBorrar = null;
@@ -406,22 +438,26 @@ public class ClienteService implements ClienteServicioInterfaz {
 			}
 		}
 		optionalCarrito.deleteDTProductoCarrito(dtpcBorrar);
-		if(optionalCarrito.getProductoCarrito().isEmpty()) {
+		if (optionalCarrito.getProductoCarrito().isEmpty()) {
 			mongoRepo.delete(optionalCarrito);
-		}else
+		} else
 			mongoRepo.save(optionalCarrito);
-		
+
+		return new DTRespuesta("Producto eliminado con éxito");
 	}
 
-	public void eliminarCarrito(int idCarrito, String mail) throws CarritoException {
+	@Override
+	public DTRespuesta eliminarCarrito(int idCarrito, String mail) throws CarritoException {
 		Carrito optionalCarrito = mongoRepo.findByMailAndActivo(mail, true);
 		if (optionalCarrito != null) {
 			mongoRepo.delete(optionalCarrito);
+			return new DTRespuesta("Carrito eliminado con éxito");
 		} else {
 			throw new CarritoException(CarritoException.NotFoundExceptionId(idCarrito));
 		}
 	}
 
+	@Override
 	public Map<String, Object> listarPedidos(int size, int page, String sort, int order, String mailUsuario)
 			throws UsuarioException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mailUsuario);
@@ -429,11 +465,11 @@ public class ClienteService implements ClienteServicioInterfaz {
 			throw new UsuarioException(UsuarioException.NotFoundException(mailUsuario));
 
 		Cliente cliente = optionalCliente.get();
-		
+
 		Sort sorting;
 		Pageable paging;
 		// En caso de no haber argumentos para el sort
-		if(sort == "" || sort == null) {
+		if (sort == "" || sort == null) {
 			paging = PageRequest.of(page, size);
 		} else {
 			if (order == 1)
@@ -442,21 +478,89 @@ public class ClienteService implements ClienteServicioInterfaz {
 				sorting = Sort.by(Sort.Direction.ASC, sort);
 			paging = PageRequest.of(page, size, sorting);
 		}
-		
+
 		Map<String, Object> response = new HashMap<>();
 		Page<Pedido> pagePedido = pedidoRepo.findAllByCliente(cliente, paging);
 		List<Pedido> pedidos = pagePedido.getContent();
 		List<DTPedido> retorno = new ArrayList<>();
-		
-		for(Pedido p: pedidos) {
+
+		for (Pedido p : pedidos) {
 			retorno.add(new DTPedido(p));
 		}
-		
+
 		response.put("currentPage", pagePedido.getNumber());
 		response.put("totalItems", pagePedido.getTotalElements());
 		response.put("pedidos", retorno);
-		
+
 		return response;
+	}
+
+	@Override
+	public DTRespuesta calificarRestaurante(String mailCliente, String mailRestaurante, Calificacion calificacion)
+			throws UsuarioException, RestauranteException {
+		Optional<Cliente> optionalCliente = userRepo.findById(mailCliente);
+		if (!optionalCliente.isPresent())
+			throw new UsuarioException(UsuarioException.NotFoundException(mailCliente));
+		Cliente cliente = optionalCliente.get();
+
+		Optional<Restaurante> optionalRestaurante = restauranteRepo.findById(mailRestaurante);
+		if (!optionalRestaurante.isPresent()) {
+			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(mailRestaurante));
+		}
+		Restaurante restaurante = optionalRestaurante.get();
+
+		calificacion.setFecha(LocalDateTime.now());
+		CalificacionRestaurante calRestaurante = new CalificacionRestaurante(calificacion, cliente, restaurante);
+		calRestauranteRepo.save(calRestaurante);
+
+		// Calculamos la calificación del cliente y la guardamos
+		List<CalificacionRestaurante> calificaciones = calRestauranteRepo.findByRestaurante(restaurante);
+		float avg = 0;
+		for (CalificacionRestaurante c : calificaciones) {
+			avg += c.getPuntaje();
+		}
+		avg /= calificaciones.size();
+		restaurante.setCalificacionPromedio(avg);
+		restauranteRepo.save(restaurante);
+
+		return new DTRespuesta("Restaurante " + mailRestaurante + " calificado correctamente");
+	}
+
+	@Override
+	public DTRespuesta bajaCalificacionRestaurante(String mailCliente, String mailRestaurante)
+			throws UsuarioException, RestauranteException {
+		Optional<Cliente> optionalCliente = userRepo.findById(mailCliente);
+		if (!optionalCliente.isPresent())
+			throw new UsuarioException(UsuarioException.NotFoundException(mailCliente));
+		Cliente cliente = optionalCliente.get();
+
+		Optional<Restaurante> optionalRestaurante = restauranteRepo.findById(mailRestaurante);
+		if (!optionalRestaurante.isPresent()) {
+			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(mailRestaurante));
+		}
+		Restaurante restaurante = optionalRestaurante.get();
+
+		Optional<CalificacionRestaurante> optionalCalificacion = calRestauranteRepo
+				.findById(new CalificacionRestauranteId(cliente, restaurante));
+		if (!optionalCalificacion.isPresent())
+			throw new UsuarioException(UsuarioException.SinCalificacion(restaurante.getNombre()));
+		CalificacionRestaurante calRestaurante = optionalCalificacion.get();
+		calRestauranteRepo.delete(calRestaurante);
+
+		List<CalificacionRestaurante> calificaciones = calRestauranteRepo.findByRestaurante(restaurante);
+		float avg = 0f;
+		if (calificaciones.size() > 0) {
+			for (CalificacionRestaurante c : calificaciones) {
+				avg += c.getPuntaje();
+			}
+		} else
+			avg = 0.5f;
+
+		restaurante.setCalificacionPromedio(avg);
+		restauranteRepo.save(restaurante);
+
+		return new DTRespuesta(
+				"Calificacion de restaurante + " + restaurante.getNombre() + " eliminada correctamente.");
 	}
 	
 	@Override
