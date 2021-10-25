@@ -39,9 +39,11 @@ import com.vpi.springboot.Modelo.LastDireccioClientenMongo;
 import com.vpi.springboot.Modelo.Pedido;
 import com.vpi.springboot.Modelo.dto.DTBuscarRestaurante;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
+import com.vpi.springboot.Modelo.dto.DTCliente;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
 import com.vpi.springboot.Modelo.dto.DTListarRestaurante;
 import com.vpi.springboot.Modelo.dto.DTPedido;
+import com.vpi.springboot.Modelo.dto.DTPedidoParaAprobar;
 import com.vpi.springboot.Modelo.dto.DTProducto;
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
@@ -368,7 +370,13 @@ public class ClienteService implements ClienteServicioInterfaz {
 					// Push notifications to front-end
 
 			        String base64EncodedEmail = Base64.getEncoder().encodeToString(pedido.getRestaurante().getMail().getBytes(StandardCharsets.UTF_8));
-					simpMessagingTemplate.convertAndSend("/topic/"+base64EncodedEmail, new DTPedido(pedido));
+			        DTPedidoParaAprobar pedidoDT= new DTPedidoParaAprobar(pedido);
+			        pedidoDT.setComentario(comentario);
+			        pedidoDT.setDireccion(pedido.getDireccion());
+			        pedidoDT.setCarrito(carrito.getProductoCarrito());
+			        pedidoDT.setCliente(new DTCliente(pedido.getCliente()));
+			        
+					simpMessagingTemplate.convertAndSend("/topic/"+base64EncodedEmail, pedidoDT);
 					
 			        //System.out.println(base64EncodedEmail);
 			        
