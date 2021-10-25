@@ -220,9 +220,9 @@ public class ClienteController {
 	}
 	
 	@GetMapping("/buscarPedido")
-	public ResponseEntity<?> buscarPedidoRealizado(@RequestParam(defaultValue = "0") int numeroPedido, @RequestParam(defaultValue = "") String mail) {
+	public ResponseEntity<?> buscarPedidoRealizado(@RequestParam(defaultValue = "0") int numeroPedido) {
 		try {
-			return new ResponseEntity<>(clienteService.buscarPedidoRealizado(numeroPedido, mail), HttpStatus.OK);
+			return new ResponseEntity<>(clienteService.buscarPedidoRealizado(numeroPedido), HttpStatus.OK);
 		} catch (Exception e ) {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}

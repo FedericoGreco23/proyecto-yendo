@@ -390,5 +390,23 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			throw new PedidoException(PedidoException.NotFoundExceptionId(idPedido));
 		}
 	}
+	
+	@Override
+	public DTPedido buscarPedidoRecibido(int numeroPedido) throws PedidoException {
+		DTPedido DTpedido = null;
+		
+		if (numeroPedido > 0) {
+			Pedido pedido = pedidoRepo.buscarPedidoPorNumero(numeroPedido);
+			if (pedido == null) {
+				throw new PedidoException(PedidoException.NotFoundExceptionId(numeroPedido));
+			} else {
+				DTpedido = new DTPedido(pedido);
+			}
+		} else {
+			throw new PedidoException(PedidoException.NotValidId());
+		}
+
+		return DTpedido;
+	}
 
 }

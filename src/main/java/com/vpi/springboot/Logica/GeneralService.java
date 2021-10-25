@@ -291,12 +291,16 @@ public class GeneralService implements GeneralServicioInterfaz {
 		
 
 		restaurantes = pageRestaurante.getContent();
+		int pagina = pageRestaurante.getNumber();
+		long totalElements = pageRestaurante.getTotalElements();
 		// Si el horarioApertura en el filtro es menor o igual que el horarioApertura
 		// del restaurante se muestra
 		if (horarioApertura > 0) {
 			for (Restaurante r : restaurantes) {
 				if (r.getHorarioApertura().getHour() >= horarioApertura) {
 					DTListarRestaurantes.add(new DTListarRestaurante(r));
+				} else {
+					totalElements = totalElements - 1;
 				}
 			}
 		} else {
@@ -304,8 +308,10 @@ public class GeneralService implements GeneralServicioInterfaz {
 				DTListarRestaurantes.add(new DTListarRestaurante(r));
 			}
 		}
-		response.put("currentPage", pageRestaurante.getNumber());
-		response.put("totalItems", pageRestaurante.getTotalElements());
+		//response.put("currentPage", pageRestaurante.getNumber());
+		//response.put("totalItems", pageRestaurante.getTotalElements());
+		response.put("currentPage", pagina);
+		response.put("totalItems", totalElements);
 		response.put("restaurantes", DTListarRestaurantes);
 
 		return response;

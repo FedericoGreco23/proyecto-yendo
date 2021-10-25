@@ -460,15 +460,11 @@ public class ClienteService implements ClienteServicioInterfaz {
 	}
 	
 	@Override
-	public DTPedido buscarPedidoRealizado(int numeroPedido, String mail) throws PedidoException, UsuarioException {
-		Optional<Cliente> optionalCliente = userRepo.findById(mail);
+	public DTPedido buscarPedidoRealizado(int numeroPedido) throws PedidoException {
 		DTPedido DTpedido = null;
-		if (!optionalCliente.isPresent()) {
-			throw new UsuarioException(UsuarioException.NotFoundException(mail));
-		}
 		
 		if (numeroPedido > 0) {
-			Pedido pedido = pedidoRepo.buscarPedidoRealizadoPorNumero(numeroPedido);
+			Pedido pedido = pedidoRepo.buscarPedidoPorNumero(numeroPedido);
 			if (pedido == null) {
 				throw new PedidoException(PedidoException.NotFoundExceptionId(numeroPedido));
 			} else {

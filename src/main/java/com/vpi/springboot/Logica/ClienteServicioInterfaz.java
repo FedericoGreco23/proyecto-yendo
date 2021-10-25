@@ -52,6 +52,6 @@ public interface ClienteServicioInterfaz {
 	public Map<String, Object> listarPedidos(int size, int page, String sort, int order, String mailUsuario)
 			throws UsuarioException;
 	
-	public DTPedido buscarPedidoRealizado(int numeroPedido, String mail) throws PedidoException, UsuarioException;
+	public DTPedido buscarPedidoRealizado(int numeroPedido) throws PedidoException;
 
 }
