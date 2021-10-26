@@ -240,7 +240,6 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		return new DTRespuesta("Menú modificado correctamente.");
 	}
 
-	// TODO ordenamiento: precio y fecha
 	@Override
 	public Map<String, Object> listarPedidos(int page, int size, String mailRestaurante, String id, String fecha,
 			String estado, String sort, int order) throws RestauranteException {
@@ -254,66 +253,97 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		List<DTPedido> retorno = new ArrayList<>();
 		Pageable paging;
 
-		if (sort != "" || sort != null) {
+		if (!sort.equalsIgnoreCase("")) {
 			if (order == 1)
 				paging = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sort)));
 			else
 				paging = PageRequest.of(page, size, Sort.by(Sort.Order.asc(sort)));
-		} else
+		} else {
 			paging = PageRequest.of(page, size);
+		}
 
 		Page<Pedido> pagePedido;
 		List<Pedido> pedidos = new ArrayList<>();
-		if (id != "" || fecha != "" || estado != "") {
-			if (id != "") {
-				try { // id puede ser parseado a int
-					int pedidoId = Integer.parseInt(id);
-					pagePedido = pedidoRepo.findPageById(pedidoId, paging);
-					pedidos = pagePedido.getContent();
-
-					response.put("currentPage", pagePedido.getNumber());
-					response.put("totalItems", pagePedido.getTotalElements());
-				} catch (Exception e) { // caso contrario
-					int totalItems = 0;
-					List<Cliente> clientes = new ArrayList<>();
-					// Busca los clientes por su mail
-					clientes = clienteRepo.buscarClientesMail(id);
-					totalItems += clientes.size();
-					for (Cliente c : clientes) {
-						for (Pedido p : c.getPedidos()) {
-							pedidos.add(p);
-						}
-					}
-					// Busca los clientes por su mail
-					clientes = clienteRepo.buscarClientesNickname(id);
-					totalItems += clientes.size();
-					for (Cliente c : clientes) {
-						for (Pedido p : c.getPedidos()) {
-							pedidos.add(p);
-						}
-					}
-
-					response.put("totalItems", totalItems);
-				}
-			} 
-			
-			if(fecha != "") {
+		if (id != "" || fecha != "" || estado != "") {			
+			if (!id.equalsIgnoreCase("") && !fecha.equalsIgnoreCase("") && !estado.equalsIgnoreCase("")) {
+				EnumEstadoPedido estadoPedido = EnumEstadoPedido.valueOf(estado);
 				DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("MM-dd-yyyy");
 			    LocalDate ld = LocalDate.parse(fecha, DATEFORMATTER);
 				LocalDateTime dateI = LocalDateTime.of(ld, LocalTime.of(00, 01));
 				LocalDateTime dateF = LocalDateTime.of(ld, LocalTime.of(23, 59));
 				
-				pagePedido = pedidoRepo.findPageByDate(dateI, dateF, paging);
+				try { // id puede ser parseado a int
+					int idPedido = Integer.parseInt(id);
+					pagePedido = pedidoRepo.findByIdFechaEstado(idPedido, dateI, dateF, estadoPedido, restaurante, paging);
+				} catch (Exception e) { // caso contrario
+					pagePedido = pedidoRepo.findByClienteFechaEstado(id, dateI, dateF, estadoPedido, restaurante, paging);
+				}
+				
 				pedidos = pagePedido.getContent();
-
 				response.put("currentPage", pagePedido.getNumber());
 				response.put("totalItems", pagePedido.getTotalElements());
 			}
 			
+			//TODO no puede parsear int
+			if (!id.equalsIgnoreCase("")) {
+				try { // id puede ser parseado a int
+					int idPedido = Integer.parseInt(id);
+					pagePedido = pedidoRepo.findById(idPedido, restaurante, paging);
+				} catch (Exception e) { // caso contrario
+					pagePedido = pedidoRepo.findByCliente(id, restaurante, paging);
+				}
+				
+				pedidos = pagePedido.getContent();
+				response.put("currentPage", pagePedido.getNumber());
+				response.put("totalItems", pagePedido.getTotalElements());
+			}
+			
+			//TODO
+			// id + fecha
+			// cliente + fecha
+			// id + estado
+			// cliente + estado
+			// fecha + estado
+			// fecha
+			// estado
+			
+			if (!id.equalsIgnoreCase("") && !fecha.equalsIgnoreCase("")) {
+				DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("MM-dd-yyyy");
+			    LocalDate ld = LocalDate.parse(fecha, DATEFORMATTER);
+				LocalDateTime dateI = LocalDateTime.of(ld, LocalTime.of(00, 01));
+				LocalDateTime dateF = LocalDateTime.of(ld, LocalTime.of(23, 59));
+				
+				try { // id puede ser parseado a int
+					int idPedido = Integer.parseInt(id);
+					pagePedido = pedidoRepo.findByIdFecha(idPedido, dateI, dateF, restaurante, paging);
+				} catch (Exception e) { // caso contrario
+					pagePedido = pedidoRepo.findByClienteFecha(id, dateI, dateF, restaurante, paging);
+				}
+				
+				pedidos = pagePedido.getContent();
+				response.put("currentPage", pagePedido.getNumber());
+				response.put("totalItems", pagePedido.getTotalElements());
+			}
+			
+//			if(fecha != "") {
+//				DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("MM-dd-yyyy");
+//			    LocalDate ld = LocalDate.parse(fecha, DATEFORMATTER);
+//				LocalDateTime dateI = LocalDateTime.of(ld, LocalTime.of(00, 01));
+//				LocalDateTime dateF = LocalDateTime.of(ld, LocalTime.of(23, 59));
+//				
+//				pagePedido = pedidoRepo.findPageByDate(dateI, dateF, paging);
+//				pedidos = pagePedido.getContent();
+//
+//				response.put("currentPage", pagePedido.getNumber());
+//				response.put("totalItems", pagePedido.getTotalElements());
+//			}
+			
 			for (Pedido p : pedidos) {
 				retorno.add(new DTPedido(p));
 			}
+			
 		} else {
+			System.out.println("todo null");
 			pagePedido = pedidoRepo.findAllByRestaurante(restaurante, paging);
 			pedidos = pagePedido.getContent();
 
