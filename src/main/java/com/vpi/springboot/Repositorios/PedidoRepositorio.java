@@ -126,8 +126,6 @@ public interface PedidoRepositorio extends JpaRepository<Pedido, Integer> {
 			"SELECT ped FROM Pedido ped "
 			+ "WHERE ped.restaurante = :restaurante "
 			+ "and ped.id = :id "
-			+ "and ped.fecha > :dateI "
-			+ "and ped.fecha < :dateF "
 			+ "and ped.estadoPedido = :estado";
 	
 	@Query(queryIdEstado)

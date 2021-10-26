@@ -95,7 +95,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	@Autowired
 	private ReclamoRepositorio recRepo;
 
-	private DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("MM-dd-yyyy");;
+	private DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");;
 
 	private DTCarrito verCarrito(int id) {
 		Optional<Carrito> optionalCarrito = mongoRepo.findById(id);
@@ -270,7 +270,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		if (!id.equalsIgnoreCase("") || !fecha.equalsIgnoreCase("") || !estado.equalsIgnoreCase("")) {
 			// cliente/id + fecha + estado
 			if (!id.equalsIgnoreCase("") && !fecha.equalsIgnoreCase("") && !estado.equalsIgnoreCase("")) {
-				EnumEstadoPedido estadoPedido = EnumEstadoPedido.valueOf(estado);
+				EnumEstadoPedido estadoPedido = EnumEstadoPedido.valueOf(estado.toUpperCase());
 				LocalDate ld = LocalDate.parse(fecha, DATEFORMATTER);
 				LocalDateTime dateI = LocalDateTime.of(ld, LocalTime.of(00, 01));
 				LocalDateTime dateF = LocalDateTime.of(ld, LocalTime.of(23, 59));
@@ -301,7 +301,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 			// cliente/id + estado
 			else if (!id.equalsIgnoreCase("") && !estado.equalsIgnoreCase("")) {
-				EnumEstadoPedido estadoPedido = EnumEstadoPedido.valueOf(estado);
+				EnumEstadoPedido estadoPedido = EnumEstadoPedido.valueOf(estado.toUpperCase());
 
 				try { // id puede ser parseado a int
 					int idPedido = Integer.parseInt(id);
@@ -313,7 +313,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 			// fecha + estado
 			else if (!fecha.equalsIgnoreCase("") && !estado.equalsIgnoreCase("")) {
-				EnumEstadoPedido estadoPedido = EnumEstadoPedido.valueOf(estado);
+				EnumEstadoPedido estadoPedido = EnumEstadoPedido.valueOf(estado.toUpperCase());
 				LocalDate ld = LocalDate.parse(fecha, DATEFORMATTER);
 				LocalDateTime dateI = LocalDateTime.of(ld, LocalTime.of(00, 01));
 				LocalDateTime dateF = LocalDateTime.of(ld, LocalTime.of(23, 59));
@@ -342,7 +342,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 			// estado
 			else if (!estado.equalsIgnoreCase("")) {
-				EnumEstadoPedido estadoPedido = EnumEstadoPedido.valueOf(estado);
+				EnumEstadoPedido estadoPedido = EnumEstadoPedido.valueOf(estado.toUpperCase());
 				pagePedido = pedidoRepo.findByEstado(estadoPedido, restaurante, paging);
 			} else
 				pagePedido = pedidoRepo.findAllByRestaurante(restaurante, paging);
