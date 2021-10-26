@@ -46,6 +46,7 @@ import com.vpi.springboot.Modelo.dto.DTPedido;
 import com.vpi.springboot.Modelo.dto.DTPedidoParaAprobar;
 import com.vpi.springboot.Modelo.dto.DTProducto;
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
+import com.vpi.springboot.Modelo.dto.DTReclamo;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoReclamo;
@@ -60,6 +61,7 @@ import com.vpi.springboot.Repositorios.GeoLocalizacionRepositorio;
 import com.vpi.springboot.Repositorios.MongoRepositorioCarrito;
 import com.vpi.springboot.Repositorios.PedidoRepositorio;
 import com.vpi.springboot.Repositorios.ProductoRepositorio;
+import com.vpi.springboot.Repositorios.ReclamoRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
 import com.vpi.springboot.exception.CarritoException;
 import com.vpi.springboot.exception.DireccionException;
@@ -96,6 +98,8 @@ public class ClienteService implements ClienteServicioInterfaz {
 	private RestauranteRepositorio restauranteRepo;
 	@Autowired
 	private CalificacionRestauranteRepositorio calRestauranteRepo;
+	@Autowired
+	private ReclamoRepositorio recRepo;
 
 	@Autowired
 	private NextSequenceService nextSequence;
@@ -103,10 +107,9 @@ public class ClienteService implements ClienteServicioInterfaz {
 	@Autowired
 	private UltimaDireccionRepositorio ultimaDireccionRepo;
 
-
 	@Autowired
 	private SimpMessagingTemplate simpMessagingTemplate;
-	
+
 	@Override
 	public List<DTDireccion> getDireccionCliente(String mail) throws UsuarioException {
 		Optional<Cliente> optionalUser = userRepo.findById(mail);
@@ -365,23 +368,25 @@ public class ClienteService implements ClienteServicioInterfaz {
 					carrito.setActivo(false);
 					mongoRepo.save(carrito);
 					// return new DTRespuesta("Pedido agregado correctamente.");
-					
+
 					// notificamos al restaurante
 					// Push notifications to front-end
 
-			        String base64EncodedEmail = Base64.getEncoder().encodeToString(pedido.getRestaurante().getMail().getBytes(StandardCharsets.UTF_8));
-			        DTPedidoParaAprobar pedidoDT= new DTPedidoParaAprobar(pedido);
-			        pedidoDT.setComentario(comentario);
-			        pedidoDT.setDireccion(pedido.getDireccion());
-			        pedidoDT.setCarrito(carrito.getProductoCarrito());
-			        pedidoDT.setCliente(new DTCliente(pedido.getCliente()));
-			        
-					simpMessagingTemplate.convertAndSend("/topic/"+base64EncodedEmail, pedidoDT);
-					
-			        //System.out.println(base64EncodedEmail);
-			        
-			        //simpMessagingTemplate.convertAndSendToUser(base64EncodedEmail, "/topic/pedido", pedidoDTO);
-					
+					String base64EncodedEmail = Base64.getEncoder()
+							.encodeToString(pedido.getRestaurante().getMail().getBytes(StandardCharsets.UTF_8));
+					DTPedidoParaAprobar pedidoDT = new DTPedidoParaAprobar(pedido);
+					pedidoDT.setComentario(comentario);
+					pedidoDT.setDireccion(pedido.getDireccion());
+					pedidoDT.setCarrito(carrito.getProductoCarrito());
+					pedidoDT.setCliente(new DTCliente(pedido.getCliente()));
+
+					simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, pedidoDT);
+
+					// System.out.println(base64EncodedEmail);
+
+					// simpMessagingTemplate.convertAndSendToUser(base64EncodedEmail,
+					// "/topic/pedido", pedidoDTO);
+
 					return new DTPedido(pedido);
 				} else {
 					throw new DireccionException(DireccionException.NotFoundExceptionId(idDireccion));
@@ -585,5 +590,29 @@ public class ClienteService implements ClienteServicioInterfaz {
 
 		return new DTRespuesta(
 				"Calificacion de restaurante + " + restaurante.getNombre() + " eliminada correctamente.");
+	}
+
+	public Map<String, Object> listarReclamos(int size, int page, String sort, int order, String mailCliente)
+			throws UsuarioException {
+		Optional<Cliente> optionalCliente = userRepo.findById(mailCliente);
+		if (!optionalCliente.isPresent())
+			throw new UsuarioException(UsuarioException.NotFoundException(mailCliente));
+		Cliente cliente = optionalCliente.get();
+		
+		Pageable paging = PageRequest.of(page, size);
+		Page<Reclamo> pageReclamo = recRepo.findAllByCliente(cliente, paging);
+		List<Reclamo> reclamos = pageReclamo.getContent();
+		List<DTReclamo> retorno = new ArrayList<>();
+		Map<String, Object> response = new HashMap<>();
+		
+		for(Reclamo r : reclamos) {
+			retorno.add(new DTReclamo(r));
+		}
+		
+		response.put("currentPage", pageReclamo.getTotalPages());
+		response.put("totalItems", pageReclamo.getTotalElements());
+		response.put("reclamos", retorno);
+		
+		return response;
 	}
 }

@@ -256,7 +256,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			retorno.add(new DTPedido(p));
 		}
 
-		response.put("pedidos", pedidos);
+		response.put("pedidos", retorno);
 		return response;
 	}
 

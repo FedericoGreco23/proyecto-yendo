@@ -60,5 +60,8 @@ public interface ClienteServicioInterfaz {
 	
 	public DTRespuesta bajaCalificacionRestaurante(String mailCliente, String mailRestaurante)
 			throws UsuarioException, RestauranteException;
+	
+	public Map<String, Object> listarReclamos(int size, int page, String sort, int order, String mailCliente)
+			throws UsuarioException;
 
 }
