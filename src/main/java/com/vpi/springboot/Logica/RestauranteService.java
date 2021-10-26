@@ -480,22 +480,40 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(mailRestaurante));
 		}
 		Restaurante restaurante = optionalRestaurante.get();
-		
+
 		Pageable paging = PageRequest.of(page, size);
 		Page<Reclamo> pageReclamo = recRepo.findAllByRestaurante(restaurante, paging);
-		
+
 		List<Reclamo> reclamos = pageReclamo.getContent();
 		List<DTReclamo> retorno = new ArrayList<>();
 		Map<String, Object> response = new HashMap<>();
-		
+
 		for(Reclamo r : reclamos) {
 			retorno.add(new DTReclamo(r));
 		}
-		
+
 		response.put("currentPage", pageReclamo.getTotalPages());
 		response.put("totalItems", pageReclamo.getTotalElements());
 		response.put("reclamos", retorno);
-		
+
 		return response;
+	}
+
+	@Override
+	public DTPedido buscarPedidoRecibido(int numeroPedido) throws PedidoException {
+		DTPedido DTpedido = null;
+
+		if (numeroPedido > 0) {
+			Pedido pedido = pedidoRepo.buscarPedidoPorNumero(numeroPedido);
+			if (pedido == null) {
+				throw new PedidoException(PedidoException.NotFoundExceptionId(numeroPedido));
+			} else {
+				DTpedido = new DTPedido(pedido);
+			}
+		} else {
+			throw new PedidoException(PedidoException.NotValidId());
+		}
+
+		return DTpedido;
 	}
 }

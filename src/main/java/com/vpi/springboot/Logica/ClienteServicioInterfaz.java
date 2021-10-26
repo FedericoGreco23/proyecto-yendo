@@ -52,16 +52,16 @@ public interface ClienteServicioInterfaz {
 
 	public Map<String, Object> listarPedidos(int size, int page, String sort, int order, String mailUsuario)
 			throws UsuarioException;
-	
-	public DTPedido buscarPedidoRealizado(int numeroPedido, String mail) throws PedidoException, UsuarioException;
-	
+
 	public DTRespuesta calificarRestaurante(String mailCliente, String mailRestaurante, Calificacion calificacion)
 			throws UsuarioException, RestauranteException;
-	
+
 	public DTRespuesta bajaCalificacionRestaurante(String mailCliente, String mailRestaurante)
 			throws UsuarioException, RestauranteException;
-	
+
 	public Map<String, Object> listarReclamos(int size, int page, String sort, int order, String mailCliente)
 			throws UsuarioException;
+
+			public DTPedido buscarPedidoRealizado(int numeroPedido) throws PedidoException;
 
 }

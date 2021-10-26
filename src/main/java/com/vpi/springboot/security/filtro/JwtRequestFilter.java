@@ -35,7 +35,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Autowired
     private JwtUtil jwtUtil;
 
-    
+    private HttpServletRequest request;
     /**
      * aqui se analizan los request. Es decir va a mirar el header y ver si el jwt es válido
      * Si es válido, guarda al usuario en el context
@@ -43,6 +43,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
+    	
+    	this.request=request;
 
     	//obtenemos el token del header y le sacamos "Bearer "
         final String authorizationHeader = request.getHeader("Authorization");
@@ -72,8 +74,15 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
             }
         }
+               
         //encadena con el siguiente filtro por defecto
         chain.doFilter(request, response);
     }
+	public HttpServletRequest getRequest() {
+		return request;
+	}
+	public void setRequest(HttpServletRequest request) {
+		this.request = request;
+	}
 
 }

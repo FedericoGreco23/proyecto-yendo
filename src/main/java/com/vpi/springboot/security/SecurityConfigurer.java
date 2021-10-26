@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -116,12 +118,32 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
 	@Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "http://localhost:4201", "https://prueba-concepto-frontend.herokuapp.com"));//aca va host 
+        
+        
+        ////////////////////////pruebas para mobile//////////////////////
+        HttpServletRequest request= jwtRequestFilter.getRequest();
+        
+        if(!request.getHeader("device").isBlank() && request.getHeader("device").contains("mobile")) {//caso mobile
+        	
+        	
+        	configuration.setAllowedOrigins(Arrays.asList("*"));
+        	
+        	
+        }else {//caso web
+        	
+        	configuration.setAllowedOrigins(Arrays.asList("/**", "http://localhost:8100", "https://localhost:443","http://localhost:4200", "http://localhost:4201", "https://prueba-concepto-frontend.herokuapp.com"));//aca va host 
+        	configuration.setAllowCredentials(true);
+        }
+        
+                
+        
+        /////////////////////////fin de prueba mobile//////////////////
+        
+
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD", "CONNECT"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         //res.header('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
         configuration.setExposedHeaders(Arrays.asList("*"));
-        configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         Map<String, CorsConfiguration> corsConfigMap= new HashMap<String, CorsConfiguration>();
         corsConfigMap.put("/**", configuration);

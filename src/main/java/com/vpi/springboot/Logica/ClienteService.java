@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.vpi.springboot.IdCompuestas.CalificacionRestauranteId;
 import com.vpi.springboot.Modelo.Calificacion;
-import com.vpi.springboot.Modelo.CalificacionCliente;
 import com.vpi.springboot.Modelo.CalificacionRestaurante;
 import com.vpi.springboot.Modelo.Carrito;
 import com.vpi.springboot.Modelo.Cliente;
@@ -52,7 +51,6 @@ import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoReclamo;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
-import com.vpi.springboot.Repositorios.CalificacionClienteRepositorio;
 import com.vpi.springboot.Repositorios.CalificacionRestauranteRepositorio;
 import com.vpi.springboot.Repositorios.ClienteRepositorio;
 import com.vpi.springboot.Repositorios.DireccionRepositorio;
@@ -503,28 +501,6 @@ public class ClienteService implements ClienteServicioInterfaz {
 	}
 
 	@Override
-	public DTPedido buscarPedidoRealizado(int numeroPedido, String mail) throws PedidoException, UsuarioException {
-		Optional<Cliente> optionalCliente = userRepo.findById(mail);
-		DTPedido DTpedido = null;
-		if (!optionalCliente.isPresent()) {
-			throw new UsuarioException(UsuarioException.NotFoundException(mail));
-		}
-
-		if (numeroPedido > 0) {
-			Pedido pedido = pedidoRepo.buscarPedidoRealizadoPorNumero(numeroPedido);
-			if (pedido == null) {
-				throw new PedidoException(PedidoException.NotFoundExceptionId(numeroPedido));
-			} else {
-				DTpedido = new DTPedido(pedido);
-			}
-		} else {
-			throw new PedidoException(PedidoException.NotValidId());
-		}
-
-		return DTpedido;
-	}
-
-	@Override
 	public DTRespuesta calificarRestaurante(String mailCliente, String mailRestaurante, Calificacion calificacion)
 			throws UsuarioException, RestauranteException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mailCliente);
@@ -598,21 +574,41 @@ public class ClienteService implements ClienteServicioInterfaz {
 		if (!optionalCliente.isPresent())
 			throw new UsuarioException(UsuarioException.NotFoundException(mailCliente));
 		Cliente cliente = optionalCliente.get();
-		
+
 		Pageable paging = PageRequest.of(page, size);
 		Page<Reclamo> pageReclamo = recRepo.findAllByCliente(cliente, paging);
 		List<Reclamo> reclamos = pageReclamo.getContent();
 		List<DTReclamo> retorno = new ArrayList<>();
 		Map<String, Object> response = new HashMap<>();
-		
+
 		for(Reclamo r : reclamos) {
 			retorno.add(new DTReclamo(r));
 		}
-		
+
 		response.put("currentPage", pageReclamo.getTotalPages());
 		response.put("totalItems", pageReclamo.getTotalElements());
 		response.put("reclamos", retorno);
-		
+
 		return response;
 	}
 }
+
+	@Override
+	public DTPedido buscarPedidoRealizado(int numeroPedido) throws PedidoException {
+		DTPedido DTpedido = null;
+
+		if (numeroPedido > 0) {
+			Pedido pedido = pedidoRepo.buscarPedidoPorNumero(numeroPedido);
+			if (pedido == null) {
+				throw new PedidoException(PedidoException.NotFoundExceptionId(numeroPedido));
+			} else {
+				DTpedido = new DTPedido(pedido);
+			}
+		} else {
+			throw new PedidoException(PedidoException.NotValidId());
+		}
+
+		return DTpedido;
+	}
+}
+>>>>>>> main

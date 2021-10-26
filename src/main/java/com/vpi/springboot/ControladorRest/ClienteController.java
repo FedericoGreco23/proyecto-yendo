@@ -1,8 +1,6 @@
 package com.vpi.springboot.ControladorRest;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.Base64;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,7 +21,6 @@ import com.vpi.springboot.Modelo.dto.DTPedido;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
 import com.vpi.springboot.exception.CarritoException;
-import com.vpi.springboot.exception.PermisosException;
 import com.vpi.springboot.exception.RestauranteException;
 import com.vpi.springboot.exception.UsuarioException;
 import com.vpi.springboot.security.util.JwtUtil;
@@ -204,16 +201,6 @@ public class ClienteController {
 		}
 	}
 
-	@GetMapping("/buscarPedido")
-	public ResponseEntity<?> buscarPedidoRealizado(@RequestParam(defaultValue = "0") int numeroPedido,
-			@RequestParam(defaultValue = "") String mail) {
-		try {
-			return new ResponseEntity<>(clienteService.buscarPedidoRealizado(numeroPedido, mail), HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
-
 	@PostMapping("/calificarRestaurante/{mailRestaurante}")
 	public ResponseEntity<?> calificarRestaurante(@PathVariable String mailRestaurante,
 			@RequestBody Calificacion calificacion) {
@@ -247,5 +234,14 @@ public class ClienteController {
 			mail = jwtUtil.extractUsername(jwt);
 		}
 		return mail;
+	}
+	
+	@GetMapping("/buscarPedido")
+	public ResponseEntity<?> buscarPedidoRealizado(@RequestParam(defaultValue = "0") int numeroPedido) {
+		try {
+			return new ResponseEntity<>(clienteService.buscarPedidoRealizado(numeroPedido), HttpStatus.OK);
+		} catch (Exception e ) {
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }

@@ -273,6 +273,15 @@ public class RestauranteController {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@GetMapping("/buscarPedido")
+	public ResponseEntity<?> buscarPedidoRecibido(@RequestParam(defaultValue = "0") int numeroPedido) {
+		try {
+			return new ResponseEntity<>(service.buscarPedidoRecibido(numeroPedido), HttpStatus.OK);
+		} catch (Exception e ) {
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 	/// PRIVADAS PARA JWT ///
 	/////////////////////////

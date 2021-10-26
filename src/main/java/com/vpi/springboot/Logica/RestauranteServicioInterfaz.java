@@ -1,6 +1,7 @@
 package com.vpi.springboot.Logica;
 
 import com.vpi.springboot.Modelo.Restaurante;
+import com.vpi.springboot.Modelo.dto.DTPedido;
 import com.vpi.springboot.Modelo.dto.DTPromocionConPrecio;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 
@@ -50,6 +51,8 @@ public interface RestauranteServicioInterfaz {
 
 	public DTRespuesta bajaCalificacionCliente(String mailCliente, String mailRestaurante)
 			throws UsuarioException, RestauranteException;
-	
+
 	public Map<String, Object> listarReclamos(int page, int size, String mailRestaurante) throws RestauranteException;
+	
+	public DTPedido buscarPedidoRecibido(int numeroPedido) throws PedidoException;
 }
