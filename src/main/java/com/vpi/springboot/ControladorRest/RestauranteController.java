@@ -99,23 +99,23 @@ public class RestauranteController {
 		}
 	}
 
-	@CrossOrigin(origins = "*", allowedHeaders = "*")
-	@GetMapping("/getPedidos")
-	public ResponseEntity<?> listarPedidos(@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "5") int size) {
-		if (!esRestaurante()) {
-			return new ResponseEntity<>(
-					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
-					HttpStatus.FORBIDDEN);
-		}
-
-		try {
-			return new ResponseEntity<>(service.listarPedidos(page, size, getMailFromJwt()), HttpStatus.OK);
-		} catch (RestauranteException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
+//	@CrossOrigin(origins = "*", allowedHeaders = "*")
+//	@GetMapping("/getPedidos")
+//	public ResponseEntity<?> listarPedidos(@RequestParam(defaultValue = "0") int page,
+//			@RequestParam(defaultValue = "5") int size) {
+//		if (!esRestaurante()) {
+//			return new ResponseEntity<>(
+//					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
+//					HttpStatus.FORBIDDEN);
+//		}
+//
+//		try {
+//			return new ResponseEntity<>(service.listarPedidos(page, size, getMailFromJwt()), HttpStatus.OK);
+//		} catch (RestauranteException e) {
+//			e.printStackTrace();
+//			return null;
+//		}
+//	}
 
 	@PostMapping("/abrirRestaurante")
 	ResponseEntity<?> abrirRestaurante() {

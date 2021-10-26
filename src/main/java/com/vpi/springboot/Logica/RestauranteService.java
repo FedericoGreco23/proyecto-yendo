@@ -1,7 +1,11 @@
 package com.vpi.springboot.Logica;
 
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -235,25 +240,89 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		return new DTRespuesta("Menú modificado correctamente.");
 	}
 
+	// TODO ordenamiento: precio y fecha
 	@Override
-	public Map<String, Object> listarPedidos(int page, int size, String varRestaurante) throws RestauranteException {
-		Optional<Restaurante> optionalRestaurante = resRepo.findById(varRestaurante);
+	public Map<String, Object> listarPedidos(int page, int size, String mailRestaurante, String id, String fecha,
+			String estado, String sort, int order) throws RestauranteException {
+		Optional<Restaurante> optionalRestaurante = resRepo.findById(mailRestaurante);
 		if (!optionalRestaurante.isPresent()) {
-			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(varRestaurante));
+			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(mailRestaurante));
 		}
 		Restaurante restaurante = optionalRestaurante.get();
 
 		Map<String, Object> response = new HashMap<>();
-		Pageable paging = PageRequest.of(page, size);
-		Page<Pedido> pagePedido = pedidoRepo.findAllByRestaurante(restaurante, paging);
-		List<Pedido> pedidos = pagePedido.getContent();
 		List<DTPedido> retorno = new ArrayList<>();
+		Pageable paging;
 
-		response.put("currentPage", pagePedido.getNumber());
-		response.put("totalItems", pagePedido.getTotalElements());
+		if (sort != "" || sort != null) {
+			if (order == 1)
+				paging = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sort)));
+			else
+				paging = PageRequest.of(page, size, Sort.by(Sort.Order.asc(sort)));
+		} else
+			paging = PageRequest.of(page, size);
 
-		for (Pedido p : pedidos) {
-			retorno.add(new DTPedido(p));
+		Page<Pedido> pagePedido;
+		List<Pedido> pedidos = new ArrayList<>();
+		if (id != "" || fecha != "" || estado != "") {
+			if (id != "") {
+				try { // id puede ser parseado a int
+					int pedidoId = Integer.parseInt(id);
+					pagePedido = pedidoRepo.findPageById(pedidoId, paging);
+					pedidos = pagePedido.getContent();
+
+					response.put("currentPage", pagePedido.getNumber());
+					response.put("totalItems", pagePedido.getTotalElements());
+				} catch (Exception e) { // caso contrario
+					int totalItems = 0;
+					List<Cliente> clientes = new ArrayList<>();
+					// Busca los clientes por su mail
+					clientes = clienteRepo.buscarClientesMail(id);
+					totalItems += clientes.size();
+					for (Cliente c : clientes) {
+						for (Pedido p : c.getPedidos()) {
+							pedidos.add(p);
+						}
+					}
+					// Busca los clientes por su mail
+					clientes = clienteRepo.buscarClientesNickname(id);
+					totalItems += clientes.size();
+					for (Cliente c : clientes) {
+						for (Pedido p : c.getPedidos()) {
+							pedidos.add(p);
+						}
+					}
+
+					response.put("totalItems", totalItems);
+				}
+			} 
+			
+			if(fecha != "") {
+				DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("MM-dd-yyyy");
+			    LocalDate ld = LocalDate.parse(fecha, DATEFORMATTER);
+				LocalDateTime dateI = LocalDateTime.of(ld, LocalTime.of(00, 01));
+				LocalDateTime dateF = LocalDateTime.of(ld, LocalTime.of(23, 59));
+				
+				pagePedido = pedidoRepo.findPageByDate(dateI, dateF, paging);
+				pedidos = pagePedido.getContent();
+
+				response.put("currentPage", pagePedido.getNumber());
+				response.put("totalItems", pagePedido.getTotalElements());
+			}
+			
+			for (Pedido p : pedidos) {
+				retorno.add(new DTPedido(p));
+			}
+		} else {
+			pagePedido = pedidoRepo.findAllByRestaurante(restaurante, paging);
+			pedidos = pagePedido.getContent();
+
+			for (Pedido p : pedidos) {
+				retorno.add(new DTPedido(p));
+			}
+
+			response.put("currentPage", pagePedido.getNumber());
+			response.put("totalItems", pagePedido.getTotalElements());
 		}
 
 		response.put("pedidos", retorno);
@@ -473,8 +542,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		return new DTRespuesta("Calificación de cliente " + mailCliente + " eliminada correctamente");
 	}
 
-	public Map<String, Object> listarReclamos(int page, int size, String mailRestaurante)
-			throws RestauranteException {
+	public Map<String, Object> listarReclamos(int page, int size, String mailRestaurante) throws RestauranteException {
 		Optional<Restaurante> optionalRestaurante = restauranteRepo.findById(mailRestaurante);
 		if (!optionalRestaurante.isPresent()) {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(mailRestaurante));
@@ -488,7 +556,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		List<DTReclamo> retorno = new ArrayList<>();
 		Map<String, Object> response = new HashMap<>();
 
-		for(Reclamo r : reclamos) {
+		for (Reclamo r : reclamos) {
 			retorno.add(new DTReclamo(r));
 		}
 

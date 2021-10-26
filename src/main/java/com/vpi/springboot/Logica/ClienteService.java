@@ -462,6 +462,8 @@ public class ClienteService implements ClienteServicioInterfaz {
 		}
 	}
 
+	//TODO ordenamiento: fecha, precio
+	//TODO filtro: fecha, restaurante
 	@Override
 	public Map<String, Object> listarPedidos(int size, int page, String sort, int order, String mailUsuario)
 			throws UsuarioException {
@@ -591,7 +593,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 
 		return response;
 	}
-}
+
 
 	@Override
 	public DTPedido buscarPedidoRealizado(int numeroPedido) throws PedidoException {
@@ -611,4 +613,3 @@ public class ClienteService implements ClienteServicioInterfaz {
 		return DTpedido;
 	}
 }
->>>>>>> main

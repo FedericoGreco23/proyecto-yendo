@@ -16,7 +16,7 @@ public interface AdministradorRepositorio extends UserBaseRepository<Administrad
 	
 	@Query("SELECT a FROM Administrador a WHERE UPPER(a.mail) LIKE CONCAT('%',UPPER(:mail),'%')")
 	public Page<Administrador> buscarAdministradorNombre(@Param("mail") String mail, @Param("page") Pageable page);
-	
+		
 	@Query("SELECT a FROM Administrador a")
 	public Page<Administrador> buscarAdministrador(@Param("page") Pageable page);
 }
