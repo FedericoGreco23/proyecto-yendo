@@ -32,6 +32,9 @@ public class Reclamo {
 	@ManyToOne
 	@JoinColumn(name = "restauranteMail")
 	private Restaurante restaurante;
+//	@ManyToOne
+//	@JoinColumn(name = "restauranteMail")
+//	private Cliente cliente;
 
 	public Reclamo(String comentario, LocalDateTime fecha, EnumEstadoReclamo estado, String resolucion) {
 		super();

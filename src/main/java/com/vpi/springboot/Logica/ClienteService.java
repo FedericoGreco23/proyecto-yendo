@@ -578,7 +578,8 @@ public class ClienteService implements ClienteServicioInterfaz {
 		Cliente cliente = optionalCliente.get();
 
 		Pageable paging = PageRequest.of(page, size);
-		Page<Reclamo> pageReclamo = recRepo.findAllByCliente(cliente, paging);
+//		Page<Reclamo> pageReclamo = recRepo.findAllByCliente(cliente, paging);
+		Page<Reclamo> pageReclamo = recRepo.findAll(paging);
 		List<Reclamo> reclamos = pageReclamo.getContent();
 		List<DTReclamo> retorno = new ArrayList<>();
 		Map<String, Object> response = new HashMap<>();
@@ -593,7 +594,6 @@ public class ClienteService implements ClienteServicioInterfaz {
 
 		return response;
 	}
-
 
 	@Override
 	public DTPedido buscarPedidoRealizado(int numeroPedido) throws PedidoException {
