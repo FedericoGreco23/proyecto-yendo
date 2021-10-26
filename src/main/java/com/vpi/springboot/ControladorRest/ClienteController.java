@@ -190,11 +190,12 @@ public class ClienteController {
 	}
 
 	@GetMapping("/getPedidos")
-	public ResponseEntity<?> listarPedidos(@RequestParam(defaultValue = "5") int size,
-			@RequestParam(defaultValue = "0") int page, @RequestParam(required = false) String sort,
+	public ResponseEntity<?> listarPedidos(@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "") String restaurante,
+			@RequestParam(defaultValue = "") String fecha, @RequestParam(defaultValue = "") String sort, 
 			@RequestParam(defaultValue = "1") int order) {
 		try {
-			return new ResponseEntity<>(clienteService.listarPedidos(size, page, sort, order, getMailFromJwt()),
+			return new ResponseEntity<>(clienteService.listarPedidos(size, page, restaurante, fecha, sort, order, getMailFromJwt()),
 					HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);

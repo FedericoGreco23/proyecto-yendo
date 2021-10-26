@@ -50,8 +50,8 @@ public interface ClienteServicioInterfaz {
 
 	public DTRespuesta eliminarCarrito(int idCarrito, String mail) throws CarritoException;
 
-	public Map<String, Object> listarPedidos(int size, int page, String sort, int order, String mailUsuario)
-			throws UsuarioException;
+	public Map<String, Object> listarPedidos(int size, int page, String varRestaurante,
+			String fecha, String sort, int order, String mailCliente) throws UsuarioException;
 
 	public DTRespuesta calificarRestaurante(String mailCliente, String mailRestaurante, Calificacion calificacion)
 			throws UsuarioException, RestauranteException;
@@ -62,6 +62,6 @@ public interface ClienteServicioInterfaz {
 	public Map<String, Object> listarReclamos(int size, int page, String sort, int order, String mailCliente)
 			throws UsuarioException;
 
-			public DTPedido buscarPedidoRealizado(int numeroPedido) throws PedidoException;
+	public DTPedido buscarPedidoRealizado(int numeroPedido) throws PedidoException;
 
 }

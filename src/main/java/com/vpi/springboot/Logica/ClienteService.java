@@ -3,6 +3,8 @@ package com.vpi.springboot.Logica;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
@@ -98,15 +100,14 @@ public class ClienteService implements ClienteServicioInterfaz {
 	private CalificacionRestauranteRepositorio calRestauranteRepo;
 	@Autowired
 	private ReclamoRepositorio recRepo;
-
 	@Autowired
 	private NextSequenceService nextSequence;
-
 	@Autowired
 	private UltimaDireccionRepositorio ultimaDireccionRepo;
-
 	@Autowired
 	private SimpMessagingTemplate simpMessagingTemplate;
+	
+	private DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");;
 
 	@Override
 	public List<DTDireccion> getDireccionCliente(String mail) throws UsuarioException {
@@ -462,41 +463,68 @@ public class ClienteService implements ClienteServicioInterfaz {
 		}
 	}
 
-	//TODO ordenamiento: fecha, precio
-	//TODO filtro: fecha, restaurante
+	// TODO ordenamiento: fecha, precio
+	// TODO filtro: fecha, restaurante
 	@Override
-	public Map<String, Object> listarPedidos(int size, int page, String sort, int order, String mailUsuario)
-			throws UsuarioException {
+	public Map<String, Object> listarPedidos(int size, int page, String varRestaurante, String fecha, String sort,
+			int order, String mailUsuario) throws UsuarioException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mailUsuario);
 		if (!optionalCliente.isPresent())
 			throw new UsuarioException(UsuarioException.NotFoundException(mailUsuario));
-
 		Cliente cliente = optionalCliente.get();
 
-		Sort sorting;
+		Map<String, Object> response = new HashMap<>();
+		List<DTPedido> retorno = new ArrayList<>();
 		Pageable paging;
-		// En caso de no haber argumentos para el sort
-		if (sort == "" || sort == null) {
+		
+		if (sort.equalsIgnoreCase("")) {
 			paging = PageRequest.of(page, size);
 		} else {
 			if (order == 1)
-				sorting = Sort.by(Sort.Order.desc(sort));
+				paging = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sort)));
 			else
-				sorting = Sort.by(Sort.Order.asc(sort));
-			paging = PageRequest.of(page, size, sorting);
+				paging = PageRequest.of(page, size, Sort.by(Sort.Order.asc(sort)));
+		}
+		
+		Page<Pedido> pagePedido;
+		List<Pedido> pedidos = new ArrayList<>();
+
+		if (!varRestaurante.equalsIgnoreCase("") || !fecha.equalsIgnoreCase("")) {
+			// restaurante + fecha
+			if (!varRestaurante.equalsIgnoreCase("") && !fecha.equalsIgnoreCase("")) {
+				LocalDate ld = LocalDate.parse(fecha, DATEFORMATTER);
+				LocalDateTime dateI = LocalDateTime.of(ld, LocalTime.of(00, 01));
+				LocalDateTime dateF = LocalDateTime.of(ld, LocalTime.of(23, 59));
+				
+				pagePedido = pedidoRepo.findByRestauranteFecha(varRestaurante, dateI, dateF, cliente, paging);
+			}
+
+			// restaurante
+			else if (!varRestaurante.equalsIgnoreCase("")) {
+				pagePedido = pedidoRepo.findByRestaurante(varRestaurante, cliente, paging);
+			}
+
+			// fecha
+			else if (!fecha.equalsIgnoreCase("")) {
+				LocalDate ld = LocalDate.parse(fecha, DATEFORMATTER);
+				LocalDateTime dateI = LocalDateTime.of(ld, LocalTime.of(00, 01));
+				LocalDateTime dateF = LocalDateTime.of(ld, LocalTime.of(23, 59));
+				
+				pagePedido = pedidoRepo.findByFecha(dateI, dateF, cliente, paging);
+			} else
+				pagePedido = pedidoRepo.findAllByCliente(cliente, paging);
+		} else {
+			pagePedido = pedidoRepo.findAllByCliente(cliente, paging);
 		}
 
-		Map<String, Object> response = new HashMap<>();
-		Page<Pedido> pagePedido = pedidoRepo.findAllByCliente(cliente, paging);
-		List<Pedido> pedidos = pagePedido.getContent();
-		List<DTPedido> retorno = new ArrayList<>();
-
+		pedidos = pagePedido.getContent();
+		response.put("currentPage", pagePedido.getNumber());
+		response.put("totalItems", pagePedido.getTotalElements());
+		
 		for (Pedido p : pedidos) {
 			retorno.add(new DTPedido(p));
 		}
-
-		response.put("currentPage", pagePedido.getNumber());
-		response.put("totalItems", pagePedido.getTotalElements());
+		
 		response.put("pedidos", retorno);
 
 		return response;
@@ -584,7 +612,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 		List<DTReclamo> retorno = new ArrayList<>();
 		Map<String, Object> response = new HashMap<>();
 
-		for(Reclamo r : reclamos) {
+		for (Reclamo r : reclamos) {
 			retorno.add(new DTReclamo(r));
 		}
 
