@@ -1,8 +1,10 @@
 package com.vpi.springboot.Logica;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
@@ -22,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.vpi.springboot.IdCompuestas.CalificacionRestauranteId;
 import com.vpi.springboot.Modelo.Calificacion;
-import com.vpi.springboot.Modelo.CalificacionCliente;
 import com.vpi.springboot.Modelo.CalificacionRestaurante;
 import com.vpi.springboot.Modelo.Carrito;
 import com.vpi.springboot.Modelo.Cliente;
@@ -36,17 +38,19 @@ import com.vpi.springboot.Modelo.LastDireccioClientenMongo;
 import com.vpi.springboot.Modelo.Pedido;
 import com.vpi.springboot.Modelo.dto.DTBuscarRestaurante;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
+import com.vpi.springboot.Modelo.dto.DTCliente;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
 import com.vpi.springboot.Modelo.dto.DTListarRestaurante;
 import com.vpi.springboot.Modelo.dto.DTPedido;
+import com.vpi.springboot.Modelo.dto.DTPedidoParaAprobar;
 import com.vpi.springboot.Modelo.dto.DTProducto;
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
+import com.vpi.springboot.Modelo.dto.DTReclamo;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoReclamo;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
-import com.vpi.springboot.Repositorios.CalificacionClienteRepositorio;
 import com.vpi.springboot.Repositorios.CalificacionRestauranteRepositorio;
 import com.vpi.springboot.Repositorios.ClienteRepositorio;
 import com.vpi.springboot.Repositorios.DireccionRepositorio;
@@ -55,6 +59,7 @@ import com.vpi.springboot.Repositorios.GeoLocalizacionRepositorio;
 import com.vpi.springboot.Repositorios.MongoRepositorioCarrito;
 import com.vpi.springboot.Repositorios.PedidoRepositorio;
 import com.vpi.springboot.Repositorios.ProductoRepositorio;
+import com.vpi.springboot.Repositorios.ReclamoRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
 import com.vpi.springboot.exception.CarritoException;
 import com.vpi.springboot.exception.DireccionException;
@@ -91,12 +96,17 @@ public class ClienteService implements ClienteServicioInterfaz {
 	private RestauranteRepositorio restauranteRepo;
 	@Autowired
 	private CalificacionRestauranteRepositorio calRestauranteRepo;
+	@Autowired
+	private ReclamoRepositorio recRepo;
 
 	@Autowired
 	private NextSequenceService nextSequence;
 
 	@Autowired
 	private UltimaDireccionRepositorio ultimaDireccionRepo;
+
+	@Autowired
+	private SimpMessagingTemplate simpMessagingTemplate;
 
 	@Override
 	public List<DTDireccion> getDireccionCliente(String mail) throws UsuarioException {
@@ -356,6 +366,25 @@ public class ClienteService implements ClienteServicioInterfaz {
 					carrito.setActivo(false);
 					mongoRepo.save(carrito);
 					// return new DTRespuesta("Pedido agregado correctamente.");
+
+					// notificamos al restaurante
+					// Push notifications to front-end
+
+					String base64EncodedEmail = Base64.getEncoder()
+							.encodeToString(pedido.getRestaurante().getMail().getBytes(StandardCharsets.UTF_8));
+					DTPedidoParaAprobar pedidoDT = new DTPedidoParaAprobar(pedido);
+					pedidoDT.setComentario(comentario);
+					pedidoDT.setDireccion(pedido.getDireccion());
+					pedidoDT.setCarrito(carrito.getProductoCarrito());
+					pedidoDT.setCliente(new DTCliente(pedido.getCliente()));
+
+					simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, pedidoDT);
+
+					// System.out.println(base64EncodedEmail);
+
+					// simpMessagingTemplate.convertAndSendToUser(base64EncodedEmail,
+					// "/topic/pedido", pedidoDTO);
+
 					return new DTPedido(pedido);
 				} else {
 					throw new DireccionException(DireccionException.NotFoundExceptionId(idDireccion));
@@ -433,6 +462,8 @@ public class ClienteService implements ClienteServicioInterfaz {
 		}
 	}
 
+	//TODO ordenamiento: fecha, precio
+	//TODO filtro: fecha, restaurante
 	@Override
 	public Map<String, Object> listarPedidos(int size, int page, String sort, int order, String mailUsuario)
 			throws UsuarioException {
@@ -449,9 +480,9 @@ public class ClienteService implements ClienteServicioInterfaz {
 			paging = PageRequest.of(page, size);
 		} else {
 			if (order == 1)
-				sorting = Sort.by(Sort.Direction.DESC, sort);
+				sorting = Sort.by(Sort.Order.desc(sort));
 			else
-				sorting = Sort.by(Sort.Direction.ASC, sort);
+				sorting = Sort.by(Sort.Order.asc(sort));
 			paging = PageRequest.of(page, size, sorting);
 		}
 
@@ -469,28 +500,6 @@ public class ClienteService implements ClienteServicioInterfaz {
 		response.put("pedidos", retorno);
 
 		return response;
-	}
-
-	@Override
-	public DTPedido buscarPedidoRealizado(int numeroPedido, String mail) throws PedidoException, UsuarioException {
-		Optional<Cliente> optionalCliente = userRepo.findById(mail);
-		DTPedido DTpedido = null;
-		if (!optionalCliente.isPresent()) {
-			throw new UsuarioException(UsuarioException.NotFoundException(mail));
-		}
-
-		if (numeroPedido > 0) {
-			Pedido pedido = pedidoRepo.buscarPedidoRealizadoPorNumero(numeroPedido);
-			if (pedido == null) {
-				throw new PedidoException(PedidoException.NotFoundExceptionId(numeroPedido));
-			} else {
-				DTpedido = new DTPedido(pedido);
-			}
-		} else {
-			throw new PedidoException(PedidoException.NotValidId());
-		}
-
-		return DTpedido;
 	}
 
 	@Override
@@ -559,5 +568,48 @@ public class ClienteService implements ClienteServicioInterfaz {
 
 		return new DTRespuesta(
 				"Calificacion de restaurante + " + restaurante.getNombre() + " eliminada correctamente.");
+	}
+
+	public Map<String, Object> listarReclamos(int size, int page, String sort, int order, String mailCliente)
+			throws UsuarioException {
+		Optional<Cliente> optionalCliente = userRepo.findById(mailCliente);
+		if (!optionalCliente.isPresent())
+			throw new UsuarioException(UsuarioException.NotFoundException(mailCliente));
+		Cliente cliente = optionalCliente.get();
+
+		Pageable paging = PageRequest.of(page, size);
+//		Page<Reclamo> pageReclamo = recRepo.findAllByCliente(cliente, paging);
+		Page<Reclamo> pageReclamo = recRepo.findAll(paging);
+		List<Reclamo> reclamos = pageReclamo.getContent();
+		List<DTReclamo> retorno = new ArrayList<>();
+		Map<String, Object> response = new HashMap<>();
+
+		for(Reclamo r : reclamos) {
+			retorno.add(new DTReclamo(r));
+		}
+
+		response.put("currentPage", pageReclamo.getTotalPages());
+		response.put("totalItems", pageReclamo.getTotalElements());
+		response.put("reclamos", retorno);
+
+		return response;
+	}
+
+	@Override
+	public DTPedido buscarPedidoRealizado(int numeroPedido) throws PedidoException {
+		DTPedido DTpedido = null;
+
+		if (numeroPedido > 0) {
+			Pedido pedido = pedidoRepo.buscarPedidoPorNumero(numeroPedido);
+			if (pedido == null) {
+				throw new PedidoException(PedidoException.NotFoundExceptionId(numeroPedido));
+			} else {
+				DTpedido = new DTPedido(pedido);
+			}
+		} else {
+			throw new PedidoException(PedidoException.NotValidId());
+		}
+
+		return DTpedido;
 	}
 }

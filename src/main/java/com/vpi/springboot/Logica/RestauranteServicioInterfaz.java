@@ -1,6 +1,7 @@
 package com.vpi.springboot.Logica;
 
 import com.vpi.springboot.Modelo.Restaurante;
+import com.vpi.springboot.Modelo.dto.DTPedido;
 import com.vpi.springboot.Modelo.dto.DTPromocionConPrecio;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 
@@ -24,7 +25,8 @@ public interface RestauranteServicioInterfaz {
 
 	public DTRespuesta modificarMenu(Producto menu) throws ProductoException;
 
-	public Map<String, Object> listarPedidos(int page, int size, String nombreRestaurante) throws RestauranteException;
+	public Map<String, Object> listarPedidos(int page, int size, String mailRestaurante, String id, String fecha,
+			String estado, String sort, int order) throws RestauranteException;
 
 	public DTRespuesta altaRestaurante(Restaurante rest) throws RestauranteException, CategoriaException;
 
@@ -50,4 +52,8 @@ public interface RestauranteServicioInterfaz {
 
 	public DTRespuesta bajaCalificacionCliente(String mailCliente, String mailRestaurante)
 			throws UsuarioException, RestauranteException;
+
+	public Map<String, Object> listarReclamos(int page, int size, String mailRestaurante) throws RestauranteException;
+
+	public DTPedido buscarPedidoRecibido(int numeroPedido) throws PedidoException;
 }

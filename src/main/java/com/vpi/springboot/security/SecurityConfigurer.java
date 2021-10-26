@@ -116,7 +116,11 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
 	@Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "http://localhost:4201", "https://prueba-concepto-frontend.herokuapp.com"));//aca va host 
+        
+       // configuration.setAllowedOrigins(Arrays.asList("/**", "http://localhost:8100", "https://localhost:443","http://localhost:4200", "http://localhost:4201", "https://prueba-concepto-frontend.herokuapp.com", "http://190.134.71.243:4200", "https://190.134.71.243:4200"
+        //		, "http://190.134.71.243:8080", "https://190.134.71.243:8080", "http://190.134.71.243:8100", "http://190.134.71.243:80", "http://localhost:80"));//aca va host 
+        
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD", "CONNECT"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         //res.header('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
