@@ -2,11 +2,13 @@ package com.vpi.springboot.Logica;
 
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +39,9 @@ import com.vpi.springboot.Modelo.Promocion;
 import com.vpi.springboot.Modelo.Reclamo;
 import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
+import com.vpi.springboot.Modelo.dto.DTCliente;
 import com.vpi.springboot.Modelo.dto.DTPedido;
+import com.vpi.springboot.Modelo.dto.DTPedidoParaAprobar;
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.Modelo.dto.DTProductoIdCantidad;
 import com.vpi.springboot.Modelo.dto.DTPromocionConPrecio;
@@ -94,6 +99,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	private CalificacionClienteRepositorio calClienteRepo;
 	@Autowired
 	private ReclamoRepositorio recRepo;
+	@Autowired
+	private SimpMessagingTemplate simpMessagingTemplate;
 
 	private DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");;
 
@@ -386,6 +393,21 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			Pedido pedido = optionalPedido.get();
 			pedido.setEstadoPedido(EnumEstadoPedido.ACEPTADO);
 			pedidoRepo.save(pedido);
+			
+			//se notifica a cliente
+			String base64EncodedEmail = Base64.getEncoder()
+					.encodeToString(pedido.getRestaurante().getMail().getBytes(StandardCharsets.UTF_8));
+			
+			DTPedidoParaAprobar pedidoDT = new DTPedidoParaAprobar(pedido);
+			pedidoDT.setComentario(pedido.getComentario());
+			pedidoDT.setDireccion(pedido.getDireccion());
+			pedidoDT.setCliente(new DTCliente(pedido.getCliente()));
+
+			simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, pedidoDT);
+			
+			//fin notificacion		
+			
+
 			return new DTRespuesta("Pedido " + idPedido + " confirmado.");
 		} else {
 			throw new PedidoException(PedidoException.NotFoundExceptionId(idPedido));
@@ -501,7 +523,24 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			Pedido pedido = optionalPedido.get();
 			pedido.setEstadoPedido(EnumEstadoPedido.RECHAZADO);
 			pedidoRepo.save(pedido);
+			
+			//se notifica a cliente
+			String base64EncodedEmail = Base64.getEncoder()
+					.encodeToString(pedido.getRestaurante().getMail().getBytes(StandardCharsets.UTF_8));
+			
+			DTPedidoParaAprobar pedidoDT = new DTPedidoParaAprobar(pedido);
+			pedidoDT.setComentario(pedido.getComentario());
+			pedidoDT.setDireccion(pedido.getDireccion());
+			pedidoDT.setCliente(new DTCliente(pedido.getCliente()));
+
+			simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, pedidoDT);
+			
+			//fin notificacion		
+			
+
 			return new DTRespuesta("Pedido " + idPedido + " rechazado.");
+			
+			
 		} else {
 			throw new PedidoException(PedidoException.NotFoundExceptionId(idPedido));
 		}
