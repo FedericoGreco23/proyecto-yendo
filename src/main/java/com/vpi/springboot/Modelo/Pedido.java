@@ -45,7 +45,7 @@ public class Pedido {
 	private List<Reclamo> reclamos = new ArrayList<>();
 	private String direccion;
 	private String comentario;
-	
+	private Boolean pago;
 	
 
 	public Pedido() {
@@ -202,5 +202,13 @@ public class Pedido {
 
 	public void setEstadoPedido(EnumEstadoPedido estadoPedido) {
 		this.estadoPedido = estadoPedido;
+	}
+
+	public Boolean getPago() {
+		return pago;
+	}
+
+	public void setPago(Boolean pago) {
+		this.pago = pago;
 	}
 }

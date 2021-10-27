@@ -345,6 +345,11 @@ public class ClienteService implements ClienteServicioInterfaz {
 					precioTotal = precioTotal + restaurante.getCostoDeEnvio();
 					Pedido pedido = new Pedido(LocalDateTime.now(), precioTotal, estado, pago, idCarrito, direccion,
 							restaurante, cliente, comentario);
+					if(pago.equals(EnumMetodoDePago.PAYPAL)) {
+						pedido.setPago(true);
+					}else if(pago.equals(EnumMetodoDePago.EFECTIVO)) {
+						pedido.setPago(false);
+					}
 					pedidoRepo.save(pedido);
 					// AGREGAR PEDIDO AL RESTAURANTE
 					if (restaurante.getPedidos() == null) {
