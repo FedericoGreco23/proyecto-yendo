@@ -15,10 +15,11 @@ public class DTPedido implements Serializable {
 	private Double costoTotal;
 	private EnumEstadoPedido estadoPedido;
 	private EnumMetodoDePago metodoDePago;
-	private int carrito;
+//	private int carrito;
 	private String cliente;
 	private String restaurante;
 //	private List<DTReclamo> reclamos = new ArrayList<>();
+	private DTCarrito carrito;
 	private String direccion;
 	private String comentario;
 
@@ -34,7 +35,6 @@ public class DTPedido implements Serializable {
 		this.costoTotal = costoTotal;
 		this.estadoPedido = estadoPedidido;
 		this.metodoDePago = metodoDePago;
-		this.carrito = carrito;
 	}
 
 	public DTPedido(Pedido ped) {
@@ -44,8 +44,21 @@ public class DTPedido implements Serializable {
 		this.costoTotal = ped.getCostoTotal();
 		this.estadoPedido = ped.getEstadoPedido();
 		this.metodoDePago = ped.getMetodoDePago();
-		this.carrito = ped.getCarrito();
 		this.cliente = ped.getCliente().getMail();
+		this.restaurante = ped.getRestaurante().getNombre();
+		this.comentario = ped.getComentario();
+		this.direccion = ped.getDireccion();
+	}
+	
+	public DTPedido(Pedido ped, DTCarrito carrito) {
+		super();
+		this.id = ped.getId();
+		this.fecha = ped.getFecha();
+		this.costoTotal = ped.getCostoTotal();
+		this.estadoPedido = ped.getEstadoPedido();
+		this.metodoDePago = ped.getMetodoDePago();
+		this.cliente = ped.getCliente().getMail();
+		this.carrito = carrito;
 		this.restaurante = ped.getRestaurante().getNombre();
 		this.comentario = ped.getComentario();
 		this.direccion = ped.getDireccion();
@@ -59,7 +72,6 @@ public class DTPedido implements Serializable {
 		this.costoTotal = costoTotal;
 		this.estadoPedido = estadoPedidido;
 		this.metodoDePago = metodoDePago;
-		this.carrito = carrito;
 		this.direccion = direccion;
 		this.comentario = comentario;
 	}
@@ -104,11 +116,11 @@ public class DTPedido implements Serializable {
 		this.metodoDePago = metodoDePago;
 	}
 
-	public int getCarrito() {
+	public DTCarrito getCarrito() {
 		return carrito;
 	}
 
-	public void setCarrito(int carrito) {
+	public void setCarrito(DTCarrito carrito) {
 		this.carrito = carrito;
 	}
 

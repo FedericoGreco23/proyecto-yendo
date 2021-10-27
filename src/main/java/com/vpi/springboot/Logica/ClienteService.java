@@ -527,7 +527,11 @@ public class ClienteService implements ClienteServicioInterfaz {
 		response.put("totalItems", pagePedido.getTotalElements());
 		
 		for (Pedido p : pedidos) {
-			retorno.add(new DTPedido(p));
+			Optional<Carrito> optionalCarrito = mongoRepo.findById(p.getCarrito());
+			if(optionalCarrito.isPresent())
+				retorno.add(new DTPedido(p, new DTCarrito(optionalCarrito.get())));
+			else 
+				retorno.add(new DTPedido(p));
 		}
 		
 		response.put("pedidos", retorno);
@@ -548,12 +552,16 @@ public class ClienteService implements ClienteServicioInterfaz {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(mailRestaurante));
 		}
 		Restaurante restaurante = optionalRestaurante.get();
+		
+		List<Pedido> pedidos = pedidoRepo.findByClienteRestaurante(cliente, restaurante);
+		if(pedidos.size() == 0)
+			throw new UsuarioException(UsuarioException.SinPedido(mailRestaurante));
 
 		calificacion.setFecha(LocalDateTime.now());
 		CalificacionRestaurante calRestaurante = new CalificacionRestaurante(calificacion, cliente, restaurante);
 		calRestauranteRepo.save(calRestaurante);
 
-		// Calculamos la calificación del cliente y la guardamos
+		// Calculamos la calificación del restaurante y la guardamos
 		List<CalificacionRestaurante> calificaciones = calRestauranteRepo.findByRestaurante(restaurante);
 		float avg = 0;
 		for (CalificacionRestaurante c : calificaciones) {
@@ -579,6 +587,10 @@ public class ClienteService implements ClienteServicioInterfaz {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(mailRestaurante));
 		}
 		Restaurante restaurante = optionalRestaurante.get();
+		
+		List<Pedido> pedidos = pedidoRepo.findByClienteRestaurante(cliente, restaurante);
+		if(pedidos.size() == 0)
+			throw new UsuarioException(UsuarioException.SinPedido(mailRestaurante));
 
 		Optional<CalificacionRestaurante> optionalCalificacion = calRestauranteRepo
 				.findById(new CalificacionRestauranteId(cliente, restaurante));

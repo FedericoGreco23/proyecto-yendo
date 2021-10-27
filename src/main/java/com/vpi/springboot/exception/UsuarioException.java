@@ -31,4 +31,8 @@ public class UsuarioException extends Exception {
 	public static String SinCalificacion(String nombre) {
 		return "Cliente no calificó a restaurante " + nombre + ".";
 	}
+	
+	public static String SinPedido(String nombre) {
+		return "Cliente no tiene ningún pedido en restaurante " + nombre + ".";
+	}
 }

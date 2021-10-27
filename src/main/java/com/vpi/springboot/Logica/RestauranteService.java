@@ -362,9 +362,15 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		pedidos = pagePedido.getContent();
 		response.put("currentPage", pagePedido.getNumber());
 		response.put("totalItems", pagePedido.getTotalElements());
-
+		
+		System.out.println("Llega antes de pedidos");
+		
 		for (Pedido p : pedidos) {
-			retorno.add(new DTPedido(p));
+			Optional<Carrito> optionalCarrito = mongoRepo.findById(p.getCarrito());
+			if(optionalCarrito.isPresent())
+				retorno.add(new DTPedido(p, new DTCarrito(optionalCarrito.get())));
+			else 
+				retorno.add(new DTPedido(p));
 		}
 
 		response.put("pedidos", retorno);
@@ -560,6 +566,10 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		if (!optionalCliente.isPresent())
 			throw new UsuarioException(UsuarioException.NotFoundException(mailCliente));
 		Cliente cliente = optionalCliente.get();
+		
+		List<Pedido> pedidos = pedidoRepo.findByClienteRestaurante(cliente, restaurante);
+		if(pedidos.size() == 0)
+			throw new UsuarioException(UsuarioException.SinPedido(mailRestaurante));
 
 		calificacion.setFecha(LocalDateTime.now());
 		CalificacionCliente calCliente = new CalificacionCliente(calificacion, restaurante, cliente);
@@ -591,6 +601,10 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		if (!optionalCliente.isPresent())
 			throw new UsuarioException(UsuarioException.NotFoundException(mailCliente));
 		Cliente cliente = optionalCliente.get();
+		
+		List<Pedido> pedidos = pedidoRepo.findByClienteRestaurante(cliente, restaurante);
+		if(pedidos.size() == 0)
+			throw new UsuarioException(UsuarioException.SinPedido(mailRestaurante));
 
 		Optional<CalificacionCliente> optionalCalificacion = calClienteRepo
 				.findById(new CalificacionClienteId(cliente, restaurante));
