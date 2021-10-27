@@ -222,6 +222,19 @@ public class ClienteController {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@GetMapping("/getReclamos")
+	public ResponseEntity<?> listarReclamos(@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "") String restaurante,
+			@RequestParam(defaultValue = "") String fecha, @RequestParam(defaultValue = "") String sort, 
+			@RequestParam(defaultValue = "1") int order) {
+		try {
+			return new ResponseEntity<>(clienteService.listarReclamos(size, page, restaurante, sort, order, getMailFromJwt()),
+					HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 	private String getMailFromJwt() {
 		// obtenemos el token del header y le sacamos "Bearer "

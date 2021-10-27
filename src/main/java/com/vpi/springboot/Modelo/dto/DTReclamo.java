@@ -3,6 +3,7 @@ package com.vpi.springboot.Modelo.dto;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+import com.vpi.springboot.Modelo.Pedido;
 import com.vpi.springboot.Modelo.Reclamo;
 
 public class DTReclamo implements Serializable {
@@ -20,13 +21,14 @@ public class DTReclamo implements Serializable {
 		super();
 	}
 
-	public DTReclamo(int id, String comentario, LocalDateTime fecha, EnumEstadoReclamo estado, String resolucion, String restaurante) {
+	public DTReclamo(int id, String comentario, LocalDateTime fecha, EnumEstadoReclamo estado, Pedido pedido, String resolucion, String restaurante) {
 		super();
 		this.id = id;
 		this.comentario = comentario;
 		this.fecha = fecha;
 		this.estado = estado;
 		this.resolucion = resolucion;
+		this.pedido = new DTPedido(pedido);
 		this.restaurante = restaurante;
 	}
 
@@ -37,6 +39,7 @@ public class DTReclamo implements Serializable {
 		this.fecha = rec.getFecha();
 		this.estado = rec.getEstado();
 		this.resolucion = rec.getResolucion();
+		this.pedido = new DTPedido(rec.getPedido());
 		this.restaurante = rec.getRestaurante().getNombre();
 	}
 

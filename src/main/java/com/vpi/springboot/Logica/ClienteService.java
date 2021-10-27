@@ -598,20 +598,36 @@ public class ClienteService implements ClienteServicioInterfaz {
 				"Calificacion de restaurante + " + restaurante.getNombre() + " eliminada correctamente.");
 	}
 
-	public Map<String, Object> listarReclamos(int size, int page, String sort, int order, String mailCliente)
+	public Map<String, Object> listarReclamos(int size, int page, String restaurante, String sort, int order, String mailCliente)
 			throws UsuarioException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mailCliente);
 		if (!optionalCliente.isPresent())
 			throw new UsuarioException(UsuarioException.NotFoundException(mailCliente));
 		Cliente cliente = optionalCliente.get();
 
-		Pageable paging = PageRequest.of(page, size);
-//		Page<Reclamo> pageReclamo = recRepo.findAllByCliente(cliente, paging);
-		Page<Reclamo> pageReclamo = recRepo.findAll(paging);
-		List<Reclamo> reclamos = pageReclamo.getContent();
-		List<DTReclamo> retorno = new ArrayList<>();
 		Map<String, Object> response = new HashMap<>();
+		List<DTReclamo> retorno = new ArrayList<>();
+		Pageable paging;
+		
+		if (!sort.equalsIgnoreCase("")) {
+			if (order == 1)
+				paging = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sort)));
+			else
+				paging = PageRequest.of(page, size, Sort.by(Sort.Order.asc(sort)));
+		} else {
+			paging = PageRequest.of(page, size);
+		}
+		
+		Page<Reclamo> pageReclamo;
+		List<Reclamo> reclamos = new ArrayList<>();
 
+		if(!restaurante.equalsIgnoreCase("")) {
+			pageReclamo = recRepo.findAllByClienteRestaurante(cliente, restaurante, paging);
+		} else {
+			pageReclamo = recRepo.findAllByCliente(cliente, paging);
+		}
+		
+		reclamos = pageReclamo.getContent();
 		for (Reclamo r : reclamos) {
 			retorno.add(new DTReclamo(r));
 		}
