@@ -218,11 +218,13 @@ public class PublicRest {
 	
 	
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
-	@PostMapping("/prueba")
-	public String probar() {
-		//notificamos al restaurante
-        // Push notifications to front-end
-		simpMessagingTemplate.convertAndSend("/topic/pedido", "Pedido esperando respuesta");
-		return "todo ok";
+	@PostMapping("/cargarDatos")
+	public String cargarDatos() {
+		try {
+			restService.cargarDatos();
+		}catch(Exception e) {
+			return "oops, estimado frontend algo se ha ido a la mierda. Consulte a su backend de confianza"; 
+		}
+		return "rock and roll nene!";
 	}
 }

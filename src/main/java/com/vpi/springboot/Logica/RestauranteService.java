@@ -689,8 +689,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
         categoriaFotoMap.put("Comida vegana", "https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/vegano.jpg");
         categoriaFotoMap.put("Comida vegetariana", "https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/vegetariano.jpg");
         //cliente
-        List<Cliente> clientesList = new ArrayList<Cliente>();
-        clientesList.add(new Cliente());
+
 		
 
 
