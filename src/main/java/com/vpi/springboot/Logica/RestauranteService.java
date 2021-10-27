@@ -97,7 +97,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 	private DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");;
 
-	private DTCarrito verCarrito(int id) {
+	/*private DTCarrito verCarrito(int id) {
 		Optional<Carrito> optionalCarrito = mongoRepo.findById(id);
 		if (optionalCarrito.isPresent()) {
 			Carrito carrito = optionalCarrito.get();
@@ -107,7 +107,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		}
 
 		return null;
-	}
+	}*/
 
 	@Override
 	public DTRespuesta altaRestaurante(Restaurante rest) throws RestauranteException, CategoriaException {
@@ -154,7 +154,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	@Override
 	public DTRespuesta altaMenu(Producto menu, String varRestaurante)
 			throws ProductoException, RestauranteException, CategoriaException, Exception {
-		Optional<Restaurante> optionalRestaurante = resRepo.findById(varRestaurante);
+		Optional<Restaurante> optionalRestaurante = restauranteRepo.findById(varRestaurante);
 		if (!optionalRestaurante.isPresent()) {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(varRestaurante));
 		}
@@ -176,7 +176,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			if (proRepo.findByNombre(menu.getNombre(), restaurante) == null) {
 				menu.setRestaurante(restaurante);
 				restaurante.addProducto(menu);
-				resRepo.save(restaurante);
+				restauranteRepo.save(restaurante);
 				return new DTRespuesta("Menú agregado correctamente.");
 			} else {
 				throw new ProductoException(ProductoException.ProductoYaExiste(menu.getNombre()));
@@ -245,7 +245,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	@Override
 	public Map<String, Object> listarPedidos(int page, int size, String mailRestaurante, String id, String fecha,
 			String estado, String sort, int order) throws RestauranteException {
-		Optional<Restaurante> optionalRestaurante = resRepo.findById(mailRestaurante);
+		Optional<Restaurante> optionalRestaurante = restauranteRepo.findById(mailRestaurante);
 		if (!optionalRestaurante.isPresent()) {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(mailRestaurante));
 		}

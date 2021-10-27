@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.aggregation.ConvertOperators.ToInt;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.vpi.springboot.Logica.ClienteService;
@@ -78,6 +79,8 @@ class ClienteServiceTest {
 	private PedidoRepositorio pedidoRepo;
 	@Mock
 	private CalificacionRestauranteRepositorio calRestauranteRepo;
+	@Mock
+	private SimpMessagingTemplate simpMessagingTemplate;
 	
 	@InjectMocks
 	private ClienteService mockCliente;
@@ -234,6 +237,7 @@ class ClienteServiceTest {
 		Mockito.doReturn(restaurante).when(restauranteRepo).save(Mockito.any(Restaurante.class));
 		Mockito.doReturn(cliente).when(clienteRepo).save(Mockito.any(Cliente.class));
 		Mockito.doReturn(carrito).when(mongoRepo).save(Mockito.any(Carrito.class));
+		Mockito.doNothing().when(simpMessagingTemplate).convertAndSend(Mockito.anyString(),Mockito.any(DTProducto.class));
 		mockCliente.altaPedido(50, EnumMetodoDePago.EFECTIVO, dir.getId(), cliente.getMail(), null);	
 	}
 	
@@ -269,8 +273,8 @@ class ClienteServiceTest {
 	@Test
 	public void testBuscarPedidoRealizado() throws PedidoException, UsuarioException {
 		Mockito.when(clienteRepo.findById(Mockito.anyString())).thenReturn(optionalCliente);
-		Mockito.when(pedidoRepo.buscarPedidoRealizadoPorNumero(Mockito.anyInt())).thenReturn(pedido);
-		mockCliente.buscarPedidoRealizado(pedido.getId(), cliente.getMail());
+		Mockito.when(pedidoRepo.buscarPedidoPorNumero(Mockito.anyInt())).thenReturn(pedido);
+		mockCliente.buscarPedidoRealizado(pedido.getId());
 	}
 	
 	@Test
