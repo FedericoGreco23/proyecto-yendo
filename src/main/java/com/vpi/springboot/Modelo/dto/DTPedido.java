@@ -13,7 +13,7 @@ public class DTPedido implements Serializable {
 	private int id;
 	private LocalDateTime fecha;
 	private Double costoTotal;
-	private EnumEstadoPedido estadoPedidido;
+	private EnumEstadoPedido estadoPedido;
 	private EnumMetodoDePago metodoDePago;
 	private int carrito;
 	private String cliente;
@@ -32,7 +32,7 @@ public class DTPedido implements Serializable {
 		this.id = id;
 		this.fecha = fecha;
 		this.costoTotal = costoTotal;
-		this.estadoPedidido = estadoPedidido;
+		this.estadoPedido = estadoPedidido;
 		this.metodoDePago = metodoDePago;
 		this.carrito = carrito;
 	}
@@ -42,7 +42,7 @@ public class DTPedido implements Serializable {
 		this.id = ped.getId();
 		this.fecha = ped.getFecha();
 		this.costoTotal = ped.getCostoTotal();
-		this.estadoPedidido = ped.getEstadoPedido();
+		this.estadoPedido = ped.getEstadoPedido();
 		this.metodoDePago = ped.getMetodoDePago();
 		this.carrito = ped.getCarrito();
 		this.cliente = ped.getCliente().getMail();
@@ -57,7 +57,7 @@ public class DTPedido implements Serializable {
 		this.id = id;
 		this.fecha = fecha;
 		this.costoTotal = costoTotal;
-		this.estadoPedidido = estadoPedidido;
+		this.estadoPedido = estadoPedidido;
 		this.metodoDePago = metodoDePago;
 		this.carrito = carrito;
 		this.direccion = direccion;
@@ -88,12 +88,12 @@ public class DTPedido implements Serializable {
 		this.costoTotal = costoTotal;
 	}
 
-	public EnumEstadoPedido getEstadoPedidido() {
-		return estadoPedidido;
+	public EnumEstadoPedido getEstadoPedido() {
+		return estadoPedido;
 	}
 
-	public void setEstadoPedidido(EnumEstadoPedido estadoPedidido) {
-		this.estadoPedidido = estadoPedidido;
+	public void setEstadoPedido(EnumEstadoPedido estadoPedido) {
+		this.estadoPedido = estadoPedido;
 	}
 
 	public EnumMetodoDePago getMetodoDePago() {
