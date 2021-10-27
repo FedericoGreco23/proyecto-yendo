@@ -59,7 +59,7 @@ public interface ClienteServicioInterfaz {
 	public DTRespuesta bajaCalificacionRestaurante(String mailCliente, String mailRestaurante)
 			throws UsuarioException, RestauranteException;
 
-	public Map<String, Object> listarReclamos(int size, int page, String sort, int order, String mailCliente)
+	public Map<String, Object> listarReclamos(int size, int page, String restaurante, String sort, int order, String mailCliente)
 			throws UsuarioException;
 
 	public DTPedido buscarPedidoRealizado(int numeroPedido) throws PedidoException;
