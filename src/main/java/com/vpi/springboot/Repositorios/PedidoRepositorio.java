@@ -47,7 +47,8 @@ public interface PedidoRepositorio extends JpaRepository<Pedido, Integer> {
 			+ "and ped.cliente IN "
 			+ "(SELECT u.mail "
 			+ "FROM Cliente u "
-			+ "WHERE UPPER(u.mail) LIKE CONCAT('%',UPPER(:mail),'%'))";
+			+ "WHERE UPPER(u.mail) LIKE CONCAT('%',UPPER(:mail),'%')"
+			+ "or UPPER(u.nickname) LIKE CONCAT('%',UPPER(:mail),'%'))";
 	
 	@Query(queryClienteFechaEstado)
 	Page<Pedido> findByClienteFechaEstado(@Param("mail") String mail, @Param("dateI") LocalDateTime dateI, @Param("dateF") LocalDateTime dateF,
@@ -62,7 +63,8 @@ public interface PedidoRepositorio extends JpaRepository<Pedido, Integer> {
 			+ "and ped.cliente IN "
 			+ "(SELECT u.mail "
 			+ "FROM Cliente u "
-			+ "WHERE UPPER(u.mail) LIKE CONCAT('%',UPPER(:mail),'%'))";
+			+ "WHERE UPPER(u.mail) LIKE CONCAT('%',UPPER(:mail),'%')"
+			+ "or UPPER(u.nickname) LIKE CONCAT('%',UPPER(:mail),'%'))";
 	
 	@Query(queryClienteFecha)
 	Page<Pedido> findByClienteFecha(@Param("mail") String mail, @Param("dateI") LocalDateTime dateI, @Param("dateF") LocalDateTime dateF,
@@ -76,7 +78,8 @@ public interface PedidoRepositorio extends JpaRepository<Pedido, Integer> {
 			+ "and ped.cliente IN "
 			+ "(SELECT u.mail "
 			+ "FROM Cliente u "
-			+ "WHERE UPPER(u.mail) LIKE CONCAT('%',UPPER(:mail),'%'))";
+			+ "WHERE UPPER(u.mail) LIKE CONCAT('%',UPPER(:mail),'%')"
+			+ "or UPPER(u.nickname) LIKE CONCAT('%',UPPER(:mail),'%'))";
 	
 	@Query(queryClienteEstado)
 	Page<Pedido> findByClienteEstado(@Param("mail") String mail, @Param("estado") EnumEstadoPedido estado, 
@@ -89,7 +92,8 @@ public interface PedidoRepositorio extends JpaRepository<Pedido, Integer> {
 			+ "and ped.cliente IN "
 			+ "(SELECT u.mail "
 			+ "FROM Cliente u "
-			+ "WHERE UPPER(u.mail) LIKE CONCAT('%',UPPER(:mail),'%'))";
+			+ "WHERE UPPER(u.mail) LIKE CONCAT('%',UPPER(:mail),'%')"
+			+ "or UPPER(u.nickname) LIKE CONCAT('%',UPPER(:mail),'%'))";
 	
 	@Query(queryCliente)
 	Page<Pedido> findByCliente(@Param("mail") String mail, @Param("restaurante") Restaurante restaurante, Pageable pageable);
@@ -174,4 +178,48 @@ public interface PedidoRepositorio extends JpaRepository<Pedido, Integer> {
 	
 	@Query(queryEstado)
 	Page<Pedido> findByEstado(@Param("estado") EnumEstadoPedido estado, Restaurante restaurante, Pageable pageable);
+	
+	
+	//////////////FUNCIONES PARA LISTAR PEDIDOS CLIENTE//////////////
+	/////////////////////////////////////////////////////////////////
+	
+	//RESTAURANTE FECHA 
+	final static String queryRestauranteFecha = 
+		"SELECT ped FROM Pedido ped "
+		+ "WHERE ped.cliente = :cliente "
+		+ "and ped.fecha > :dateI "
+		+ "and ped.fecha < :dateF "
+		+ "and ped.restaurante IN "
+		+ "(SELECT u.mail "
+		+ "FROM Restaurante u "
+		+ "WHERE UPPER(u.mail) LIKE CONCAT('%',UPPER(:restaurante),'%') "
+		+ "or UPPER(u.nombre) LIKE CONCAT('%',UPPER(:restaurante),'%'))";
+	
+	@Query(queryRestauranteFecha)
+	Page<Pedido> findByRestauranteFecha(@Param("restaurante") String restaurante, @Param("dateI") LocalDateTime dateI, @Param("dateF") LocalDateTime dateF,
+			@Param("cliente") Cliente cliente, Pageable pageable);
+	
+	//CLIENTE FECHA ESTADO
+	final static String queryRestaurante = 
+		"SELECT ped FROM Pedido ped "
+		+ "WHERE ped.cliente = :cliente "
+		+ "and ped.restaurante IN "
+		+ "(SELECT u.mail "
+		+ "FROM Restaurante u "
+		+ "WHERE UPPER(u.mail) LIKE CONCAT('%',UPPER(:restaurante),'%') "
+		+ "or UPPER(u.nombre) LIKE CONCAT('%',UPPER(:restaurante),'%'))";
+	
+	@Query(queryRestaurante)
+	Page<Pedido> findByRestaurante(@Param("restaurante") String restaurante, @Param("cliente") Cliente cliente, Pageable pageable);
+	
+	//CLIENTE FECHA ESTADO
+	final static String queryFecha2 = 
+		"SELECT ped FROM Pedido ped "
+		+ "WHERE ped.cliente = :cliente "
+		+ "and ped.fecha > :dateI "
+		+ "and ped.fecha < :dateF";
+	
+	@Query(queryFecha2)
+	Page<Pedido> findByFecha(@Param("dateI") LocalDateTime dateI, @Param("dateF") LocalDateTime dateF, 
+			@Param("cliente") Cliente cliente, Pageable pageable);
 }
