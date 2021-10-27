@@ -147,8 +147,6 @@ public class ClienteController {
 			}
 			DTPedido pedidoDTO = clienteService.altaPedido(idCarrito, pago, idDireccion, mail, comentario);
 
-
-
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Pedido enviado con éxito"), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -168,8 +166,7 @@ public class ClienteController {
 	}
 
 	@PostMapping("/eliminarProductoCarrito")
-	public ResponseEntity<?> eliminarProductoCarrito(@RequestParam int idProducto,
-			@RequestParam int cantABorrar) {
+	public ResponseEntity<?> eliminarProductoCarrito(@RequestParam int idProducto, @RequestParam int cantABorrar) {
 		try {
 			;
 			return new ResponseEntity<>(
@@ -182,8 +179,7 @@ public class ClienteController {
 	@PostMapping("/eliminarCarrito")
 	public ResponseEntity<?> eliminarCarrito(@RequestParam int idCarrito) {
 		try {
-			return new ResponseEntity<>(clienteService.eliminarCarrito(idCarrito, getMailFromJwt()),
-					HttpStatus.OK);
+			return new ResponseEntity<>(clienteService.eliminarCarrito(idCarrito, getMailFromJwt()), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -192,10 +188,11 @@ public class ClienteController {
 	@GetMapping("/getPedidos")
 	public ResponseEntity<?> listarPedidos(@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "") String restaurante,
-			@RequestParam(defaultValue = "") String fecha, @RequestParam(defaultValue = "") String sort, 
+			@RequestParam(defaultValue = "") String fecha, @RequestParam(defaultValue = "") String sort,
 			@RequestParam(defaultValue = "1") int order) {
 		try {
-			return new ResponseEntity<>(clienteService.listarPedidos(size, page, restaurante, fecha, sort, order, getMailFromJwt()),
+			return new ResponseEntity<>(
+					clienteService.listarPedidos(size, page, restaurante, fecha, sort, order, getMailFromJwt()),
 					HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -207,7 +204,8 @@ public class ClienteController {
 			@RequestBody Calificacion calificacion) {
 		try {
 			return new ResponseEntity<>(
-					clienteService.calificarRestaurante(getMailFromJwt(), mailRestaurante, calificacion), HttpStatus.OK);
+					clienteService.calificarRestaurante(getMailFromJwt(), mailRestaurante, calificacion),
+					HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -216,20 +214,21 @@ public class ClienteController {
 	@PostMapping("/eliminarCalificacion/{mailRestaurante}")
 	public ResponseEntity<?> bajaCalificacionRestaurante(@PathVariable String mailRestaurante) {
 		try {
-			return new ResponseEntity<>(
-					clienteService.bajaCalificacionRestaurante(getMailFromJwt(), mailRestaurante), HttpStatus.OK);
+			return new ResponseEntity<>(clienteService.bajaCalificacionRestaurante(getMailFromJwt(), mailRestaurante),
+					HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@GetMapping("/getReclamos")
 	public ResponseEntity<?> listarReclamos(@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "") String restaurante,
-			@RequestParam(defaultValue = "") String fecha, @RequestParam(defaultValue = "") String sort, 
+			@RequestParam(defaultValue = "") String fecha, @RequestParam(defaultValue = "") String sort,
 			@RequestParam(defaultValue = "1") int order) {
 		try {
-			return new ResponseEntity<>(clienteService.listarReclamos(size, page, restaurante, sort, order, getMailFromJwt()),
+			return new ResponseEntity<>(
+					clienteService.listarReclamos(size, page, restaurante, sort, order, getMailFromJwt()),
 					HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -249,12 +248,12 @@ public class ClienteController {
 		}
 		return mail;
 	}
-	
+
 	@GetMapping("/buscarPedido")
 	public ResponseEntity<?> buscarPedidoRealizado(@RequestParam(defaultValue = "0") int numeroPedido) {
 		try {
 			return new ResponseEntity<>(clienteService.buscarPedidoRealizado(numeroPedido), HttpStatus.OK);
-		} catch (Exception e ) {
+		} catch (Exception e) {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
