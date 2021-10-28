@@ -221,7 +221,8 @@ public class PublicRest {
 	@PostMapping("/cargarDatos")
 	public String cargarDatos() {
 		try {
-			restService.cargarDatos();
+			//restService.cargarDatos();
+			restService.corregirDatos();
 		}catch(Exception e) {
 			return "oops, estimado frontend algo se ha ido a la mierda. Consulte a su backend de confianza"; 
 		}

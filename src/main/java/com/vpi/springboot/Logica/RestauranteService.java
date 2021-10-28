@@ -942,4 +942,34 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	private boolean emailExist(String mail) {
 		return userRepo.findById(mail).isPresent();
 	}
+	
+	@Override
+	public void corregirDatos() {
+		String restoString = "La Pasiva,Sushi Go,La Taberna del Diablo,Burger King,Empanadas Mafalda,Il Mondo della Pizza,Fans,D' La Ribera,El Hornito,Grido,Tiqui Taca,Don Koto,Empanadas La Barca,Heladería Las Delicias,Pizza Trouville,Pizza Piedra,Pizzería Rodelú,Grazie Italia,Subway,Food & Love,La Isla,Soprano's,Chiviteria Marcos,Pizzería Cervantes,Sushiapp,Felipe,Chivipizza,El Club de la Papa Frita,OMG Fried Chicken,Cremona - Dicomo Pasta,Premium,Fábrica de Pastas La Bolognesa,Freddo,Lehmeyun 100%,La Roca,El Noble,Fellini,Artico,Barbacoa,Billie Joe,Gelateria del Club,Los Tavarez,Pizzeria Papa Jorge,Sushi Time,Pastas Baccino,Sinestesia,Crêpas,Tropical Smoothies,Chajá Bistro,San Roque,McDonald's,Chesterhouse,La Cigale,Homeopatía Alemana,Supermercados,Farmacias,Farmashop,Nescafé Dolce Gusto,Crepez,I love Tacos,Porto Vanila,Laika,Heladería La Chicharra,Iberpark,Farmacia El Tunel,Chéntola Gelato Artesanal,Sbarro,Fabric Sushi,Al Dente Pastas Artesanales,Del Abuelo Helados Artesanales,Alberto's,Cuidate - Comida Saludable,El Horno de Juan,El Novillo Alegre,Heladería Facal,Hoy te Quiero,Asian Food,Mimoso Resto Bar,Donut City,Hong Kong - Comida China,Mr. Kebap's,Veggie Mafalda,Rudy,Pizza Club,Pizza's House,Axion,Ciudad Aventura,Tomato Gourmet,Futuro Refuerzos,Pizzabrossa,Mascotas,Devoto,Poked,Noah's,The Lab Coffee,26 Sushi,Sabores,The Paletas Factory,La Vienesa,Paparike,Magnum,La Chacha Empanadas,Mise en place,Bar La Cruz,Lehmeyun Pizza Turca Armenia,Almacén de Pizzas,BIGA - Pizza y Pasta,II Gufo,Heladeria Pecas,Gaucho Burger,Emporio Gastronómico,Chivitos lo de Pepe,Facal,La Boletería,Burger Club,McCafé - McDonald's,Green To Go,Flores,Miyagi Sushi,Cafeterías,Pizza Mania,Bebidas,Bao bao,Tiendas,Wing It";
+		List<String> restaurantesList = Arrays.asList(restoString.split(","));
+		
+		//fotos restaurante
+		String fotosRString = "https://www.alacarta.com.uy/wp-content/uploads/2021/09/alacarta-restaurante-adorado-01-300x160.jpg,https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT4BL01pRdMb4Fh3Urp-QVU6Vd8OcXeuaSPHFrdJxMohPsxwt3XaMTOjgyHGO0syh6pKf0&usqp=CAU,https://media-cdn.tripadvisor.com/media/photo-s/11/23/53/c4/img-20171031-144058-largejpg.jpg,https://media-cdn.tripadvisor.com/media/photo-s/0d/38/b5/d4/outdoor-seating.jpg,https://media-cdn.tripadvisor.com/media/photo-p/17/ff/4e/1c/terrasse.jpg,https://media-cdn.tripadvisor.com/media/photo-s/12/dd/a6/cf/doble-v.jpg,https://media-cdn.tripadvisor.com/media/photo-p/1a/d9/1b/c7/photo0jpg.jpg,https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRc2btjCzipIQA0d3Pp4s22KIf5P0XDlbd5A&usqp=CAU,https://www.estudiomontevideo.com/wp-content/uploads/2018/08/010917-KANTINE-AC-ph-G-Viramonte-1015.jpg,https://media-cdn.tripadvisor.com/media/photo-s/16/26/0a/22/restaurant.jpg,https://media-cdn.tripadvisor.com/media/photo-s/0d/a8/5b/78/demode.jpg";
+		List<String> fotosRestaurante = Arrays.asList(fotosRString.split(","));
+
+		Double lat=-34.9128;
+		Double lon= -56.1886;
+		for (String resto : restaurantesList) {
+			Optional<Restaurante> rop=restauranteRepo.findById(resto.replace(" ", "") + "@" + resto.replace(" ", "") + ".com");
+			if(rop.isPresent()) {
+				GeoLocalizacion geo= new GeoLocalizacion();
+				
+				geo.setLatitud(lat);
+				geo.setLongitud(lon);
+				Restaurante restaurante=rop.get();
+				restaurante.setGeoLocalizacion(geo);
+				restauranteRepo.save(restaurante);
+			lat=lat+1;
+			lon=lon+1;
+			}
+	
+			
+		}
+		
+	}
 }
