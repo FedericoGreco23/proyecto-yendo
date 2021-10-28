@@ -36,7 +36,7 @@ public class DTPromocion extends DTProducto implements Serializable {
 			String nombreAnterior = "";
 			if (items.get(p.getNombre()) == 1) {
 				nombreProducto = p.getNombre();
-			} else if (items.get(p.getNombre()) == 2){
+			} else if (items.get(p.getNombre()) == 2) {
 				nombreAnterior = p.getNombre() + " x" + items.get(p.getNombre());
 				nombreProducto = p.getNombre();
 			} else {

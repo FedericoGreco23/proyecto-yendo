@@ -40,4 +40,6 @@ public interface GeneralServicioInterfaz {
 
 	public List<DTPromocion> listarPromocionesRestaurante(String nombreRestaurante)
 			throws RestauranteException;
+	
+	public Map<String, Object> buscarMenusPromociones(String restaurante, String producto) throws RestauranteException;
 }
