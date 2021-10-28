@@ -57,5 +57,5 @@ public interface RestauranteServicioInterfaz {
 
 	public DTPedido buscarPedidoRecibido(int numeroPedido) throws PedidoException;
 
-	public void cargarDatos();
+	public void cargarDatos() throws ProductoException, RestauranteException, CategoriaException, Exception;
 }
