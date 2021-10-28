@@ -17,6 +17,14 @@ public class DTCalificacion implements Serializable {
 	public DTCalificacion() {
 		super();
 	}
+	
+	public DTCalificacion(int puntaje, String comentario, String foto, LocalDateTime fecha) {
+		super();
+		this.puntaje = puntaje;
+		this.comentario = comentario;
+		this.foto = foto;
+		this.fecha = fecha;
+	}
 
 	public DTCalificacion(int id, int puntaje, String comentario, String foto, LocalDateTime fecha) {
 		super();

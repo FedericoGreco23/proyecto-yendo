@@ -1,5 +1,6 @@
 package com.vpi.springboot.ControladorRest;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import com.vpi.springboot.Logica.GeneralService;
 import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.DTUsuario;
+import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
@@ -41,5 +43,18 @@ public class GeneralController {
 		}
 	}
 
+	@PostMapping("registrarPago")
+	public ResponseEntity<?> registrarPago(@RequestParam(required = true) String fecha, 
+			@RequestParam(required = true) Double costoTotal, 
+			@RequestParam(required = true) EnumMetodoDePago metodoDePago, 
+			@RequestParam(required = true) String clienteMail, 
+			@RequestParam(required = true) String restauranteMail) {
+		try {
+			service.registrarPagoEnEfectivo(fecha, costoTotal, metodoDePago, clienteMail, restauranteMail);
+			return new ResponseEntity<String>("Registro de pago realizado.", HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 }

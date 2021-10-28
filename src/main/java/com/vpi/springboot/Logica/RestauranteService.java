@@ -27,6 +27,7 @@ import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.IdCompuestas.CalificacionClienteId;
 import com.vpi.springboot.Modelo.Calificacion;
 import com.vpi.springboot.Modelo.CalificacionCliente;
+import com.vpi.springboot.Modelo.CalificacionRestaurante;
 import com.vpi.springboot.Modelo.Carrito;
 import com.vpi.springboot.Modelo.Categoria;
 import com.vpi.springboot.Modelo.GeoLocalizacion;
@@ -35,7 +36,9 @@ import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.Modelo.Promocion;
 import com.vpi.springboot.Modelo.Reclamo;
 import com.vpi.springboot.Modelo.Restaurante;
+import com.vpi.springboot.Modelo.dto.DTCalificacionRestaurante;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
+import com.vpi.springboot.Modelo.dto.DTListarRestaurante;
 import com.vpi.springboot.Modelo.dto.DTPedido;
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.Modelo.dto.DTProductoIdCantidad;
@@ -47,6 +50,7 @@ import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoReclamo;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Repositorios.CalificacionClienteRepositorio;
+import com.vpi.springboot.Repositorios.CalificacionRestauranteRepositorio;
 import com.vpi.springboot.Repositorios.CategoriaRepositorio;
 import com.vpi.springboot.Repositorios.ClienteRepositorio;
 import com.vpi.springboot.Repositorios.GeoLocalizacionRepositorio;
@@ -92,6 +96,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	private ClienteRepositorio clienteRepo;
 	@Autowired
 	private CalificacionClienteRepositorio calClienteRepo;
+	@Autowired
+	private CalificacionRestauranteRepositorio calRestauranteRepo;
 	@Autowired
 	private ReclamoRepositorio recRepo;
 
@@ -617,5 +623,42 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		}
 
 		return DTpedido;
+	}
+	
+	@Override
+	public Map<String, Object> consultarCalificacion(int page, int size, String sort, int order, String mailRestaurante) throws RestauranteException {
+		Map<String, Object> response = new HashMap<>();
+		List<DTCalificacionRestaurante> DTCalificacionesRestaurante = new ArrayList<DTCalificacionRestaurante>();
+		List<CalificacionRestaurante> calificacionRestaurantes = new ArrayList<CalificacionRestaurante>();
+
+		Sort sorting;
+		Pageable paging;
+		
+		if (!sort.equalsIgnoreCase("")) {
+			if (order == 1) {
+				sorting = Sort.by(Sort.Order.desc(sort));
+			} else {
+				sorting = Sort.by(Sort.Order.asc(sort));
+			}
+			paging = PageRequest.of(page, size, sorting);
+		} else {
+			paging = PageRequest.of(page, size);
+		}
+		
+		Page<CalificacionRestaurante> pageCalificacion;
+		pageCalificacion = calRestauranteRepo.consultarCalificacion();
+		calificacionRestaurantes = pageCalificacion.getContent();
+		int pagina = pageCalificacion.getNumber();
+		long totalElements = pageCalificacion.getTotalElements();
+		
+		for (CalificacionRestaurante c : calificacionRestaurantes) {
+			DTCalificacionesRestaurante.add(new DTCalificacionRestaurante(c));
+		}
+		
+		response.put("currentPage", pagina);
+		response.put("totalItems", totalElements);
+		response.put("restaurantes", DTCalificacionesRestaurante);
+
+		return response;
 	}
 }

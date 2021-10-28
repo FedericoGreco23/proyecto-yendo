@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 import com.vpi.springboot.Modelo.Calificacion;
 import com.vpi.springboot.Modelo.CalificacionCliente;
+import com.vpi.springboot.Modelo.CalificacionRestaurante;
 
 public class DTCalificacionRestaurante extends DTCalificacion implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -21,6 +22,12 @@ public class DTCalificacionRestaurante extends DTCalificacion implements Seriali
 		super(id, puntaje, comentario, foto, fecha);
 		this.restaurante = restaurante;
 		this.cliente = cliente;
+	}
+	
+	//Este uso para consultarCalificacion del restaurante
+	public DTCalificacionRestaurante(CalificacionRestaurante c) {
+		super(c.getPuntaje(), c.getComentario(), c.getFoto(), c.getFecha());
+		this.cliente = c.getCliente().getNickname();
 	}
 
 	public DTCalificacionRestaurante(CalificacionCliente cal) {

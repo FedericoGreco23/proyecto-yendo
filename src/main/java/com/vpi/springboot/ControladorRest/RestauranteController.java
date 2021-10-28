@@ -286,6 +286,18 @@ public class RestauranteController {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@GetMapping("/consultarCalificacion")
+	public ResponseEntity<?> consultarCalificacion(@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "") String sort,
+			@RequestParam(defaultValue = "0") int order) {
+		try {
+			return new ResponseEntity<>(service.consultarCalificacion(page, size, sort, order, getMailFromJwt()), HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 
 	/// PRIVADAS PARA JWT ///
 	/////////////////////////

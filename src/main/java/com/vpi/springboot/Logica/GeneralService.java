@@ -1,5 +1,7 @@
 package com.vpi.springboot.Logica;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
@@ -11,6 +13,18 @@ import java.util.stream.Collectors;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
+
+import org.bson.Document;
+import org.bson.conversions.Bson;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -439,5 +453,24 @@ public class GeneralService implements GeneralServicioInterfaz {
 	public List<Categoria> listarCategorias() {
 		return catRepo.findAll();
 
+	}
+	
+	@Override
+	public void registrarPagoEnEfectivo(String fecha, Double costoTotal, EnumMetodoDePago metodoDePago, String clienteMail, String restauranteMail) {
+		MongoClientURI uri = new MongoClientURI("mongodb+srv://grupo1:grupo1@cluster0.l17sm.mongodb.net/prueba-concepto");
+		MongoClient mongoClient = new MongoClient(uri);
+		MongoDatabase dataBase = mongoClient.getDatabase("prueba-concepto");
+		MongoCollection<Document> collectionPedidos = dataBase.getCollection("pedidos");
+		
+		Document document = new Document();
+		
+		//DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		
+		document.put("Fecha", fecha);
+		document.put("CostoTotal", costoTotal);
+		document.put("MetodoDePago", metodoDePago.toString());
+		document.put("ClienteMail", clienteMail);
+		document.put("RestauranteMail", restauranteMail);
+		collectionPedidos.insertOne(document);
 	}
 }
