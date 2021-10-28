@@ -216,6 +216,19 @@ public class PublicRest {
 		}
 	}
 	
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
+	@GetMapping("/buscarMenusPromociones/{restaurante}")
+	public ResponseEntity<?> buscarMenusPromociones(@PathVariable(required = true) String restaurante,
+			@RequestParam(required = true) String producto) {
+		try {
+			return new ResponseEntity<>(service.buscarMenusPromociones(restaurante, producto), HttpStatus.OK);
+		} catch (RestauranteException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
 	
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/prueba")
