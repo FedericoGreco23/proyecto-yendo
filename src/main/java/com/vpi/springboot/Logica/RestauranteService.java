@@ -105,17 +105,15 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 	private DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");;
 
-	/*private DTCarrito verCarrito(int id) {
-		Optional<Carrito> optionalCarrito = mongoRepo.findById(id);
-		if (optionalCarrito.isPresent()) {
-			Carrito carrito = optionalCarrito.get();
-			DTCarrito dt = new DTCarrito(carrito.getId(), carrito.getProductoCarrito(), carrito.getMailRestaurante(),
-					carrito.getCostoEnvio());
-			return dt;
-		}
-
-		return null;
-	}*/
+	/*
+	 * private DTCarrito verCarrito(int id) { Optional<Carrito> optionalCarrito =
+	 * mongoRepo.findById(id); if (optionalCarrito.isPresent()) { Carrito carrito =
+	 * optionalCarrito.get(); DTCarrito dt = new DTCarrito(carrito.getId(),
+	 * carrito.getProductoCarrito(), carrito.getMailRestaurante(),
+	 * carrito.getCostoEnvio()); return dt; }
+	 * 
+	 * return null; }
+	 */
 
 	@Override
 	public DTRespuesta altaRestaurante(Restaurante rest) throws RestauranteException, CategoriaException {
@@ -346,7 +344,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				LocalDateTime dateF = LocalDateTime.of(ld, LocalTime.of(23, 59));
 
 				pagePedido = pedidoRepo.findByFecha(dateI, dateF, restaurante, paging);
-			} 
+			}
 
 			// estado
 			else if (!estado.equalsIgnoreCase("")) {
@@ -354,7 +352,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				pagePedido = pedidoRepo.findByEstado(estadoPedido, restaurante, paging);
 			} else
 				pagePedido = pedidoRepo.findAllByRestaurante(restaurante, paging);
-			
+
 		} else {
 			pagePedido = pedidoRepo.findAllByRestaurante(restaurante, paging);
 		}
@@ -362,14 +360,14 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		pedidos = pagePedido.getContent();
 		response.put("currentPage", pagePedido.getNumber());
 		response.put("totalItems", pagePedido.getTotalElements());
-		
+
 		System.out.println("Llega antes de pedidos");
-		
+
 		for (Pedido p : pedidos) {
 			Optional<Carrito> optionalCarrito = mongoRepo.findById(p.getCarrito());
-			if(optionalCarrito.isPresent())
+			if (optionalCarrito.isPresent())
 				retorno.add(new DTPedido(p, new DTCarrito(optionalCarrito.get())));
-			else 
+			else
 				retorno.add(new DTPedido(p));
 		}
 
@@ -400,20 +398,22 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			Pedido pedido = optionalPedido.get();
 			pedido.setEstadoPedido(EnumEstadoPedido.ACEPTADO);
 			pedidoRepo.save(pedido);
-			
-			//se notifica a cliente
+
+			// se notifica a cliente
 			String base64EncodedEmail = Base64.getEncoder()
 					.encodeToString(pedido.getRestaurante().getMail().getBytes(StandardCharsets.UTF_8));
-			
-			/*DTPedidoParaAprobar pedidoDT = new DTPedidoParaAprobar(pedido);
-			pedidoDT.setComentario(pedido.getComentario());
-			pedidoDT.setDireccion(pedido.getDireccion());
-			pedidoDT.setCliente(new DTCliente(pedido.getCliente()));*/
 
-			simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, "Su pedido ha sido aceptado y se está siendo preparado");
-			
-			//fin notificacion		
-			
+			/*
+			 * DTPedidoParaAprobar pedidoDT = new DTPedidoParaAprobar(pedido);
+			 * pedidoDT.setComentario(pedido.getComentario());
+			 * pedidoDT.setDireccion(pedido.getDireccion()); pedidoDT.setCliente(new
+			 * DTCliente(pedido.getCliente()));
+			 */
+
+			simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail,
+					"Su pedido ha sido aceptado y se está siendo preparado");
+
+			// fin notificacion
 
 			return new DTRespuesta("Pedido " + idPedido + " confirmado.");
 		} else {
@@ -530,24 +530,24 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			Pedido pedido = optionalPedido.get();
 			pedido.setEstadoPedido(EnumEstadoPedido.RECHAZADO);
 			pedidoRepo.save(pedido);
-			
-			//se notifica a cliente
+
+			// se notifica a cliente
 			String base64EncodedEmail = Base64.getEncoder()
 					.encodeToString(pedido.getRestaurante().getMail().getBytes(StandardCharsets.UTF_8));
-			
-			/*DTPedidoParaAprobar pedidoDT = new DTPedidoParaAprobar(pedido);
-			pedidoDT.setComentario(pedido.getComentario());
-			pedidoDT.setDireccion(pedido.getDireccion());
-			pedidoDT.setCliente(new DTCliente(pedido.getCliente()));*/
+
+			/*
+			 * DTPedidoParaAprobar pedidoDT = new DTPedidoParaAprobar(pedido);
+			 * pedidoDT.setComentario(pedido.getComentario());
+			 * pedidoDT.setDireccion(pedido.getDireccion()); pedidoDT.setCliente(new
+			 * DTCliente(pedido.getCliente()));
+			 */
 
 			simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, "Su pedido ha sido rechazado");
-			
-			//fin notificacion		
-			
+
+			// fin notificacion
 
 			return new DTRespuesta("Pedido " + idPedido + " rechazado.");
-			
-			
+
 		} else {
 			throw new PedidoException(PedidoException.NotFoundExceptionId(idPedido));
 		}
@@ -566,9 +566,9 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		if (!optionalCliente.isPresent())
 			throw new UsuarioException(UsuarioException.NotFoundException(mailCliente));
 		Cliente cliente = optionalCliente.get();
-		
+
 		List<Pedido> pedidos = pedidoRepo.findByClienteRestaurante(cliente, restaurante);
-		if(pedidos.size() == 0)
+		if (pedidos.size() == 0)
 			throw new UsuarioException(UsuarioException.SinPedido(mailRestaurante));
 
 		calificacion.setFecha(LocalDateTime.now());
@@ -601,9 +601,9 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		if (!optionalCliente.isPresent())
 			throw new UsuarioException(UsuarioException.NotFoundException(mailCliente));
 		Cliente cliente = optionalCliente.get();
-		
+
 		List<Pedido> pedidos = pedidoRepo.findByClienteRestaurante(cliente, restaurante);
-		if(pedidos.size() == 0)
+		if (pedidos.size() == 0)
 			throw new UsuarioException(UsuarioException.SinPedido(mailRestaurante));
 
 		Optional<CalificacionCliente> optionalCalificacion = calClienteRepo
@@ -630,20 +630,37 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		return new DTRespuesta("Calificación de cliente " + mailCliente + " eliminada correctamente");
 	}
 
-	public Map<String, Object> listarReclamos(int page, int size, String mailRestaurante) throws RestauranteException {
+	public Map<String, Object> listarReclamos(int page, int size, String cliente, String sort, int order,
+			String mailRestaurante) throws RestauranteException {
 		Optional<Restaurante> optionalRestaurante = restauranteRepo.findById(mailRestaurante);
 		if (!optionalRestaurante.isPresent()) {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(mailRestaurante));
 		}
 		Restaurante restaurante = optionalRestaurante.get();
 
-		Pageable paging = PageRequest.of(page, size);
-		Page<Reclamo> pageReclamo = recRepo.findAllByRestaurante(restaurante, paging);
-
-		List<Reclamo> reclamos = pageReclamo.getContent();
-		List<DTReclamo> retorno = new ArrayList<>();
 		Map<String, Object> response = new HashMap<>();
+		List<DTReclamo> retorno = new ArrayList<>();
+		Pageable paging;
 
+		if (!sort.equalsIgnoreCase("")) {
+			if (order == 1)
+				paging = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sort)));
+			else
+				paging = PageRequest.of(page, size, Sort.by(Sort.Order.asc(sort)));
+		} else {
+			paging = PageRequest.of(page, size);
+		}
+
+		Page<Reclamo> pageReclamo;
+		List<Reclamo> reclamos = new ArrayList<>();
+
+		if (!cliente.equalsIgnoreCase("")) {
+			pageReclamo = recRepo.findAllByRestauranteCliente(cliente, restaurante, paging);
+		} else {
+			pageReclamo = recRepo.findAllByRestaurante(restaurante, paging);
+		}
+
+		reclamos = pageReclamo.getContent();
 		for (Reclamo r : reclamos) {
 			retorno.add(new DTReclamo(r));
 		}
@@ -675,47 +692,48 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 	@Override
 	public void cargarDatos() {
-		
-		///////////////////DATOS///////////
-		//RESTAURANTES
-		String restoString= "La Pasiva,Sushi Go,La Taberna del Diablo,Burger King,Empanadas Mafalda,Il Mondo della Pizza,Fans,D' La Ribera,El Hornito,Grido,Tiqui Taca,Don Koto,Empanadas La Barca,Heladería Las Delicias,Pizza Trouville,Pizza Piedra,Pizzería Rodelú,Grazie Italia,Subway,Food & Love,La Isla,Soprano's,Chiviteria Marcos,Pizzería Cervantes,Sushiapp,Felipe,Chivipizza,El Club de la Papa Frita,OMG Fried Chicken,Cremona - Dicomo Pasta,Premium,Fábrica de Pastas La Bolognesa,Freddo,Lehmeyun 100%,La Roca,El Noble,Fellini,Artico,Barbacoa,Billie Joe,Gelateria del Club,Los Tavarez,Pizzeria Papa Jorge,Sushi Time,Pastas Baccino,Sinestesia,Crêpas,Tropical Smoothies,Chajá Bistro,San Roque,McDonald's,Chesterhouse,La Cigale,Homeopatía Alemana,Supermercados,Farmacias,Farmashop,Nescafé Dolce Gusto,Crepez,I love Tacos,Porto Vanila,Laika,Heladería La Chicharra,Iberpark,Farmacia El Tunel,Chéntola Gelato Artesanal,Sbarro,Fabric Sushi,Al Dente Pastas Artesanales,Del Abuelo Helados Artesanales,Alberto's,Cuidate - Comida Saludable,El Horno de Juan,El Novillo Alegre,Heladería Facal,Hoy te Quiero,Asian Food,Mimoso Resto Bar,Donut City,Hong Kong - Comida China,Mr. Kebap's,Veggie Mafalda,Rudy,Pizza Club,Pizza's House,Axion,Ciudad Aventura,Tomato Gourmet,Futuro Refuerzos,Pizzabrossa,Mascotas,Devoto,Poked,Noah's,The Lab Coffee,26 Sushi,Sabores,The Paletas Factory,La Vienesa,Paparike,Magnum,La Chacha Empanadas,Mise en place,Bar La Cruz,Lehmeyun Pizza Turca Armenia,Almacén de Pizzas,BIGA - Pizza y Pasta,II Gufo,Heladeria Pecas,Gaucho Burger,Emporio Gastronómico,Chivitos lo de Pepe,Facal,La Boletería,Burger Club,McCafé - McDonald's,Green To Go,Flores,Miyagi Sushi,Cafeterías,Pizza Mania,Bebidas,Bao bao,Tiendas,Wing It";
-		List<String> restaurantesList= Arrays.asList(restoString.split(","));
-		//CATEGORIIA
-		Map<String, String> categoriaFotoMap= new HashMap<String, String>();
-	    categoriaFotoMap.put("Bebidas", "https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/alcohol.jpeg");
-        categoriaFotoMap.put("Comida oriental", "https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/china.jpg");
-        categoriaFotoMap.put("Chivitos", "https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/chivitos.jpg");
-        categoriaFotoMap.put("Empanadas", "https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/empanadas.jpg");
-        categoriaFotoMap.put("Comida española", "https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/espanola.jpg");
-        categoriaFotoMap.put("Hamburguesas", "https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/hamburguesa.jpg");
-        categoriaFotoMap.put("Helados", "https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/helado.jpg");
-        categoriaFotoMap.put("Comida italiana", "https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/italiana.jpg");
-        categoriaFotoMap.put("Desayunos y Meriendas", "https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/meriendas.jpg");
-        categoriaFotoMap.put("Comida mexicana", "https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/mexicana.jpg");
-        categoriaFotoMap.put("Milanesas", "https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/milanesa.jpg");
-        categoriaFotoMap.put("Parrillada", "https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/parrilla.jpg");
-        categoriaFotoMap.put("Pasta", "https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/pasta.jpg");
-        categoriaFotoMap.put("Pastelería", "https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/pasteleria.jpg");
-        categoriaFotoMap.put("Picadas", "https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/picadas.jpg");
-        categoriaFotoMap.put("Pizzas", "https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/pizzas.jpg");
-        categoriaFotoMap.put("Postres", "https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/postre.jpg");
-        categoriaFotoMap.put("Saludable", "https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/saludable.jpg");
-        categoriaFotoMap.put("Comida vegana", "https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/vegano.jpg");
-        categoriaFotoMap.put("Comida vegetariana", "https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/vegetariano.jpg");
-        //cliente
 
-		
+		/////////////////// DATOS///////////
+		// RESTAURANTES
+		String restoString = "La Pasiva,Sushi Go,La Taberna del Diablo,Burger King,Empanadas Mafalda,Il Mondo della Pizza,Fans,D' La Ribera,El Hornito,Grido,Tiqui Taca,Don Koto,Empanadas La Barca,Heladería Las Delicias,Pizza Trouville,Pizza Piedra,Pizzería Rodelú,Grazie Italia,Subway,Food & Love,La Isla,Soprano's,Chiviteria Marcos,Pizzería Cervantes,Sushiapp,Felipe,Chivipizza,El Club de la Papa Frita,OMG Fried Chicken,Cremona - Dicomo Pasta,Premium,Fábrica de Pastas La Bolognesa,Freddo,Lehmeyun 100%,La Roca,El Noble,Fellini,Artico,Barbacoa,Billie Joe,Gelateria del Club,Los Tavarez,Pizzeria Papa Jorge,Sushi Time,Pastas Baccino,Sinestesia,Crêpas,Tropical Smoothies,Chajá Bistro,San Roque,McDonald's,Chesterhouse,La Cigale,Homeopatía Alemana,Supermercados,Farmacias,Farmashop,Nescafé Dolce Gusto,Crepez,I love Tacos,Porto Vanila,Laika,Heladería La Chicharra,Iberpark,Farmacia El Tunel,Chéntola Gelato Artesanal,Sbarro,Fabric Sushi,Al Dente Pastas Artesanales,Del Abuelo Helados Artesanales,Alberto's,Cuidate - Comida Saludable,El Horno de Juan,El Novillo Alegre,Heladería Facal,Hoy te Quiero,Asian Food,Mimoso Resto Bar,Donut City,Hong Kong - Comida China,Mr. Kebap's,Veggie Mafalda,Rudy,Pizza Club,Pizza's House,Axion,Ciudad Aventura,Tomato Gourmet,Futuro Refuerzos,Pizzabrossa,Mascotas,Devoto,Poked,Noah's,The Lab Coffee,26 Sushi,Sabores,The Paletas Factory,La Vienesa,Paparike,Magnum,La Chacha Empanadas,Mise en place,Bar La Cruz,Lehmeyun Pizza Turca Armenia,Almacén de Pizzas,BIGA - Pizza y Pasta,II Gufo,Heladeria Pecas,Gaucho Burger,Emporio Gastronómico,Chivitos lo de Pepe,Facal,La Boletería,Burger Club,McCafé - McDonald's,Green To Go,Flores,Miyagi Sushi,Cafeterías,Pizza Mania,Bebidas,Bao bao,Tiendas,Wing It";
+		List<String> restaurantesList = Arrays.asList(restoString.split(","));
+		// CATEGORIIA
+		Map<String, String> categoriaFotoMap = new HashMap<String, String>();
+		categoriaFotoMap.put("Bebidas", "https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/alcohol.jpeg");
+		categoriaFotoMap.put("Comida oriental",
+				"https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/china.jpg");
+		categoriaFotoMap.put("Chivitos", "https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/chivitos.jpg");
+		categoriaFotoMap.put("Empanadas",
+				"https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/empanadas.jpg");
+		categoriaFotoMap.put("Comida española",
+				"https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/espanola.jpg");
+		categoriaFotoMap.put("Hamburguesas",
+				"https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/hamburguesa.jpg");
+		categoriaFotoMap.put("Helados", "https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/helado.jpg");
+		categoriaFotoMap.put("Comida italiana",
+				"https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/italiana.jpg");
+		categoriaFotoMap.put("Desayunos y Meriendas",
+				"https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/meriendas.jpg");
+		categoriaFotoMap.put("Comida mexicana",
+				"https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/mexicana.jpg");
+		categoriaFotoMap.put("Milanesas", "https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/milanesa.jpg");
+		categoriaFotoMap.put("Parrillada",
+				"https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/parrilla.jpg");
+		categoriaFotoMap.put("Pasta", "https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/pasta.jpg");
+		categoriaFotoMap.put("Pastelería",
+				"https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/pasteleria.jpg");
+		categoriaFotoMap.put("Picadas", "https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/picadas.jpg");
+		categoriaFotoMap.put("Pizzas", "https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/pizzas.jpg");
+		categoriaFotoMap.put("Postres", "https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/postre.jpg");
+		categoriaFotoMap.put("Saludable",
+				"https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/saludable.jpg");
+		categoriaFotoMap.put("Comida vegana",
+				"https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/vegano.jpg");
+		categoriaFotoMap.put("Comida vegetariana",
+				"https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/vegetariano.jpg");
+		// cliente
 
+		////////// RESTAURANTE/////////
 
-
-
-		
-		
-
-		
-		//////////RESTAURANTE/////////
-		
-
-		
 	}
 }

@@ -286,6 +286,27 @@ public class RestauranteController {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
+	@GetMapping("/getReclamos")
+	public ResponseEntity<?> listarReclamos(@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "") String cliente,
+			@RequestParam(defaultValue = "") String sort, @RequestParam(defaultValue = "1") int order) {
+		if (!esRestaurante()) {
+			return new ResponseEntity<>(
+					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
+					HttpStatus.FORBIDDEN);
+		}
+
+		try {
+			return new ResponseEntity<>(
+					service.listarReclamos(page, size, cliente, sort, order, getMailFromJwt()),
+					HttpStatus.OK);
+		} catch (RestauranteException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 
 	/// PRIVADAS PARA JWT ///
 	/////////////////////////
