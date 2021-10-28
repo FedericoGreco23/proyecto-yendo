@@ -807,7 +807,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				Restaurante r = new Restaurante(resto.replace(" ", "") + "@" + resto.replace(" ", "") + ".com",
 						"123456", numero.toString(), null, false, true, resto, direccionesList.get(numero),
 						Float.valueOf(5), EnumEstadoRestaurante.values()[i - 1], null, null, null, 20, null,
-						productosRandom, "LMMJSD", true);	
+						productosRandom, "LMWJVSD", true);	
 				
 				for(Producto prod: productosRandom) {
 					
