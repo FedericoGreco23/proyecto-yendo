@@ -2,6 +2,7 @@ package com.vpi.springboot.Logica;
 
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -582,7 +583,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		return new DTRespuesta("Calificación de cliente " + mailCliente + " eliminada correctamente");
 	}
 
-	public Map<String, Object> listarReclamos(int page, int size, String mailRestaurante) throws RestauranteException {
+	public Map<String, Object> listarReclamos(int page, int size, String cliente, String sort, int order,
+			String mailRestaurante) throws RestauranteException {
 		Optional<Restaurante> optionalRestaurante = restauranteRepo.findById(mailRestaurante);
 		if (!optionalRestaurante.isPresent()) {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(mailRestaurante));

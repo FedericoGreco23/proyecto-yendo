@@ -45,7 +45,7 @@ public class Pedido {
 	private List<Reclamo> reclamos = new ArrayList<>();
 	private String direccion;
 	private String comentario;
-	
+	private Boolean pago;
 	
 
 	public Pedido() {
@@ -79,6 +79,21 @@ public class Pedido {
 		
 	}
 	
+	public Pedido(int id, LocalDateTime fecha, Double costoTotal, EnumEstadoPedido estadoPedido,
+			EnumMetodoDePago metodoDePago, Integer carrito, String direccion, Restaurante resto, Cliente cliente, String comentario) {
+		super();
+		this.id = id;
+		this.fecha = fecha;
+		this.costoTotal = costoTotal;
+		this.estadoPedido = estadoPedido;
+		this.metodoDePago = metodoDePago;
+		this.carrito = carrito;
+		this.direccion = direccion;
+		this.restaurante = resto;
+		this.cliente = cliente;
+		this.comentario = comentario;
+		
+	}
 	
 	public Pedido(int id, LocalDateTime fecha, Double costoTotal, EnumEstadoPedido estadoPedido,
 			EnumMetodoDePago metodoDePago, Integer carrito, String direccion, String comentario) {
@@ -187,5 +202,13 @@ public class Pedido {
 
 	public void setEstadoPedido(EnumEstadoPedido estadoPedido) {
 		this.estadoPedido = estadoPedido;
+	}
+
+	public Boolean getPago() {
+		return pago;
+	}
+
+	public void setPago(Boolean pago) {
+		this.pago = pago;
 	}
 }

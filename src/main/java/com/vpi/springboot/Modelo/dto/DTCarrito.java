@@ -4,30 +4,39 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.vpi.springboot.Modelo.Carrito;
+
 public class DTCarrito implements Serializable {
-    /**
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	private long id;
-	private List<DTProductoCarrito> dtProductoCarritoList= new ArrayList<DTProductoCarrito>();
+	private List<DTProductoCarrito> dtProductoCarritoList = new ArrayList<DTProductoCarrito>();
 	private String mailRestaurante;
 	private Integer costoEnvio;
 
-  
-	 public DTCarrito(long id,List<DTProductoCarrito> dtProductoCarritoList, String mailRestaurante, Integer costoEnvio) {
-	     this.id = id;   
-		 this.dtProductoCarritoList = dtProductoCarritoList;
-		 this.mailRestaurante = mailRestaurante;
-	     this.costoEnvio = costoEnvio;
-	    }
-	 
-	 public DTCarrito(List<DTProductoCarrito> dtProductoCarritoList) {
-	        this.dtProductoCarritoList = dtProductoCarritoList;
-	    }
+	public DTCarrito(long id, List<DTProductoCarrito> dtProductoCarritoList, String mailRestaurante,
+			Integer costoEnvio) {
+		this.id = id;
+		this.dtProductoCarritoList = dtProductoCarritoList;
+		this.mailRestaurante = mailRestaurante;
+		this.costoEnvio = costoEnvio;
+	}
 
-    public long getId() {
+	public DTCarrito(List<DTProductoCarrito> dtProductoCarritoList) {
+		this.dtProductoCarritoList = dtProductoCarritoList;
+	}
+	
+	public DTCarrito(Carrito c) {
+		this.id = c.getId();
+		this.dtProductoCarritoList = c.getProductoCarrito();
+		this.mailRestaurante = c.getMailRestaurante();
+		this.costoEnvio = c.getCostoEnvio();
+	}
+
+	public long getId() {
 		return id;
 	}
 
@@ -36,14 +45,14 @@ public class DTCarrito implements Serializable {
 	}
 
 	public List<DTProductoCarrito> getDtProductoCarritoList() {
-        return dtProductoCarritoList;
-    }
+		return dtProductoCarritoList;
+	}
 
-    public void setDtProductoCarritoList(List<DTProductoCarrito> dtProductoCarritoList) {
-        this.dtProductoCarritoList = dtProductoCarritoList;
-    }
+	public void setDtProductoCarritoList(List<DTProductoCarrito> dtProductoCarritoList) {
+		this.dtProductoCarritoList = dtProductoCarritoList;
+	}
 
-    public String getMailRestaurante() {
+	public String getMailRestaurante() {
 		return mailRestaurante;
 	}
 
@@ -60,9 +69,7 @@ public class DTCarrito implements Serializable {
 	}
 
 	@Override
-    public String toString() {
-        return "DTCarrito{" +
-                "dtProductoCarritoList=" + dtProductoCarritoList +
-                '}';
-    }
+	public String toString() {
+		return "DTCarrito{" + "dtProductoCarritoList=" + dtProductoCarritoList + '}';
+	}
 }

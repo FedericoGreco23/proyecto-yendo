@@ -345,6 +345,11 @@ public class ClienteService implements ClienteServicioInterfaz {
 					precioTotal = precioTotal + restaurante.getCostoDeEnvio();
 					Pedido pedido = new Pedido(LocalDateTime.now(), precioTotal, estado, pago, idCarrito, direccion,
 							restaurante, cliente, comentario);
+					if(pago.equals(EnumMetodoDePago.PAYPAL)) {
+						pedido.setPago(true);
+					}else if(pago.equals(EnumMetodoDePago.EFECTIVO)) {
+						pedido.setPago(false);
+					}
 					pedidoRepo.save(pedido);
 					// AGREGAR PEDIDO AL RESTAURANTE
 					if (restaurante.getPedidos() == null) {
@@ -522,7 +527,11 @@ public class ClienteService implements ClienteServicioInterfaz {
 		response.put("totalItems", pagePedido.getTotalElements());
 		
 		for (Pedido p : pedidos) {
-			retorno.add(new DTPedido(p));
+			Optional<Carrito> optionalCarrito = mongoRepo.findById(p.getCarrito());
+			if(optionalCarrito.isPresent())
+				retorno.add(new DTPedido(p, new DTCarrito(optionalCarrito.get())));
+			else 
+				retorno.add(new DTPedido(p));
 		}
 		
 		response.put("pedidos", retorno);
@@ -543,12 +552,16 @@ public class ClienteService implements ClienteServicioInterfaz {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(mailRestaurante));
 		}
 		Restaurante restaurante = optionalRestaurante.get();
+		
+		List<Pedido> pedidos = pedidoRepo.findByClienteRestaurante(cliente, restaurante);
+		if(pedidos.size() == 0)
+			throw new UsuarioException(UsuarioException.SinPedido(mailRestaurante));
 
 		calificacion.setFecha(LocalDateTime.now());
 		CalificacionRestaurante calRestaurante = new CalificacionRestaurante(calificacion, cliente, restaurante);
 		calRestauranteRepo.save(calRestaurante);
 
-		// Calculamos la calificación del cliente y la guardamos
+		// Calculamos la calificación del restaurante y la guardamos
 		List<CalificacionRestaurante> calificaciones = calRestauranteRepo.findByRestaurante(restaurante);
 		float avg = 0;
 		for (CalificacionRestaurante c : calificaciones) {
@@ -574,6 +587,10 @@ public class ClienteService implements ClienteServicioInterfaz {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(mailRestaurante));
 		}
 		Restaurante restaurante = optionalRestaurante.get();
+		
+		List<Pedido> pedidos = pedidoRepo.findByClienteRestaurante(cliente, restaurante);
+		if(pedidos.size() == 0)
+			throw new UsuarioException(UsuarioException.SinPedido(mailRestaurante));
 
 		Optional<CalificacionRestaurante> optionalCalificacion = calRestauranteRepo
 				.findById(new CalificacionRestauranteId(cliente, restaurante));
