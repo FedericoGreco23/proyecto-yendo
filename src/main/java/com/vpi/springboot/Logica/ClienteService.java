@@ -424,11 +424,26 @@ public class ClienteService implements ClienteServicioInterfaz {
 			/**
 			 * guarda el reclamo y envia mail
 			 */
-
+			
+			Restaurante restaurante =pedido.getRestaurante();
+			//reclamo
 			List<Reclamo> reclamos = pedido.getReclamos();
-			reclamos.add(new Reclamo(comentario, now, EnumEstadoReclamo.ENVIADO, ""));
+			Reclamo reclamo= new Reclamo(comentario, now, EnumEstadoReclamo.ENVIADO, "");
+			reclamo.setPedido(pedido);
+			reclamo.setRestaurante(restaurante);
+			reclamos.add(reclamo);
+			
+			//pedido	
 			pedido.setReclamos(reclamos);
+			
+			//restaurante
+			List<Reclamo> reclamosResto = restaurante.getReclamos();
+			restaurante.setReclamos(reclamosResto);
+		
+			
 			pedidoRepo.save(pedido);
+			recRepo.save(reclamo);
+			restauranteRepo.save(restaurante);
 			return new DTRespuesta(
 					"Reclamo ingresado con éxito. Le llegará un mail con la resulución. Disculpe las molestias.");
 		} else {
