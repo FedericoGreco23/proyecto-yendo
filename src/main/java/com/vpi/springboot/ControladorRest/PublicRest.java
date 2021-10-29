@@ -235,7 +235,7 @@ public class PublicRest {
 	public String cargarDatos() {
 		try {
 			//restService.cargarDatos();
-			restService.corregirDatos();
+			restService.cargarDatos();
 		}catch(Exception e) {
 			return "oops, estimado frontend algo se ha ido a la mierda. Consulte a su backend de confianza"; 
 		}

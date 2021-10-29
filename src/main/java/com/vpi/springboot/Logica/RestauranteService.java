@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Direccion;
 import com.vpi.springboot.IdCompuestas.CalificacionClienteId;
+import com.vpi.springboot.Modelo.Administrador;
 import com.vpi.springboot.Modelo.Calificacion;
 import com.vpi.springboot.Modelo.CalificacionCliente;
 import com.vpi.springboot.Modelo.CalificacionRestaurante;
@@ -67,6 +68,7 @@ import com.vpi.springboot.Repositorios.ProductoRepositorio;
 import com.vpi.springboot.Repositorios.PromocionRepositorio;
 import com.vpi.springboot.Repositorios.ReclamoRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
+import com.vpi.springboot.exception.AdministradorException;
 import com.vpi.springboot.exception.CategoriaException;
 import com.vpi.springboot.exception.PedidoException;
 import com.vpi.springboot.exception.ProductoException;
@@ -111,6 +113,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	private SimpMessagingTemplate simpMessagingTemplate;
 	@Autowired
 	private ClienteRepositorio userRepo;
+	@Autowired
+	private AdministradorService administradorService;
 
 	private DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");;
 
@@ -410,7 +414,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 			// se notifica a cliente
 			String base64EncodedEmail = Base64.getEncoder()
-					.encodeToString(pedido.getRestaurante().getMail().getBytes(StandardCharsets.UTF_8));
+					.encodeToString(pedido.getCliente().getMail().getBytes(StandardCharsets.UTF_8));
 
 			/*
 			 * DTPedidoParaAprobar pedidoDT = new DTPedidoParaAprobar(pedido);
@@ -542,7 +546,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 			// se notifica a cliente
 			String base64EncodedEmail = Base64.getEncoder()
-					.encodeToString(pedido.getRestaurante().getMail().getBytes(StandardCharsets.UTF_8));
+					.encodeToString(pedido.getCliente().getMail().getBytes(StandardCharsets.UTF_8));
 
 			/*
 			 * DTPedidoParaAprobar pedidoDT = new DTPedidoParaAprobar(pedido);
@@ -703,6 +707,17 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	public void cargarDatos() {
 
 		/////////////////// DATOS///////////
+		
+		//////////////admin/////////////////
+		
+		Administrador admin= new Administrador("admin1@gmail.com", "123456", "099999999", "https://www.elliberal.com/wp-content/uploads/2021/09/elon-musk.jpg", false, 
+				true, LocalDate.now());
+		try {
+			administradorService.crearAdministrador(admin);
+		} catch (AdministradorException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
 		// CATEGORIIA
 		Map<String, String> categoriaFotoMap = new HashMap<String, String>();
@@ -743,7 +758,13 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 		// Productos
 		// bebidas
-		String bebidasString = "Cocoroco,Vodka Spirytus,Absenta,Chinchón seco especial,Licor de cocuy,Bacanora,Mezcal,Whisky,Orujo blanco,Fernet,Coñac,Cachaza,Grappa,Aquavit,Becherovka,Gin de Menorca,Vodka,Ron,Tequila,Ouzo,Bourbon,Brandy,Ginebra,Chinchón,Jägermeister,Caña,Pisco,Aguardiente,Palo,Tía María,Limoncello,Punsch,Cherry Heering,Pacharán,Ratafia,Vino de Oporto,Vodka Azul o Rojo,Vino de arroz,Vermut,Jerez,Mariete,Vino,Pelin,Pulque,Cerveza,Chinchón conga,Sidra";
+		String bebidasString = "Cocoroco,Vodka Spirytus,Absenta,Chinchón seco especial,Licor de cocuy,Bacanora,Mezcal,Whisky,Orujo blanco,Fernet,Coñac,Cachaza,Grappa,Aquavit,Becherovka,Gin de Menorca,Vodka,Ron,Tequila,Ouzo,Bourbon,Brandy,Ginebra,Chinchón,Jägermeister,Caña,Pisco,Aguardiente,Palo,Tía María,Limoncello,Punsch,Cherry Heering,Pacharán,Ratafia,Vino de Oporto,Vodka Azul o Rojo,Vino de arroz,Vermut,Jerez,Mariete,Vino,Pelin,Pulque,Cerveza,Chinchón conga,Sidra,"
+				+ "				Cocoroco,Vodka Spirytus,Absenta,Chinchón seco especial,Licor de cocuy,Bacanora,Mezcal,Whisky,Orujo blanco,Fernet,Coñac,Cachaza,Grappa,Aquavit,Becherovka,Gin de Menorca,Vodka,Ron,Tequila,Ouzo,Bourbon,Brandy,Ginebra,Chinchón,Jägermeister,Caña,Pisco,Aguardiente,Palo,Tía María,Limoncello,Punsch,Cherry Heering,Pacharán,Ratafia,Vino de Oporto,Vodka Azul o Rojo,Vino de arroz,Vermut,Jerez,Mariete,Vino,Pelin,Pulque,Cerveza,Chinchón conga,Sidra,"
+				+ "				Cocoroco,Vodka Spirytus,Absenta,Chinchón seco especial,Licor de cocuy,Bacanora,Mezcal,Whisky,Orujo blanco,Fernet,Coñac,Cachaza,Grappa,Aquavit,Becherovka,Gin de Menorca,Vodka,Ron,Tequila,Ouzo,Bourbon,Brandy,Ginebra,Chinchón,Jägermeister,Caña,Pisco,Aguardiente,Palo,Tía María,Limoncello,Punsch,Cherry Heering,Pacharán,Ratafia,Vino de Oporto,Vodka Azul o Rojo,Vino de arroz,Vermut,Jerez,Mariete,Vino,Pelin,Pulque,Cerveza,Chinchón conga,Sidra,"
+				+ "				Cocoroco,Vodka Spirytus,Absenta,Chinchón seco especial,Licor de cocuy,Bacanora,Mezcal,Whisky,Orujo blanco,Fernet,Coñac,Cachaza,Grappa,Aquavit,Becherovka,Gin de Menorca,Vodka,Ron,Tequila,Ouzo,Bourbon,Brandy,Ginebra,Chinchón,Jägermeister,Caña,Pisco,Aguardiente,Palo,Tía María,Limoncello,Punsch,Cherry Heering,Pacharán,Ratafia,Vino de Oporto,Vodka Azul o Rojo,Vino de arroz,Vermut,Jerez,Mariete,Vino,Pelin,Pulque,Cerveza,Chinchón conga,Sidra,"
+				+ "				Cocoroco,Vodka Spirytus,Absenta,Chinchón seco especial,Licor de cocuy,Bacanora,Mezcal,Whisky,Orujo blanco,Fernet,Coñac,Cachaza,Grappa,Aquavit,Becherovka,Gin de Menorca,Vodka,Ron,Tequila,Ouzo,Bourbon,Brandy,Ginebra,Chinchón,Jägermeister,Caña,Pisco,Aguardiente,Palo,Tía María,Limoncello,Punsch,Cherry Heering,Pacharán,Ratafia,Vino de Oporto,Vodka Azul o Rojo,Vino de arroz,Vermut,Jerez,Mariete,Vino,Pelin,Pulque,Cerveza,Chinchón conga,Sidra,"
+				+ "				Cocoroco,Vodka Spirytus,Absenta,Chinchón seco especial,Licor de cocuy,Bacanora,Mezcal,Whisky,Orujo blanco,Fernet,Coñac,Cachaza,Grappa,Aquavit,Becherovka,Gin de Menorca,Vodka,Ron,Tequila,Ouzo,Bourbon,Brandy,Ginebra,Chinchón,Jägermeister,Caña,Pisco,Aguardiente,Palo,Tía María,Limoncello,Punsch,Cherry Heering,Pacharán,Ratafia,Vino de Oporto,Vodka Azul o Rojo,Vino de arroz,Vermut,Jerez,Mariete,Vino,Pelin,Pulque,Cerveza,Chinchón conga,Sidra,"
+				+ "				Cocoroco,Vodka Spirytus,Absenta,Chinchón seco especial,Licor de cocuy,Bacanora,Mezcal,Whisky,Orujo blanco,Fernet,Coñac,Cachaza,Grappa,Aquavit,Becherovka,Gin de Menorca,Vodka,Ron,Tequila,Ouzo,Bourbon,Brandy,Ginebra,Chinchón,Jägermeister,Caña,Pisco,Aguardiente,Palo,Tía María,Limoncello,Punsch,Cherry Heering,Pacharán,Ratafia,Vino de Oporto,Vodka Azul o Rojo,Vino de arroz,Vermut,Jerez,Mariete,Vino,Pelin,Pulque,Cerveza,Chinchón conga,Sidra";
 		List<String> bebidasList = Arrays.asList(bebidasString.split(","));
 		List<Producto> bebidasProductoList = new ArrayList<Producto>();
 		for (String s : bebidasList) {
@@ -753,7 +774,14 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			bebidasProductoList.add(p0);
 		}
 
-		String orientalString = "Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot";
+		String orientalString = "Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,"
+								+ "Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,"
+								+ "Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,"
+								+ "Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,"
+								+ "Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,"
+								+ "Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,"
+								+ "Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,"
+								+ "Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot";
 		List<String> orientalList = Arrays.asList(bebidasString.split(","));
 		List<Producto> orientalProductoList = new ArrayList<Producto>();
 		for (String s : orientalList) {
@@ -787,39 +815,62 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		String fotosRString = "https://www.alacarta.com.uy/wp-content/uploads/2021/09/alacarta-restaurante-adorado-01-300x160.jpg,https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT4BL01pRdMb4Fh3Urp-QVU6Vd8OcXeuaSPHFrdJxMohPsxwt3XaMTOjgyHGO0syh6pKf0&usqp=CAU,https://media-cdn.tripadvisor.com/media/photo-s/11/23/53/c4/img-20171031-144058-largejpg.jpg,https://media-cdn.tripadvisor.com/media/photo-s/0d/38/b5/d4/outdoor-seating.jpg,https://media-cdn.tripadvisor.com/media/photo-p/17/ff/4e/1c/terrasse.jpg,https://media-cdn.tripadvisor.com/media/photo-s/12/dd/a6/cf/doble-v.jpg,https://media-cdn.tripadvisor.com/media/photo-p/1a/d9/1b/c7/photo0jpg.jpg,https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRc2btjCzipIQA0d3Pp4s22KIf5P0XDlbd5A&usqp=CAU,https://www.estudiomontevideo.com/wp-content/uploads/2018/08/010917-KANTINE-AC-ph-G-Viramonte-1015.jpg,https://media-cdn.tripadvisor.com/media/photo-s/16/26/0a/22/restaurant.jpg,https://media-cdn.tripadvisor.com/media/photo-s/0d/a8/5b/78/demode.jpg";
 		List<String> fotosRestaurante = Arrays.asList(fotosRString.split(","));
 
+		
+		Double lat=-34.9128;
+		Double lon= -56.1886;
 		for (String resto : restaurantesList) {
 			try {
 
-				Integer numero = (int) (Math.random() * 19 + 1);
+				if(bebidasProductoList.isEmpty() || orientalProductoList.isEmpty() ) {
+					
+				}
+				Integer bebidaNumero = (int) (Math.random() * bebidasProductoList.size()-1);
+				Integer orientalNumero = (int) (Math.random() * orientalProductoList.size()-1);
 				Integer i = (int) (Math.random() * 3 + 1);
-				Integer randomFoto = (int) (Math.random() * fotosRestaurante.size());
+				Integer randomFoto = (int) (Math.random() * 11)-1;
+				Integer telefono= (int) (Math.random() * 9999999);
+				Integer dir = (int) (Math.random() * direccionesList.size()-1);
 				// carga de productos
 
 				List<Producto> productosRandom = new ArrayList<Producto>();
 				Set<Categoria> categoriaRandom = new HashSet<Categoria>();
-				productosRandom.add(bebidasProductoList.get(numero));
-				productosRandom.add(bebidasProductoList.get(numero / 2));
-				productosRandom.add(bebidasProductoList.get(numero + 1));
-				productosRandom.add(bebidasProductoList.get(numero + 2));
+				productosRandom.add(bebidasProductoList.get(bebidaNumero));
+				bebidasProductoList.remove(bebidaNumero);
+				productosRandom.add(bebidasProductoList.get(bebidaNumero / 2));
+				bebidasProductoList.remove(bebidaNumero / 2);
+				productosRandom.add(bebidasProductoList.get(bebidaNumero -1));
+				bebidasProductoList.remove(bebidaNumero-1);
 				productosRandom.add(p);
 				productosRandom.add(p1);
 				productosRandom.add(p2);
-				productosRandom.add(orientalProductoList.get(numero / 2));
-				productosRandom.add(orientalProductoList.get(numero / 3));
+				productosRandom.add(orientalProductoList.get(orientalNumero));
+				orientalProductoList.remove(orientalNumero);
+				productosRandom.add(orientalProductoList.get(orientalNumero / 2));
+				orientalProductoList.remove(orientalNumero/ 2);
+				productosRandom.add(orientalProductoList.get(orientalNumero / 3));
+				orientalProductoList.remove(orientalNumero/ 3);
 
 
+				GeoLocalizacion geo= new GeoLocalizacion();
+				
+				geo.setLatitud(lat);
+				geo.setLongitud(lon);
+				lat=lat+1;
+				lon=lon+1;
+				
+				
 				Restaurante r = new Restaurante(resto.replace(" ", "") + "@" + resto.replace(" ", "") + ".com",
-						"123456", numero.toString(), null, false, true, resto, direccionesList.get(numero),
+						"123456", "9"+telefono.toString(), null, false, true, resto, direccionesList.get(dir),
 						Float.valueOf(5), EnumEstadoRestaurante.values()[i - 1], null, null, null, 20, null,
 						productosRandom, "LMWJVSD", true);	
 				
 				for(Producto prod: productosRandom) {
-					
+					prod.setRestaurante(r);
 					categoriaRandom.add(prod.getCategoria());
 				}
 				r.setProductos(productosRandom);
 				r.setFoto(fotosRestaurante.get(randomFoto));
-
+				r.setGeoLocalizacion(geo);
 
 				for(Categoria value : categoriaRandom) {
 					r.addCategoria(value);
@@ -827,11 +878,12 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		         
 		    
 				
-				
-				
-				proRepo.saveAll(productosRandom);
+
 				crearRestaurantesDePrueba(r);
 				
+				for(Producto prodR: productosRandom) {
+					proRepo.save(p);
+				}
 				
 			} catch (RestauranteException | CategoriaException e) {
 				System.out.print(e.toString());
@@ -851,7 +903,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		for (String c : clientesList) {
 			try {
 
-				Integer dir = (int) (Math.random() * 19 + 1);
+				Integer dir = (int) (Math.random() * direccionesList.size()-1);
 				Integer telefono = (int) (Math.random() * 99999999 + 1);
 				Integer numero = (int) (Math.random() * 99 + 1);
 				Integer fotoRandom = (int) (Math.random() * fotosClientesList.size());
