@@ -441,9 +441,9 @@ public class ClienteService implements ClienteServicioInterfaz {
 			restaurante.setReclamos(reclamosResto);
 		
 			
-			pedidoRepo.save(pedido);
+			//pedidoRepo.save(pedido);
 			recRepo.save(reclamo);
-			restauranteRepo.save(restaurante);
+			//restauranteRepo.save(restaurante);
 			return new DTRespuesta(
 					"Reclamo ingresado con éxito. Le llegará un mail con la resulución. Disculpe las molestias.");
 		} else {
