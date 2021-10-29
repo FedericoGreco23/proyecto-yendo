@@ -1,5 +1,6 @@
 package com.vpi.springboot.Logica;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -58,6 +59,8 @@ public class GeneralService implements GeneralServicioInterfaz {
 	private CategoriaRepositorio catRepo;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+	@Autowired
+	private PedidoRepositorio pedidoRepo;
 
 	private static final int iterations = 20 * 1000;
 	private static final int desiredKeyLen = 256;
@@ -456,21 +459,36 @@ public class GeneralService implements GeneralServicioInterfaz {
 	}
 	
 	@Override
-	public void registrarPagoEnEfectivo(String fecha, Double costoTotal, EnumMetodoDePago metodoDePago, String clienteMail, String restauranteMail) {
-		MongoClientURI uri = new MongoClientURI("mongodb+srv://grupo1:grupo1@cluster0.l17sm.mongodb.net/prueba-concepto");
+	public DTRespuesta registrarPago(int idPedido) {
+		/*MongoClientURI uri = new MongoClientURI("mongodb+srv://grupo1:grupo1@cluster0.l17sm.mongodb.net/prueba-concepto");
 		MongoClient mongoClient = new MongoClient(uri);
 		MongoDatabase dataBase = mongoClient.getDatabase("prueba-concepto");
-		MongoCollection<Document> collectionPedidos = dataBase.getCollection("pedidos");
+		MongoCollection<Document> collectionPedidos = dataBase.getCollection("pedidos");*/
 		
-		Document document = new Document();
+		Optional<Pedido> optionalPedido = pedidoRepo.findById(idPedido);
+		Pedido pedido = optionalPedido.get();
+		pedido.setPago(true);
+		pedidoRepo.save(pedido);
 		
-		//DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		//Document buscado = (Document) collectionPedidos.find(new Document("_id", idPedido)).first();
+		//String idProducto = buscado.getString("productoCarrito");
 		
-		document.put("Fecha", fecha);
-		document.put("CostoTotal", costoTotal);
-		document.put("MetodoDePago", metodoDePago.toString());
-		document.put("ClienteMail", clienteMail);
-		document.put("RestauranteMail", restauranteMail);
-		collectionPedidos.insertOne(document);
+		return new DTRespuesta("Pago registrado con éxito.");
+	}
+	
+	@Override
+	public void ventaProducto(String idProducto, String cantidad, String categoria, String fecha) {
+		
+	}
+	
+	@Override
+	public DTRespuesta devolucionPedido(Pedido pedido) {
+		Pedido devolucion = new Pedido(pedido.getFecha(), pedido.getCostoTotal()*-1, pedido.getEstadoPedido(), 
+				pedido.getMetodoDePago(), pedido.getCarrito(), pedido.getDireccion(), 
+				pedido.getRestaurante(), pedido.getCliente(), pedido.getComentario(), 
+				pedido.getPago());
+		
+		pedidoRepo.save(devolucion);
+		return new DTRespuesta("Devolucion registrada con éxito.");
 	}
 }
