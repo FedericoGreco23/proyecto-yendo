@@ -461,6 +461,34 @@ public class GeneralService implements GeneralServicioInterfaz {
 	}
 	
 	@Override
+	public Map<String, Object> buscarMenusPromociones(String mailRestaurante, String producto) throws RestauranteException {
+		Optional<Restaurante> optionalRestaurante = resRepo.findById(mailRestaurante);
+		if (!optionalRestaurante.isPresent()) {
+			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(mailRestaurante));
+		}
+		Restaurante restaurante = optionalRestaurante.get();
+
+		Map<String, Object> retorno = new HashMap<>();
+		List<DTProducto> dtproductos = new ArrayList<>();
+		List<DTPromocion> dtpromociones = new ArrayList<>();
+		List<Producto> productos = proRepo.findAllByParametro(restaurante, producto);
+
+		for(Producto p : productos) {
+			if(p instanceof Promocion) {
+				Promocion promocion = (Promocion) p;
+				dtpromociones.add(new DTPromocion(promocion));
+			} else {
+				dtproductos.add(new DTProducto(p));
+			}
+		}
+
+		retorno.put("productos", dtproductos);
+		retorno.put("promociones", dtpromociones);
+
+		return retorno;
+	}
+	
+	@Override
 	public DTRespuesta registrarPago(int idPedido) {
 		/*MongoClientURI uri = new MongoClientURI("mongodb+srv://grupo1:grupo1@cluster0.l17sm.mongodb.net/prueba-concepto");
 		MongoClient mongoClient = new MongoClient(uri);
