@@ -277,7 +277,8 @@ public class GeneralService implements GeneralServicioInterfaz {
 	}
 
 	@Override
-	public Map<String, Object> listarRestaurantes(int page, int size, int horarioApertura, String nombre, String sort, int order) throws RestauranteException {
+	public Map<String, Object> listarRestaurantes(int page, int size, int horarioApertura, String nombre, String sort,
+			int order) throws RestauranteException {
 		Map<String, Object> response = new HashMap<>();
 		List<DTListarRestaurante> DTListarRestaurantes = new ArrayList<DTListarRestaurante>();
 		List<Restaurante> restaurantes = new ArrayList<Restaurante>();
@@ -295,15 +296,17 @@ public class GeneralService implements GeneralServicioInterfaz {
 		} else {
 			paging = PageRequest.of(page, size);
 		}
-		
+
 		Page<Restaurante> pageRestaurante;
 
 		// Devuelve los restaurantes aceptados no bloqueados y activos
 		if (!nombre.equalsIgnoreCase("")) {
-			//Aplico nombre
-			pageRestaurante = resRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivosPorNombre(nombre, EnumEstadoRestaurante.ACEPTADO, paging);
+			// Aplico nombre
+			pageRestaurante = resRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivosPorNombre(nombre,
+					EnumEstadoRestaurante.ACEPTADO, paging);
 		} else {
-			pageRestaurante = resRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivos(EnumEstadoRestaurante.ACEPTADO, paging);
+			pageRestaurante = resRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivos(EnumEstadoRestaurante.ACEPTADO,
+					paging);
 		}
 		
 
@@ -325,8 +328,8 @@ public class GeneralService implements GeneralServicioInterfaz {
 				DTListarRestaurantes.add(new DTListarRestaurante(r));
 			}
 		}
-		//response.put("currentPage", pageRestaurante.getNumber());
-		//response.put("totalItems", pageRestaurante.getTotalElements());
+		// response.put("currentPage", pageRestaurante.getNumber());
+		// response.put("totalItems", pageRestaurante.getTotalElements());
 		response.put("currentPage", pagina);
 		response.put("totalItems", totalElements);
 		response.put("restaurantes", DTListarRestaurantes);
@@ -389,7 +392,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 		for (Producto p : productos) {
 			Categoria categoria = p.getCategoria();
 			// Debería prevenir que retorne promociones
-			if(!(p instanceof Promocion)) {
+			if (!(p instanceof Promocion)) {
 				if (categoria != null) {
 					if (!map.containsKey(categoria)) {
 						map.put(categoria, new ArrayList<>());
@@ -435,8 +438,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 		return response;
 	}
 
-	public List<DTPromocion> listarPromocionesRestaurante(String mailRestaurante)
-			throws RestauranteException {
+	public List<DTPromocion> listarPromocionesRestaurante(String mailRestaurante) throws RestauranteException {
 		Optional<Restaurante> optionalRestaurante = resRepo.findById(mailRestaurante);
 		if (!optionalRestaurante.isPresent()) {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(mailRestaurante));

@@ -34,4 +34,14 @@ public interface ProductoRepositorio extends ProductoBaseRepository<Producto> {
 						  
 	@Query("SELECT u FROM Producto u WHERE u.restaurante = :restaurante and u.activo = true")
 	List<Producto> findAllByRestaurante(@Param("restaurante") Restaurante restaurante);
+	
+	final static String queryNombreDescripcion =
+			"SELECT pro "
+			+ "FROM Producto pro "
+			+ "WHERE pro.restaurante = :restaurante "
+			+ "and (UPPER(pro.nombre) LIKE CONCAT('%',UPPER(:producto),'%') "
+			+ "or UPPER(pro.descripcion) LIKE CONCAT('%',UPPER(:producto),'%'))";
+	
+	@Query(queryNombreDescripcion)
+	List<Producto> findAllByParametro(@Param("restaurante") Restaurante restaurante, @Param("producto") String producto);
 }
