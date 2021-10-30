@@ -727,7 +727,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		categoriaFotoMap.put("Chivitos", "https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/chivitos.jpg");
 		categoriaFotoMap.put("Empanadas",
 				"https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/empanadas.jpg");
-		categoriaFotoMap.put("Comida española",
+		categoriaFotoMap.put("Comida espanola",
 				"https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/espanola.jpg");
 		categoriaFotoMap.put("Hamburguesas",
 				"https://grupo1-proyecto.s3.sa-east-1.amazonaws.com/categorias/hamburguesa.jpg");
@@ -758,13 +758,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 		// Productos
 		// bebidas
-		String bebidasString = "Cocoroco,Vodka Spirytus,Absenta,Chinchón seco especial,Licor de cocuy,Bacanora,Mezcal,Whisky,Orujo blanco,Fernet,Coñac,Cachaza,Grappa,Aquavit,Becherovka,Gin de Menorca,Vodka,Ron,Tequila,Ouzo,Bourbon,Brandy,Ginebra,Chinchón,Jägermeister,Caña,Pisco,Aguardiente,Palo,Tía María,Limoncello,Punsch,Cherry Heering,Pacharán,Ratafia,Vino de Oporto,Vodka Azul o Rojo,Vino de arroz,Vermut,Jerez,Mariete,Vino,Pelin,Pulque,Cerveza,Chinchón conga,Sidra,"
-				+ "				Cocoroco,Vodka Spirytus,Absenta,Chinchón seco especial,Licor de cocuy,Bacanora,Mezcal,Whisky,Orujo blanco,Fernet,Coñac,Cachaza,Grappa,Aquavit,Becherovka,Gin de Menorca,Vodka,Ron,Tequila,Ouzo,Bourbon,Brandy,Ginebra,Chinchón,Jägermeister,Caña,Pisco,Aguardiente,Palo,Tía María,Limoncello,Punsch,Cherry Heering,Pacharán,Ratafia,Vino de Oporto,Vodka Azul o Rojo,Vino de arroz,Vermut,Jerez,Mariete,Vino,Pelin,Pulque,Cerveza,Chinchón conga,Sidra,"
-				+ "				Cocoroco,Vodka Spirytus,Absenta,Chinchón seco especial,Licor de cocuy,Bacanora,Mezcal,Whisky,Orujo blanco,Fernet,Coñac,Cachaza,Grappa,Aquavit,Becherovka,Gin de Menorca,Vodka,Ron,Tequila,Ouzo,Bourbon,Brandy,Ginebra,Chinchón,Jägermeister,Caña,Pisco,Aguardiente,Palo,Tía María,Limoncello,Punsch,Cherry Heering,Pacharán,Ratafia,Vino de Oporto,Vodka Azul o Rojo,Vino de arroz,Vermut,Jerez,Mariete,Vino,Pelin,Pulque,Cerveza,Chinchón conga,Sidra,"
-				+ "				Cocoroco,Vodka Spirytus,Absenta,Chinchón seco especial,Licor de cocuy,Bacanora,Mezcal,Whisky,Orujo blanco,Fernet,Coñac,Cachaza,Grappa,Aquavit,Becherovka,Gin de Menorca,Vodka,Ron,Tequila,Ouzo,Bourbon,Brandy,Ginebra,Chinchón,Jägermeister,Caña,Pisco,Aguardiente,Palo,Tía María,Limoncello,Punsch,Cherry Heering,Pacharán,Ratafia,Vino de Oporto,Vodka Azul o Rojo,Vino de arroz,Vermut,Jerez,Mariete,Vino,Pelin,Pulque,Cerveza,Chinchón conga,Sidra,"
-				+ "				Cocoroco,Vodka Spirytus,Absenta,Chinchón seco especial,Licor de cocuy,Bacanora,Mezcal,Whisky,Orujo blanco,Fernet,Coñac,Cachaza,Grappa,Aquavit,Becherovka,Gin de Menorca,Vodka,Ron,Tequila,Ouzo,Bourbon,Brandy,Ginebra,Chinchón,Jägermeister,Caña,Pisco,Aguardiente,Palo,Tía María,Limoncello,Punsch,Cherry Heering,Pacharán,Ratafia,Vino de Oporto,Vodka Azul o Rojo,Vino de arroz,Vermut,Jerez,Mariete,Vino,Pelin,Pulque,Cerveza,Chinchón conga,Sidra,"
-				+ "				Cocoroco,Vodka Spirytus,Absenta,Chinchón seco especial,Licor de cocuy,Bacanora,Mezcal,Whisky,Orujo blanco,Fernet,Coñac,Cachaza,Grappa,Aquavit,Becherovka,Gin de Menorca,Vodka,Ron,Tequila,Ouzo,Bourbon,Brandy,Ginebra,Chinchón,Jägermeister,Caña,Pisco,Aguardiente,Palo,Tía María,Limoncello,Punsch,Cherry Heering,Pacharán,Ratafia,Vino de Oporto,Vodka Azul o Rojo,Vino de arroz,Vermut,Jerez,Mariete,Vino,Pelin,Pulque,Cerveza,Chinchón conga,Sidra,"
-				+ "				Cocoroco,Vodka Spirytus,Absenta,Chinchón seco especial,Licor de cocuy,Bacanora,Mezcal,Whisky,Orujo blanco,Fernet,Coñac,Cachaza,Grappa,Aquavit,Becherovka,Gin de Menorca,Vodka,Ron,Tequila,Ouzo,Bourbon,Brandy,Ginebra,Chinchón,Jägermeister,Caña,Pisco,Aguardiente,Palo,Tía María,Limoncello,Punsch,Cherry Heering,Pacharán,Ratafia,Vino de Oporto,Vodka Azul o Rojo,Vino de arroz,Vermut,Jerez,Mariete,Vino,Pelin,Pulque,Cerveza,Chinchón conga,Sidra";
+		String bebidasString = "Cocoroco,Vodka Spirytus,Absenta,Chinchón seco especial,Licor de cocuy,Bacanora,Mezcal,Whisky,Orujo blanco,Fernet,Coñac,Cachaza,Grappa,Aquavit,Becherovka,Gin de Menorca,Vodka,Ron,Tequila,Ouzo,Bourbon,Brandy,Ginebra,Chinchón,Jägermeister,Caña,Pisco,Aguardiente,Palo,Tía María,Limoncello,Punsch,Cherry Heering,Pacharán,Ratafia,Vino de Oporto,Vodka Azul o Rojo,Vino de arroz,Vermut,Jerez,Mariete,Vino,Pelin,Pulque,Cerveza,Chinchón conga,Sidra";
 		List<String> bebidasList = Arrays.asList(bebidasString.split(","));
 		List<Producto> bebidasProductoList = new ArrayList<Producto>();
 		for (String s : bebidasList) {
@@ -774,14 +768,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			bebidasProductoList.add(p0);
 		}
 
-		String orientalString = "Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,"
-								+ "Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,"
-								+ "Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,"
-								+ "Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,"
-								+ "Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,"
-								+ "Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,"
-								+ "Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,"
-								+ "Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot";
+		String orientalString = "Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot";
 		List<String> orientalList = Arrays.asList(bebidasString.split(","));
 		List<Producto> orientalProductoList = new ArrayList<Producto>();
 		for (String s : orientalList) {
@@ -819,79 +806,117 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		Double lat=-34.9128;
 		Double lon= -56.1886;
 		for (String resto : restaurantesList) {
+
 			try {
 
-				if(bebidasProductoList.isEmpty() || orientalProductoList.isEmpty() ) {
-					
-				}
-				Integer bebidaNumero = (int) (Math.random() * bebidasProductoList.size()-1);
-				Integer orientalNumero = (int) (Math.random() * orientalProductoList.size()-1);
+				
 				Integer i = (int) (Math.random() * 3 + 1);
-				Integer randomFoto = (int) (Math.random() * 11)-1;
-				Integer telefono= (int) (Math.random() * 9999999);
-				Integer dir = (int) (Math.random() * direccionesList.size()-1);
+				Integer randomFoto = (int) (Math.random() * 10);
+				Integer telefono= (int) (Math.random() * 999999);
+				Integer dir = (int) (Math.random() * direccionesList.size());
 				// carga de productos
 
-				List<Producto> productosRandom = new ArrayList<Producto>();
-				Set<Categoria> categoriaRandom = new HashSet<Categoria>();
-				productosRandom.add(bebidasProductoList.get(bebidaNumero));
-				bebidasProductoList.remove(bebidaNumero);
-				productosRandom.add(bebidasProductoList.get(bebidaNumero / 2));
-				bebidasProductoList.remove(bebidaNumero / 2);
-				productosRandom.add(bebidasProductoList.get(bebidaNumero -1));
-				bebidasProductoList.remove(bebidaNumero-1);
-				productosRandom.add(p);
-				productosRandom.add(p1);
-				productosRandom.add(p2);
-				productosRandom.add(orientalProductoList.get(orientalNumero));
-				orientalProductoList.remove(orientalNumero);
-				productosRandom.add(orientalProductoList.get(orientalNumero / 2));
-				orientalProductoList.remove(orientalNumero/ 2);
-				productosRandom.add(orientalProductoList.get(orientalNumero / 3));
-				orientalProductoList.remove(orientalNumero/ 3);
+
 
 
 				GeoLocalizacion geo= new GeoLocalizacion();
 				
 				geo.setLatitud(lat);
 				geo.setLongitud(lon);
-				lat=lat+1;
-				lon=lon+1;
+
 				
 				
-				Restaurante r = new Restaurante(resto.replace(" ", "") + "@" + resto.replace(" ", "") + ".com",
+				Restaurante r = new Restaurante(resto.toLowerCase().replace(" ", "") + "@" + resto.toLowerCase().replace(" ", "") + ".com",
 						"123456", "9"+telefono.toString(), null, false, true, resto, direccionesList.get(dir),
 						Float.valueOf(5), EnumEstadoRestaurante.values()[i - 1], null, null, null, 20, null,
-						productosRandom, "LMWJVSD", true);	
+						null, "LMWJVSD", true);	
 				
-				for(Producto prod: productosRandom) {
-					prod.setRestaurante(r);
-					categoriaRandom.add(prod.getCategoria());
-				}
-				r.setProductos(productosRandom);
+
+				Set<Categoria> categoriaRandom = new HashSet<Categoria>();
+
+				r.setProductos(null);
 				r.setFoto(fotosRestaurante.get(randomFoto));
 				r.setGeoLocalizacion(geo);
+				r.setProductos(new ArrayList<>());
 
 				for(Categoria value : categoriaRandom) {
+
 					r.addCategoria(value);
 				}
 		         
 		    
-				
+	
 
 				crearRestaurantesDePrueba(r);
 				
-				for(Producto prodR: productosRandom) {
-					proRepo.save(p);
-				}
+
+				
 				
 			} catch (RestauranteException | CategoriaException e) {
-				System.out.print(e.toString());
+				System.out.println(e.toString());
+				System.out.println(e.toString());
+				System.out.println(e.toString());
+				System.out.println(e.toString());
+				System.out.println(e.toString());
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+
+			
+			
+
+		}
+		}
+		
+		List<Restaurante> restauList= resRepo.findAll();
+		for(Restaurante restau: restauList ) {
+			
+		
+			Integer bebidaNumero = (int) (Math.random() * bebidasProductoList.size())+1;
+			Integer orientalNumero = (int) (Math.random() * orientalProductoList.size())+1;
+			Set<Producto> productosRandom = new HashSet<Producto>();
+			productosRandom.add(bebidasProductoList.get(bebidaNumero));
+			bebidasProductoList.remove(bebidasProductoList.get(bebidaNumero));
+			productosRandom.add(bebidasProductoList.get(bebidaNumero / 2));
+			bebidasProductoList.remove(bebidasProductoList.get(bebidaNumero / 2));
+			//productosRandom.add(bebidasProductoList.get(bebidaNumero -1));
+			//bebidasProductoList.remove(bebidasProductoList.get(bebidaNumero -1));
+			//productosRandom.add(p);
+			//productosRandom.add(p1);
+			//productosRandom.add(p2);
+			productosRandom.add(orientalProductoList.get(orientalNumero));
+			orientalProductoList.remove(orientalProductoList.get(orientalNumero));
+			productosRandom.add(orientalProductoList.get(orientalNumero / 2));
+			orientalProductoList.remove(orientalProductoList.get(orientalNumero / 2));
+			//productosRandom.add(orientalProductoList.get(orientalNumero / 3));
+			//orientalProductoList.remove(orientalProductoList.get(orientalNumero / 3));
+			
+			for(Producto pr: productosRandom) {
+			try {
+				pr.setNombre(pr.getNombre()+restau.getNombre());
+
+				System.out.println(pr.toString());
+				System.out.println(pr.toString());
+				System.out.println(pr.toString());
+				altaMenu(pr, restau.getMail());
+			} catch (ProductoException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			}
 
+			Set<Categoria> categoriaRandom = new HashSet<Categoria>();
+			for(Producto prod: productosRandom) {
+				//prod.setRestaurante(r);
+				categoriaRandom.add(prod.getCategoria());
+			}
+			
+			//guardar resto
+			
 		}
+		
 
 		//////////////// clientes//////////////////////
 		String clienteString = "Hernandez Monterroza,Adriana Marcela Rey Sanchez,Alejandro Abondano Acevedo,Alexander Carvajal Vargas,Andrea Catalina Acero Caro,Andrea Liliana Cruz Garcia,Andres Felipe Villa Monroy,Angela Patricia Mahecha Pineros,Angelica Lisseth Blanco Concha,Angelica Maria Rocha Garcia,Angie Tatiana FernÁNdez MartÍNez,Brigite Polanco Ruiz,Camilo Villamizar Aristizabal,Camilo RodrÍGuez Botero,Camilo Alberto CortÉS Montejo,Camilo Enrique Gomez Rodriguez,Carlos AndrÉS Polo Castellanos,Carlos Didier CastaÑO Contreras,Carlos Felipe MogollÓN PachÓN,Carol Ruchina Gomez Gianine,Carol Ruchina Gomez Gianine,Carolina Pintor Pinzon,Catherine Ospina Alfonso,Cinthya Fernanda DussÁN GuzmÁN,Claudia Liliana Torres Frias,Cristina Elizabeth Barthel Guardiola,Daniel GÓMez Delgado,Daniel AndrÉS Castiblanco Salgado,Daniela HernÁNdez Bravo,Daniela HernÁNdez Bravo,Daniela GuzmÁN,Daniela Katherinne Suarique ÁVila,Daniella Puerto Navia,Deny Marcela MuÑOz Lizarazo,Diana Carolina Lopez Rodriguez,Diana Catalina Diaz Beltran,Diego Alejandro Forero PeÑA,Estewil Carlos Quesada CalderÍN,Estewil Carlos Quesada CalderÍN,Fabian Andres Fino Andrade,Gabriel Felipe Herrera Moreno,Gabriel Mauricio Nieto Bustos,Gabriel Mauricio Nieto Bustos,Gloria Patricia Mendoza Alvear,Hugo AndrÉS Camargo Vargas,Ingrid Rocio Guerrero Penagos,IvÁN David Coral Burbano,Ivonne Jouliette Barrera Lopez,Jenny Fernanda SÁNchez Arenas,Jenny Viviana Moncaleano Preciado,Jorge Esteban Rey Botero,Jorge Mario Orozco DussÁN,Jorge Mario Orozco DussÁN,Jose Guillermo Marin Zubieta,Juan Camilo Ortega PeÑA,Juan Camilo Jimenez Cortes,Juan Camilo Jimenez Cortes,Juan Esteban Lanao SÁNchez,Juan Fernando Barjuch Moreno,Juan Sebastian Romero Escobar,Juan Sebastian Tarquino Acosta,Juan Sebastian Sanchez Sanchez,JuliÁN Romero Montoya,Julian Leonardo Sanchez Prada,Juliana Gaviria Garcia,July Catherine Gonzalez Suarez,Karen Eliana HernÁNdez Pulido,Laura Diaz Mejia,Laura Camila Puerto Castro,Laura Catalina Varon Buitrago,Laura Fernanda RodrÍGuez Torres,Laura Fernanda RodrÍGuez Torres,Laura Natalia Novoa Gomez,Laura Viviana Del RÍO Ayerbe,Leonardo AndrÉS DueÑAs Rojas,Lina MarÍA ZÚÑIga RamÍRez,Liseth Tatiana Sierra Villamil,Liseth Tatiana Sierra Villamil,Luisa Fernanda GarcÍA Fonnegra,Luisa Fernanda GarcÍA Fonnegra,Marcela Garcia Rueda,Maria Alejandra BolÍVar Galeano,Maria Alejandra Horta Ochoa,MarÍA AngÉLica BeltrÁN Castillo,MarÍA Camila Guacas JimÉNez,Maria Camila Nieto Bustos,Maria JosÉ GarcÍA Mora,Maria JosÉ GarcÍA Mora,Maria Margarita Perez Moreno,Maria Margarita Perez Moreno,Maria Natalia Cervantes Luna,Mariana Del Pilar Santos Milachay,Mario Fernando GarzÓN MuÑOz,MÓNica Alexandra Camacho Amaya,MÓNica Natalia Camargo Mendoza,Natalia Buitrago Contreras,Natalia Puentes Perdomo,Natalia Andrea GutiÉRrez Velasco,Natalia Melissa Barrero Forero,Natalia Vivy Casas PÁEz,Olga Stephannia Saman Jimenez,Olga Viviana Ovalle Solano,Oscar Fabian Castellanos Rojas,Oscar David Colmenares Barbudo,Oscar Julian Ulloa Orjuela,Pablo Uribe Antia,Paola Andrea Correa Larios,Rafael Alejandro Gonzalez Rojas,Rafael Andres Alvarez Castillo,Rafael Andres Alvarez Castillo,Ricardo Vega Zambrano,Ricardo Vega Zambrano,Sandra Ximena GarcÉS Parra,Sebastian Borda Melguizo,SebastiÁN Iregui Galeano,Yiriam Liliam Ochoa Sabogal,Yiriam Liliam Ochoa Sabogal,Yurany Catalina Cifuentes Mendez,Yuri Catalina Salazar Aristizabal";
@@ -917,7 +942,9 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				cliente.addDireccion(direccion);
 				crearCliente(cliente);
 			} catch (Exception e) {
-
+				System.out.print(e.toString());
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 
@@ -954,7 +981,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		rest.setFechaCreacion(LocalDate.now());
 		// rest.setEstado(EnumEstadoRestaurante.EN_ESPERA);
 		// rest.setFechaApertura(null);
-//		rest.setProductos(null);
+		//rest.setProductos(null);
 //		rest.setReclamos(null);
 //		rest.setPedidos(null);
 		LocalTime maximo = LocalTime.of(0, 50, 0);
@@ -967,6 +994,18 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		rest.setAbierto(true);
 		rest.setContrasenia(passwordEncoder.encode(rest.getContrasenia()));
 
+		System.out.println(rest.toString());
+		System.out.println(rest.toString());
+		System.out.println(rest.toString());
+		System.out.println(rest.toString());
+		System.out.println(rest.toString());
+
+		try {
+			Thread.sleep(50);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		restauranteRepo.save(rest);
 		return new DTRespuesta("Restaurante " + rest.getNombre() + " dado de alta correctamente.");
 	}

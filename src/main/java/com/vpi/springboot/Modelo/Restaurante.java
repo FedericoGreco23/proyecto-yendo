@@ -261,4 +261,17 @@ public class Restaurante extends Usuario {
 		if(!this.categorias.contains(cat) && this.categorias.size() < 3)
 			this.categorias.add(cat);
 	}
+
+	@Override
+	public String toString() {
+		return "Restaurante [nombre=" + nombre + ", direccion=" + direccion + ", calificacionPromedio="
+				+ calificacionPromedio + ", estado=" + estado + ", horarioApertura=" + horarioApertura
+				+ ", horarioCierre=" + horarioCierre + ", tiempoEstimadoMinimo=" + tiempoEstimadoMinimo
+				+ ", tiempoEstimadoMaximo=" + tiempoEstimadoMaximo + ", fechaApertura=" + fechaApertura
+				+ ", costoDeEnvio=" + costoDeEnvio + ", pedidos=" + pedidos + ", reclamos=" + reclamos
+				+ ", geoLocalizacion=" + geoLocalizacion + ", categorias=" + categorias + ", diasAbierto=" + diasAbierto
+				+ ", abierto=" + abierto + ", productos=" + productos + "]";
+	}
+	
+	
 }
