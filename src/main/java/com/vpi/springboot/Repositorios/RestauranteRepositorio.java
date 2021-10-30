@@ -1,6 +1,5 @@
 package com.vpi.springboot.Repositorios;
 
-import java.util.Collection;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -11,7 +10,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.vpi.springboot.Modelo.Restaurante;
-import com.vpi.springboot.Modelo.Categoria;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 
 @Transactional

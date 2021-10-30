@@ -1,9 +1,12 @@
 package com.vpi.springboot.Logica;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
 import com.vpi.springboot.Modelo.Categoria;
+import com.vpi.springboot.Modelo.Pedido;
 import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.Modelo.dto.DTBuscarRestaurante;
 import com.vpi.springboot.Modelo.dto.DTCategoriaProducto;
@@ -13,6 +16,7 @@ import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
 import com.vpi.springboot.Modelo.dto.DTRestaurantePedido;
 import com.vpi.springboot.Modelo.dto.DTUsuario;
+import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
 import com.vpi.springboot.exception.RestauranteException;
 import com.vpi.springboot.exception.UsuarioException;
 
@@ -41,6 +45,12 @@ public interface GeneralServicioInterfaz {
 
 	public List<DTPromocion> listarPromocionesRestaurante(String nombreRestaurante)
 			throws RestauranteException;
-	
 
+	public Map<String, Object> buscarMenusPromociones(String mailRestaurante, String producto) throws RestauranteException;
+	
+	public DTRespuesta registrarPago(int idPedido);
+	
+	public void ventaProducto(String idProducto, String cantidad, String categoria, String fecha);
+
+	public DTRespuesta devolucionPedido(Pedido pedido);
 }

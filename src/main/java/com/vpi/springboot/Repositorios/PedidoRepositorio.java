@@ -1,6 +1,7 @@
 package com.vpi.springboot.Repositorios;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +34,9 @@ public interface PedidoRepositorio extends JpaRepository<Pedido, Integer> {
 	
 	@Query("SELECT u FROM Pedido u WHERE u.id = :numeroPedido")
 	Pedido buscarPedidoPorNumero(@Param("numeroPedido") int numeroPedido);
+	
+	@Query("SELECT u FROM Pedido u WHERE u.restaurante = :restaurante and u.cliente = :cliente")
+	List<Pedido> findByClienteRestaurante(@Param("cliente") Cliente cliente, @Param("restaurante") Restaurante restaurante);
 	
 	//////////////FUNCIONES PARA LISTAR PEDIDOS RESTAURANTE//////////////
 	/////////////////////////////////////////////////////////////////////

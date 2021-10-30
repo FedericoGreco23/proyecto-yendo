@@ -1,5 +1,8 @@
 package com.vpi.springboot.Logica;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
@@ -11,6 +14,18 @@ import java.util.stream.Collectors;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
+
+import org.bson.Document;
+import org.bson.conversions.Bson;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -46,7 +61,8 @@ public class GeneralService implements GeneralServicioInterfaz {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	@Autowired
-	private RestaurantePedidosRepositorio restaurantePedidosRepo;
+	private PedidoRepositorio pedidoRepo;
+
 
 	private static final int iterations = 20 * 1000;
 	private static final int desiredKeyLen = 256;
@@ -263,7 +279,8 @@ public class GeneralService implements GeneralServicioInterfaz {
 	}
 
 	@Override
-	public Map<String, Object> listarRestaurantes(int page, int size, int horarioApertura, String nombre, String sort, int order) throws RestauranteException {
+	public Map<String, Object> listarRestaurantes(int page, int size, int horarioApertura, String nombre, String sort,
+			int order) throws RestauranteException {
 		Map<String, Object> response = new HashMap<>();
 		List<DTListarRestaurante> DTListarRestaurantes = new ArrayList<DTListarRestaurante>();
 		List<Restaurante> restaurantes = new ArrayList<Restaurante>();
@@ -281,15 +298,17 @@ public class GeneralService implements GeneralServicioInterfaz {
 		} else {
 			paging = PageRequest.of(page, size);
 		}
-		
+
 		Page<Restaurante> pageRestaurante;
 
 		// Devuelve los restaurantes aceptados no bloqueados y activos
 		if (!nombre.equalsIgnoreCase("")) {
-			//Aplico nombre
-			pageRestaurante = resRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivosPorNombre(nombre, EnumEstadoRestaurante.ACEPTADO, paging);
+			// Aplico nombre
+			pageRestaurante = resRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivosPorNombre(nombre,
+					EnumEstadoRestaurante.ACEPTADO, paging);
 		} else {
-			pageRestaurante = resRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivos(EnumEstadoRestaurante.ACEPTADO, paging);
+			pageRestaurante = resRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivos(EnumEstadoRestaurante.ACEPTADO,
+					paging);
 		}
 		
 
@@ -311,8 +330,8 @@ public class GeneralService implements GeneralServicioInterfaz {
 				DTListarRestaurantes.add(new DTListarRestaurante(r));
 			}
 		}
-		//response.put("currentPage", pageRestaurante.getNumber());
-		//response.put("totalItems", pageRestaurante.getTotalElements());
+		// response.put("currentPage", pageRestaurante.getNumber());
+		// response.put("totalItems", pageRestaurante.getTotalElements());
 		response.put("currentPage", pagina);
 		response.put("totalItems", totalElements);
 		response.put("restaurantes", DTListarRestaurantes);
@@ -375,7 +394,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 		for (Producto p : productos) {
 			Categoria categoria = p.getCategoria();
 			// Debería prevenir que retorne promociones
-			if(!(p instanceof Promocion)) {
+			if (!(p instanceof Promocion)) {
 				if (categoria != null) {
 					if (!map.containsKey(categoria)) {
 						map.put(categoria, new ArrayList<>());
@@ -421,8 +440,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 		return response;
 	}
 
-	public List<DTPromocion> listarPromocionesRestaurante(String mailRestaurante)
-			throws RestauranteException {
+	public List<DTPromocion> listarPromocionesRestaurante(String mailRestaurante) throws RestauranteException {
 		Optional<Restaurante> optionalRestaurante = resRepo.findById(mailRestaurante);
 		if (!optionalRestaurante.isPresent()) {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(mailRestaurante));
@@ -443,5 +461,66 @@ public class GeneralService implements GeneralServicioInterfaz {
 		return catRepo.findAll();
 
 	}
+
+	@Override
+	public Map<String, Object> buscarMenusPromociones(String mailRestaurante, String producto) throws RestauranteException {
+		Optional<Restaurante> optionalRestaurante = resRepo.findById(mailRestaurante);
+		if (!optionalRestaurante.isPresent()) {
+			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(mailRestaurante));
+		}
+		Restaurante restaurante = optionalRestaurante.get();
+
+		Map<String, Object> retorno = new HashMap<>();
+		List<DTProducto> dtproductos = new ArrayList<>();
+		List<DTPromocion> dtpromociones = new ArrayList<>();
+		List<Producto> productos = proRepo.findAllByParametro(restaurante, producto);
+
+		for(Producto p : productos) {
+			if(p instanceof Promocion) {
+				Promocion promocion = (Promocion) p;
+				dtpromociones.add(new DTPromocion(promocion));
+			} else {
+				dtproductos.add(new DTProducto(p));
+			}
+		}
+
+		retorno.put("productos", dtproductos);
+		retorno.put("promociones", dtpromociones);
+
+		return retorno;
+	}
 	
+	@Override
+	public DTRespuesta registrarPago(int idPedido) {
+		/*MongoClientURI uri = new MongoClientURI("mongodb+srv://grupo1:grupo1@cluster0.l17sm.mongodb.net/prueba-concepto");
+		MongoClient mongoClient = new MongoClient(uri);
+		MongoDatabase dataBase = mongoClient.getDatabase("prueba-concepto");
+		MongoCollection<Document> collectionPedidos = dataBase.getCollection("pedidos");*/
+		
+		Optional<Pedido> optionalPedido = pedidoRepo.findById(idPedido);
+		Pedido pedido = optionalPedido.get();
+		pedido.setPago(true);
+		pedidoRepo.save(pedido);
+		
+		//Document buscado = (Document) collectionPedidos.find(new Document("_id", idPedido)).first();
+		//String idProducto = buscado.getString("productoCarrito");
+		
+		return new DTRespuesta("Pago registrado con éxito.");
+	}
+	
+	@Override
+	public void ventaProducto(String idProducto, String cantidad, String categoria, String fecha) {
+		
+	}
+	
+	@Override
+	public DTRespuesta devolucionPedido(Pedido pedido) {
+		Pedido devolucion = new Pedido(pedido.getFecha(), pedido.getCostoTotal()*-1, pedido.getEstadoPedido(), 
+				pedido.getMetodoDePago(), pedido.getCarrito(), pedido.getDireccion(), 
+				pedido.getRestaurante(), pedido.getCliente(), pedido.getComentario(), 
+				pedido.getPago());
+		
+		pedidoRepo.save(devolucion);
+		return new DTRespuesta("Devolucion registrada con éxito.");
+	}
 }

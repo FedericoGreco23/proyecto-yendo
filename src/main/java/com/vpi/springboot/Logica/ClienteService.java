@@ -424,11 +424,26 @@ public class ClienteService implements ClienteServicioInterfaz {
 			/**
 			 * guarda el reclamo y envia mail
 			 */
-
+			
+			Restaurante restaurante =pedido.getRestaurante();
+			//reclamo
 			List<Reclamo> reclamos = pedido.getReclamos();
-			reclamos.add(new Reclamo(comentario, now, EnumEstadoReclamo.ENVIADO, ""));
+			Reclamo reclamo= new Reclamo(comentario, now, EnumEstadoReclamo.ENVIADO, "");
+			reclamo.setPedido(pedido);
+			reclamo.setRestaurante(restaurante);
+			reclamos.add(reclamo);
+			
+			//pedido	
 			pedido.setReclamos(reclamos);
-			pedidoRepo.save(pedido);
+			
+			//restaurante
+			List<Reclamo> reclamosResto = restaurante.getReclamos();
+			restaurante.setReclamos(reclamosResto);
+		
+			
+			//pedidoRepo.save(pedido);
+			recRepo.save(reclamo);
+			//restauranteRepo.save(restaurante);
 			return new DTRespuesta(
 					"Reclamo ingresado con éxito. Le llegará un mail con la resulución. Disculpe las molestias.");
 		} else {
@@ -527,7 +542,11 @@ public class ClienteService implements ClienteServicioInterfaz {
 		response.put("totalItems", pagePedido.getTotalElements());
 		
 		for (Pedido p : pedidos) {
-			retorno.add(new DTPedido(p));
+			Optional<Carrito> optionalCarrito = mongoRepo.findById(p.getCarrito());
+			if(optionalCarrito.isPresent())
+				retorno.add(new DTPedido(p, new DTCarrito(optionalCarrito.get())));
+			else 
+				retorno.add(new DTPedido(p));
 		}
 		
 		response.put("pedidos", retorno);
@@ -548,12 +567,16 @@ public class ClienteService implements ClienteServicioInterfaz {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(mailRestaurante));
 		}
 		Restaurante restaurante = optionalRestaurante.get();
+		
+		List<Pedido> pedidos = pedidoRepo.findByClienteRestaurante(cliente, restaurante);
+		if(pedidos.size() == 0)
+			throw new UsuarioException(UsuarioException.SinPedido(mailRestaurante));
 
 		calificacion.setFecha(LocalDateTime.now());
 		CalificacionRestaurante calRestaurante = new CalificacionRestaurante(calificacion, cliente, restaurante);
 		calRestauranteRepo.save(calRestaurante);
 
-		// Calculamos la calificación del cliente y la guardamos
+		// Calculamos la calificación del restaurante y la guardamos
 		List<CalificacionRestaurante> calificaciones = calRestauranteRepo.findByRestaurante(restaurante);
 		float avg = 0;
 		for (CalificacionRestaurante c : calificaciones) {
@@ -579,6 +602,10 @@ public class ClienteService implements ClienteServicioInterfaz {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(mailRestaurante));
 		}
 		Restaurante restaurante = optionalRestaurante.get();
+		
+		List<Pedido> pedidos = pedidoRepo.findByClienteRestaurante(cliente, restaurante);
+		if(pedidos.size() == 0)
+			throw new UsuarioException(UsuarioException.SinPedido(mailRestaurante));
 
 		Optional<CalificacionRestaurante> optionalCalificacion = calRestauranteRepo
 				.findById(new CalificacionRestauranteId(cliente, restaurante));
