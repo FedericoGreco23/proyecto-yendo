@@ -205,6 +205,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			if (proRepo.findByNombre(menu.getNombre(), restaurante) == null) {
 				menu.setRestaurante(restaurante);
 				restaurante.addProducto(menu);
+				restaurante.addCategoria(menu.getCategoria());
 				restauranteRepo.save(restaurante);
 				return new DTRespuesta("Menú agregado correctamente.");
 			} else {
@@ -924,17 +925,15 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 						null, "LMWJVSD", true);	
 				
 
-				Set<Categoria> categoriaRandom = new HashSet<Categoria>();
+				//Set<Categoria> categoriaRandom = new HashSet<Categoria>();
 
 				r.setProductos(null);
 				r.setFoto(fotosRestaurante.get(randomFoto));
 				r.setGeoLocalizacion(geo);
 				r.setProductos(new ArrayList<>());
 
-				for(Categoria value : categoriaRandom) {
 
-					r.addCategoria(value);
-				}
+				
 		         
 		    
 	
@@ -1017,7 +1016,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			
 			for(Producto pr: productosRandom) {
 			try {
-				pr.setNombre(pr.getNombre()+restau.getNombre());
+				pr.setNombre(pr.getNombre());
 
 				altaMenu(pr, restau.getMail());
 			} catch (ProductoException e) {
