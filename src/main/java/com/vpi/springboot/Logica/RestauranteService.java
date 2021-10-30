@@ -29,6 +29,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -85,6 +86,7 @@ import com.vpi.springboot.exception.UsuarioException;
 import com.vpi.springboot.security.util.JwtUtil.keyInfoJWT;
 
 @Service
+@EnableScheduling
 public class RestauranteService implements RestauranteServicioInterfaz {
 
 	@Autowired
@@ -711,7 +713,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		return DTpedido;
 	}
 	
-	@Scheduled(cron = "*/59 */10 * * * *") //1  vez cada 10 minutos
+	@Scheduled(cron = "*/59 */5 * * * *") //1  vez cada 5 minutos
 	public DTRespuesta guaradarEnMongo() {
 		List<Object[]> lista = restauranteRepo.buscarRestaurantesConMasPedidos();
 		//Map<String, Integer> restpedidos = new HashMap<String, Integer>();
