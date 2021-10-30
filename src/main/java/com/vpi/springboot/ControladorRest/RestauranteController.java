@@ -320,7 +320,8 @@ public class RestauranteController {
         }
     }
 
-	/*@PostMapping("/resPed")
+	//ESTA NO SE USA, SE HACE AUTOMATICO. LA DEJO POR LAS DUDAS
+	@PostMapping("/resPed")
 	public ResponseEntity<?> guardaRestaurantesEnMongo(){
 		try {
 			return new ResponseEntity<>(service.guaradarEnMongo(), HttpStatus.OK);
@@ -328,7 +329,7 @@ public class RestauranteController {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
-	}*/
+	}
 	
 	
 	/// PRIVADAS PARA JWT ///

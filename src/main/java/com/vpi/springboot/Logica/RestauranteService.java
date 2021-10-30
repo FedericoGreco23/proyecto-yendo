@@ -3,6 +3,7 @@ package com.vpi.springboot.Logica;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -28,6 +29,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -56,6 +58,7 @@ import com.vpi.springboot.Modelo.dto.DTPromocionConPrecio;
 import com.vpi.springboot.Modelo.dto.DTReclamo;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
+import com.vpi.springboot.Modelo.dto.DTRestaurantePedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoReclamo;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
@@ -70,6 +73,7 @@ import com.vpi.springboot.Repositorios.ProductoRepositorio;
 import com.vpi.springboot.Repositorios.PromocionRepositorio;
 import com.vpi.springboot.Repositorios.ReclamoRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
+import com.vpi.springboot.Repositorios.mongo.RestaurantePedidosRepositorio;
 import com.vpi.springboot.exception.AdministradorException;
 import com.vpi.springboot.exception.CategoriaException;
 import com.vpi.springboot.exception.PedidoException;
@@ -117,6 +121,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	private ClienteRepositorio userRepo;
 	@Autowired
 	private AdministradorService administradorService;
+	@Autowired 
+	private RestaurantePedidosRepositorio resPedRepo;
 
 	private DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");;
 
@@ -703,6 +709,35 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		}
 
 		return DTpedido;
+	}
+	
+	@Scheduled(cron = "*/59 */10 * * * *") //1  vez cada 10 minutos
+	public DTRespuesta guaradarEnMongo() {
+		List<Object[]> lista = restauranteRepo.buscarRestaurantesConMasPedidos();
+		//Map<String, Integer> restpedidos = new HashMap<String, Integer>();
+		List<DTRestaurantePedido> restaurantesPedidos = new ArrayList<DTRestaurantePedido>();
+		Optional<DTRestaurantePedido> optionalDt;
+		Optional<Restaurante> optionalRes;
+		Restaurante res;
+		DTRestaurantePedido dt;
+		for (Object[] object : lista) {	
+			optionalRes = restauranteRepo.findById((String) object[0]);
+			res = optionalRes.get();
+			optionalDt = resPedRepo.findById((String) object[0]);
+			if (optionalDt.isPresent()) {
+				dt = optionalDt.get();
+				dt.setCantPedidos((BigInteger)object[1]);
+				resPedRepo.save(dt);
+				
+			}else {
+				dt = new DTRestaurantePedido((String) object[0], (BigInteger) object[1]);
+				dt.setNombre(res.getNombre());
+				resPedRepo.save(dt);
+			}
+		}
+		
+		//resPedRepo.saveAll(restaurantesPedidos);	
+		return new DTRespuesta("Base de datos actualizada");
 	}
 
 	@Override
