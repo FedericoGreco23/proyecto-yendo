@@ -1,6 +1,7 @@
 package logicaTest;
 
 import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.mockitoSession;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +25,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.vpi.springboot.Logica.ClienteService;
+import com.vpi.springboot.Logica.NextSequenceService;
 import com.vpi.springboot.Modelo.Calificacion;
 import com.vpi.springboot.Modelo.CalificacionRestaurante;
 import com.vpi.springboot.Modelo.Carrito;
@@ -88,6 +91,8 @@ class ClienteServiceTest {
 	private SimpMessagingTemplate simpMessagingTemplate;
 	@Mock
 	private ReclamoRepositorio recRepo;
+	@Mock
+	private NextSequenceService nextSequence;
 	
 	@InjectMocks
 	private ClienteService mockCliente;
@@ -107,7 +112,7 @@ class ClienteServiceTest {
 	private Optional<Producto> optionalProducto;
 	private Producto producto;
 	private Carrito carrito;
-	private Optional<Carrito> optionalCarrito;
+	private Carrito carritoVacio;
 	private Optional<Carrito> optionalCarritoLleno;
 	private DTProductoCarrito dtProductoCarrito;
 	private List<DTProductoCarrito> listProductoCarrito = new ArrayList<DTProductoCarrito>();
@@ -135,7 +140,7 @@ class ClienteServiceTest {
 		cliente = optionalCliente.get();
 		restaurante = new Restaurante("restaurante1@gmail.com", "123456", "25125325", "foto", false, true, "resto1","dire 3223", 5.0f, EnumEstadoRestaurante.ACEPTADO,
 				LocalTime.now(), LocalTime.now(), LocalDate.now(), 50, geo, productos, "SDLM", true);
-
+		restaurante.setCostoDeEnvio(50);
 		optionalRestaurante = Optional.of(restaurante);
 		geo = new GeoLocalizacion(2210.0, 2515.2);
 		dir = new Direccion("calle1 4555", geo);
@@ -153,6 +158,7 @@ class ClienteServiceTest {
 		dtProductoCarrito = new DTProductoCarrito(new DTProducto(producto), 2);
 		listProductoCarrito.add(dtProductoCarrito);
 		carrito = new Carrito(50, cliente.getMail(), restaurante.getMail(), listProductoCarrito, true);
+		carritoVacio= new Carrito();
 		optionalCarritoLleno = Optional.of(carrito);
 		optionalLastDir = Optional.of(actualDire);
 		pedido = new Pedido(1,LocalDateTime.now(), 1250.2, EnumEstadoPedido.PROCESADO, EnumMetodoDePago.EFECTIVO,50, dir.getCalleNro(), restaurante, cliente, null);
@@ -165,6 +171,8 @@ class ClienteServiceTest {
 		optionalCalificacionRestaurante = Optional.of(calificacionRestaurante);
 		calificaciones.add(calificacionRestaurante);
 		reclamo = new Reclamo("comentario", LocalDateTime.now(), EnumEstadoReclamo.ENVIADO, "");
+		reclamo.setPedido(pedido);
+		reclamo.setRestaurante(restaurante);
 		reclamos.add(reclamo);
 		pageReclamo=new PageImpl<>(reclamos);
 		
@@ -225,6 +233,17 @@ class ClienteServiceTest {
 		Mockito.when(productoRepo.findById(Mockito.anyInt())).thenReturn(optionalProducto);
 		Mockito.when(mongoRepo.findByMailAndActivo(Mockito.anyString(), Mockito.anyBoolean())).thenReturn(carrito);
 		Mockito.when(restauranteRepo.findById(Mockito.anyString())).thenReturn(optionalRestaurante);
+		Mockito.doReturn(carrito).when(mongoRepo).save(Mockito.any(Carrito.class));
+		mockCliente.agregarACarrito(producto.getId(), 1, cliente.getMail(), restaurante.getMail());
+	}
+	
+	@Test
+	public void testAgregarACarrito2() throws ProductoException {
+		Mockito.when(productoRepo.findById(Mockito.anyInt())).thenReturn(optionalProducto);
+		Mockito.when(mongoRepo.findByMailAndActivo(Mockito.anyString(), Mockito.anyBoolean())).thenReturn(null);
+		Mockito.when(restauranteRepo.findById(Mockito.anyString())).thenReturn(optionalRestaurante);
+		Mockito.when(restauranteRepo.getById(Mockito.anyString())).thenReturn(restaurante);
+		Mockito.when(nextSequence.getNextSequence("customSequences")).thenReturn(2);
 		Mockito.doReturn(carrito).when(mongoRepo).save(Mockito.any(Carrito.class));
 		mockCliente.agregarACarrito(producto.getId(), 1, cliente.getMail(), restaurante.getMail());
 	}
@@ -321,6 +340,7 @@ class ClienteServiceTest {
 		Mockito.when(clienteRepo.findById(Mockito.anyString())).thenReturn(optionalCliente);
 		Mockito.when(restauranteRepo.findById(Mockito.anyString())).thenReturn(optionalRestaurante);
 		Mockito.doReturn(calificacionRestaurante).when(calRestauranteRepo).save(Mockito.any(CalificacionRestaurante.class));
+		Mockito.doReturn(pedidos).when(pedidoRepo).findByClienteRestaurante(Mockito.any(Cliente.class), Mockito.any(Restaurante.class));
 		Mockito.doReturn(restaurante).when(restauranteRepo).save(Mockito.any(Restaurante.class));
 		mockCliente.calificarRestaurante(cliente.getMail(), restaurante.getMail(), calificacion);
 	}
@@ -332,6 +352,7 @@ class ClienteServiceTest {
 		Mockito.when(calRestauranteRepo.findById(Mockito.any())).thenReturn(optionalCalificacionRestaurante);
 		Mockito.doNothing().when(calRestauranteRepo).delete(Mockito.any(CalificacionRestaurante.class));
 		Mockito.when(calRestauranteRepo.findByRestaurante(Mockito.any())).thenReturn(calificaciones);
+		Mockito.doReturn(pedidos).when(pedidoRepo).findByClienteRestaurante(Mockito.any(Cliente.class), Mockito.any(Restaurante.class));
 		Mockito.doReturn(restaurante).when(restauranteRepo).save(Mockito.any(Restaurante.class));
 		mockCliente.bajaCalificacionRestaurante(cliente.getMail(), restaurante.getMail());
 	}

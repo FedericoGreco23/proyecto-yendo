@@ -26,7 +26,7 @@ public interface ClienteServicioInterfaz {
 
 	public DTRespuesta altaCliente(Cliente usuario) throws UsuarioException, Exception;
 
-	public List<Cliente> obtenerClientes();
+//	public List<Cliente> obtenerClientes();
 
 	public DTRespuesta altaDireccion(DTDireccion direccion, String mail) throws UsuarioException;
 

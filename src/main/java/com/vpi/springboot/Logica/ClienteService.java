@@ -21,9 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.vpi.springboot.IdCompuestas.CalificacionRestauranteId;
 import com.vpi.springboot.Modelo.Calificacion;
@@ -38,11 +36,9 @@ import com.vpi.springboot.Modelo.Reclamo;
 import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.LastDireccioClientenMongo;
 import com.vpi.springboot.Modelo.Pedido;
-import com.vpi.springboot.Modelo.dto.DTBuscarRestaurante;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTCliente;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
-import com.vpi.springboot.Modelo.dto.DTListarRestaurante;
 import com.vpi.springboot.Modelo.dto.DTPedido;
 import com.vpi.springboot.Modelo.dto.DTPedidoParaAprobar;
 import com.vpi.springboot.Modelo.dto.DTProducto;
@@ -51,7 +47,6 @@ import com.vpi.springboot.Modelo.dto.DTReclamo;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoReclamo;
-import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
 import com.vpi.springboot.Repositorios.CalificacionRestauranteRepositorio;
 import com.vpi.springboot.Repositorios.ClienteRepositorio;
@@ -159,14 +154,14 @@ public class ClienteService implements ClienteServicioInterfaz {
 		return userRepo.findById(mail).isPresent();
 	}
 
-	@Override
+	/*@Override
 	public List<Cliente> obtenerClientes() {
 		Iterable<Cliente> usuario = userRepo.findAll();
 		List<Cliente> clientes = new ArrayList<Cliente>();
 		usuario.forEach(c -> clientes.add(c));
 
 		return clientes;
-	}
+	}*/
 
 	@Override
 	public DTRespuesta altaDireccion(DTDireccion direccion, String mail) throws UsuarioException {
@@ -220,7 +215,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 	public DTRespuesta modificarDireccion(int id, DTDireccion nueva, String mail) throws UsuarioException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mail);
 		if (optionalCliente.isPresent()) {
-			Cliente cliente = optionalCliente.get();
+			//Cliente cliente = optionalCliente.get();
 			Optional<Direccion> optionalDireccion = dirRepo.findById(id);
 			if (optionalDireccion.isPresent()) {
 				Direccion dirNueva = optionalDireccion.get();
@@ -244,7 +239,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 	public DTRespuesta eliminarDireccion(Integer id, String mail) throws UsuarioException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mail);
 		if (optionalCliente.isPresent()) {
-			Cliente cliente = optionalCliente.get();
+			//Cliente cliente = optionalCliente.get();
 			Optional<Direccion> optionalDireccion = dirRepo.findById(id);
 			if (optionalDireccion.isPresent()) {
 				Direccion dir = optionalDireccion.get();

@@ -18,9 +18,11 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.vpi.springboot.Logica.RestauranteService;
+import com.vpi.springboot.Modelo.Carrito;
 import com.vpi.springboot.Modelo.Categoria;
 import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Direccion;
@@ -28,10 +30,13 @@ import com.vpi.springboot.Modelo.GeoLocalizacion;
 import com.vpi.springboot.Modelo.Pedido;
 import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.Modelo.Restaurante;
+import com.vpi.springboot.Modelo.dto.DTProducto;
+import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
 import com.vpi.springboot.Repositorios.CategoriaRepositorio;
+import com.vpi.springboot.Repositorios.MongoRepositorioCarrito;
 import com.vpi.springboot.Repositorios.PedidoRepositorio;
 import com.vpi.springboot.Repositorios.ProductoRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
@@ -52,6 +57,10 @@ class RestauranteServiceTest {
 	private ProductoRepositorio prodRepo;
 	@Mock
 	private PedidoRepositorio pedidoRepo;
+	@Mock
+	private SimpMessagingTemplate simpMessagingTemplate;
+	@Mock
+	private MongoRepositorioCarrito mongoRepo;
 	
 	@InjectMocks
 	private RestauranteService mockRestaurante;
@@ -75,6 +84,10 @@ class RestauranteServiceTest {
     private Optional<Pedido> optionalPedido;
     private List<Pedido> pedidos = new ArrayList<Pedido>();
     private Page<Pedido> pagePedido;
+	private DTProductoCarrito dtProductoCarrito;
+	private List<DTProductoCarrito> listProductoCarrito = new ArrayList<DTProductoCarrito>();
+    private Carrito carrito;
+	private Optional<Carrito> optionalCarritoLleno;
 	
 	
 
@@ -107,6 +120,10 @@ class RestauranteServiceTest {
 		cliente.addPedido(pedido);
 		pedidos.add(pedido);
 		pagePedido= new PageImpl<>(pedidos);
+		dtProductoCarrito = new DTProductoCarrito(new DTProducto(producto), 2);
+		listProductoCarrito.add(dtProductoCarrito);
+		carrito = new Carrito(50, cliente.getMail(), restaurante.getMail(), listProductoCarrito, true);
+		optionalCarritoLleno = Optional.of(carrito);
 	}
 	
 	@Test
@@ -147,6 +164,7 @@ class RestauranteServiceTest {
 	public void testListarPedidos() throws RestauranteException {
 		Mockito.when(restauranteRepo.findById(Mockito.anyString())).thenReturn(optionalRestaurante);;
 		Mockito.when(pedidoRepo.findByCliente(Mockito.anyString(), Mockito.any(Restaurante.class), Mockito.any(Pageable.class))).thenReturn(pagePedido);
+		Mockito.when(mongoRepo.findById(Mockito.anyInt())).thenReturn(optionalCarritoLleno);
 		mockRestaurante.listarPedidos(5, 5, restaurante.getMail(), cliente.getMail(), "", "", "costoTotal", 0);
 	}
 	
@@ -155,6 +173,7 @@ class RestauranteServiceTest {
 		Mockito.when(restauranteRepo.findById(Mockito.anyString())).thenReturn(optionalRestaurante);
 		Mockito.when(pedidoRepo.findByFecha(Mockito.any(), Mockito.any(), Mockito.any(Restaurante.class),
 				Mockito.any(Pageable.class))).thenReturn(pagePedido);
+		Mockito.when(mongoRepo.findById(Mockito.anyInt())).thenReturn(optionalCarritoLleno);
 		mockRestaurante.listarPedidos(5, 5, restaurante.getMail(), "", "12/10/2021", "", "costoTotal", 0);
 	}
 	
@@ -163,6 +182,7 @@ class RestauranteServiceTest {
 		Mockito.when(restauranteRepo.findById(Mockito.anyString())).thenReturn(optionalRestaurante);
 		Mockito.when(pedidoRepo.findByClienteFechaEstado(Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(Restaurante.class),
 				Mockito.any(Pageable.class))).thenReturn(pagePedido);
+		Mockito.when(mongoRepo.findById(Mockito.anyInt())).thenReturn(optionalCarritoLleno);
 		mockRestaurante.listarPedidos(5, 5, restaurante.getMail(), cliente.getMail(), "25/10/2021", "ACEPTADO", "costoTotal", 0);
 	}
 	
@@ -171,6 +191,7 @@ class RestauranteServiceTest {
 		Mockito.when(restauranteRepo.findById(Mockito.anyString())).thenReturn(optionalRestaurante);
 		Mockito.when(pedidoRepo.findByClienteEstado(Mockito.anyString(),Mockito.any(), Mockito.any(Restaurante.class),
 				Mockito.any(Pageable.class))).thenReturn(pagePedido);
+		Mockito.when(mongoRepo.findById(Mockito.anyInt())).thenReturn(optionalCarritoLleno);
 		mockRestaurante.listarPedidos(5, 5, "", cliente.getMail(), "", "ACEPTADO", "costoTotal", 0);
 	}
 	
@@ -179,6 +200,7 @@ class RestauranteServiceTest {
 		Mockito.when(restauranteRepo.findById(Mockito.anyString())).thenReturn(optionalRestaurante);
 		Mockito.when(pedidoRepo.findByClienteFecha(Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any(Restaurante.class),
 				Mockito.any(Pageable.class))).thenReturn(pagePedido);	
+		Mockito.when(mongoRepo.findById(Mockito.anyInt())).thenReturn(optionalCarritoLleno);
 		mockRestaurante.listarPedidos(5, 5, "", cliente.getMail(), "25/10/2021", "", "costoTotal", 0);
 	}
 	
@@ -187,6 +209,7 @@ class RestauranteServiceTest {
 		Mockito.when(restauranteRepo.findById(Mockito.anyString())).thenReturn(optionalRestaurante);
 		Mockito.when(pedidoRepo.findByFechaEstado(Mockito.any(),Mockito.any(), Mockito.any(), Mockito.any(Restaurante.class),
 				Mockito.any(Pageable.class))).thenReturn(pagePedido);
+		Mockito.when(mongoRepo.findById(Mockito.anyInt())).thenReturn(optionalCarritoLleno);
 		mockRestaurante.listarPedidos(5, 5, "", "", "25/10/2021", "ACEPTADO", "costoTotal", 0);
 	}
 	
@@ -194,6 +217,7 @@ class RestauranteServiceTest {
 	public void testListarPedidos7() throws RestauranteException {
 		Mockito.when(restauranteRepo.findById(Mockito.anyString())).thenReturn(optionalRestaurante);
 		Mockito.when(pedidoRepo.findByEstado(Mockito.any(), Mockito.any(Restaurante.class),	Mockito.any(Pageable.class))).thenReturn(pagePedido);
+		Mockito.when(mongoRepo.findById(Mockito.anyInt())).thenReturn(optionalCarritoLleno);
 		mockRestaurante.listarPedidos(5, 5, "", "", "", "ACEPTADO", "costoTotal", 0);
 	}
 	
@@ -201,6 +225,7 @@ class RestauranteServiceTest {
 	public void testListarPedidos8() throws RestauranteException {
 		Mockito.when(restauranteRepo.findById(Mockito.anyString())).thenReturn(optionalRestaurante);
 		Mockito.when(pedidoRepo.findAllByRestaurante(Mockito.any(Restaurante.class), Mockito.any(Pageable.class))).thenReturn(pagePedido);
+		Mockito.when(mongoRepo.findById(Mockito.anyInt())).thenReturn(optionalCarritoLleno);
 		mockRestaurante.listarPedidos(5, 5, restaurante.getMail(), "", "", "", "costoTotal", 0);
 	}
 	
@@ -222,6 +247,7 @@ class RestauranteServiceTest {
 	public void testConfirmarPedido() throws PedidoException {
 		Mockito.when(pedidoRepo.findById(Mockito.anyInt())).thenReturn(optionalPedido);
 		Mockito.doReturn(pedido).when(pedidoRepo).save(Mockito.any(Pedido.class));
+		Mockito.doNothing().when(simpMessagingTemplate).convertAndSend(Mockito.anyString(),Mockito.anyString());
 		mockRestaurante.confirmarPedido(pedido.getId());
 	}
 	
