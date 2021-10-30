@@ -6,6 +6,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -23,6 +24,7 @@ public interface RestaurantePedidosRepositorio extends MongoRepository<DTRestaur
 	 @Query("select d from DTRestaurantePedido d where d.mailRestaurante = :mailRestaurante")
 	 DTRestaurantePedido findBymailRestaurante(@Param("mailRestaurante") String mailRestaurante);
 
+
 	/* @Query("SELECT r FROM DTRestaurantePedido r")
-	 public List<> buscarTodo(Pageable page);*/
+	 public Page<DTRestaurantePedido> findAll(Pageable page);*/
 }
