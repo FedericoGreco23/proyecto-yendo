@@ -821,7 +821,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		List<String> chivitoList = Arrays.asList(chivitoString.split(","));
 		List<Producto> chivitoProductoList = new ArrayList<Producto>();
 		for (String s : chivitoList) {
-			Producto p0 = new Producto(s, "Para los que saben lo que es bueno" + s, (Math.random() * 500),
+			Producto p0 = new Producto(s, "Para los que saben lo que es bueno" , (Math.random() * 500),
 					"https://conocer365.uy/wp-content/uploads/2019/03/Tinkal_chivito_3-585x388.png", 5, true);
 			p0.setCategoria(catRepo.findById("Chivitos").get());
 			chivitoProductoList.add(p0);
@@ -832,13 +832,37 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		List<String> empanadasListString = Arrays.asList(empanadasString.split(","));
 		List<Producto> empanadasProductoList = new ArrayList<Producto>();
 		for (String s : empanadasListString) {
-			Producto p0 = new Producto(s, "Para los que saben lo que es bueno" + s, (Math.random() * 500),
+			Producto p0 = new Producto(s, "Para los que saben lo que es bueno" , (Math.random() * 500),
 					"https://elmundoenrecetas.s3.amazonaws.com/uploads/recipe/main_image/95/IMG_4693_1200px.jpg", 5, true);
 			p0.setCategoria(catRepo.findById("Empanadas").get());
 			empanadasProductoList.add(p0);
 		}
 		
 		
+		//pizza
+		String pizzaString = "Pepperoni,Hawaiian,TALIA,Mexican,Margher,Margherita,Vegetarian,Chicken,Deluxe,Deluxe,Tree cheese,Sausage,Anchovy,Jalapene";
+		List<String> pizzaListString = Arrays.asList(pizzaString.split(","));
+		List<Producto> pizzaProductoList = new ArrayList<Producto>();
+		for (String s : pizzaListString) {
+			Producto p0 = new Producto(s, "Con los mejores ingredientes" , (Math.random() * 500),
+					"https://filesedc.com/uploads/other/2019/08/1200/los-15-tipos-de-pizza-mas-populares-y-sus-ingredientes.jpeg", 5, true);
+			p0.setCategoria(catRepo.findById("Pizzas").get());
+			pizzaProductoList.add(p0);
+		}
+		
+		//hamburguezas
+		String burguerString = "LAÇADOR,FRITZ,GRINGO,ANITA,PAMPA BURGER,CHIMANGO,PIRATINI,MARAGATO,GARIBALDI,CAMPEREADA,LA PLATA,MACANUDO,BORGHETTINHO,LOBISOMEM,DO ARVOREDO,CHARRUA,GALO VEIO,PRO D'água";
+		List<String> burguerListString = Arrays.asList(burguerString.split(","));
+		List<Producto> burguerStringProductoList = new ArrayList<Producto>();
+		for (String s : burguerListString) {
+			Producto p0 = new Producto(s, "Para paladares exigentes" , (Math.random() * 500),
+					"https://media-cdn.tripadvisor.com/media/photo-s/14/ba/b3/45/burgers.jpg", 12, true);
+			p0.setCategoria(catRepo.findById("Hamburguesas").get());
+			burguerStringProductoList.add(p0);
+		}
+
+
+
 
 		///// seguir agregando
 
@@ -921,11 +945,6 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				
 				
 			} catch (RestauranteException | CategoriaException e) {
-				System.out.println(e.toString());
-				System.out.println(e.toString());
-				System.out.println(e.toString());
-				System.out.println(e.toString());
-				System.out.println(e.toString());
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 
@@ -941,10 +960,10 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		List<Restaurante> restauList= resRepo.findAll();
 		
 		for(Restaurante restau: restauList ) {
-			
+
+			Set<Producto> productosRandom = new HashSet<Producto>();
 		if(bebidaNumero>3 && orientalNumero>3) {
 			
-			Set<Producto> productosRandom = new HashSet<Producto>();
 			
 			productosRandom.add(bebidasProductoList.get(bebidaNumero));
 			bebidaNumero=bebidaNumero-1;
@@ -952,27 +971,54 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			bebidaNumero=bebidaNumero-1;
 			productosRandom.add(bebidasProductoList.get(bebidaNumero));
 			bebidaNumero=bebidaNumero-1;
-			//productosRandom.add(p);
-			//productosRandom.add(p1);
-			//productosRandom.add(p2);
-			productosRandom.add(orientalProductoList.get(orientalNumero));
-			orientalNumero=orientalNumero-1;
-			productosRandom.add(orientalProductoList.get(orientalNumero));
-			orientalNumero=orientalNumero-1;
+
+
 			//productosRandom.add(orientalProductoList.get(orientalNumero / 3));
 			//orientalProductoList.remove(orientalProductoList.get(orientalNumero / 3));
-			if(0==orientalNumero%3) {
+		
+			if(0==bebidaNumero%3) {
 
 				productosRandom.addAll(chivitoProductoList);
 			}
+			if(0==bebidaNumero%5) {
+
+				productosRandom.addAll(empanadasProductoList);
+			}
+			
+			if(0==bebidaNumero%7) {
+
+				productosRandom.addAll(pizzaProductoList);
+			}
+			
+			if(0==bebidaNumero%2) {
+
+				productosRandom.addAll(burguerStringProductoList);
+			}
+			
+			
+			if(bebidaNumero<7) {
+				productosRandom.add(orientalProductoList.get(orientalNumero));
+				orientalNumero=orientalNumero-1;
+				productosRandom.add(orientalProductoList.get(orientalNumero));
+				orientalNumero=orientalNumero-1;
+			}
+		
+		
+		}else {
+			productosRandom.add(p);
+			productosRandom.add(p1);
+			productosRandom.add(p2);
+		}
+
+			
+
+			
+			
 			
 			for(Producto pr: productosRandom) {
 			try {
 				pr.setNombre(pr.getNombre()+restau.getNombre());
 
-				System.out.println(pr.toString());
-				System.out.println(pr.toString());
-				System.out.println(pr.toString());
 				altaMenu(pr, restau.getMail());
 			} catch (ProductoException e) {
 				// TODO Auto-generated catch block
@@ -982,15 +1028,15 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				e.printStackTrace();
 			}
 			}
-
+/*
 			Set<Categoria> categoriaRandom = new HashSet<Categoria>();
 			for(Producto prod: productosRandom) {
 				//prod.setRestaurante(r);
 				categoriaRandom.add(prod.getCategoria());
-			}
+			}*/
 			
 			//guardar resto
-		}
+		
 			
 		}
 		
@@ -1089,12 +1135,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		System.out.println(rest.toString());
 		System.out.println(rest.toString());
 
-		try {
-			Thread.sleep(50);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
 		restauranteRepo.save(rest);
 		return new DTRespuesta("Restaurante " + rest.getNombre() + " dado de alta correctamente.");
 	}
