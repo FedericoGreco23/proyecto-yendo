@@ -760,7 +760,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 		// Productos
 		// bebidas
-		String bebidasString = "Cocoroco,Vodka Spirytus,Absenta,Chinchón seco especial,Licor de cocuy,Bacanora,Mezcal,Whisky,Orujo blanco,Fernet,Coñac,Cachaza,Grappa,Aquavit,Becherovka,Gin de Menorca,Vodka,Ron,Tequila,Ouzo,Bourbon,Brandy,Ginebra,Chinchón,Jägermeister,Caña,Pisco,Aguardiente,Palo,Tía María,Limoncello,Punsch,Cherry Heering,Pacharán,Ratafia,Vino de Oporto,Vodka Azul o Rojo,Vino de arroz,Vermut,Jerez,Mariete,Vino,Pelin,Pulque,Cerveza,Chinchón conga,Sidra";
+		String bebidasString = "Cocoroco,Vodka Spirytus,Absenta,Chinchón seco especial,Licor de cocuy,Bacanora,Mezcal,Whisky,Orujo blanco,Fernet,Coñac,Cachaza,Grappa,Aquavit,Becherovka,Gin de Menorca,Vodka,Ron,Tequila,Ouzo,Bourbon,Brandy,Ginebra,Chinchón,Jägermeister,Caña,Pisco,Aguardiente,Palo,Tía María,Limoncello,Punsch,Cherry Heering,Pacharán,Ratafia,Vino de Oporto,Vodka Azul o Rojo,Vino de arroz,Vermut,Jerez,Mariete,Vino,Pelin,Pulque,Cerveza,Chinchón conga,Sidra,Vodka Spirytus,Absenta,Chinchón seco especial,Licor de cocuy,Bacanora,Mezcal,Whisky,Orujo blanco,Fernet,Coñac,Cachaza,Grappa,Aquavit,Becherovka,Gin de Menorca,Vodka,Ron,Tequila,Ouzo,Bourbon,Brandy,Ginebra,Chinchón,Jägermeister,Caña,Pisco,Aguardiente,Palo,Tía María,Limoncello,Punsch,Cherry Heering,Pacharán,Ratafia,Vino de Oporto,Vodka Azul o Rojo,Vino de arroz,Vermut,Jerez,Mariete,Vino,Pelin,Pulque,Cerveza,Chinchón conga,Sidra,Vodka Spirytus,Absenta,Chinchón seco especial,Licor de cocuy,Bacanora,Mezcal,Whisky,Orujo blanco,Fernet,Coñac,Cachaza,Grappa,Aquavit,Becherovka,Gin de Menorca,Vodka,Ron,Tequila,Ouzo,Bourbon,Brandy,Ginebra,Chinchón,Jägermeister,Caña,Pisco,Aguardiente,Palo,Tía María,Limoncello,Punsch,Cherry Heering,Pacharán,Ratafia,Vino de Oporto,Vodka Azul o Rojo,Vino de arroz,Vermut,Jerez,Mariete,Vino,Pelin,Pulque,Cerveza,Chinchón conga,Sidra";
 		List<String> bebidasList = Arrays.asList(bebidasString.split(","));
 		List<Producto> bebidasProductoList = new ArrayList<Producto>();
 		for (String s : bebidasList) {
@@ -770,7 +770,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			bebidasProductoList.add(p0);
 		}
 
-		String orientalString = "Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot";
+		String orientalString = "Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot";
 		List<String> orientalList = Arrays.asList(bebidasString.split(","));
 		List<Producto> orientalProductoList = new ArrayList<Producto>();
 		for (String s : orientalList) {
@@ -810,7 +810,13 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		for (String resto : restaurantesList) {
 
 			try {
-
+				Double rand = (Double) (Math.random() * 1);
+				Double latitud = BigDecimal.valueOf(lat+rand)
+					    .setScale(4, RoundingMode.HALF_UP)
+					    .doubleValue();
+				Double longitud = BigDecimal.valueOf(lon+rand)
+					    .setScale(4, RoundingMode.HALF_UP)
+					    .doubleValue();
 				
 				Integer i = (int) (Math.random() * 3 + 1);
 				Integer randomFoto = (int) (Math.random() * 10);
@@ -823,8 +829,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 				GeoLocalizacion geo= new GeoLocalizacion();
 				
-				geo.setLatitud(lat);
-				geo.setLongitud(lon);
+				geo.setLatitud(latitud);
+				geo.setLongitud(longitud);
 
 				
 				
