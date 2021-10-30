@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import com.vpi.springboot.Modelo.*;
 import com.vpi.springboot.Modelo.dto.*;
 import com.vpi.springboot.Repositorios.*;
+import com.vpi.springboot.Repositorios.mongo.RestaurantePedidosRepositorio;
 import com.vpi.springboot.exception.*;
 
 @Service
@@ -44,6 +45,8 @@ public class GeneralService implements GeneralServicioInterfaz {
 	private CategoriaRepositorio catRepo;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+	@Autowired
+	private RestaurantePedidosRepositorio restaurantePedidosRepo;
 
 	private static final int iterations = 20 * 1000;
 	private static final int desiredKeyLen = 256;
@@ -440,4 +443,5 @@ public class GeneralService implements GeneralServicioInterfaz {
 		return catRepo.findAll();
 
 	}
+	
 }

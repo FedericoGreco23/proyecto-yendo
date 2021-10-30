@@ -1,7 +1,6 @@
 package com.vpi.springboot.Logica;
 
-import static org.assertj.core.api.Assertions.assertThatNullPointerException;
-
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,7 +12,6 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +19,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -31,26 +29,19 @@ import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.IdCompuestas.CalificacionClienteId;
 import com.vpi.springboot.Modelo.Calificacion;
 import com.vpi.springboot.Modelo.CalificacionCliente;
-import com.vpi.springboot.Modelo.Carrito;
 import com.vpi.springboot.Modelo.Categoria;
-import com.vpi.springboot.Modelo.GeoLocalizacion;
 import com.vpi.springboot.Modelo.Pedido;
 import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.Modelo.Promocion;
 import com.vpi.springboot.Modelo.Reclamo;
 import com.vpi.springboot.Modelo.Restaurante;
-import com.vpi.springboot.Modelo.dto.DTCarrito;
-import com.vpi.springboot.Modelo.dto.DTCliente;
 import com.vpi.springboot.Modelo.dto.DTPedido;
-import com.vpi.springboot.Modelo.dto.DTPedidoParaAprobar;
-import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.Modelo.dto.DTProductoIdCantidad;
 import com.vpi.springboot.Modelo.dto.DTPromocionConPrecio;
 import com.vpi.springboot.Modelo.dto.DTReclamo;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
-import com.vpi.springboot.Modelo.dto.DTRestaurante;
+import com.vpi.springboot.Modelo.dto.DTRestaurantePedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
-import com.vpi.springboot.Modelo.dto.EnumEstadoReclamo;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Repositorios.CalificacionClienteRepositorio;
 import com.vpi.springboot.Repositorios.CategoriaRepositorio;
@@ -62,22 +53,20 @@ import com.vpi.springboot.Repositorios.ProductoRepositorio;
 import com.vpi.springboot.Repositorios.PromocionRepositorio;
 import com.vpi.springboot.Repositorios.ReclamoRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
+import com.vpi.springboot.Repositorios.mongo.RestaurantePedidosRepositorio;
 import com.vpi.springboot.exception.CategoriaException;
 import com.vpi.springboot.exception.PedidoException;
 import com.vpi.springboot.exception.ProductoException;
-import com.vpi.springboot.exception.ReclamoException;
 import com.vpi.springboot.exception.PromocionException;
 import com.vpi.springboot.exception.RestauranteException;
 import com.vpi.springboot.exception.UsuarioException;
-import com.vpi.springboot.security.util.JwtUtil.keyInfoJWT;
 
 @Service
+@EnableScheduling
 public class RestauranteService implements RestauranteServicioInterfaz {
 
 	@Autowired
 	private RestauranteRepositorio restauranteRepo;
-	@Autowired
-	private GeoLocalizacionRepositorio geoRepo;
 	@Autowired
 	private PedidoRepositorio pedidoRepo;
 	@Autowired
@@ -86,10 +75,6 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	private CategoriaRepositorio catRepo;
 	@Autowired
 	private ProductoRepositorio proRepo;
-	@Autowired
-	private RestauranteRepositorio resRepo;
-	@Autowired
-	private MongoRepositorioCarrito mongoRepo;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	@Autowired
@@ -102,6 +87,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	private ReclamoRepositorio recRepo;
 	@Autowired
 	private SimpMessagingTemplate simpMessagingTemplate;
+	@Autowired 
+	private RestaurantePedidosRepositorio resPedRepo;
 
 	private DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");;
 
@@ -657,6 +644,36 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		}
 
 		return DTpedido;
+	}
+	
+	
+	@Scheduled(cron = "*/59 */5 * * * *") //1  vez cada 5 minutos
+	public DTRespuesta guaradarEnMongo() {
+		List<Object[]> lista = restauranteRepo.buscarRestaurantesConMasPedidos();
+		//Map<String, Integer> restpedidos = new HashMap<String, Integer>();
+		List<DTRestaurantePedido> restaurantesPedidos = new ArrayList<DTRestaurantePedido>();
+		Optional<DTRestaurantePedido> optionalDt;
+		Optional<Restaurante> optionalRes;
+		Restaurante res;
+		DTRestaurantePedido dt;
+		for (Object[] object : lista) {	
+			optionalRes = restauranteRepo.findById((String) object[0]);
+			res = optionalRes.get();
+			optionalDt = resPedRepo.findById((String) object[0]);
+			if (optionalDt.isPresent()) {
+				dt = optionalDt.get();
+				dt.setCantPedidos((BigInteger)object[1]);
+				resPedRepo.save(dt);
+				
+			}else {
+				dt = new DTRestaurantePedido((String) object[0], (BigInteger) object[1]);
+				dt.setNombre(res.getNombre());
+				resPedRepo.save(dt);
+			}
+		}
+		
+		//resPedRepo.saveAll(restaurantesPedidos);	
+		return new DTRespuesta("Base de datos actualizada");
 	}
 
 	@Override

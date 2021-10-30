@@ -22,11 +22,13 @@ import com.vpi.springboot.Modelo.dto.DTAdministrador;
 import com.vpi.springboot.Modelo.dto.DTCliente;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
+import com.vpi.springboot.Modelo.dto.DTRestaurantePedido;
 import com.vpi.springboot.Modelo.dto.DTUsuario;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Repositorios.AdministradorRepositorio;
 import com.vpi.springboot.Repositorios.ClienteRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
+import com.vpi.springboot.Repositorios.mongo.RestaurantePedidosRepositorio;
 import com.vpi.springboot.exception.AdministradorException;
 import com.vpi.springboot.exception.RestauranteException;
 import com.vpi.springboot.exception.UsuarioException;
@@ -46,6 +48,9 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 	@Autowired
 	private RestauranteRepositorio resRepo;
 
+	@Autowired
+	private RestaurantePedidosRepositorio restaurantePedidosRepo;
+	
 	@Override
 	public DTRespuesta crearAdministrador(Administrador admin) throws AdministradorException {
 		Optional<Administrador> optionalUser = adminRepo.findById(admin.getMail());
@@ -416,5 +421,22 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 
 		resRepo.save(restaurante);
 		return new DTRespuesta("Estado de restaurante cambiado a " + est + ".");
+	}
+	
+	@Override
+	public Map<String, Object> restaurantesConMasPedidos(int page, int size){
+		Pageable paging;
+		paging = PageRequest.of(page, size);
+		Map<String, Object> response = new HashMap<>();
+		Page<DTRestaurantePedido> pageRestaurantePedido;
+		pageRestaurantePedido = restaurantePedidosRepo.findAll(paging);
+		List<DTRestaurantePedido> restauranteList = new ArrayList<DTRestaurantePedido>();
+		restauranteList = pageRestaurantePedido.getContent();
+		int pagina = pageRestaurantePedido.getNumber();
+		long totalElements = pageRestaurantePedido.getTotalElements();
+		response.put("currentPage", pagina);
+		response.put("totalItems", totalElements);
+		response.put("restaurantes", restauranteList);
+		return response;
 	}
 }

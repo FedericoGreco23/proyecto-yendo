@@ -56,4 +56,8 @@ public interface RestauranteRepositorio extends UserBaseRepository<Restaurante> 
 	
 	@Query("SELECT r FROM Restaurante r INNER JOIN r.categorias c WHERE UPPER(c.nombre) LIKE UPPER(:categoria) AND r.estado = :estado AND r.bloqueado = FALSE AND r.activo = TRUE")
 	List<Restaurante> buscarRestauranteDesdeClientePorCategoria(@Param("categoria") String categoria, @Param("estado") EnumEstadoRestaurante estado);
+	
+	
+	@Query(value = "SELECT \"restaurante_mail\", COUNT(*) FROM Pedido GROUP BY \"restaurante_mail\" ORDER BY count(*) DESC", nativeQuery = true)
+	List<Object[]> buscarRestaurantesConMasPedidos();
 }

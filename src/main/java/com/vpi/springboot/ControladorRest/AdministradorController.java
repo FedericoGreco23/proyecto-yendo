@@ -190,4 +190,14 @@ public class AdministradorController {
 		}
 		return infoSolicitada;
 	}
+	
+	@GetMapping("/topRestaurantes")
+	public ResponseEntity<?> topRestaurantes(@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "5") int size) {
+		try {
+			return new ResponseEntity<>(service.restaurantesConMasPedidos(page, size), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+}
 }
