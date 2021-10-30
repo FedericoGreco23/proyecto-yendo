@@ -1,6 +1,9 @@
 package com.vpi.springboot.Logica;
 
-import java.math.BigInteger;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -25,8 +28,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -55,7 +56,6 @@ import com.vpi.springboot.Modelo.dto.DTPromocionConPrecio;
 import com.vpi.springboot.Modelo.dto.DTReclamo;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
-import com.vpi.springboot.Modelo.dto.DTRestaurantePedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoReclamo;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
@@ -70,7 +70,6 @@ import com.vpi.springboot.Repositorios.ProductoRepositorio;
 import com.vpi.springboot.Repositorios.PromocionRepositorio;
 import com.vpi.springboot.Repositorios.ReclamoRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
-import com.vpi.springboot.Repositorios.mongo.RestaurantePedidosRepositorio;
 import com.vpi.springboot.exception.AdministradorException;
 import com.vpi.springboot.exception.CategoriaException;
 import com.vpi.springboot.exception.PedidoException;
@@ -82,11 +81,12 @@ import com.vpi.springboot.exception.UsuarioException;
 import com.vpi.springboot.security.util.JwtUtil.keyInfoJWT;
 
 @Service
-@EnableScheduling
 public class RestauranteService implements RestauranteServicioInterfaz {
 
 	@Autowired
 	private RestauranteRepositorio restauranteRepo;
+	@Autowired
+	private GeoLocalizacionRepositorio geoRepo;
 	@Autowired
 	private PedidoRepositorio pedidoRepo;
 	@Autowired
@@ -96,11 +96,13 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	@Autowired
 	private ProductoRepositorio proRepo;
 	@Autowired
+	private RestauranteRepositorio resRepo;
+	@Autowired
+	private MongoRepositorioCarrito mongoRepo;
+	@Autowired
 	private PasswordEncoder passwordEncoder;
 	@Autowired
 	private ProductoRepositorio productoRepo;
-	@Autowired
-	private RestauranteRepositorio resRepo;
 	@Autowired
 	private ClienteRepositorio clienteRepo;
 	@Autowired
@@ -111,15 +113,11 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	private ReclamoRepositorio recRepo;
 	@Autowired
 	private SimpMessagingTemplate simpMessagingTemplate;
-	@Autowired 
-	private RestaurantePedidosRepositorio resPedRepo;
 	@Autowired
 	private ClienteRepositorio userRepo;
 	@Autowired
 	private AdministradorService administradorService;
-	@Autowired
-	private MongoRepositorioCarrito mongoRepo;
-	
+
 	private DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");;
 
 	/*
@@ -706,36 +704,6 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 		return DTpedido;
 	}
-	
-	
-	@Scheduled(cron = "*/59 */5 * * * *") //1  vez cada 5 minutos
-	public DTRespuesta guaradarEnMongo() {
-		List<Object[]> lista = restauranteRepo.buscarRestaurantesConMasPedidos();
-		//Map<String, Integer> restpedidos = new HashMap<String, Integer>();
-		List<DTRestaurantePedido> restaurantesPedidos = new ArrayList<DTRestaurantePedido>();
-		Optional<DTRestaurantePedido> optionalDt;
-		Optional<Restaurante> optionalRes;
-		Restaurante res;
-		DTRestaurantePedido dt;
-		for (Object[] object : lista) {	
-			optionalRes = restauranteRepo.findById((String) object[0]);
-			res = optionalRes.get();
-			optionalDt = resPedRepo.findById((String) object[0]);
-			if (optionalDt.isPresent()) {
-				dt = optionalDt.get();
-				dt.setCantPedidos((BigInteger)object[1]);
-				resPedRepo.save(dt);
-				
-			}else {
-				dt = new DTRestaurantePedido((String) object[0], (BigInteger) object[1]);
-				dt.setNombre(res.getNombre());
-				resPedRepo.save(dt);
-			}
-		}
-		
-		//resPedRepo.saveAll(restaurantesPedidos);	
-		return new DTRespuesta("Base de datos actualizada");
-	}
 
 	@Override
 	public void cargarDatos() {
@@ -901,26 +869,30 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		}
 		}
 		
+		Integer bebidaNumero = bebidasProductoList.size()-1;
+		Integer orientalNumero = orientalProductoList.size()-1;
+		
 		List<Restaurante> restauList= resRepo.findAll();
+		
 		for(Restaurante restau: restauList ) {
 			
-		
-			Integer bebidaNumero = (int) (Math.random() * bebidasProductoList.size())+1;
-			Integer orientalNumero = (int) (Math.random() * orientalProductoList.size())+1;
+		if(bebidaNumero>3 && orientalNumero>3) {
+			
 			Set<Producto> productosRandom = new HashSet<Producto>();
+			
 			productosRandom.add(bebidasProductoList.get(bebidaNumero));
-			bebidasProductoList.remove(bebidasProductoList.get(bebidaNumero));
-			productosRandom.add(bebidasProductoList.get(bebidaNumero / 2));
-			bebidasProductoList.remove(bebidasProductoList.get(bebidaNumero / 2));
-			//productosRandom.add(bebidasProductoList.get(bebidaNumero -1));
-			//bebidasProductoList.remove(bebidasProductoList.get(bebidaNumero -1));
+			bebidaNumero=bebidaNumero-1;
+			productosRandom.add(bebidasProductoList.get(bebidaNumero));
+			bebidaNumero=bebidaNumero-1;
+			productosRandom.add(bebidasProductoList.get(bebidaNumero));
+			bebidaNumero=bebidaNumero-1;
 			//productosRandom.add(p);
 			//productosRandom.add(p1);
 			//productosRandom.add(p2);
 			productosRandom.add(orientalProductoList.get(orientalNumero));
-			orientalProductoList.remove(orientalProductoList.get(orientalNumero));
-			productosRandom.add(orientalProductoList.get(orientalNumero / 2));
-			orientalProductoList.remove(orientalProductoList.get(orientalNumero / 2));
+			orientalNumero=orientalNumero-1;
+			productosRandom.add(orientalProductoList.get(orientalNumero));
+			orientalNumero=orientalNumero-1;
 			//productosRandom.add(orientalProductoList.get(orientalNumero / 3));
 			//orientalProductoList.remove(orientalProductoList.get(orientalNumero / 3));
 			
@@ -948,6 +920,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			}
 			
 			//guardar resto
+		}
 			
 		}
 		
@@ -962,6 +935,17 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		for (String c : clientesList) {
 			try {
 
+				Double rand = (Double) (Math.random() * 1);
+				Double latitud = BigDecimal.valueOf(lat+rand)
+					    .setScale(4, RoundingMode.HALF_UP)
+					    .doubleValue();
+				Double longitud = BigDecimal.valueOf(lon+rand)
+					    .setScale(4, RoundingMode.HALF_UP)
+					    .doubleValue();
+				
+				GeoLocalizacion GeoCliente= new GeoLocalizacion(latitud,longitud);
+				
+
 				Integer dir = (int) (Math.random() * direccionesList.size()-1);
 				Integer telefono = (int) (Math.random() * 99999999 + 1);
 				Integer numero = (int) (Math.random() * 99 + 1);
@@ -973,6 +957,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				Direccion direccion= new Direccion();
 				direccion.setCalleNro(direccionesList.get(dir));
 				direccion.setCliente(cliente);
+				direccion.setGeoLocalizacion(GeoCliente);
 				cliente.addDireccion(direccion);
 				crearCliente(cliente);
 			} catch (Exception e) {
