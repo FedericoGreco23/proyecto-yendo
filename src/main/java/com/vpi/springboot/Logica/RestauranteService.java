@@ -799,21 +799,44 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		List<String> bebidasList = Arrays.asList(bebidasString.split(","));
 		List<Producto> bebidasProductoList = new ArrayList<Producto>();
 		for (String s : bebidasList) {
-			Producto p0 = new Producto(s, "la más rica " + s, 150,
-					"https://www.xlsemanal.com/wp-content/uploads/sites/3/2018/05/bebidas.jpg", 10, true);
+			Producto p0 = new Producto(s, "la más rica " + s, (Math.random() * 200),
+					"https://www.xlsemanal.com/wp-content/uploads/sites/3/2018/05/bebidas.jpg", 15, true);
 			p0.setCategoria(catRepo.findById("Bebidas").get());
 			bebidasProductoList.add(p0);
 		}
 
 		String orientalString = "Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot";
-		List<String> orientalList = Arrays.asList(bebidasString.split(","));
+		List<String> orientalList = Arrays.asList(orientalString.split(","));
 		List<Producto> orientalProductoList = new ArrayList<Producto>();
 		for (String s : orientalList) {
-			Producto p0 = new Producto(s, "埃斯特柏拉圖" + s, 150,
-					"https://dam.cocinafacil.com.mx/wp-content/uploads/2019/06/palillos.chinos.jpg", 10, true);
+			Producto p0 = new Producto(s, "埃斯特柏拉圖" + s, (Math.random() * 400),
+					"https://dam.cocinafacil.com.mx/wp-content/uploads/2019/06/palillos.chinos.jpg", 20, true);
 			p0.setCategoria(catRepo.findById("Comida oriental").get());
 			orientalProductoList.add(p0);
 		}
+		
+		String chivitoString = "chivito de la casa,chivito big, grosso,chivito gigante,chivito doble carne,chivito completo, al plato";
+		List<String> chivitoList = Arrays.asList(chivitoString.split(","));
+		List<Producto> chivitoProductoList = new ArrayList<Producto>();
+		for (String s : chivitoList) {
+			Producto p0 = new Producto(s, "Para los que saben lo que es bueno" + s, (Math.random() * 500),
+					"https://conocer365.uy/wp-content/uploads/2019/03/Tinkal_chivito_3-585x388.png", 5, true);
+			p0.setCategoria(catRepo.findById("Chivitos").get());
+			chivitoProductoList.add(p0);
+		}
+		
+		//empanadas
+	    String empanadasString = "Carne Suave,Carne Dulce,Carne Picante,Pollo Gauchita,Pollo con Champignon,Espinaca y Queso,Verdura - Hierbabuena al limón,Mazorca, Cebolla y salsa blanca,Queso, Orégano y Aceitunas,Frutal (queso y frutas),Queso - Queso,Queso y Albahaca,Queso y Jamón";
+		List<String> empanadasListString = Arrays.asList(empanadasString.split(","));
+		List<Producto> empanadasProductoList = new ArrayList<Producto>();
+		for (String s : empanadasListString) {
+			Producto p0 = new Producto(s, "Para los que saben lo que es bueno" + s, (Math.random() * 500),
+					"https://elmundoenrecetas.s3.amazonaws.com/uploads/recipe/main_image/95/IMG_4693_1200px.jpg", 5, true);
+			p0.setCategoria(catRepo.findById("Empanadas").get());
+			empanadasProductoList.add(p0);
+		}
+		
+		
 
 		///// seguir agregando
 
@@ -936,6 +959,10 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			orientalNumero=orientalNumero-1;
 			//productosRandom.add(orientalProductoList.get(orientalNumero / 3));
 			//orientalProductoList.remove(orientalProductoList.get(orientalNumero / 3));
+			if(0==orientalNumero%3) {
+
+				productosRandom.addAll(chivitoProductoList);
+			}
 			
 			for(Producto pr: productosRandom) {
 			try {
