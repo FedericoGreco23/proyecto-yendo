@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 import com.vpi.springboot.IdCompuestas.CalificacionRestauranteId;
@@ -14,10 +16,12 @@ import com.vpi.springboot.IdCompuestas.CalificacionRestauranteId;
 public class CalificacionRestaurante extends Calificacion {
 
 	@Id
-	@OneToOne
+	@ManyToOne
+	@JoinColumn(name = "restaurante")
 	private Restaurante restaurante;
 	@Id
-	@OneToOne
+	@ManyToOne 
+	@JoinColumn(name = "cliente")
 	private Cliente cliente;
 
 	public CalificacionRestaurante() {

@@ -300,13 +300,17 @@ public class GeneralService implements GeneralServicioInterfaz {
 				mailSender.sendMail(to, body, topic);
 			} catch (MessagingException e) {
 				return new DTRespuesta("No se pudo mandar mail: " + e.getMessage());
+			} finally {
+				tokenRepo.delete(verificacion);
 			}
 
+			tokenRepo.delete(verificacion);
 			return new DTRespuesta("El token expiró. Se ha reenviado un nuevo mail de verificación.");
 		}
 
 		cliente.setVerificado(true);
 		clienteRepo.save(cliente);
+		tokenRepo.delete(verificacion); //borramos la verificación vieja
 		return new DTRespuesta("Cuenta activada");
 	}
 

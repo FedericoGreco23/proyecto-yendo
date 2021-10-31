@@ -100,7 +100,7 @@ public class PublicRest {
 		try {
 			return new ResponseEntity<>(clienteService.altaCliente(usuario), HttpStatus.OK);
 		} catch (Exception e) {
-			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	
@@ -152,12 +152,12 @@ public class PublicRest {
 	}
 
 	@GetMapping("getRestaurante")
-	public ResponseEntity<DTRestaurante> getRestaurante(@RequestParam(defaultValue = "") String mail) {
+	public ResponseEntity<?> getRestaurante(@RequestParam(defaultValue = "") String mail) {
 		try {
 			DTRestaurante respuesta = service.getRestaurante(mail);
-			return new ResponseEntity<DTRestaurante>(respuesta, HttpStatus.OK);
+			return new ResponseEntity<>(respuesta, HttpStatus.OK);
 		} catch (Exception e) {
-			return new ResponseEntity<DTRestaurante>(HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 

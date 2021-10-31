@@ -175,14 +175,8 @@ public class ClienteService implements ClienteServicioInterfaz {
 				+ "                    <tr>\r\n"
 				+ "                        <td bgcolor=\"#ffffff\" align=\"left\" style=\"padding: 0px 30px 40px 30px; border-radius: 0px 0px 4px 4px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;\">\r\n"
 				+ "                            <p style=\"margin: 0;\">Saludos,<br> Yendo team</p>\r\n"
-				+ "                        </td>\r\n"
-				+ "                    </tr>\r\n"
-				+ "                </table>\r\n"
-				+ "            </td>\r\n"
-				+ "        </tr>\r\n"
-				+ "    </table>\r\n"
-				+ "</body>\r\n"
-				+ "</html>";
+				+ "                        </td>\r\n" + "                    </tr>\r\n" + "                </table>\r\n"
+				+ "            </td>\r\n" + "        </tr>\r\n" + "    </table>\r\n" + "</body>\r\n" + "</html>";
 	}
 
 	@Override
