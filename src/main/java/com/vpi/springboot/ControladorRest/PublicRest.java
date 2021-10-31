@@ -143,10 +143,10 @@ public class PublicRest {
 	@GetMapping("/listarRestaurantes")
 	public Map<String, Object> listarRestaurantesAbiertos(@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "0") int horarioApertura, 
-			@RequestParam(defaultValue = "") String nombre, @RequestParam(defaultValue = "") String sort,
-			@RequestParam(defaultValue = "0") int order) {
+			@RequestParam(defaultValue = "") String nombre, @RequestParam(defaultValue = "")String categoria, 
+			@RequestParam(defaultValue = "") String sort, @RequestParam(defaultValue = "0") int order) {
 		try {
-			return service.listarRestaurantes(page, size, horarioApertura, nombre, sort, order);
+			return service.listarRestaurantes(page, size, horarioApertura, nombre, categoria, sort, order);
 		} catch (RestauranteException e) {
 			e.printStackTrace();
 			return null;

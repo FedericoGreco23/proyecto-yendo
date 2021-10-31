@@ -18,6 +18,7 @@ import javax.crypto.spec.PBEKeySpec;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
+import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
@@ -279,8 +280,8 @@ public class GeneralService implements GeneralServicioInterfaz {
 	}
 
 	@Override
-	public Map<String, Object> listarRestaurantes(int page, int size, int horarioApertura, String nombre, String sort,
-			int order) throws RestauranteException {
+	public Map<String, Object> listarRestaurantes(int page, int size, int horarioApertura, String nombre, 
+			String categoria, String sort, int order) throws RestauranteException {
 		Map<String, Object> response = new HashMap<>();
 		List<DTListarRestaurante> DTListarRestaurantes = new ArrayList<DTListarRestaurante>();
 		List<Restaurante> restaurantes = new ArrayList<Restaurante>();
@@ -303,10 +304,22 @@ public class GeneralService implements GeneralServicioInterfaz {
 
 		// Devuelve los restaurantes aceptados no bloqueados y activos
 		if (!nombre.equalsIgnoreCase("")) {
-			// Aplico nombre
-			pageRestaurante = resRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivosPorNombre(nombre,
+			if (!categoria.equalsIgnoreCase("")) {
+				//Aplico nombre y categoria
+				pageRestaurante = resRepo.listarRestauranteDesdeClientePorNombreYCategoria(nombre, categoria,
+						EnumEstadoRestaurante.ACEPTADO, paging);
+			} else {
+				// Aplico solo nombre
+				pageRestaurante = resRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivosPorNombre(nombre,
+						EnumEstadoRestaurante.ACEPTADO, paging);
+			}
+			
+		} if (!categoria.equalsIgnoreCase("")) {
+			// Aplico solo categoria
+			pageRestaurante = resRepo.listarRestauranteDesdeClientePorCategoria(categoria, 
 					EnumEstadoRestaurante.ACEPTADO, paging);
 		} else {
+			//No aplico ni categoria ni nombre
 			pageRestaurante = resRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivos(EnumEstadoRestaurante.ACEPTADO,
 					paging);
 		}
@@ -492,10 +505,10 @@ public class GeneralService implements GeneralServicioInterfaz {
 	
 	@Override
 	public DTRespuesta registrarPago(int idPedido) {
-		/*MongoClientURI uri = new MongoClientURI("mongodb+srv://grupo1:grupo1@cluster0.l17sm.mongodb.net/prueba-concepto");
+		MongoClientURI uri = new MongoClientURI("mongodb+srv://grupo1:grupo1@cluster0.l17sm.mongodb.net/prueba-concepto");
 		MongoClient mongoClient = new MongoClient(uri);
 		MongoDatabase dataBase = mongoClient.getDatabase("prueba-concepto");
-		MongoCollection<Document> collectionPedidos = dataBase.getCollection("pedidos");*/
+		MongoCollection<Document> collectionCarrito = dataBase.getCollection("carrito");
 		
 		Optional<Pedido> optionalPedido = pedidoRepo.findById(idPedido);
 		Pedido pedido = optionalPedido.get();
@@ -505,12 +518,46 @@ public class GeneralService implements GeneralServicioInterfaz {
 		//Document buscado = (Document) collectionPedidos.find(new Document("_id", idPedido)).first();
 		//String idProducto = buscado.getString("productoCarrito");
 		
+		//Obtengo la informacion de los productos pedidos de un carrito
+		Document carritoBuscado = collectionCarrito.find(new Document("_id", pedido.getCarrito())).first();
+		List<BasicDBObject> listaDBObject = (List<BasicDBObject>) carritoBuscado.get("productoCarrito");
+		
+		Document carritoDocument;
+		Document productoDocument;
+		
+		String idProducto;
+		String cantidad;
+		String categoria;
+		String fecha;
+		
+		for (Object obj : listaDBObject) {
+			carritoDocument = (Document) obj;
+			cantidad = carritoDocument.get("cantidad").toString();
+			productoDocument = (Document) carritoDocument.get("producto");
+			idProducto = productoDocument.get("_id").toString();
+			categoria = productoDocument.getString("categoria");
+			fecha = pedido.getFecha().toString();
+			
+			ventaProducto(idProducto, cantidad, categoria, fecha);
+		}
+		
 		return new DTRespuesta("Pago registrado con éxito.");
 	}
 	
 	@Override
 	public void ventaProducto(String idProducto, String cantidad, String categoria, String fecha) {
+		MongoClientURI uri = new MongoClientURI("mongodb+srv://grupo1:grupo1@cluster0.l17sm.mongodb.net/prueba-concepto");
+		MongoClient mongoClient = new MongoClient(uri);
+		MongoDatabase dataBase = mongoClient.getDatabase("prueba-concepto");
+		MongoCollection<Document> collectionPedidos = dataBase.getCollection("pedidos");
 		
+		Document document = new Document();
+		
+		document.put("idProducto", idProducto);
+		document.put("cantidad", cantidad);
+		document.put("categoria", categoria);
+		document.put("fecha", fecha);
+		collectionPedidos.insertOne(document);
 	}
 	
 	@Override

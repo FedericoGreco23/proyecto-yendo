@@ -46,6 +46,8 @@ public interface RestauranteRepositorio extends UserBaseRepository<Restaurante> 
 //	  @Param("status") Integer status, 
 //	  @Param("name") String name);
 	
+//PARA BUSCAR RESTAURANTES
+	
 	@Query("SELECT r FROM Restaurante r WHERE UPPER(r.nombre) LIKE CONCAT('%',UPPER(:texto),'%') AND r.estado = :estado AND r.bloqueado = FALSE AND r.activo = TRUE")
 	List<Restaurante> buscarRestauranteDesdeClientePorNombre(@Param("texto") String texto, @Param("estado") EnumEstadoRestaurante estado);
 	
@@ -54,6 +56,17 @@ public interface RestauranteRepositorio extends UserBaseRepository<Restaurante> 
 	
 	@Query("SELECT r FROM Restaurante r INNER JOIN r.categorias c WHERE UPPER(c.nombre) LIKE UPPER(:categoria) AND r.estado = :estado AND r.bloqueado = FALSE AND r.activo = TRUE")
 	List<Restaurante> buscarRestauranteDesdeClientePorCategoria(@Param("categoria") String categoria, @Param("estado") EnumEstadoRestaurante estado);
+	
+//PARA LISTAR RESTAURANTES
+	
+	@Query("SELECT r FROM Restaurante r WHERE UPPER(r.nombre) LIKE CONCAT('%',UPPER(:texto),'%') AND r.estado = :estado AND r.bloqueado = FALSE AND r.activo = TRUE")
+	Page<Restaurante> listarRestauranteDesdeClientePorNombre(@Param("texto") String texto, @Param("estado") EnumEstadoRestaurante estado, Pageable pageable);
+	
+	@Query("SELECT r FROM Restaurante r INNER JOIN r.categorias c WHERE UPPER(c.nombre) LIKE UPPER(:categoria) AND UPPER(r.nombre) LIKE CONCAT('%',UPPER(:texto),'%') AND r.estado = :estado AND r.bloqueado = FALSE AND r.activo = TRUE")
+	Page<Restaurante> listarRestauranteDesdeClientePorNombreYCategoria(@Param("texto") String texto, @Param("categoria") String categoria, @Param("estado") EnumEstadoRestaurante estado, Pageable pageable);
+	
+	@Query("SELECT r FROM Restaurante r INNER JOIN r.categorias c WHERE UPPER(c.nombre) LIKE UPPER(:categoria) AND r.estado = :estado AND r.bloqueado = FALSE AND r.activo = TRUE")
+	Page<Restaurante> listarRestauranteDesdeClientePorCategoria(@Param("categoria") String categoria, @Param("estado") EnumEstadoRestaurante estado, Pageable pageable);
 	
 	
 	@Query(value = "SELECT \"restaurante_mail\", COUNT(*) FROM Pedido GROUP BY \"restaurante_mail\" ORDER BY count(*) DESC", nativeQuery = true)
