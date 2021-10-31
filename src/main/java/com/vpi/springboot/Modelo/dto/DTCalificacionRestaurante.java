@@ -12,6 +12,7 @@ public class DTCalificacionRestaurante extends DTCalificacion implements Seriali
 
 	private String restaurante;
 	private String cliente;
+	private String fotoCliente;
 
 	public DTCalificacionRestaurante() {
 		super();
@@ -28,6 +29,7 @@ public class DTCalificacionRestaurante extends DTCalificacion implements Seriali
 	public DTCalificacionRestaurante(CalificacionRestaurante c) {
 		super(c.getPuntaje(), c.getComentario(), c.getFoto(), c.getFecha());
 		this.cliente = c.getCliente().getNickname();
+		this.fotoCliente = c.getCliente().getFoto();
 	}
 
 	public DTCalificacionRestaurante(CalificacionCliente cal) {
@@ -56,5 +58,13 @@ public class DTCalificacionRestaurante extends DTCalificacion implements Seriali
 
 	public void setCliente(String cliente) {
 		this.cliente = cliente;
+	}
+
+	public String getFotoCliente() {
+		return fotoCliente;
+	}
+
+	public void setFotoCliente(String fotoCliente) {
+		this.fotoCliente = fotoCliente;
 	}
 }

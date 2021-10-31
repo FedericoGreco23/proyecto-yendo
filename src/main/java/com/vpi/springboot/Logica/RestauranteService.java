@@ -1353,7 +1353,9 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	}
 	
 	@Override
-	public DTRespuesta devolucionPedido(Pedido pedido) {
+	public DTRespuesta devolucionPedido(int idPedido) {
+		Optional<Pedido> optionalPedido = pedidoRepo.findById(idPedido);
+		Pedido pedido = optionalPedido.get();
 		Pedido devolucion = new Pedido(pedido.getFecha(), pedido.getCostoTotal()*-1, pedido.getEstadoPedido(), 
 				pedido.getMetodoDePago(), pedido.getCarrito(), pedido.getDireccion(), 
 				pedido.getRestaurante(), pedido.getCliente(), pedido.getComentario(), 

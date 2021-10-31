@@ -223,12 +223,24 @@ public class PublicRest {
 		}
 	}
 	
-	@GetMapping("/clienteConsultaCalificacion")
-    public ResponseEntity<?> clienteConsultaCalificacionRestaurante(@RequestParam(defaultValue = "0") int page,
+	@GetMapping("/consultarCalificacionesRestaurante")
+    public ResponseEntity<?> consultarCalificacionesRestaurante(@RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "") String sort,
             @RequestParam(defaultValue = "0") int order, @RequestParam(defaultValue = "") String restauranteMail) {
         try {
             return new ResponseEntity<>(restService.consultarCalificacion(page, size, sort, order, restauranteMail), HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+	
+	@GetMapping("/consultarCalificacionesCliente")
+    public ResponseEntity<?> consultarCalificacionesCliente(@RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "") String sort,
+            @RequestParam(defaultValue = "0") int order, @RequestParam(defaultValue = "") String clienteMail) {
+        try {
+            return new ResponseEntity<>(clienteService.consultarCalificacion(page, size, sort, order, clienteMail), HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return null;

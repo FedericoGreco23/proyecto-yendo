@@ -309,18 +309,6 @@ public class RestauranteController {
 		}
 	}
 	
-	@GetMapping("/consultarCalificacion")
-    public ResponseEntity<?> consultarCalificacion(@RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "") String sort,
-            @RequestParam(defaultValue = "0") int order) {
-        try {
-            return new ResponseEntity<>(service.consultarCalificacion(page, size, sort, order, getMailFromJwt()), HttpStatus.OK);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-	
 	@PostMapping("registrarPago")
 	public ResponseEntity<?> registrarPago(@RequestParam(required = true) int idPedido) {
 		try {
@@ -332,9 +320,9 @@ public class RestauranteController {
 	}
 
 	@PostMapping("devolucionPedido")
-	public ResponseEntity<?> devolucionPedido(@RequestBody(required = true) Pedido pedido) {
+	public ResponseEntity<?> devolucionPedido(@RequestBody(required = true) int idPedido) {
 		try {
-			return new ResponseEntity<>(service.devolucionPedido(pedido), HttpStatus.OK);
+			return new ResponseEntity<>(service.devolucionPedido(idPedido), HttpStatus.OK);
 		} catch (ConstraintViolationException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {

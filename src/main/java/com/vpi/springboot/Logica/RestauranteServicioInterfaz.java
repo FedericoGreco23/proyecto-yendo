@@ -70,7 +70,7 @@ public interface RestauranteServicioInterfaz {
 	
 	public void ventaProducto(String idProducto, String cantidad, String categoria, String fecha);
 
-	public DTRespuesta devolucionPedido(Pedido pedido);
+	public DTRespuesta devolucionPedido(int idPedido);
 	
 	void cargarDatos2();
 }
