@@ -279,50 +279,6 @@ public class GeneralService implements GeneralServicioInterfaz {
 	}
 
 	@Override
-	public DTRespuesta verificarMail(String mail) throws UsuarioException {
-		String to = "";
-		int tipo;
-
-		Optional<Cliente> optionalCliente = clienteRepo.findById(mail);
-		if (optionalCliente.isPresent()) { // cliente
-			Cliente cliente = optionalCliente.get();
-			to = cliente.getMail();
-			tipo = 0;
-		} else {
-			Optional<Restaurante> optionalRestaurante = resRepo.findById(mail);
-			if (optionalRestaurante.isPresent()) { // restaurante
-				Restaurante restaurante = optionalRestaurante.get();
-				to = restaurante.getMail();
-				tipo = 1;
-			} else {
-				Optional<Administrador> optionalAdmin = adminRepo.findById(mail);
-				if (optionalAdmin.isPresent()) { // administrador
-					Administrador administrador = optionalAdmin.get();
-					to = administrador.getMail();
-					tipo = 2;
-				} else {
-					throw new UsuarioException(UsuarioException.NotFoundException(mail));
-				}
-			}
-		}
-
-		String servicio = "localhost:8080/api/general/activar/?mail=" + mail + "&tipo=" + tipo;
-
-		if (to.contains("@") && to.contains(".com")) {
-			String topic = "Verificación de mail.";
-			String body = "Para verificar su mail, por favor use el siguiente link: \n" + servicio;
-			try {
-				mailSender.sendMail(to, body, topic);
-			} catch (MessagingException e) {
-				System.out.println("Error al mandar mail: " + e.getMessage());
-			}
-			return new DTRespuesta("Mail enviado con contraseña.");
-		} else {
-			return new DTRespuesta("Mail de usuario inválido.");
-		}
-	}
-
-	@Override
 	public DTRespuesta activarCuenta(String token) {
 		TokenVerificacion verificacion = tokenRepo.findByToken(token);
 

@@ -133,16 +133,6 @@ public class PublicRest {
 		}
 	}
 
-	@CrossOrigin(origins = "*", allowedHeaders = "*")
-	@RequestMapping(value = "/verificar", method = RequestMethod.POST)
-	public ResponseEntity<?> verificarMail(@RequestParam String mail) {
-		try {
-			return new ResponseEntity<>(service.verificarMail(mail), HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
-
 	@GetMapping("/listarRestaurantes")
 	public Map<String, Object> listarRestaurantesAbiertos(@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "0") int horarioApertura,
