@@ -55,6 +55,7 @@ import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.Modelo.Promocion;
 import com.vpi.springboot.Modelo.Reclamo;
 import com.vpi.springboot.Modelo.Restaurante;
+import com.vpi.springboot.Modelo.dto.DTCalificacionCliente;
 import com.vpi.springboot.Modelo.dto.DTCalificacionRestaurante;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTListarRestaurante;
@@ -1318,5 +1319,25 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 		pedidoRepo.save(devolucion);
 		return new DTRespuesta("Devolucion registrada con éxito.");
+	}
+
+	@Override
+	public DTCalificacionCliente getCalificacionCliente(String mailCliente, String mailRestaurante) throws UsuarioException, RestauranteException {
+		Optional<Cliente> optionalCliente = userRepo.findById(mailCliente);
+		if (!optionalCliente.isPresent())
+			throw new UsuarioException(UsuarioException.NotFoundException(mailCliente));
+		Cliente cliente = optionalCliente.get();
+		
+		Optional<Restaurante> optionalRestaurante = restauranteRepo.findById(mailRestaurante);
+		if (!optionalRestaurante.isPresent()) {
+			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(mailRestaurante));
+		}
+		Restaurante restaurante = optionalRestaurante.get();
+		
+		CalificacionCliente calCliente = calClienteRepo.findByClienteRestaurante(cliente, restaurante);
+				
+		if(calCliente == null)
+			throw new UsuarioException(RestauranteException.SinCalificacion(mailCliente));
+		return new DTCalificacionCliente(calCliente);
 	}
 }

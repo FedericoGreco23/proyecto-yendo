@@ -341,6 +341,21 @@ public class RestauranteController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@GetMapping("/getCalCliente/{cliente}")
+	ResponseEntity<?> getCalificacionCliente(@PathVariable String cliente) {
+		if (!esRestaurante()) {
+			return new ResponseEntity<>(
+					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
+					HttpStatus.FORBIDDEN);
+		}
+
+		try {
+			return new ResponseEntity<>(service.getCalificacionCliente(cliente, getMailFromJwt()), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 	//ESTA NO SE USA, SE HACE AUTOMATICO. LA DEJO POR LAS DUDAS
 	@PostMapping("/resPed")
@@ -351,7 +366,6 @@ public class RestauranteController {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
 	
 	/// PRIVADAS PARA JWT ///
 	/////////////////////////

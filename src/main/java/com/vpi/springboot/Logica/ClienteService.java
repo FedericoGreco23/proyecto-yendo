@@ -550,8 +550,6 @@ public class ClienteService implements ClienteServicioInterfaz {
 		}
 	}
 
-	// TODO ordenamiento: fecha, precio
-	// TODO filtro: fecha, restaurante
 	@Override
 	public Map<String, Object> listarPedidos(int size, int page, String varRestaurante, String fecha, String sort,
 			int order, String mailUsuario) throws UsuarioException {
@@ -697,6 +695,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 				"Calificacion de restaurante + " + restaurante.getNombre() + " eliminada correctamente.");
 	}
 
+	@Override
 	public Map<String, Object> listarReclamos(int size, int page, String restaurante, String sort, int order,
 			String mailCliente) throws UsuarioException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mailCliente);
@@ -756,6 +755,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 		return DTpedido;
 	}
 
+	@Override
 	public DTCalificacionRestaurante getCalificacionRestaurante(String mailCliente, String mailRestaurante)
 			throws UsuarioException, RestauranteException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mailCliente);
@@ -769,9 +769,9 @@ public class ClienteService implements ClienteServicioInterfaz {
 		}
 		Restaurante restaurante = optionalRestaurante.get();
 		
-		CalificacionRestaurante calCliente = calRestauranteRepo.findByClienteRestaurante(cliente, restaurante);
-		if(calCliente == null)
+		CalificacionRestaurante calRestaurante = calRestauranteRepo.findByClienteRestaurante(cliente, restaurante);
+		if(calRestaurante == null)
 			throw new UsuarioException(UsuarioException.SinCalificacion(mailRestaurante));
-		return new DTCalificacionRestaurante(calCliente);
+		return new DTCalificacionRestaurante(calRestaurante);
 	}
 }
