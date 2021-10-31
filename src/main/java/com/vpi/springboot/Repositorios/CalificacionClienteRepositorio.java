@@ -6,11 +6,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.vpi.springboot.IdCompuestas.CalificacionClienteId;
 import com.vpi.springboot.Modelo.CalificacionCliente;
 import com.vpi.springboot.Modelo.Cliente;
+import com.vpi.springboot.Modelo.Restaurante;
 
 /**
  * Repository for the entity Person.
@@ -25,4 +27,8 @@ public interface CalificacionClienteRepositorio extends JpaRepository<Calificaci
 	
 	@Query("SELECT c FROM CalificacionCliente c WHERE c.cliente = :cliente")
 	Page<CalificacionCliente> consultarCalificacion(Cliente cliente, Pageable pageable);
+	
+	@Query("SELECT u FROM CalificacionCliente u WHERE u.cliente = :cliente and u.restaurante = :restaurante")
+	CalificacionCliente findByClienteRestaurante(@Param("cliente") Cliente cliente,
+			@Param("restaurante") Restaurante restaurante);
 }

@@ -309,6 +309,18 @@ public class RestauranteController {
 		}
 	}
 	
+	@GetMapping("/consultarCalificacion")
+    public ResponseEntity<?> consultarCalificacion(@RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "") String sort,
+            @RequestParam(defaultValue = "0") int order) {
+        try {
+            return new ResponseEntity<>(service.consultarCalificacion(page, size, sort, order, getMailFromJwt()), HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+	
 	@PostMapping("registrarPago")
 	public ResponseEntity<?> registrarPago(@RequestParam(required = true) int idPedido) {
 		try {
@@ -327,6 +339,21 @@ public class RestauranteController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@GetMapping("/getCalCliente/{cliente}")
+	ResponseEntity<?> getCalificacionCliente(@PathVariable String cliente) {
+		if (!esRestaurante()) {
+			return new ResponseEntity<>(
+					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
+					HttpStatus.FORBIDDEN);
+		}
+
+		try {
+			return new ResponseEntity<>(service.getCalificacionCliente(cliente, getMailFromJwt()), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 

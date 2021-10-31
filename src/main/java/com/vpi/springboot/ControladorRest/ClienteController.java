@@ -235,6 +235,24 @@ public class ClienteController {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@GetMapping("/buscarPedido")
+	public ResponseEntity<?> buscarPedidoRealizado(@RequestParam(defaultValue = "0") int numeroPedido) {
+		try {
+			return new ResponseEntity<>(clienteService.buscarPedidoRealizado(numeroPedido), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping("/getCalRestaurante/{restaurante}")
+	public ResponseEntity<?> getCalificacionRestaurante(@PathVariable String restaurante) {
+		try {
+			return new ResponseEntity<>(clienteService.getCalificacionRestaurante(getMailFromJwt(), restaurante), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 	private String getMailFromJwt() {
 		// obtenemos el token del header y le sacamos "Bearer "
@@ -248,15 +266,6 @@ public class ClienteController {
 			mail = jwtUtil.extractUsername(jwt);
 		}
 		return mail;
-	}
-
-	@GetMapping("/buscarPedido")
-	public ResponseEntity<?> buscarPedidoRealizado(@RequestParam(defaultValue = "0") int numeroPedido) {
-		try {
-			return new ResponseEntity<>(clienteService.buscarPedidoRealizado(numeroPedido), HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
-		}
 	}
 	
 	@GetMapping("/listarRestaurantesPorZona")

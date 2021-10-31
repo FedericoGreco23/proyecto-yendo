@@ -8,6 +8,7 @@ import com.vpi.springboot.Modelo.Calificacion;
 import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Pedido;
 import com.vpi.springboot.Modelo.dto.DTBuscarRestaurante;
+import com.vpi.springboot.Modelo.dto.DTCalificacionRestaurante;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
 import com.vpi.springboot.Modelo.dto.DTPedido;
@@ -68,4 +69,6 @@ public interface ClienteServicioInterfaz {
 
 	public Map<String, Object> listarRestaurantesPorZona(int page, int size, int horarioApertura, String nombre,
 			String categoria, String sort, int order, int idDireccion) throws UsuarioException;
+	
+	public DTCalificacionRestaurante getCalificacionRestaurante(String mailCliente, String mailRestaurante) throws UsuarioException, RestauranteException;
 }

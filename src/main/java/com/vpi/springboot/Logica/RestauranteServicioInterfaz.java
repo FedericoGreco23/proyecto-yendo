@@ -1,6 +1,7 @@
 package com.vpi.springboot.Logica;
 
 import com.vpi.springboot.Modelo.Restaurante;
+import com.vpi.springboot.Modelo.dto.DTCalificacionCliente;
 import com.vpi.springboot.Modelo.dto.DTCalificacionRestaurante;
 import com.vpi.springboot.Modelo.dto.DTPedido;
 import com.vpi.springboot.Modelo.dto.DTPromocionConPrecio;
@@ -71,6 +72,8 @@ public interface RestauranteServicioInterfaz {
 	public void ventaProducto(String idProducto, String cantidad, String categoria, String fecha);
 
 	public DTRespuesta devolucionPedido(int idPedido);
+	
+	public DTCalificacionCliente getCalificacionCliente(String mailCliente, String mailRestaurante) throws UsuarioException, RestauranteException;
 	
 	void cargarDatos2();
 }

@@ -44,7 +44,6 @@ public class PublicRest {
 
 	@Autowired
 	private AuthenticationManager authenticationManager;
-
 	@Autowired
 	private JwtUtil jwtTokenUtil;
 	@Autowired
