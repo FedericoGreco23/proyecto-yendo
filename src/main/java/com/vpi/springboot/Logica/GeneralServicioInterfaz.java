@@ -47,10 +47,4 @@ public interface GeneralServicioInterfaz {
 			throws RestauranteException;
 
 	public Map<String, Object> buscarMenusPromociones(String mailRestaurante, String producto) throws RestauranteException;
-	
-	public DTRespuesta registrarPago(int idPedido);
-	
-	public void ventaProducto(String idProducto, String cantidad, String categoria, String fecha);
-
-	public DTRespuesta devolucionPedido(Pedido pedido);
 }

@@ -45,25 +45,4 @@ public class GeneralController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-
-	@PostMapping("registrarPago")
-	public ResponseEntity<?> registrarPago(@RequestParam(required = true) int idPedido) {
-		try {
-			DTRespuesta respuesta = service.registrarPago(idPedido);
-			return new ResponseEntity<>(respuesta, HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
-
-	@PostMapping("devolucionPedido")
-	public ResponseEntity<?> devolucionPedido(@RequestBody(required = true) Pedido pedido) {
-		try {
-			return new ResponseEntity<>(service.devolucionPedido(pedido), HttpStatus.OK);
-		} catch (ConstraintViolationException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
-		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
 }

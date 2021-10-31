@@ -21,6 +21,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -36,6 +37,11 @@ import org.springframework.stereotype.Service;
 
 import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Direccion;
+import com.mongodb.BasicDBObject;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import com.vpi.springboot.IdCompuestas.CalificacionClienteId;
 import com.vpi.springboot.Modelo.Administrador;
 import com.vpi.springboot.Modelo.Calificacion;
@@ -1246,6 +1252,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		}
 	}
 	
+	//Uso esta funcion tanto para consultarCalificacionRestaurante como clienteConsultaCalificacionRestaurante
 	@Override
 	public Map<String, Object> consultarCalificacion(int page, int size, String sort, int order, String mailRestaurante) throws RestauranteException {
 		Map<String, Object> response = new HashMap<>();
@@ -1284,5 +1291,75 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		response.put("restaurantes", DTCalificacionesRestaurante);
 
 		return response;
+	}
+	
+	@Override
+	public DTRespuesta registrarPago(int idPedido) {
+		MongoClientURI uri = new MongoClientURI("mongodb+srv://grupo1:grupo1@cluster0.l17sm.mongodb.net/prueba-concepto");
+		MongoClient mongoClient = new MongoClient(uri);
+		MongoDatabase dataBase = mongoClient.getDatabase("prueba-concepto");
+		MongoCollection<Document> collectionCarrito = dataBase.getCollection("carrito");
+		
+		Optional<Pedido> optionalPedido = pedidoRepo.findById(idPedido);
+		Pedido pedido = optionalPedido.get();
+		if (pedido.getMetodoDePago().equals(EnumMetodoDePago.EFECTIVO)) {
+			pedido.setPago(true);
+			pedidoRepo.save(pedido);
+		}
+		
+		//Document buscado = (Document) collectionPedidos.find(new Document("_id", idPedido)).first();
+		//String idProducto = buscado.getString("productoCarrito");
+		
+		//Obtengo la informacion de los productos pedidos de un carrito
+		Document carritoBuscado = collectionCarrito.find(new Document("_id", pedido.getCarrito())).first();
+		List<BasicDBObject> listaDBObject = (List<BasicDBObject>) carritoBuscado.get("productoCarrito");
+		
+		Document carritoDocument;
+		Document productoDocument;
+		
+		String idProducto;
+		String cantidad;
+		String categoria;
+		String fecha;
+		
+		for (Object obj : listaDBObject) {
+			carritoDocument = (Document) obj;
+			cantidad = carritoDocument.get("cantidad").toString();
+			productoDocument = (Document) carritoDocument.get("producto");
+			idProducto = productoDocument.get("_id").toString();
+			categoria = productoDocument.getString("categoria");
+			fecha = pedido.getFecha().toString();
+			
+			ventaProducto(idProducto, cantidad, categoria, fecha);
+		}
+		
+		return new DTRespuesta("Pago registrado con éxito.");
+	}
+	
+	@Override
+	public void ventaProducto(String idProducto, String cantidad, String categoria, String fecha) {
+		MongoClientURI uri = new MongoClientURI("mongodb+srv://grupo1:grupo1@cluster0.l17sm.mongodb.net/prueba-concepto");
+		MongoClient mongoClient = new MongoClient(uri);
+		MongoDatabase dataBase = mongoClient.getDatabase("prueba-concepto");
+		MongoCollection<Document> collectionPedidos = dataBase.getCollection("pedidos");
+		
+		Document document = new Document();
+		
+		document.put("idProducto", idProducto);
+		document.put("cantidad", cantidad);
+		document.put("categoria", categoria);
+		document.put("fecha", fecha);
+		collectionPedidos.insertOne(document);
+	}
+	
+	@Override
+	public DTRespuesta devolucionPedido(Pedido pedido) {
+		Pedido devolucion = new Pedido(pedido.getFecha(), pedido.getCostoTotal()*-1, pedido.getEstadoPedido(), 
+				pedido.getMetodoDePago(), pedido.getCarrito(), pedido.getDireccion(), 
+				pedido.getRestaurante(), pedido.getCliente(), pedido.getComentario(), 
+				pedido.getPago());
+		
+		pedidoRepo.save(devolucion);
+		return new DTRespuesta("Devolucion registrada con éxito.");
 	}
 }

@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.vpi.springboot.Logica.RestauranteService;
 import com.vpi.springboot.Modelo.Calificacion;
+import com.vpi.springboot.Modelo.Pedido;
 import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.Modelo.dto.DTPromocionConPrecio;
 import com.vpi.springboot.Modelo.Promocion;
@@ -319,6 +320,27 @@ public class RestauranteController {
             return null;
         }
     }
+	
+	@PostMapping("registrarPago")
+	public ResponseEntity<?> registrarPago(@RequestParam(required = true) int idPedido) {
+		try {
+			DTRespuesta respuesta = service.registrarPago(idPedido);
+			return new ResponseEntity<>(respuesta, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping("devolucionPedido")
+	public ResponseEntity<?> devolucionPedido(@RequestBody(required = true) Pedido pedido) {
+		try {
+			return new ResponseEntity<>(service.devolucionPedido(pedido), HttpStatus.OK);
+		} catch (ConstraintViolationException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 	//ESTA NO SE USA, SE HACE AUTOMATICO. LA DEJO POR LAS DUDAS
 	@PostMapping("/resPed")
@@ -328,7 +350,6 @@ public class RestauranteController {
 		} catch (Exception e) {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		
 	}
 	
 	

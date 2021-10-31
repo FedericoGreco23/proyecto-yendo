@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.vpi.springboot.Modelo.Calificacion;
+import com.vpi.springboot.Modelo.Pedido;
 import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.Modelo.Promocion;
 import com.vpi.springboot.exception.CategoriaException;
@@ -65,5 +66,11 @@ public interface RestauranteServicioInterfaz {
 
 	public Map<String, Object> consultarCalificacion(int page, int size, String sort, int order, String mailRestaurante) throws RestauranteException;
 
+	public DTRespuesta registrarPago(int idPedido);
+	
+	public void ventaProducto(String idProducto, String cantidad, String categoria, String fecha);
+
+	public DTRespuesta devolucionPedido(Pedido pedido);
+	
 	void cargarDatos2();
 }
