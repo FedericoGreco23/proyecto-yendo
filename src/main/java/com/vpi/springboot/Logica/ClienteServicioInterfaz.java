@@ -8,6 +8,7 @@ import com.vpi.springboot.Modelo.Calificacion;
 import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Pedido;
 import com.vpi.springboot.Modelo.dto.DTBuscarRestaurante;
+import com.vpi.springboot.Modelo.dto.DTCalificacionRestaurante;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
 import com.vpi.springboot.Modelo.dto.DTPedido;
@@ -63,5 +64,7 @@ public interface ClienteServicioInterfaz {
 			throws UsuarioException;
 
 	public DTPedido buscarPedidoRealizado(int numeroPedido) throws PedidoException;
+	
+	public DTCalificacionRestaurante getCalificacionRestaurante(String mailCliente, String mailRestaurante) throws UsuarioException, RestauranteException;
 
 }

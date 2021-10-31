@@ -130,9 +130,9 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	private ClienteRepositorio userRepo;
 	@Autowired
 	private AdministradorService administradorService;
-	@Autowired 
+	@Autowired
 	private RestaurantePedidosRepositorio resPedRepo;
-	@Autowired 
+	@Autowired
 	private ClienteService clienteService;
 
 	private DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");;
@@ -722,33 +722,33 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 		return DTpedido;
 	}
-	
-	@Scheduled(cron = "*/59 */5 * * * *") //1  vez cada 5 minutos
+
+	@Scheduled(cron = "*/59 */5 * * * *") // 1 vez cada 5 minutos
 	public DTRespuesta guaradarEnMongo() {
 		List<Object[]> lista = restauranteRepo.buscarRestaurantesConMasPedidos();
-		//Map<String, Integer> restpedidos = new HashMap<String, Integer>();
+		// Map<String, Integer> restpedidos = new HashMap<String, Integer>();
 		List<DTRestaurantePedido> restaurantesPedidos = new ArrayList<DTRestaurantePedido>();
 		Optional<DTRestaurantePedido> optionalDt;
 		Optional<Restaurante> optionalRes;
 		Restaurante res;
 		DTRestaurantePedido dt;
-		for (Object[] object : lista) {	
+		for (Object[] object : lista) {
 			optionalRes = restauranteRepo.findById((String) object[0]);
 			res = optionalRes.get();
 			optionalDt = resPedRepo.findById((String) object[0]);
 			if (optionalDt.isPresent()) {
 				dt = optionalDt.get();
-				dt.setCantPedidos((BigInteger)object[1]);
+				dt.setCantPedidos((BigInteger) object[1]);
 				resPedRepo.save(dt);
-				
-			}else {
+
+			} else {
 				dt = new DTRestaurantePedido((String) object[0], (BigInteger) object[1]);
 				dt.setNombre(res.getNombre());
 				resPedRepo.save(dt);
 			}
 		}
-		
-		//resPedRepo.saveAll(restaurantesPedidos);	
+
+		// resPedRepo.saveAll(restaurantesPedidos);
 		return new DTRespuesta("Base de datos actualizada");
 	}
 
@@ -756,11 +756,11 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	public void cargarDatos() {
 
 		/////////////////// DATOS///////////
-		
-		//////////////admin/////////////////
-		
-		Administrador admin= new Administrador("admin1@gmail.com", "123456", "099999999", "https://www.elliberal.com/wp-content/uploads/2021/09/elon-musk.jpg", false, 
-				true, LocalDate.now());
+
+		////////////// admin/////////////////
+
+		Administrador admin = new Administrador("admin1@gmail.com", "123456", "099999999",
+				"https://www.elliberal.com/wp-content/uploads/2021/09/elon-musk.jpg", false, true, LocalDate.now());
 		try {
 			administradorService.crearAdministrador(admin);
 		} catch (AdministradorException e1) {
@@ -826,53 +826,51 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			p0.setCategoria(catRepo.findById("Comida oriental").get());
 			orientalProductoList.add(p0);
 		}
-		
+
 		String chivitoString = "chivito de la casa,chivito big, grosso,chivito gigante,chivito doble carne,chivito completo, al plato";
 		List<String> chivitoList = Arrays.asList(chivitoString.split(","));
 		List<Producto> chivitoProductoList = new ArrayList<Producto>();
 		for (String s : chivitoList) {
-			Producto p0 = new Producto(s, "Para los que saben lo que es bueno" , (Math.random() * 500),
+			Producto p0 = new Producto(s, "Para los que saben lo que es bueno", (Math.random() * 500),
 					"https://conocer365.uy/wp-content/uploads/2019/03/Tinkal_chivito_3-585x388.png", 5, true);
 			p0.setCategoria(catRepo.findById("Chivitos").get());
 			chivitoProductoList.add(p0);
 		}
-		
-		//empanadas
-	    String empanadasString = "Carne Suave,Carne Dulce,Carne Picante,Pollo Gauchita,Pollo con Champignon,Espinaca y Queso,Verdura - Hierbabuena al limón,Mazorca, Cebolla y salsa blanca,Queso, Orégano y Aceitunas,Frutal (queso y frutas),Queso - Queso,Queso y Albahaca,Queso y Jamón";
+
+		// empanadas
+		String empanadasString = "Carne Suave,Carne Dulce,Carne Picante,Pollo Gauchita,Pollo con Champignon,Espinaca y Queso,Verdura - Hierbabuena al limón,Mazorca, Cebolla y salsa blanca,Queso, Orégano y Aceitunas,Frutal (queso y frutas),Queso - Queso,Queso y Albahaca,Queso y Jamón";
 		List<String> empanadasListString = Arrays.asList(empanadasString.split(","));
 		List<Producto> empanadasProductoList = new ArrayList<Producto>();
 		for (String s : empanadasListString) {
-			Producto p0 = new Producto(s, "Para los que saben lo que es bueno" , (Math.random() * 500),
-					"https://elmundoenrecetas.s3.amazonaws.com/uploads/recipe/main_image/95/IMG_4693_1200px.jpg", 5, true);
+			Producto p0 = new Producto(s, "Para los que saben lo que es bueno", (Math.random() * 500),
+					"https://elmundoenrecetas.s3.amazonaws.com/uploads/recipe/main_image/95/IMG_4693_1200px.jpg", 5,
+					true);
 			p0.setCategoria(catRepo.findById("Empanadas").get());
 			empanadasProductoList.add(p0);
 		}
-		
-		
-		//pizza
+
+		// pizza
 		String pizzaString = "Pepperoni,Hawaiian,TALIA,Mexican,Margher,Margherita,Vegetarian,Chicken,Deluxe,Deluxe,Tree cheese,Sausage,Anchovy,Jalapene";
 		List<String> pizzaListString = Arrays.asList(pizzaString.split(","));
 		List<Producto> pizzaProductoList = new ArrayList<Producto>();
 		for (String s : pizzaListString) {
-			Producto p0 = new Producto(s, "Con los mejores ingredientes" , (Math.random() * 500),
-					"https://filesedc.com/uploads/other/2019/08/1200/los-15-tipos-de-pizza-mas-populares-y-sus-ingredientes.jpeg", 5, true);
+			Producto p0 = new Producto(s, "Con los mejores ingredientes", (Math.random() * 500),
+					"https://filesedc.com/uploads/other/2019/08/1200/los-15-tipos-de-pizza-mas-populares-y-sus-ingredientes.jpeg",
+					5, true);
 			p0.setCategoria(catRepo.findById("Pizzas").get());
 			pizzaProductoList.add(p0);
 		}
-		
-		//hamburguezas
+
+		// hamburguezas
 		String burguerString = "LAÇADOR,FRITZ,GRINGO,ANITA,PAMPA BURGER,CHIMANGO,PIRATINI,MARAGATO,GARIBALDI,CAMPEREADA,LA PLATA,MACANUDO,BORGHETTINHO,LOBISOMEM,DO ARVOREDO,CHARRUA,GALO VEIO,PRO D'água";
 		List<String> burguerListString = Arrays.asList(burguerString.split(","));
 		List<Producto> burguerStringProductoList = new ArrayList<Producto>();
 		for (String s : burguerListString) {
-			Producto p0 = new Producto(s, "Para paladares exigentes" , (Math.random() * 500),
+			Producto p0 = new Producto(s, "Para paladares exigentes", (Math.random() * 500),
 					"https://media-cdn.tripadvisor.com/media/photo-s/14/ba/b3/45/burgers.jpg", 12, true);
 			p0.setCategoria(catRepo.findById("Hamburguesas").get());
 			burguerStringProductoList.add(p0);
 		}
-
-
-
 
 		///// seguir agregando
 
@@ -893,184 +891,147 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		// RESTAURANTES
 		String restoString = "La Pasiva,Sushi Go,La Taberna del Diablo,Burger King,Empanadas Mafalda,Il Mondo della Pizza,Fans,D' La Ribera,El Hornito,Grido,Tiqui Taca,Don Koto,Empanadas La Barca,Heladería Las Delicias,Pizza Trouville,Pizza Piedra,Pizzería Rodelú,Grazie Italia,Subway,Food & Love,La Isla,Soprano's,Chiviteria Marcos,Pizzería Cervantes,Sushiapp,Felipe,Chivipizza,El Club de la Papa Frita,OMG Fried Chicken,Cremona - Dicomo Pasta,Premium,Fábrica de Pastas La Bolognesa,Freddo,Lehmeyun 100%,La Roca,El Noble,Fellini,Artico,Barbacoa,Billie Joe,Gelateria del Club,Los Tavarez,Pizzeria Papa Jorge,Sushi Time,Pastas Baccino,Sinestesia,Crêpas,Tropical Smoothies,Chajá Bistro,San Roque,McDonald's,Chesterhouse,La Cigale,Homeopatía Alemana,Supermercados,Farmacias,Farmashop,Nescafé Dolce Gusto,Crepez,I love Tacos,Porto Vanila,Laika,Heladería La Chicharra,Iberpark,Farmacia El Tunel,Chéntola Gelato Artesanal,Sbarro,Fabric Sushi,Al Dente Pastas Artesanales,Del Abuelo Helados Artesanales,Alberto's,Cuidate - Comida Saludable,El Horno de Juan,El Novillo Alegre,Heladería Facal,Hoy te Quiero,Asian Food,Mimoso Resto Bar,Donut City,Hong Kong - Comida China,Mr. Kebap's,Veggie Mafalda,Rudy,Pizza Club,Pizza's House,Axion,Ciudad Aventura,Tomato Gourmet,Futuro Refuerzos,Pizzabrossa,Mascotas,Devoto,Poked,Noah's,The Lab Coffee,26 Sushi,Sabores,The Paletas Factory,La Vienesa,Paparike,Magnum,La Chacha Empanadas,Mise en place,Bar La Cruz,Lehmeyun Pizza Turca Armenia,Almacén de Pizzas,BIGA - Pizza y Pasta,II Gufo,Heladeria Pecas,Gaucho Burger,Emporio Gastronómico,Chivitos lo de Pepe,Facal,La Boletería,Burger Club,McCafé - McDonald's,Green To Go,Flores,Miyagi Sushi,Cafeterías,Pizza Mania,Bebidas,Bao bao,Tiendas,Wing It";
 		List<String> restaurantesList = Arrays.asList(restoString.split(","));
-		
-		//fotos restaurante
+
+		// fotos restaurante
 		String fotosRString = "https://www.alacarta.com.uy/wp-content/uploads/2021/09/alacarta-restaurante-adorado-01-300x160.jpg,https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT4BL01pRdMb4Fh3Urp-QVU6Vd8OcXeuaSPHFrdJxMohPsxwt3XaMTOjgyHGO0syh6pKf0&usqp=CAU,https://media-cdn.tripadvisor.com/media/photo-s/11/23/53/c4/img-20171031-144058-largejpg.jpg,https://media-cdn.tripadvisor.com/media/photo-s/0d/38/b5/d4/outdoor-seating.jpg,https://media-cdn.tripadvisor.com/media/photo-p/17/ff/4e/1c/terrasse.jpg,https://media-cdn.tripadvisor.com/media/photo-s/12/dd/a6/cf/doble-v.jpg,https://media-cdn.tripadvisor.com/media/photo-p/1a/d9/1b/c7/photo0jpg.jpg,https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRc2btjCzipIQA0d3Pp4s22KIf5P0XDlbd5A&usqp=CAU,https://www.estudiomontevideo.com/wp-content/uploads/2018/08/010917-KANTINE-AC-ph-G-Viramonte-1015.jpg,https://media-cdn.tripadvisor.com/media/photo-s/16/26/0a/22/restaurant.jpg,https://media-cdn.tripadvisor.com/media/photo-s/0d/a8/5b/78/demode.jpg";
 		List<String> fotosRestaurante = Arrays.asList(fotosRString.split(","));
 
-		
-		Double lat=-34.9128;
-		Double lon= -56.1886;
-		int calificacion= 5;
+		Double lat = -34.9128;
+		Double lon = -56.1886;
+		int calificacion = 5;
 		for (String resto : restaurantesList) {
-			calificacion=calificacion-1;
-			if(calificacion==1) {
-				calificacion=5;
+			calificacion = calificacion - 1;
+			if (calificacion == 1) {
+				calificacion = 5;
 			}
 			try {
 				Double rand = (Double) (Math.random() * 1);
-				Double latitud = BigDecimal.valueOf(lat+rand)
-					    .setScale(4, RoundingMode.HALF_UP)
-					    .doubleValue();
-				Double longitud = BigDecimal.valueOf(lon+rand)
-					    .setScale(4, RoundingMode.HALF_UP)
-					    .doubleValue();
-				
+				Double latitud = BigDecimal.valueOf(lat + rand).setScale(4, RoundingMode.HALF_UP).doubleValue();
+				Double longitud = BigDecimal.valueOf(lon + rand).setScale(4, RoundingMode.HALF_UP).doubleValue();
+
 				Integer i = (int) (Math.random() * 2 + 1);
 				Integer envio = (int) (Math.random() * 30 + 1);
 				Integer randomFoto = (int) (Math.random() * 10);
-				Integer telefono= (int) (Math.random() * 999999);
+				Integer telefono = (int) (Math.random() * 999999);
 				Integer dir = (int) (Math.random() * direccionesList.size());
 				// carga de productos
 
+				GeoLocalizacion geo = new GeoLocalizacion();
 
-
-
-				GeoLocalizacion geo= new GeoLocalizacion();
-				
 				geo.setLatitud(latitud);
 				geo.setLongitud(longitud);
 
-				
-				
-				Restaurante r = new Restaurante(resto.toLowerCase().replace(" ", "") + "@" + resto.toLowerCase().replace(" ", "") + ".com",
-						"123456", "9"+telefono.toString(), null, false, true, resto, direccionesList.get(dir),
-						Float.valueOf(calificacion), EnumEstadoRestaurante.values()[i - 1], null, null, null, envio, null,
-						null, "LMWJVSD", true);	
-				
+				Restaurante r = new Restaurante(
+						resto.toLowerCase().replace(" ", "") + "@" + resto.toLowerCase().replace(" ", "") + ".com",
+						"123456", "9" + telefono.toString(), null, false, true, resto, direccionesList.get(dir),
+						Float.valueOf(calificacion), EnumEstadoRestaurante.values()[i - 1], null, null, null, envio,
+						null, null, "LMWJVSD", true);
 
-				//Set<Categoria> categoriaRandom = new HashSet<Categoria>();
+				// Set<Categoria> categoriaRandom = new HashSet<Categoria>();
 
 				r.setProductos(null);
 				r.setFoto(fotosRestaurante.get(randomFoto));
 				r.setGeoLocalizacion(geo);
 				r.setProductos(new ArrayList<>());
 
-
-				
-		         
-		    
-	
-
 				crearRestaurantesDePrueba(r);
-				
 
-				
-				
 			} catch (RestauranteException | CategoriaException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 
-			
-			
+			}
+		}
 
-		}
-		}
-		
-		Integer bebidaNumero = bebidasProductoList.size()-1;
-		Integer orientalNumero = orientalProductoList.size()-1;
-		
-		List<Restaurante> restauList= resRepo.findAll();
-		
-		for(Restaurante restau: restauList ) {
+		Integer bebidaNumero = bebidasProductoList.size() - 1;
+		Integer orientalNumero = orientalProductoList.size() - 1;
+
+		List<Restaurante> restauList = resRepo.findAll();
+
+		for (Restaurante restau : restauList) {
 
 			Set<Producto> productosRandom = new HashSet<Producto>();
-		if(bebidaNumero>3 && orientalNumero>3) {
-			
-			
-			productosRandom.add(bebidasProductoList.get(bebidaNumero));
-			bebidaNumero=bebidaNumero-1;
-			productosRandom.add(bebidasProductoList.get(bebidaNumero));
-			bebidaNumero=bebidaNumero-1;
-			productosRandom.add(bebidasProductoList.get(bebidaNumero));
-			bebidaNumero=bebidaNumero-1;
+			if (bebidaNumero > 3 && orientalNumero > 3) {
 
+				productosRandom.add(bebidasProductoList.get(bebidaNumero));
+				bebidaNumero = bebidaNumero - 1;
+				productosRandom.add(bebidasProductoList.get(bebidaNumero));
+				bebidaNumero = bebidaNumero - 1;
+				productosRandom.add(bebidasProductoList.get(bebidaNumero));
+				bebidaNumero = bebidaNumero - 1;
 
-			//productosRandom.add(orientalProductoList.get(orientalNumero / 3));
-			//orientalProductoList.remove(orientalProductoList.get(orientalNumero / 3));
-		
-			if(0==bebidaNumero%3) {
+				// productosRandom.add(orientalProductoList.get(orientalNumero / 3));
+				// orientalProductoList.remove(orientalProductoList.get(orientalNumero / 3));
 
-				productosRandom.addAll(chivitoProductoList);
+				if (0 == bebidaNumero % 3) {
+
+					productosRandom.addAll(chivitoProductoList);
+				}
+				if (0 == bebidaNumero % 5) {
+
+					productosRandom.addAll(empanadasProductoList);
+				}
+
+				if (0 == bebidaNumero % 7) {
+
+					productosRandom.addAll(pizzaProductoList);
+				}
+
+				if (0 == bebidaNumero % 2) {
+
+					productosRandom.addAll(burguerStringProductoList);
+				}
+
+				if (bebidaNumero < 7) {
+					productosRandom.add(orientalProductoList.get(orientalNumero));
+					orientalNumero = orientalNumero - 1;
+					productosRandom.add(orientalProductoList.get(orientalNumero));
+					orientalNumero = orientalNumero - 1;
+				}
+
+			} else {
+				productosRandom.add(p);
+				productosRandom.add(p1);
+				productosRandom.add(p2);
 			}
-			if(0==bebidaNumero%5) {
 
-				productosRandom.addAll(empanadasProductoList);
-			}
-			
-			if(0==bebidaNumero%7) {
+			for (Producto pr : productosRandom) {
+				try {
+					pr.setNombre(pr.getNombre());
 
-				productosRandom.addAll(pizzaProductoList);
+					altaMenu(pr, restau.getMail());
+				} catch (ProductoException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
-			
-			if(0==bebidaNumero%2) {
+			/*
+			 * Set<Categoria> categoriaRandom = new HashSet<Categoria>(); for(Producto prod:
+			 * productosRandom) { //prod.setRestaurante(r);
+			 * categoriaRandom.add(prod.getCategoria()); }
+			 */
 
-				productosRandom.addAll(burguerStringProductoList);
-			}
-			
-			
-			if(bebidaNumero<7) {
-				productosRandom.add(orientalProductoList.get(orientalNumero));
-				orientalNumero=orientalNumero-1;
-				productosRandom.add(orientalProductoList.get(orientalNumero));
-				orientalNumero=orientalNumero-1;
-			}
-		
-		
-		}else {
-			productosRandom.add(p);
-			productosRandom.add(p1);
-			productosRandom.add(p2);
+			// guardar resto
+
 		}
-
-			
-
-			
-			
-			
-			for(Producto pr: productosRandom) {
-			try {
-				pr.setNombre(pr.getNombre());
-
-				altaMenu(pr, restau.getMail());
-			} catch (ProductoException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			}
-/*
-			Set<Categoria> categoriaRandom = new HashSet<Categoria>();
-			for(Producto prod: productosRandom) {
-				//prod.setRestaurante(r);
-				categoriaRandom.add(prod.getCategoria());
-			}*/
-			
-			//guardar resto
-		
-			
-		}
-		
-
-
 
 	}
-	
+
 	@Override
 	public void cargarDatos2() {
-		Double lat=-34.9128;
-		Double lon= -56.1886;
+		Double lat = -34.9128;
+		Double lon = -56.1886;
 		String dirString = "Andes 1180,Prof. Bacigalupi 2244,Jaime Cibils 2878,Durazno 2116 entre Salterain y Requena,Cabo Polonio 2107,Lucas Obes 896,Pedro Fco. Berro 773 esq.Jaime Zudánez (Pocitos),8 de Octubre 2619,Av. Lezica 5831 casi Yegros,Mataojo 1862,Grecia 3194 y México,Av. Américo Ricaldoni 2804,Francisco Echagoyen 4949,8 de Octubre 3390, esquina Propios,Av. Arocena 1919,Gil 1065,Fernández Crespo 2274,Av. Millán 3898,20 de Febrero 2510 ,Ledo Arroyo Torres s/n casi Hernani,Enriqueta Compte y Riqué 1287,28 de Febrero 1097, esq. Elías Regules,Presbítero José Barrales 2500,Camino Maldonado 81201, Ruta 8 Km 16.800,Dr. Joaquín Requena 3010,18 de Julio 2205 esq. Alejandro Beisso,Bulevar España 2772, Esquina Ellauri,Blandengues 2020 esq.Constitución,José Batlle y Ordoñez 1401 esq. Rivera,18 de Diciembre 1600,Carlos Roxlo 1611, esquina Paysandú,Ana María Rubens 2324 esq. Camino Carrasco,18 de Julio 2205 esq. Alejandro Beisso,José Enrique Rodó 1875 casi Eduardo Acevedo,Camino Castro 711,Vasconcellos s/n esq. Osvaldo Cruz,Ruperto Pérez Martínez 882 ,Matilde Pacheco 4160,Andes 1180,Prof. Bacigalupi 2244,Jaime Cibils 2878,Durazno 2116 entre Salterain y Requena,Cabo Polonio 2107,Lucas Obes 896,Pedro Fco. Berro 773 esq.Jaime Zudánez (Pocitos),8 de Octubre 2619,Av. Lezica 5831 casi Yegros,Mataojo 1862,Grecia 3194 y México,Av. Américo Ricaldoni 2804,Francisco Echagoyen 4949,8 de Octubre 3390, esquina Propios,Av. Arocena 1919,Gil 1065,Fernández Crespo 2274,Av. Millán 3898,20 de Febrero 2510 ,Ledo Arroyo Torres s/n casi Hernani,Enriqueta Compte y Riqué 1287,28 de Febrero 1097, esq. Elías Regules,Presbítero José Barrales 2500,Camino Maldonado 81201, Ruta 8 Km 16.800,Dr. Joaquín Requena 3010,18 de Julio 2205 esq. Alejandro Beisso,Bulevar España 2772, Esquina Ellauri,Blandengues 2020 esq.Constitución,José Batlle y Ordoñez 1401 esq. Rivera";
 		List<String> direccionesList = Arrays.asList(dirString.split(","));
-		
-		
+
 		// RESTAURANTES
 		String restoString = "La Pasiva,Sushi Go,La Taberna del Diablo,Burger King,Empanadas Mafalda,Il Mondo della Pizza,Fans,D' La Ribera,El Hornito,Grido,Tiqui Taca,Don Koto,Empanadas La Barca,Heladería Las Delicias,Pizza Trouville,Pizza Piedra,Pizzería Rodelú,Grazie Italia,Subway,Food & Love,La Isla,Soprano's,Chiviteria Marcos,Pizzería Cervantes,Sushiapp,Felipe,Chivipizza,El Club de la Papa Frita,OMG Fried Chicken,Cremona - Dicomo Pasta,Premium,Fábrica de Pastas La Bolognesa,Freddo,Lehmeyun 100%,La Roca,El Noble,Fellini,Artico,Barbacoa,Billie Joe,Gelateria del Club,Los Tavarez,Pizzeria Papa Jorge,Sushi Time,Pastas Baccino,Sinestesia,Crêpas,Tropical Smoothies,Chajá Bistro,San Roque,McDonald's,Chesterhouse,La Cigale,Homeopatía Alemana,Supermercados,Farmacias,Farmashop,Nescafé Dolce Gusto,Crepez,I love Tacos,Porto Vanila,Laika,Heladería La Chicharra,Iberpark,Farmacia El Tunel,Chéntola Gelato Artesanal,Sbarro,Fabric Sushi,Al Dente Pastas Artesanales,Del Abuelo Helados Artesanales,Alberto's,Cuidate - Comida Saludable,El Horno de Juan,El Novillo Alegre,Heladería Facal,Hoy te Quiero,Asian Food,Mimoso Resto Bar,Donut City,Hong Kong - Comida China,Mr. Kebap's,Veggie Mafalda,Rudy,Pizza Club,Pizza's House,Axion,Ciudad Aventura,Tomato Gourmet,Futuro Refuerzos,Pizzabrossa,Mascotas,Devoto,Poked,Noah's,The Lab Coffee,26 Sushi,Sabores,The Paletas Factory,La Vienesa,Paparike,Magnum,La Chacha Empanadas,Mise en place,Bar La Cruz,Lehmeyun Pizza Turca Armenia,Almacén de Pizzas,BIGA - Pizza y Pasta,II Gufo,Heladeria Pecas,Gaucho Burger,Emporio Gastronómico,Chivitos lo de Pepe,Facal,La Boletería,Burger Club,McCafé - McDonald's,Green To Go,Flores,Miyagi Sushi,Cafeterías,Pizza Mania,Bebidas,Bao bao,Tiendas,Wing It";
 		List<String> restaurantesList = Arrays.asList(restoString.split(","));
-		
-				//////////////// clientes//////////////////////
+
+		//////////////// clientes//////////////////////
 		String clienteString = "Hernandez Monterroza,Adriana Marcela Rey Sanchez,Alejandro Abondano Acevedo,Alexander Carvajal Vargas,Andrea Catalina Acero Caro,Andrea Liliana Cruz Garcia,Andres Felipe Villa Monroy,Angela Patricia Mahecha Pineros,Angelica Lisseth Blanco Concha,Angelica Maria Rocha Garcia,Angie Tatiana FernÁNdez MartÍNez,Brigite Polanco Ruiz,Camilo Villamizar Aristizabal,Camilo RodrÍGuez Botero,Camilo Alberto CortÉS Montejo,Camilo Enrique Gomez Rodriguez,Carlos AndrÉS Polo Castellanos,Carlos Didier CastaÑO Contreras,Carlos Felipe MogollÓN PachÓN,Carol Ruchina Gomez Gianine,Carol Ruchina Gomez Gianine,Carolina Pintor Pinzon,Catherine Ospina Alfonso,Cinthya Fernanda DussÁN GuzmÁN,Claudia Liliana Torres Frias,Cristina Elizabeth Barthel Guardiola,Daniel GÓMez Delgado,Daniel AndrÉS Castiblanco Salgado,Daniela HernÁNdez Bravo,Daniela HernÁNdez Bravo,Daniela GuzmÁN,Daniela Katherinne Suarique ÁVila,Daniella Puerto Navia,Deny Marcela MuÑOz Lizarazo,Diana Carolina Lopez Rodriguez,Diana Catalina Diaz Beltran,Diego Alejandro Forero PeÑA,Estewil Carlos Quesada CalderÍN,Estewil Carlos Quesada CalderÍN,Fabian Andres Fino Andrade,Gabriel Felipe Herrera Moreno,Gabriel Mauricio Nieto Bustos,Gabriel Mauricio Nieto Bustos,Gloria Patricia Mendoza Alvear,Hugo AndrÉS Camargo Vargas,Ingrid Rocio Guerrero Penagos,IvÁN David Coral Burbano,Ivonne Jouliette Barrera Lopez,Jenny Fernanda SÁNchez Arenas,Jenny Viviana Moncaleano Preciado,Jorge Esteban Rey Botero,Jorge Mario Orozco DussÁN,Jorge Mario Orozco DussÁN,Jose Guillermo Marin Zubieta,Juan Camilo Ortega PeÑA,Juan Camilo Jimenez Cortes,Juan Camilo Jimenez Cortes,Juan Esteban Lanao SÁNchez,Juan Fernando Barjuch Moreno,Juan Sebastian Romero Escobar,Juan Sebastian Tarquino Acosta,Juan Sebastian Sanchez Sanchez,JuliÁN Romero Montoya,Julian Leonardo Sanchez Prada,Juliana Gaviria Garcia,July Catherine Gonzalez Suarez,Karen Eliana HernÁNdez Pulido,Laura Diaz Mejia,Laura Camila Puerto Castro,Laura Catalina Varon Buitrago,Laura Fernanda RodrÍGuez Torres,Laura Fernanda RodrÍGuez Torres,Laura Natalia Novoa Gomez,Laura Viviana Del RÍO Ayerbe,Leonardo AndrÉS DueÑAs Rojas,Lina MarÍA ZÚÑIga RamÍRez,Liseth Tatiana Sierra Villamil,Liseth Tatiana Sierra Villamil,Luisa Fernanda GarcÍA Fonnegra,Luisa Fernanda GarcÍA Fonnegra,Marcela Garcia Rueda,Maria Alejandra BolÍVar Galeano,Maria Alejandra Horta Ochoa,MarÍA AngÉLica BeltrÁN Castillo,MarÍA Camila Guacas JimÉNez,Maria Camila Nieto Bustos,Maria JosÉ GarcÍA Mora,Maria JosÉ GarcÍA Mora,Maria Margarita Perez Moreno,Maria Margarita Perez Moreno,Maria Natalia Cervantes Luna,Mariana Del Pilar Santos Milachay,Mario Fernando GarzÓN MuÑOz,MÓNica Alexandra Camacho Amaya,MÓNica Natalia Camargo Mendoza,Natalia Buitrago Contreras,Natalia Puentes Perdomo,Natalia Andrea GutiÉRrez Velasco,Natalia Melissa Barrero Forero,Natalia Vivy Casas PÁEz,Olga Stephannia Saman Jimenez,Olga Viviana Ovalle Solano,Oscar Fabian Castellanos Rojas,Oscar David Colmenares Barbudo,Oscar Julian Ulloa Orjuela,Pablo Uribe Antia,Paola Andrea Correa Larios,Rafael Alejandro Gonzalez Rojas,Rafael Andres Alvarez Castillo,Rafael Andres Alvarez Castillo,Ricardo Vega Zambrano,Ricardo Vega Zambrano,Sandra Ximena GarcÉS Parra,Sebastian Borda Melguizo,SebastiÁN Iregui Galeano,Yiriam Liliam Ochoa Sabogal,Yiriam Liliam Ochoa Sabogal,Yurany Catalina Cifuentes Mendez,Yuri Catalina Salazar Aristizabal";
 		List<String> clientesList = Arrays.asList(clienteString.split(","));
 
@@ -1081,17 +1042,12 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			try {
 
 				Double rand = (Double) (Math.random() * 1);
-				Double latitud = BigDecimal.valueOf(lat+rand)
-					    .setScale(4, RoundingMode.HALF_UP)
-					    .doubleValue();
-				Double longitud = BigDecimal.valueOf(lon+rand)
-					    .setScale(4, RoundingMode.HALF_UP)
-					    .doubleValue();
-				
-				GeoLocalizacion GeoCliente= new GeoLocalizacion(latitud,longitud);
-				
+				Double latitud = BigDecimal.valueOf(lat + rand).setScale(4, RoundingMode.HALF_UP).doubleValue();
+				Double longitud = BigDecimal.valueOf(lon + rand).setScale(4, RoundingMode.HALF_UP).doubleValue();
 
-				Integer dir = (int) (Math.random() * direccionesList.size()-1);
+				GeoLocalizacion GeoCliente = new GeoLocalizacion(latitud, longitud);
+
+				Integer dir = (int) (Math.random() * direccionesList.size() - 1);
 				Integer telefono = (int) (Math.random() * 99999999 + 1);
 				Integer numero = (int) (Math.random() * 99 + 1);
 				Integer fotoRandom = (int) (Math.random() * fotosClientesList.size());
@@ -1099,47 +1055,44 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 						c.replace(" ", "").toLowerCase() + "@" + c.replace(" ", "").toLowerCase() + ".com", "123456",
 						telefono.toString(), fotosClientesList.get(fotoRandom), false, true, null,
 						c.split(" ")[0] + c.split(" ")[1] + numero, null, null, c.split(" ")[0], c.split(" ")[1], null);
-				Direccion direccion= new Direccion();
+				Direccion direccion = new Direccion();
 				direccion.setCalleNro(direccionesList.get(dir));
 				direccion.setCliente(cliente);
 				direccion.setGeoLocalizacion(GeoCliente);
 				cliente.addDireccion(direccion);
 				try {
-					
-				crearCliente(cliente);
-				}catch(Exception e) {
-					
-				}
-				
-						
-		////////////pedidos///////////////////
 
-		Integer randomR = (int) (Math.random() * 21);
-		String mailREsto= restaurantesList.get(randomR).toLowerCase().replace(" ", "") + "@" + restaurantesList.get(randomR).toLowerCase().replace(" ", "") + ".com";
-		Optional<Restaurante> resOp =resRepo.findById(mailREsto);
-		Optional<Cliente> cli =userRepo.findById(cliente.getMail());
-		if(cli.isPresent() && resOp.isPresent() && resOp.get().getActivo() && !resOp.get().getBloqueado()) {
-			try {
-			clienteService.agregarACarrito(resOp.get().getProductos().get(0).getId(), 3, cliente.getMail(), resOp.get().getMail());
-			DTCarrito carrito= clienteService.verCarrito(cliente.getMail());
-			clienteService.altaPedido((int) carrito.getId(), EnumMetodoDePago.EFECTIVO, cli.get().getDirecciones().get(0).getId(), cliente.getMail(), "Muero de hambre");
-			}catch(Exception e) {
-				
-			}
-		}
-		
-		
-		
+					crearCliente(cliente);
+				} catch (Exception e) {
+
+				}
+
+				//////////// pedidos///////////////////
+
+				Integer randomR = (int) (Math.random() * 21);
+				String mailREsto = restaurantesList.get(randomR).toLowerCase().replace(" ", "") + "@"
+						+ restaurantesList.get(randomR).toLowerCase().replace(" ", "") + ".com";
+				Optional<Restaurante> resOp = resRepo.findById(mailREsto);
+				Optional<Cliente> cli = userRepo.findById(cliente.getMail());
+				if (cli.isPresent() && resOp.isPresent() && resOp.get().getActivo() && !resOp.get().getBloqueado()) {
+					try {
+						clienteService.agregarACarrito(resOp.get().getProductos().get(0).getId(), 3, cliente.getMail(),
+								resOp.get().getMail());
+						DTCarrito carrito = clienteService.verCarrito(cliente.getMail());
+						clienteService.altaPedido((int) carrito.getId(), EnumMetodoDePago.EFECTIVO,
+								cli.get().getDirecciones().get(0).getId(), cliente.getMail(), "Muero de hambre");
+					} catch (Exception e) {
+
+					}
+				}
+
 			} catch (Exception e) {
 				System.out.print(e.toString());
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		
-		
-		
-		
+
 	}
 
 	private DTRespuesta crearRestaurantesDePrueba(Restaurante rest) throws RestauranteException, CategoriaException {
@@ -1173,7 +1126,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		rest.setFechaCreacion(LocalDate.now());
 		// rest.setEstado(EnumEstadoRestaurante.EN_ESPERA);
 		// rest.setFechaApertura(null);
-		//rest.setProductos(null);
+		// rest.setProductos(null);
 //		rest.setReclamos(null);
 //		rest.setPedidos(null);
 		LocalTime maximo = LocalTime.of(0, 50, 0);
@@ -1191,7 +1144,6 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		System.out.println(rest.toString());
 		System.out.println(rest.toString());
 		System.out.println(rest.toString());
-
 
 		restauranteRepo.save(rest);
 		return new DTRespuesta("Restaurante " + rest.getNombre() + " dado de alta correctamente.");
@@ -1224,44 +1176,47 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	private boolean emailExist(String mail) {
 		return userRepo.findById(mail).isPresent();
 	}
-	
+
 	@Override
 	public void corregirDatos() {
 		String restoString = "La Pasiva,Sushi Go,La Taberna del Diablo,Burger King,Empanadas Mafalda,Il Mondo della Pizza,Fans,D' La Ribera,El Hornito,Grido,Tiqui Taca,Don Koto,Empanadas La Barca,Heladería Las Delicias,Pizza Trouville,Pizza Piedra,Pizzería Rodelú,Grazie Italia,Subway,Food & Love,La Isla,Soprano's,Chiviteria Marcos,Pizzería Cervantes,Sushiapp,Felipe,Chivipizza,El Club de la Papa Frita,OMG Fried Chicken,Cremona - Dicomo Pasta,Premium,Fábrica de Pastas La Bolognesa,Freddo,Lehmeyun 100%,La Roca,El Noble,Fellini,Artico,Barbacoa,Billie Joe,Gelateria del Club,Los Tavarez,Pizzeria Papa Jorge,Sushi Time,Pastas Baccino,Sinestesia,Crêpas,Tropical Smoothies,Chajá Bistro,San Roque,McDonald's,Chesterhouse,La Cigale,Homeopatía Alemana,Supermercados,Farmacias,Farmashop,Nescafé Dolce Gusto,Crepez,I love Tacos,Porto Vanila,Laika,Heladería La Chicharra,Iberpark,Farmacia El Tunel,Chéntola Gelato Artesanal,Sbarro,Fabric Sushi,Al Dente Pastas Artesanales,Del Abuelo Helados Artesanales,Alberto's,Cuidate - Comida Saludable,El Horno de Juan,El Novillo Alegre,Heladería Facal,Hoy te Quiero,Asian Food,Mimoso Resto Bar,Donut City,Hong Kong - Comida China,Mr. Kebap's,Veggie Mafalda,Rudy,Pizza Club,Pizza's House,Axion,Ciudad Aventura,Tomato Gourmet,Futuro Refuerzos,Pizzabrossa,Mascotas,Devoto,Poked,Noah's,The Lab Coffee,26 Sushi,Sabores,The Paletas Factory,La Vienesa,Paparike,Magnum,La Chacha Empanadas,Mise en place,Bar La Cruz,Lehmeyun Pizza Turca Armenia,Almacén de Pizzas,BIGA - Pizza y Pasta,II Gufo,Heladeria Pecas,Gaucho Burger,Emporio Gastronómico,Chivitos lo de Pepe,Facal,La Boletería,Burger Club,McCafé - McDonald's,Green To Go,Flores,Miyagi Sushi,Cafeterías,Pizza Mania,Bebidas,Bao bao,Tiendas,Wing It";
 		List<String> restaurantesList = Arrays.asList(restoString.split(","));
-		
-		//fotos restaurante
+
+		// fotos restaurante
 		String fotosRString = "https://www.alacarta.com.uy/wp-content/uploads/2021/09/alacarta-restaurante-adorado-01-300x160.jpg,https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT4BL01pRdMb4Fh3Urp-QVU6Vd8OcXeuaSPHFrdJxMohPsxwt3XaMTOjgyHGO0syh6pKf0&usqp=CAU,https://media-cdn.tripadvisor.com/media/photo-s/11/23/53/c4/img-20171031-144058-largejpg.jpg,https://media-cdn.tripadvisor.com/media/photo-s/0d/38/b5/d4/outdoor-seating.jpg,https://media-cdn.tripadvisor.com/media/photo-p/17/ff/4e/1c/terrasse.jpg,https://media-cdn.tripadvisor.com/media/photo-s/12/dd/a6/cf/doble-v.jpg,https://media-cdn.tripadvisor.com/media/photo-p/1a/d9/1b/c7/photo0jpg.jpg,https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRc2btjCzipIQA0d3Pp4s22KIf5P0XDlbd5A&usqp=CAU,https://www.estudiomontevideo.com/wp-content/uploads/2018/08/010917-KANTINE-AC-ph-G-Viramonte-1015.jpg,https://media-cdn.tripadvisor.com/media/photo-s/16/26/0a/22/restaurant.jpg,https://media-cdn.tripadvisor.com/media/photo-s/0d/a8/5b/78/demode.jpg";
 		List<String> fotosRestaurante = Arrays.asList(fotosRString.split(","));
 
-		Double lat=-34.9128;
-		Double lon= -56.1886;
+		Double lat = -34.9128;
+		Double lon = -56.1886;
 		for (String resto : restaurantesList) {
-			Optional<Restaurante> rop=restauranteRepo.findById(resto.replace(" ", "") + "@" + resto.replace(" ", "") + ".com");
-			if(rop.isPresent()) {
-				GeoLocalizacion geo= new GeoLocalizacion();
-				
+			Optional<Restaurante> rop = restauranteRepo
+					.findById(resto.replace(" ", "") + "@" + resto.replace(" ", "") + ".com");
+			if (rop.isPresent()) {
+				GeoLocalizacion geo = new GeoLocalizacion();
+
 				geo.setLatitud(lat);
 				geo.setLongitud(lon);
-				Restaurante restaurante=rop.get();
+				Restaurante restaurante = rop.get();
 				restaurante.setGeoLocalizacion(geo);
 				restauranteRepo.save(restaurante);
-			lat=lat+1;
-			lon=lon+1;
+				lat = lat + 1;
+				lon = lon + 1;
 			}
 		}
 	}
-	
-	//Uso esta funcion tanto para consultarCalificacionRestaurante como clienteConsultaCalificacionRestaurante
+
+	// Uso esta funcion tanto para consultarCalificacionRestaurante como
+	// clienteConsultaCalificacionRestaurante
 	@Override
-	public Map<String, Object> consultarCalificacion(int page, int size, String sort, int order, String mailRestaurante) throws RestauranteException {
+	public Map<String, Object> consultarCalificacion(int page, int size, String sort, int order, String mailRestaurante)
+			throws RestauranteException {
 		Map<String, Object> response = new HashMap<>();
 		List<DTCalificacionRestaurante> DTCalificacionesRestaurante = new ArrayList<DTCalificacionRestaurante>();
 		List<CalificacionRestaurante> calificacionRestaurantes = new ArrayList<CalificacionRestaurante>();
 
 		Sort sorting;
 		Pageable paging;
-		
+
 		if (!sort.equalsIgnoreCase("")) {
 			if (order == 1) {
 				sorting = Sort.by(Sort.Order.desc(sort));
@@ -1272,56 +1227,58 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		} else {
 			paging = PageRequest.of(page, size);
 		}
-		
+
 		Optional<Restaurante> optionalRestaurante = restauranteRepo.findById(mailRestaurante);
 		Restaurante restaurante = optionalRestaurante.get();
-		
+
 		Page<CalificacionRestaurante> pageCalificacion;
 		pageCalificacion = calRestauranteRepo.consultarCalificacion(restaurante, paging);
 		calificacionRestaurantes = pageCalificacion.getContent();
 		int pagina = pageCalificacion.getNumber();
 		long totalElements = pageCalificacion.getTotalElements();
-		
+
 		for (CalificacionRestaurante c : calificacionRestaurantes) {
 			DTCalificacionesRestaurante.add(new DTCalificacionRestaurante(c));
 		}
-		
+
 		response.put("currentPage", pagina);
 		response.put("totalItems", totalElements);
 		response.put("restaurantes", DTCalificacionesRestaurante);
 
 		return response;
 	}
-	
+
 	@Override
 	public DTRespuesta registrarPago(int idPedido) {
-		MongoClientURI uri = new MongoClientURI("mongodb+srv://grupo1:grupo1@cluster0.l17sm.mongodb.net/prueba-concepto");
+		MongoClientURI uri = new MongoClientURI(
+				"mongodb+srv://grupo1:grupo1@cluster0.l17sm.mongodb.net/prueba-concepto");
 		MongoClient mongoClient = new MongoClient(uri);
 		MongoDatabase dataBase = mongoClient.getDatabase("prueba-concepto");
 		MongoCollection<Document> collectionCarrito = dataBase.getCollection("carrito");
-		
+
 		Optional<Pedido> optionalPedido = pedidoRepo.findById(idPedido);
 		Pedido pedido = optionalPedido.get();
 		if (pedido.getMetodoDePago().equals(EnumMetodoDePago.EFECTIVO)) {
 			pedido.setPago(true);
 			pedidoRepo.save(pedido);
 		}
-		
-		//Document buscado = (Document) collectionPedidos.find(new Document("_id", idPedido)).first();
-		//String idProducto = buscado.getString("productoCarrito");
-		
-		//Obtengo la informacion de los productos pedidos de un carrito
+
+		// Document buscado = (Document) collectionPedidos.find(new Document("_id",
+		// idPedido)).first();
+		// String idProducto = buscado.getString("productoCarrito");
+
+		// Obtengo la informacion de los productos pedidos de un carrito
 		Document carritoBuscado = collectionCarrito.find(new Document("_id", pedido.getCarrito())).first();
 		List<BasicDBObject> listaDBObject = (List<BasicDBObject>) carritoBuscado.get("productoCarrito");
-		
+
 		Document carritoDocument;
 		Document productoDocument;
-		
+
 		String idProducto;
 		String cantidad;
 		String categoria;
 		String fecha;
-		
+
 		for (Object obj : listaDBObject) {
 			carritoDocument = (Document) obj;
 			cantidad = carritoDocument.get("cantidad").toString();
@@ -1329,36 +1286,36 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			idProducto = productoDocument.get("_id").toString();
 			categoria = productoDocument.getString("categoria");
 			fecha = pedido.getFecha().toString();
-			
+
 			ventaProducto(idProducto, cantidad, categoria, fecha);
 		}
-		
+
 		return new DTRespuesta("Pago registrado con éxito.");
 	}
-	
+
 	@Override
 	public void ventaProducto(String idProducto, String cantidad, String categoria, String fecha) {
-		MongoClientURI uri = new MongoClientURI("mongodb+srv://grupo1:grupo1@cluster0.l17sm.mongodb.net/prueba-concepto");
+		MongoClientURI uri = new MongoClientURI(
+				"mongodb+srv://grupo1:grupo1@cluster0.l17sm.mongodb.net/prueba-concepto");
 		MongoClient mongoClient = new MongoClient(uri);
 		MongoDatabase dataBase = mongoClient.getDatabase("prueba-concepto");
 		MongoCollection<Document> collectionPedidos = dataBase.getCollection("pedidos");
-		
+
 		Document document = new Document();
-		
+
 		document.put("idProducto", idProducto);
 		document.put("cantidad", cantidad);
 		document.put("categoria", categoria);
 		document.put("fecha", fecha);
 		collectionPedidos.insertOne(document);
 	}
-	
+
 	@Override
 	public DTRespuesta devolucionPedido(Pedido pedido) {
-		Pedido devolucion = new Pedido(pedido.getFecha(), pedido.getCostoTotal()*-1, pedido.getEstadoPedido(), 
-				pedido.getMetodoDePago(), pedido.getCarrito(), pedido.getDireccion(), 
-				pedido.getRestaurante(), pedido.getCliente(), pedido.getComentario(), 
-				pedido.getPago());
-		
+		Pedido devolucion = new Pedido(pedido.getFecha(), pedido.getCostoTotal() * -1, pedido.getEstadoPedido(),
+				pedido.getMetodoDePago(), pedido.getCarrito(), pedido.getDireccion(), pedido.getRestaurante(),
+				pedido.getCliente(), pedido.getComentario(), pedido.getPago());
+
 		pedidoRepo.save(devolucion);
 		return new DTRespuesta("Devolucion registrada con éxito.");
 	}

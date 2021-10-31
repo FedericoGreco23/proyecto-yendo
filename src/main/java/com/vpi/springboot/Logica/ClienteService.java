@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import com.vpi.springboot.IdCompuestas.CalificacionRestauranteId;
 import com.vpi.springboot.Modelo.Calificacion;
+import com.vpi.springboot.Modelo.CalificacionCliente;
 import com.vpi.springboot.Modelo.CalificacionRestaurante;
 import com.vpi.springboot.Modelo.Carrito;
 import com.vpi.springboot.Modelo.Cliente;
@@ -38,6 +39,7 @@ import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.TokenVerificacion;
 import com.vpi.springboot.Modelo.LastDireccioClientenMongo;
 import com.vpi.springboot.Modelo.Pedido;
+import com.vpi.springboot.Modelo.dto.DTCalificacionRestaurante;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTCliente;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
@@ -50,6 +52,7 @@ import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoReclamo;
 import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
+import com.vpi.springboot.Repositorios.CalificacionClienteRepositorio;
 import com.vpi.springboot.Repositorios.CalificacionRestauranteRepositorio;
 import com.vpi.springboot.Repositorios.ClienteRepositorio;
 import com.vpi.springboot.Repositorios.DireccionRepositorio;
@@ -97,13 +100,15 @@ public class ClienteService implements ClienteServicioInterfaz {
 	@Autowired
 	private CalificacionRestauranteRepositorio calRestauranteRepo;
 	@Autowired
+	private CalificacionClienteRepositorio calClienteRepo;
+	@Autowired
 	private ReclamoRepositorio recRepo;
 	@Autowired
 	private VerificacionRepositorio tokenRepo;
 	@Autowired
-	private NextSequenceService nextSequence;
-	@Autowired
 	private UltimaDireccionRepositorio ultimaDireccionRepo;
+	@Autowired
+	private NextSequenceService nextSequence;
 	@Autowired
 	private SimpMessagingTemplate simpMessagingTemplate;
 	@Autowired
@@ -115,66 +120,47 @@ public class ClienteService implements ClienteServicioInterfaz {
 		return "<html>\r\n"
 				+ "<body style=\"background-color: #f4f4f4; margin: 0 !important; padding: 0 !important;\">\r\n"
 				+ "    <div style=\"display: none; font-size: 1px; color: #fefefe; line-height: 1px; font-family: 'Lato', Helvetica, Arial, sans-serif; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden;\"> We're thrilled to have you here! Get ready to dive into your new account. </div>\r\n"
-				+ "    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">\r\n"
-				+ "        <tr>\r\n"
+				+ "    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">\r\n" + "        <tr>\r\n"
 				+ "            <td bgcolor=\"#FFA73B\" align=\"center\">\r\n"
 				+ "                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 600px;\">\r\n"
 				+ "                    <tr>\r\n"
 				+ "                        <td align=\"center\" valign=\"top\" style=\"padding: 40px 10px 40px 10px;\"> </td>\r\n"
-				+ "                    </tr>\r\n"
-				+ "                </table>\r\n"
-				+ "            </td>\r\n"
-				+ "        </tr>\r\n"
-				+ "        <tr>\r\n"
+				+ "                    </tr>\r\n" + "                </table>\r\n" + "            </td>\r\n"
+				+ "        </tr>\r\n" + "        <tr>\r\n"
 				+ "            <td bgcolor=\"#FFA73B\" align=\"center\" style=\"padding: 0px 10px 0px 10px;\">\r\n"
 				+ "                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 600px;\">\r\n"
 				+ "                    <tr>\r\n"
 				+ "                        <td bgcolor=\"#ffffff\" align=\"center\" valign=\"top\" style=\"padding: 40px 20px 20px 20px; border-radius: 4px 4px 0px 0px; color: #111111; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 48px; font-weight: 400; letter-spacing: 4px; line-height: 48px;\">\r\n"
 				+ "                            <h1 style=\"font-size: 48px; font-weight: 400; margin: 2;\">¡Bienvenido a Yendo!</h1>\r\n"
-				+ "                        </td>\r\n"
-				+ "                    </tr>\r\n"
-				+ "                </table>\r\n"
-				+ "            </td>\r\n"
-				+ "        </tr>\r\n"
-				+ "        <tr>\r\n"
+				+ "                        </td>\r\n" + "                    </tr>\r\n" + "                </table>\r\n"
+				+ "            </td>\r\n" + "        </tr>\r\n" + "        <tr>\r\n"
 				+ "            <td bgcolor=\"#f4f4f4\" align=\"center\" style=\"padding: 0px 10px 0px 10px;\">\r\n"
 				+ "                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 600px;\">\r\n"
 				+ "                    <tr>\r\n"
 				+ "                        <td bgcolor=\"#ffffff\" align=\"left\" style=\"padding: 20px 30px 40px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;\">\r\n"
 				+ "                            <p style=\"margin: 0;\">Para poder comenzar a usar nuestros servicios, por favor verifique su cuenta.</p>\r\n"
-				+ "                        </td>\r\n"
-				+ "                    </tr>\r\n"
-				+ "                    <tr>\r\n"
+				+ "                        </td>\r\n" + "                    </tr>\r\n" + "                    <tr>\r\n"
 				+ "                        <td bgcolor=\"#ffffff\" align=\"left\">\r\n"
 				+ "                            <table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\r\n"
 				+ "                                <tr>\r\n"
 				+ "                                    <td bgcolor=\"#ffffff\" align=\"center\" style=\"padding: 20px 30px 60px 30px;\">\r\n"
 				+ "                                        <table border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\r\n"
 				+ "                                            <tr>\r\n"
-				+ "                                                <td align=\"center\" style=\"border-radius: 3px;\" bgcolor=\"#FFA73B\"><a href=\"" + link + "\" target=\"\" style=\"font-size: 20px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; color: #ffffff; text-decoration: none; padding: 15px 25px; border-radius: 2px; border: 1px solid #FFA73B; display: inline-block;\">Confirmar Cuenta</a></td>\r\n"
+				+ "                                                <td align=\"center\" style=\"border-radius: 3px;\" bgcolor=\"#FFA73B\"><a href=\""
+				+ link
+				+ "\" target=\"\" style=\"font-size: 20px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; color: #ffffff; text-decoration: none; padding: 15px 25px; border-radius: 2px; border: 1px solid #FFA73B; display: inline-block;\">Confirmar Cuenta</a></td>\r\n"
 				+ "                                            </tr>\r\n"
 				+ "                                        </table>\r\n"
-				+ "                                    </td>\r\n"
-				+ "                                </tr>\r\n"
-				+ "                            </table>\r\n"
-				+ "                        </td>\r\n"
-				+ "                    </tr>\r\n"
-				+ "                    <tr>\r\n"
+				+ "                                    </td>\r\n" + "                                </tr>\r\n"
+				+ "                            </table>\r\n" + "                        </td>\r\n"
+				+ "                    </tr>\r\n" + "                    <tr>\r\n"
 				+ "                        <td bgcolor=\"#ffffff\" align=\"left\" style=\"padding: 0px 30px 20px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;\">\r\n"
 				+ "                            <p style=\"margin: 0;\">En caso de tener alguna consulta, por favor acudir a nuestro centro de atención al cliente.</p>\r\n"
-				+ "                        </td>\r\n"
-				+ "                    </tr>\r\n"
-				+ "                    <tr>\r\n"
+				+ "                        </td>\r\n" + "                    </tr>\r\n" + "                    <tr>\r\n"
 				+ "                        <td bgcolor=\"#ffffff\" align=\"left\" style=\"padding: 0px 30px 40px 30px; border-radius: 0px 0px 4px 4px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;\">\r\n"
 				+ "                            <p style=\"margin: 0;\">Saludos,<br> Yendo team</p>\r\n"
-				+ "                        </td>\r\n"
-				+ "                    </tr>\r\n"
-				+ "                </table>\r\n"
-				+ "            </td>\r\n"
-				+ "        </tr>\r\n"
-				+ "    </table>\r\n"
-				+ "</body>\r\n"
-				+ "</html>";
+				+ "                        </td>\r\n" + "                    </tr>\r\n" + "                </table>\r\n"
+				+ "            </td>\r\n" + "        </tr>\r\n" + "    </table>\r\n" + "</body>\r\n" + "</html>";
 	}
 
 	@Override
@@ -768,5 +754,24 @@ public class ClienteService implements ClienteServicioInterfaz {
 		}
 
 		return DTpedido;
+	}
+
+	public DTCalificacionRestaurante getCalificacionRestaurante(String mailCliente, String mailRestaurante)
+			throws UsuarioException, RestauranteException {
+		Optional<Cliente> optionalCliente = userRepo.findById(mailCliente);
+		if (!optionalCliente.isPresent())
+			throw new UsuarioException(UsuarioException.NotFoundException(mailCliente));
+		Cliente cliente = optionalCliente.get();
+		
+		Optional<Restaurante> optionalRestaurante = restauranteRepo.findById(mailRestaurante);
+		if (!optionalRestaurante.isPresent()) {
+			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(mailRestaurante));
+		}
+		Restaurante restaurante = optionalRestaurante.get();
+		
+		CalificacionRestaurante calCliente = calRestauranteRepo.findByClienteRestaurante(cliente, restaurante);
+		if(calCliente == null)
+			throw new UsuarioException(UsuarioException.SinCalificacion(mailRestaurante));
+		return new DTCalificacionRestaurante(calCliente);
 	}
 }

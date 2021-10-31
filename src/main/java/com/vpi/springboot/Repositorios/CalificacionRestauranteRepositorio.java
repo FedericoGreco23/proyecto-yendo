@@ -11,13 +11,9 @@ import org.springframework.stereotype.Repository;
 
 import com.vpi.springboot.IdCompuestas.CalificacionRestauranteId;
 import com.vpi.springboot.Modelo.CalificacionRestaurante;
+import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Restaurante;
 
-/**
- * Repository for the entity Person.
- * 
- * @see netgloo.models.UserBaseRepository
- */
 @Repository
 public interface CalificacionRestauranteRepositorio
 		extends JpaRepository<CalificacionRestaurante, CalificacionRestauranteId> {
@@ -27,4 +23,8 @@ public interface CalificacionRestauranteRepositorio
 	
 	@Query("SELECT c FROM CalificacionRestaurante c WHERE c.restaurante = :restaurante")
 	Page<CalificacionRestaurante> consultarCalificacion(Restaurante restaurante, Pageable pageable);
+	
+	@Query("SELECT u FROM CalificacionRestaurante u WHERE u.cliente = :cliente and u.restaurante = :restaurante")
+	CalificacionRestaurante findByClienteRestaurante(@Param("cliente") Cliente cliente,
+			@Param("restaurante") Restaurante restaurante);
 }
