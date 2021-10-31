@@ -64,4 +64,6 @@ public interface RestauranteServicioInterfaz {
 	void corregirDatos();
 
 	public Map<String, Object> consultarCalificacion(int page, int size, String sort, int order, String mailRestaurante) throws RestauranteException;
+
+	void cargarDatos2();
 }

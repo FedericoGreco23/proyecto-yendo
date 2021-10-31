@@ -63,6 +63,7 @@ import com.vpi.springboot.Modelo.dto.DTRestaurantePedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoReclamo;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
+import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
 import com.vpi.springboot.Repositorios.CalificacionClienteRepositorio;
 import com.vpi.springboot.Repositorios.CalificacionRestauranteRepositorio;
 import com.vpi.springboot.Repositorios.CategoriaRepositorio;
@@ -125,6 +126,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	private AdministradorService administradorService;
 	@Autowired 
 	private RestaurantePedidosRepositorio resPedRepo;
+	@Autowired 
+	private ClienteService clienteService;
 
 	private DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");;
 
@@ -869,7 +872,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 		Producto p = new Producto("Milanesa", "la mejor del condado", 200.0,
 				"https://t2.rg.ltmcdn.com/es/images/4/9/8/img_milanesa_de_carne_11894_orig.jpg", 10, true);
-		p.setCategoria(catRepo.findById("Chivitos").get());
+		p.setCategoria(catRepo.findById("Milanesas").get());
 		Producto p1 = new Producto("Helado", "el mejor del condado", 100.0,
 				"https://i.blogs.es/098b7c/helados1/1366_2000.jpg", 10, true);
 		p1.setCategoria(catRepo.findById("Helados").get());
@@ -903,7 +906,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 					    .setScale(4, RoundingMode.HALF_UP)
 					    .doubleValue();
 				
-				Integer i = (int) (Math.random() * 3 + 1);
+				Integer i = (int) (Math.random() * 2 + 1);
 				Integer randomFoto = (int) (Math.random() * 10);
 				Integer telefono= (int) (Math.random() * 999999);
 				Integer dir = (int) (Math.random() * direccionesList.size());
@@ -1040,7 +1043,23 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		}
 		
 
-		//////////////// clientes//////////////////////
+
+
+	}
+	
+	@Override
+	public void cargarDatos2() {
+		Double lat=-34.9128;
+		Double lon= -56.1886;
+		String dirString = "Andes 1180,Prof. Bacigalupi 2244,Jaime Cibils 2878,Durazno 2116 entre Salterain y Requena,Cabo Polonio 2107,Lucas Obes 896,Pedro Fco. Berro 773 esq.Jaime Zudánez (Pocitos),8 de Octubre 2619,Av. Lezica 5831 casi Yegros,Mataojo 1862,Grecia 3194 y México,Av. Américo Ricaldoni 2804,Francisco Echagoyen 4949,8 de Octubre 3390, esquina Propios,Av. Arocena 1919,Gil 1065,Fernández Crespo 2274,Av. Millán 3898,20 de Febrero 2510 ,Ledo Arroyo Torres s/n casi Hernani,Enriqueta Compte y Riqué 1287,28 de Febrero 1097, esq. Elías Regules,Presbítero José Barrales 2500,Camino Maldonado 81201, Ruta 8 Km 16.800,Dr. Joaquín Requena 3010,18 de Julio 2205 esq. Alejandro Beisso,Bulevar España 2772, Esquina Ellauri,Blandengues 2020 esq.Constitución,José Batlle y Ordoñez 1401 esq. Rivera,18 de Diciembre 1600,Carlos Roxlo 1611, esquina Paysandú,Ana María Rubens 2324 esq. Camino Carrasco,18 de Julio 2205 esq. Alejandro Beisso,José Enrique Rodó 1875 casi Eduardo Acevedo,Camino Castro 711,Vasconcellos s/n esq. Osvaldo Cruz,Ruperto Pérez Martínez 882 ,Matilde Pacheco 4160,Andes 1180,Prof. Bacigalupi 2244,Jaime Cibils 2878,Durazno 2116 entre Salterain y Requena,Cabo Polonio 2107,Lucas Obes 896,Pedro Fco. Berro 773 esq.Jaime Zudánez (Pocitos),8 de Octubre 2619,Av. Lezica 5831 casi Yegros,Mataojo 1862,Grecia 3194 y México,Av. Américo Ricaldoni 2804,Francisco Echagoyen 4949,8 de Octubre 3390, esquina Propios,Av. Arocena 1919,Gil 1065,Fernández Crespo 2274,Av. Millán 3898,20 de Febrero 2510 ,Ledo Arroyo Torres s/n casi Hernani,Enriqueta Compte y Riqué 1287,28 de Febrero 1097, esq. Elías Regules,Presbítero José Barrales 2500,Camino Maldonado 81201, Ruta 8 Km 16.800,Dr. Joaquín Requena 3010,18 de Julio 2205 esq. Alejandro Beisso,Bulevar España 2772, Esquina Ellauri,Blandengues 2020 esq.Constitución,José Batlle y Ordoñez 1401 esq. Rivera";
+		List<String> direccionesList = Arrays.asList(dirString.split(","));
+		
+		
+		// RESTAURANTES
+		String restoString = "La Pasiva,Sushi Go,La Taberna del Diablo,Burger King,Empanadas Mafalda,Il Mondo della Pizza,Fans,D' La Ribera,El Hornito,Grido,Tiqui Taca,Don Koto,Empanadas La Barca,Heladería Las Delicias,Pizza Trouville,Pizza Piedra,Pizzería Rodelú,Grazie Italia,Subway,Food & Love,La Isla,Soprano's,Chiviteria Marcos,Pizzería Cervantes,Sushiapp,Felipe,Chivipizza,El Club de la Papa Frita,OMG Fried Chicken,Cremona - Dicomo Pasta,Premium,Fábrica de Pastas La Bolognesa,Freddo,Lehmeyun 100%,La Roca,El Noble,Fellini,Artico,Barbacoa,Billie Joe,Gelateria del Club,Los Tavarez,Pizzeria Papa Jorge,Sushi Time,Pastas Baccino,Sinestesia,Crêpas,Tropical Smoothies,Chajá Bistro,San Roque,McDonald's,Chesterhouse,La Cigale,Homeopatía Alemana,Supermercados,Farmacias,Farmashop,Nescafé Dolce Gusto,Crepez,I love Tacos,Porto Vanila,Laika,Heladería La Chicharra,Iberpark,Farmacia El Tunel,Chéntola Gelato Artesanal,Sbarro,Fabric Sushi,Al Dente Pastas Artesanales,Del Abuelo Helados Artesanales,Alberto's,Cuidate - Comida Saludable,El Horno de Juan,El Novillo Alegre,Heladería Facal,Hoy te Quiero,Asian Food,Mimoso Resto Bar,Donut City,Hong Kong - Comida China,Mr. Kebap's,Veggie Mafalda,Rudy,Pizza Club,Pizza's House,Axion,Ciudad Aventura,Tomato Gourmet,Futuro Refuerzos,Pizzabrossa,Mascotas,Devoto,Poked,Noah's,The Lab Coffee,26 Sushi,Sabores,The Paletas Factory,La Vienesa,Paparike,Magnum,La Chacha Empanadas,Mise en place,Bar La Cruz,Lehmeyun Pizza Turca Armenia,Almacén de Pizzas,BIGA - Pizza y Pasta,II Gufo,Heladeria Pecas,Gaucho Burger,Emporio Gastronómico,Chivitos lo de Pepe,Facal,La Boletería,Burger Club,McCafé - McDonald's,Green To Go,Flores,Miyagi Sushi,Cafeterías,Pizza Mania,Bebidas,Bao bao,Tiendas,Wing It";
+		List<String> restaurantesList = Arrays.asList(restoString.split(","));
+		
+				//////////////// clientes//////////////////////
 		String clienteString = "Hernandez Monterroza,Adriana Marcela Rey Sanchez,Alejandro Abondano Acevedo,Alexander Carvajal Vargas,Andrea Catalina Acero Caro,Andrea Liliana Cruz Garcia,Andres Felipe Villa Monroy,Angela Patricia Mahecha Pineros,Angelica Lisseth Blanco Concha,Angelica Maria Rocha Garcia,Angie Tatiana FernÁNdez MartÍNez,Brigite Polanco Ruiz,Camilo Villamizar Aristizabal,Camilo RodrÍGuez Botero,Camilo Alberto CortÉS Montejo,Camilo Enrique Gomez Rodriguez,Carlos AndrÉS Polo Castellanos,Carlos Didier CastaÑO Contreras,Carlos Felipe MogollÓN PachÓN,Carol Ruchina Gomez Gianine,Carol Ruchina Gomez Gianine,Carolina Pintor Pinzon,Catherine Ospina Alfonso,Cinthya Fernanda DussÁN GuzmÁN,Claudia Liliana Torres Frias,Cristina Elizabeth Barthel Guardiola,Daniel GÓMez Delgado,Daniel AndrÉS Castiblanco Salgado,Daniela HernÁNdez Bravo,Daniela HernÁNdez Bravo,Daniela GuzmÁN,Daniela Katherinne Suarique ÁVila,Daniella Puerto Navia,Deny Marcela MuÑOz Lizarazo,Diana Carolina Lopez Rodriguez,Diana Catalina Diaz Beltran,Diego Alejandro Forero PeÑA,Estewil Carlos Quesada CalderÍN,Estewil Carlos Quesada CalderÍN,Fabian Andres Fino Andrade,Gabriel Felipe Herrera Moreno,Gabriel Mauricio Nieto Bustos,Gabriel Mauricio Nieto Bustos,Gloria Patricia Mendoza Alvear,Hugo AndrÉS Camargo Vargas,Ingrid Rocio Guerrero Penagos,IvÁN David Coral Burbano,Ivonne Jouliette Barrera Lopez,Jenny Fernanda SÁNchez Arenas,Jenny Viviana Moncaleano Preciado,Jorge Esteban Rey Botero,Jorge Mario Orozco DussÁN,Jorge Mario Orozco DussÁN,Jose Guillermo Marin Zubieta,Juan Camilo Ortega PeÑA,Juan Camilo Jimenez Cortes,Juan Camilo Jimenez Cortes,Juan Esteban Lanao SÁNchez,Juan Fernando Barjuch Moreno,Juan Sebastian Romero Escobar,Juan Sebastian Tarquino Acosta,Juan Sebastian Sanchez Sanchez,JuliÁN Romero Montoya,Julian Leonardo Sanchez Prada,Juliana Gaviria Garcia,July Catherine Gonzalez Suarez,Karen Eliana HernÁNdez Pulido,Laura Diaz Mejia,Laura Camila Puerto Castro,Laura Catalina Varon Buitrago,Laura Fernanda RodrÍGuez Torres,Laura Fernanda RodrÍGuez Torres,Laura Natalia Novoa Gomez,Laura Viviana Del RÍO Ayerbe,Leonardo AndrÉS DueÑAs Rojas,Lina MarÍA ZÚÑIga RamÍRez,Liseth Tatiana Sierra Villamil,Liseth Tatiana Sierra Villamil,Luisa Fernanda GarcÍA Fonnegra,Luisa Fernanda GarcÍA Fonnegra,Marcela Garcia Rueda,Maria Alejandra BolÍVar Galeano,Maria Alejandra Horta Ochoa,MarÍA AngÉLica BeltrÁN Castillo,MarÍA Camila Guacas JimÉNez,Maria Camila Nieto Bustos,Maria JosÉ GarcÍA Mora,Maria JosÉ GarcÍA Mora,Maria Margarita Perez Moreno,Maria Margarita Perez Moreno,Maria Natalia Cervantes Luna,Mariana Del Pilar Santos Milachay,Mario Fernando GarzÓN MuÑOz,MÓNica Alexandra Camacho Amaya,MÓNica Natalia Camargo Mendoza,Natalia Buitrago Contreras,Natalia Puentes Perdomo,Natalia Andrea GutiÉRrez Velasco,Natalia Melissa Barrero Forero,Natalia Vivy Casas PÁEz,Olga Stephannia Saman Jimenez,Olga Viviana Ovalle Solano,Oscar Fabian Castellanos Rojas,Oscar David Colmenares Barbudo,Oscar Julian Ulloa Orjuela,Pablo Uribe Antia,Paola Andrea Correa Larios,Rafael Alejandro Gonzalez Rojas,Rafael Andres Alvarez Castillo,Rafael Andres Alvarez Castillo,Ricardo Vega Zambrano,Ricardo Vega Zambrano,Sandra Ximena GarcÉS Parra,Sebastian Borda Melguizo,SebastiÁN Iregui Galeano,Yiriam Liliam Ochoa Sabogal,Yiriam Liliam Ochoa Sabogal,Yurany Catalina Cifuentes Mendez,Yuri Catalina Salazar Aristizabal";
 		List<String> clientesList = Arrays.asList(clienteString.split(","));
 
@@ -1074,14 +1093,42 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				direccion.setCliente(cliente);
 				direccion.setGeoLocalizacion(GeoCliente);
 				cliente.addDireccion(direccion);
+				try {
+					
 				crearCliente(cliente);
+				}catch(Exception e) {
+					
+				}
+				
+						
+		////////////pedidos///////////////////
+
+		Integer randomR = (int) (Math.random() * 21);
+		String mailREsto= restaurantesList.get(randomR).toLowerCase().replace(" ", "") + "@" + restaurantesList.get(randomR).toLowerCase().replace(" ", "") + ".com";
+		Optional<Restaurante> resOp =resRepo.findById(mailREsto);
+		Optional<Cliente> cli =userRepo.findById(cliente.getMail());
+		if(cli.isPresent() && resOp.isPresent() && resOp.get().getActivo() && !resOp.get().getBloqueado()) {
+			try {
+			clienteService.agregarACarrito(resOp.get().getProductos().get(0).getId(), 3, cliente.getMail(), resOp.get().getMail());
+			DTCarrito carrito= clienteService.verCarrito(cliente.getMail());
+			clienteService.altaPedido((int) carrito.getId(), EnumMetodoDePago.EFECTIVO, cli.get().getDirecciones().get(0).getId(), cliente.getMail(), "Muero de hambre");
+			}catch(Exception e) {
+				
+			}
+		}
+		
+		
+		
 			} catch (Exception e) {
 				System.out.print(e.toString());
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-
+		
+		
+		
+		
 	}
 
 	private DTRespuesta crearRestaurantesDePrueba(Restaurante rest) throws RestauranteException, CategoriaException {

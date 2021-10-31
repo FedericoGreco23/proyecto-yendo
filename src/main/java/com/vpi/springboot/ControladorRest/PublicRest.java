@@ -242,5 +242,16 @@ public class PublicRest {
 		return "rock and roll nene!";
 	}
 	
-
+	
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
+	@PostMapping("/cargarDatos2")
+	public String cargarDatos2() {
+		try {
+			//restService.cargarDatos();
+			restService.cargarDatos2();
+		}catch(Exception e) {
+			return "oops, estimado frontend algo se ha ido a la mierda. Consulte a su backend de confianza"; 
+		}
+		return "rock and roll nene!";
+	}
 }
