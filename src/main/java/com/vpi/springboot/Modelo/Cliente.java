@@ -29,23 +29,23 @@ public class Cliente extends Usuario {
 	@OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JsonIgnore
 	private List<Pedido> pedidos = new ArrayList<>();
+	private Boolean verificado;
 
 	public Cliente() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	public Cliente(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado, Boolean activo,
 			LocalDate fechaCreacion, String nickname, Float calificacionPromedio, Float saldoBono, String nombre,
 			String apellido, String tokenDispositivo) {
 		super(mail, contrasenia, telefono, foto, bloqueado, activo, fechaCreacion);
-		// TODO Auto-generated constructor stub
 		this.nickname = nickname;
 		this.calificacionPromedio = calificacionPromedio;
 		this.saldoBono = saldoBono;
 		this.nombre = nombre;
 		this.apellido = apellido;
 		this.tokenDispositivo = tokenDispositivo;
+		this.verificado = false;
 	}
 
 	// Funcion para pasar a DT de buscarUsuario y otros
@@ -129,4 +129,11 @@ public class Cliente extends Usuario {
 		this.pedidos.add(pedido);
 	}
 
+	public Boolean getVerificado() {
+		return verificado;
+	}
+
+	public void setVerificado(Boolean verificado) {
+		this.verificado = verificado;
+	}
 }

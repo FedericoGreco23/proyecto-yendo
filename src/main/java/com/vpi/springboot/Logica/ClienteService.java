@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.stereotype.Service;
 
 import com.vpi.springboot.IdCompuestas.CalificacionRestauranteId;
@@ -34,6 +35,7 @@ import com.vpi.springboot.Modelo.GeoLocalizacion;
 import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.Modelo.Reclamo;
 import com.vpi.springboot.Modelo.Restaurante;
+import com.vpi.springboot.Modelo.TokenVerificacion;
 import com.vpi.springboot.Modelo.LastDireccioClientenMongo;
 import com.vpi.springboot.Modelo.Pedido;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
@@ -58,6 +60,7 @@ import com.vpi.springboot.Repositorios.PedidoRepositorio;
 import com.vpi.springboot.Repositorios.ProductoRepositorio;
 import com.vpi.springboot.Repositorios.ReclamoRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
+import com.vpi.springboot.Repositorios.VerificacionRepositorio;
 import com.vpi.springboot.exception.CarritoException;
 import com.vpi.springboot.exception.DireccionException;
 import com.vpi.springboot.exception.ProductoException;
@@ -96,13 +99,83 @@ public class ClienteService implements ClienteServicioInterfaz {
 	@Autowired
 	private ReclamoRepositorio recRepo;
 	@Autowired
+	private VerificacionRepositorio tokenRepo;
+	@Autowired
 	private NextSequenceService nextSequence;
 	@Autowired
 	private UltimaDireccionRepositorio ultimaDireccionRepo;
 	@Autowired
 	private SimpMessagingTemplate simpMessagingTemplate;
-	
-	private DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");;
+	@Autowired
+	private MailService mailSender;
+
+	private DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+	private String getMailVerificacion(String link) {
+		return "<html>\r\n"
+				+ "<body style=\"background-color: #f4f4f4; margin: 0 !important; padding: 0 !important;\">\r\n"
+				+ "    <div style=\"display: none; font-size: 1px; color: #fefefe; line-height: 1px; font-family: 'Lato', Helvetica, Arial, sans-serif; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden;\"> We're thrilled to have you here! Get ready to dive into your new account. </div>\r\n"
+				+ "    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">\r\n"
+				+ "        <tr>\r\n"
+				+ "            <td bgcolor=\"#FFA73B\" align=\"center\">\r\n"
+				+ "                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 600px;\">\r\n"
+				+ "                    <tr>\r\n"
+				+ "                        <td align=\"center\" valign=\"top\" style=\"padding: 40px 10px 40px 10px;\"> </td>\r\n"
+				+ "                    </tr>\r\n"
+				+ "                </table>\r\n"
+				+ "            </td>\r\n"
+				+ "        </tr>\r\n"
+				+ "        <tr>\r\n"
+				+ "            <td bgcolor=\"#FFA73B\" align=\"center\" style=\"padding: 0px 10px 0px 10px;\">\r\n"
+				+ "                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 600px;\">\r\n"
+				+ "                    <tr>\r\n"
+				+ "                        <td bgcolor=\"#ffffff\" align=\"center\" valign=\"top\" style=\"padding: 40px 20px 20px 20px; border-radius: 4px 4px 0px 0px; color: #111111; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 48px; font-weight: 400; letter-spacing: 4px; line-height: 48px;\">\r\n"
+				+ "                            <h1 style=\"font-size: 48px; font-weight: 400; margin: 2;\">¡Bienvenido a Yendo!</h1>\r\n"
+				+ "                        </td>\r\n"
+				+ "                    </tr>\r\n"
+				+ "                </table>\r\n"
+				+ "            </td>\r\n"
+				+ "        </tr>\r\n"
+				+ "        <tr>\r\n"
+				+ "            <td bgcolor=\"#f4f4f4\" align=\"center\" style=\"padding: 0px 10px 0px 10px;\">\r\n"
+				+ "                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 600px;\">\r\n"
+				+ "                    <tr>\r\n"
+				+ "                        <td bgcolor=\"#ffffff\" align=\"left\" style=\"padding: 20px 30px 40px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;\">\r\n"
+				+ "                            <p style=\"margin: 0;\">Para poder comenzar a usar nuestros servicios, por favor verifique su cuenta.</p>\r\n"
+				+ "                        </td>\r\n"
+				+ "                    </tr>\r\n"
+				+ "                    <tr>\r\n"
+				+ "                        <td bgcolor=\"#ffffff\" align=\"left\">\r\n"
+				+ "                            <table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\r\n"
+				+ "                                <tr>\r\n"
+				+ "                                    <td bgcolor=\"#ffffff\" align=\"center\" style=\"padding: 20px 30px 60px 30px;\">\r\n"
+				+ "                                        <table border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\r\n"
+				+ "                                            <tr>\r\n"
+				+ "                                                <td align=\"center\" style=\"border-radius: 3px;\" bgcolor=\"#FFA73B\"><a href=\"" + link + "\" target=\"\" style=\"font-size: 20px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; color: #ffffff; text-decoration: none; padding: 15px 25px; border-radius: 2px; border: 1px solid #FFA73B; display: inline-block;\">Confirmar Cuenta</a></td>\r\n"
+				+ "                                            </tr>\r\n"
+				+ "                                        </table>\r\n"
+				+ "                                    </td>\r\n"
+				+ "                                </tr>\r\n"
+				+ "                            </table>\r\n"
+				+ "                        </td>\r\n"
+				+ "                    </tr>\r\n"
+				+ "                    <tr>\r\n"
+				+ "                        <td bgcolor=\"#ffffff\" align=\"left\" style=\"padding: 0px 30px 20px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;\">\r\n"
+				+ "                            <p style=\"margin: 0;\">En caso de tener alguna consulta, por favor acudir a nuestro centro de atención al cliente.</p>\r\n"
+				+ "                        </td>\r\n"
+				+ "                    </tr>\r\n"
+				+ "                    <tr>\r\n"
+				+ "                        <td bgcolor=\"#ffffff\" align=\"left\" style=\"padding: 0px 30px 40px 30px; border-radius: 0px 0px 4px 4px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;\">\r\n"
+				+ "                            <p style=\"margin: 0;\">Saludos,<br> Yendo team</p>\r\n"
+				+ "                        </td>\r\n"
+				+ "                    </tr>\r\n"
+				+ "                </table>\r\n"
+				+ "            </td>\r\n"
+				+ "        </tr>\r\n"
+				+ "    </table>\r\n"
+				+ "</body>\r\n"
+				+ "</html>";
+	}
 
 	@Override
 	public List<DTDireccion> getDireccionCliente(String mail) throws UsuarioException {
@@ -134,34 +207,49 @@ public class ClienteService implements ClienteServicioInterfaz {
 		if (mail != null && !mail.isEmpty() && usuario.getNickname() != null) {
 			usuario.setActivo(true);
 			usuario.setBloqueado(false);
+			usuario.setVerificado(false);
 			usuario.setSaldoBono(0.0f);
 			usuario.setCalificacionPromedio(5.0f);
 			usuario.setFechaCreacion(LocalDate.now());
 			usuario.setContrasenia(passwordEncoder.encode(usuario.getContrasenia()));
+
 			try {
 				userRepo.save(usuario);
-				return new DTRespuesta("Cliente dado de alta con éxito.");
 			} catch (Exception e) {
 				throw new UsuarioException("Ya existe un usuario con el nickname " + usuario.getNickname());
 			}
+
+			try {
+				TokenVerificacion token = new TokenVerificacion(usuario);
+				tokenRepo.save(token);
+
+				String to = usuario.getMail();
+				String body = getMailVerificacion("https://www.youtube.com/");
+				String topic = "Verificación de usuario " + usuario.getNickname() + ".";
+				mailSender.sendMail(to, body, topic);
+			} catch (Exception e) {
+				return new DTRespuesta("Error: " + e.getMessage());
+			}
+
+			return new DTRespuesta(
+					"Cliente dado de alta con éxito. Se ha enviado un mail para confirmación del usuario.");
+
 		} else {
 			throw new UsuarioException("Mail, nickname y contraseña son campos obligatorios");
 		}
-
 	}
 
 	private boolean emailExist(String mail) {
 		return userRepo.findById(mail).isPresent();
 	}
 
-	/*@Override
-	public List<Cliente> obtenerClientes() {
-		Iterable<Cliente> usuario = userRepo.findAll();
-		List<Cliente> clientes = new ArrayList<Cliente>();
-		usuario.forEach(c -> clientes.add(c));
-
-		return clientes;
-	}*/
+	/*
+	 * @Override public List<Cliente> obtenerClientes() { Iterable<Cliente> usuario
+	 * = userRepo.findAll(); List<Cliente> clientes = new ArrayList<Cliente>();
+	 * usuario.forEach(c -> clientes.add(c));
+	 * 
+	 * return clientes; }
+	 */
 
 	@Override
 	public DTRespuesta altaDireccion(DTDireccion direccion, String mail) throws UsuarioException {
@@ -191,7 +279,6 @@ public class ClienteService implements ClienteServicioInterfaz {
 		} else {
 			throw new UsuarioException(UsuarioException.NotFoundException(mail));
 		}
-
 	}
 
 	@Override
@@ -215,7 +302,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 	public DTRespuesta modificarDireccion(int id, DTDireccion nueva, String mail) throws UsuarioException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mail);
 		if (optionalCliente.isPresent()) {
-			//Cliente cliente = optionalCliente.get();
+			// Cliente cliente = optionalCliente.get();
 			Optional<Direccion> optionalDireccion = dirRepo.findById(id);
 			if (optionalDireccion.isPresent()) {
 				Direccion dirNueva = optionalDireccion.get();
@@ -239,7 +326,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 	public DTRespuesta eliminarDireccion(Integer id, String mail) throws UsuarioException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mail);
 		if (optionalCliente.isPresent()) {
-			//Cliente cliente = optionalCliente.get();
+			// Cliente cliente = optionalCliente.get();
 			Optional<Direccion> optionalDireccion = dirRepo.findById(id);
 			if (optionalDireccion.isPresent()) {
 				Direccion dir = optionalDireccion.get();
@@ -340,9 +427,9 @@ public class ClienteService implements ClienteServicioInterfaz {
 					precioTotal = precioTotal + restaurante.getCostoDeEnvio();
 					Pedido pedido = new Pedido(LocalDateTime.now(), precioTotal, estado, pago, idCarrito, direccion,
 							restaurante, cliente, comentario);
-					if(pago.equals(EnumMetodoDePago.PAYPAL)) {
+					if (pago.equals(EnumMetodoDePago.PAYPAL)) {
 						pedido.setPago(true);
-					}else if(pago.equals(EnumMetodoDePago.EFECTIVO)) {
+					} else if (pago.equals(EnumMetodoDePago.EFECTIVO)) {
 						pedido.setPago(false);
 					}
 					pedidoRepo.save(pedido);
@@ -419,26 +506,25 @@ public class ClienteService implements ClienteServicioInterfaz {
 			/**
 			 * guarda el reclamo y envia mail
 			 */
-			
-			Restaurante restaurante =pedido.getRestaurante();
-			//reclamo
+
+			Restaurante restaurante = pedido.getRestaurante();
+			// reclamo
 			List<Reclamo> reclamos = pedido.getReclamos();
-			Reclamo reclamo= new Reclamo(comentario, now, EnumEstadoReclamo.ENVIADO, "");
+			Reclamo reclamo = new Reclamo(comentario, now, EnumEstadoReclamo.ENVIADO, "");
 			reclamo.setPedido(pedido);
 			reclamo.setRestaurante(restaurante);
 			reclamos.add(reclamo);
-			
-			//pedido	
+
+			// pedido
 			pedido.setReclamos(reclamos);
-			
-			//restaurante
+
+			// restaurante
 			List<Reclamo> reclamosResto = restaurante.getReclamos();
 			restaurante.setReclamos(reclamosResto);
-		
-			
-			//pedidoRepo.save(pedido);
+
+			// pedidoRepo.save(pedido);
 			recRepo.save(reclamo);
-			//restauranteRepo.save(restaurante);
+			// restauranteRepo.save(restaurante);
 			return new DTRespuesta(
 					"Reclamo ingresado con éxito. Le llegará un mail con la resulución. Disculpe las molestias.");
 		} else {
@@ -491,7 +577,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 		Map<String, Object> response = new HashMap<>();
 		List<DTPedido> retorno = new ArrayList<>();
 		Pageable paging;
-		
+
 		if (sort.equalsIgnoreCase("")) {
 			paging = PageRequest.of(page, size);
 		} else {
@@ -500,7 +586,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 			else
 				paging = PageRequest.of(page, size, Sort.by(Sort.Order.asc(sort)));
 		}
-		
+
 		Page<Pedido> pagePedido;
 		List<Pedido> pedidos = new ArrayList<>();
 
@@ -510,7 +596,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 				LocalDate ld = LocalDate.parse(fecha, DATEFORMATTER);
 				LocalDateTime dateI = LocalDateTime.of(ld, LocalTime.of(00, 01));
 				LocalDateTime dateF = LocalDateTime.of(ld, LocalTime.of(23, 59));
-				
+
 				pagePedido = pedidoRepo.findByRestauranteFecha(varRestaurante, dateI, dateF, cliente, paging);
 			}
 
@@ -524,7 +610,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 				LocalDate ld = LocalDate.parse(fecha, DATEFORMATTER);
 				LocalDateTime dateI = LocalDateTime.of(ld, LocalTime.of(00, 01));
 				LocalDateTime dateF = LocalDateTime.of(ld, LocalTime.of(23, 59));
-				
+
 				pagePedido = pedidoRepo.findByFecha(dateI, dateF, cliente, paging);
 			} else
 				pagePedido = pedidoRepo.findAllByCliente(cliente, paging);
@@ -535,15 +621,15 @@ public class ClienteService implements ClienteServicioInterfaz {
 		pedidos = pagePedido.getContent();
 		response.put("currentPage", pagePedido.getNumber());
 		response.put("totalItems", pagePedido.getTotalElements());
-		
+
 		for (Pedido p : pedidos) {
 			Optional<Carrito> optionalCarrito = mongoRepo.findById(p.getCarrito());
-			if(optionalCarrito.isPresent())
+			if (optionalCarrito.isPresent())
 				retorno.add(new DTPedido(p, new DTCarrito(optionalCarrito.get())));
-			else 
+			else
 				retorno.add(new DTPedido(p));
 		}
-		
+
 		response.put("pedidos", retorno);
 
 		return response;
@@ -562,9 +648,9 @@ public class ClienteService implements ClienteServicioInterfaz {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(mailRestaurante));
 		}
 		Restaurante restaurante = optionalRestaurante.get();
-		
+
 		List<Pedido> pedidos = pedidoRepo.findByClienteRestaurante(cliente, restaurante);
-		if(pedidos.size() == 0)
+		if (pedidos.size() == 0)
 			throw new UsuarioException(UsuarioException.SinPedido(mailRestaurante));
 
 		calificacion.setFecha(LocalDateTime.now());
@@ -597,9 +683,9 @@ public class ClienteService implements ClienteServicioInterfaz {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(mailRestaurante));
 		}
 		Restaurante restaurante = optionalRestaurante.get();
-		
+
 		List<Pedido> pedidos = pedidoRepo.findByClienteRestaurante(cliente, restaurante);
-		if(pedidos.size() == 0)
+		if (pedidos.size() == 0)
 			throw new UsuarioException(UsuarioException.SinPedido(mailRestaurante));
 
 		Optional<CalificacionRestaurante> optionalCalificacion = calRestauranteRepo
@@ -625,8 +711,8 @@ public class ClienteService implements ClienteServicioInterfaz {
 				"Calificacion de restaurante + " + restaurante.getNombre() + " eliminada correctamente.");
 	}
 
-	public Map<String, Object> listarReclamos(int size, int page, String restaurante, String sort, int order, String mailCliente)
-			throws UsuarioException {
+	public Map<String, Object> listarReclamos(int size, int page, String restaurante, String sort, int order,
+			String mailCliente) throws UsuarioException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mailCliente);
 		if (!optionalCliente.isPresent())
 			throw new UsuarioException(UsuarioException.NotFoundException(mailCliente));
@@ -635,7 +721,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 		Map<String, Object> response = new HashMap<>();
 		List<DTReclamo> retorno = new ArrayList<>();
 		Pageable paging;
-		
+
 		if (!sort.equalsIgnoreCase("")) {
 			if (order == 1)
 				paging = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sort)));
@@ -644,16 +730,16 @@ public class ClienteService implements ClienteServicioInterfaz {
 		} else {
 			paging = PageRequest.of(page, size);
 		}
-		
+
 		Page<Reclamo> pageReclamo;
 		List<Reclamo> reclamos = new ArrayList<>();
 
-		if(!restaurante.equalsIgnoreCase("")) {
+		if (!restaurante.equalsIgnoreCase("")) {
 			pageReclamo = recRepo.findAllByClienteRestaurante(cliente, restaurante, paging);
 		} else {
 			pageReclamo = recRepo.findAllByCliente(cliente, paging);
 		}
-		
+
 		reclamos = pageReclamo.getContent();
 		for (Reclamo r : reclamos) {
 			retorno.add(new DTReclamo(r));
