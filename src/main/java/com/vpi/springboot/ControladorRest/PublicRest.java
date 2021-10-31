@@ -260,8 +260,8 @@ public class PublicRest {
 		try {
 			//restService.cargarDatos();
 			restService.cargarDatos2();
-		}catch(Exception e) {
-			return "oops, estimado frontend algo se ha ido a la mierda. Consulte a su backend de confianza"; 
+		} catch (Exception e) {
+			return "oops, estimado frontend algo se ha ido a la mierda. Consulte a su backend de confianza";
 		}
 		return "rock and roll nene!";
 	}

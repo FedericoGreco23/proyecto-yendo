@@ -30,7 +30,7 @@ public class Usuario {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	
+
 	public Usuario(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado, Boolean activo) {
 		super();
 		this.mail = mail;
@@ -41,7 +41,8 @@ public class Usuario {
 		this.activo = activo;
 	}
 
-	public Usuario(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado, Boolean activo, LocalDate fechaCreacion) {
+	public Usuario(String mail, String contrasenia, String telefono, String foto, Boolean bloqueado, Boolean activo,
+			LocalDate fechaCreacion) {
 		super();
 		this.mail = mail;
 		this.contrasenia = contrasenia;
@@ -101,7 +102,7 @@ public class Usuario {
 	public void setActivo(Boolean activo) {
 		this.activo = activo;
 	}
-	
+
 	public LocalDate getFechaCreacion() {
 		return fechaCreacion;
 	}
