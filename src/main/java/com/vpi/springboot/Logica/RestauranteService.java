@@ -895,8 +895,12 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		
 		Double lat=-34.9128;
 		Double lon= -56.1886;
+		int calificacion= 5;
 		for (String resto : restaurantesList) {
-
+			calificacion=calificacion-1;
+			if(calificacion==1) {
+				calificacion=5;
+			}
 			try {
 				Double rand = (Double) (Math.random() * 1);
 				Double latitud = BigDecimal.valueOf(lat+rand)
@@ -907,6 +911,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 					    .doubleValue();
 				
 				Integer i = (int) (Math.random() * 2 + 1);
+				Integer envio = (int) (Math.random() * 30 + 1);
 				Integer randomFoto = (int) (Math.random() * 10);
 				Integer telefono= (int) (Math.random() * 999999);
 				Integer dir = (int) (Math.random() * direccionesList.size());
@@ -924,7 +929,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				
 				Restaurante r = new Restaurante(resto.toLowerCase().replace(" ", "") + "@" + resto.toLowerCase().replace(" ", "") + ".com",
 						"123456", "9"+telefono.toString(), null, false, true, resto, direccionesList.get(dir),
-						Float.valueOf(5), EnumEstadoRestaurante.values()[i - 1], null, null, null, 20, null,
+						Float.valueOf(calificacion), EnumEstadoRestaurante.values()[i - 1], null, null, null, envio, null,
 						null, "LMWJVSD", true);	
 				
 
