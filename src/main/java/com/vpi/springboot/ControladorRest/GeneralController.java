@@ -33,19 +33,6 @@ public class GeneralController {
 	@Autowired
 	private GeneralService service;
 
-	@CrossOrigin(origins = "*", allowedHeaders = "*")
-	@PostMapping("/activar")
-	public ResponseEntity<?> activarCuenta(@RequestParam(required = true) String mail, 
-										   @RequestParam(required = true) int tipoUsuario) {
-		try {
-			System.out.println("Dentro de GeneralController /activar");
-			service.activarCuenta(mail, tipoUsuario);
-			return new ResponseEntity<String>("Cuenta " + mail + " activada.", HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
-
 	@PostMapping("registrarPago")
 	public ResponseEntity<?> registrarPago(@RequestParam(required = true) int idPedido) {
 		try {

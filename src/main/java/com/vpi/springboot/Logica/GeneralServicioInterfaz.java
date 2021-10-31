@@ -27,7 +27,7 @@ public interface GeneralServicioInterfaz {
 
 	public DTRespuesta verificarMail(String mail) throws UsuarioException;
 
-	public DTRespuesta activarCuenta(String mail, int tipoUsuario);
+	public DTRespuesta activarCuenta(String token);
 	
 	public DTRestaurante getRestaurante(String mail) throws RestauranteException;
 	
