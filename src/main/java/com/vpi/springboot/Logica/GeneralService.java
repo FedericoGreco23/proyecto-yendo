@@ -5,15 +5,18 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
+import javax.mail.MessagingException;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -56,17 +59,111 @@ public class GeneralService implements GeneralServicioInterfaz {
 	@Autowired
 	private PromocionRepositorio promoRepo;
 	@Autowired
-	private MailService mailSender;
-	@Autowired
 	private CategoriaRepositorio catRepo;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	@Autowired
 	private PedidoRepositorio pedidoRepo;
-
+	@Autowired
+	private VerificacionRepositorio tokenRepo;
+	@Autowired
+	private MailService mailSender;
 
 	private static final int iterations = 20 * 1000;
 	private static final int desiredKeyLen = 256;
+
+	private String getMailVerificacion(String link) {
+		return "<html>\r\n"
+				+ "<body style=\"background-color: #f4f4f4; margin: 0 !important; padding: 0 !important;\">\r\n"
+				+ "    <div style=\"display: none; font-size: 1px; color: #fefefe; line-height: 1px; font-family: 'Lato', Helvetica, Arial, sans-serif; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden;\"> We're thrilled to have you here! Get ready to dive into your new account. </div>\r\n"
+				+ "    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">\r\n" + "        <tr>\r\n"
+				+ "            <td bgcolor=\"#FFA73B\" align=\"center\">\r\n"
+				+ "                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 600px;\">\r\n"
+				+ "                    <tr>\r\n"
+				+ "                        <td align=\"center\" valign=\"top\" style=\"padding: 40px 10px 40px 10px;\"> </td>\r\n"
+				+ "                    </tr>\r\n" + "                </table>\r\n" + "            </td>\r\n"
+				+ "        </tr>\r\n" + "        <tr>\r\n"
+				+ "            <td bgcolor=\"#FFA73B\" align=\"center\" style=\"padding: 0px 10px 0px 10px;\">\r\n"
+				+ "                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 600px;\">\r\n"
+				+ "                    <tr>\r\n"
+				+ "                        <td bgcolor=\"#ffffff\" align=\"center\" valign=\"top\" style=\"padding: 40px 20px 20px 20px; border-radius: 4px 4px 0px 0px; color: #111111; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 48px; font-weight: 400; letter-spacing: 4px; line-height: 48px;\">\r\n"
+				+ "                            <h1 style=\"font-size: 48px; font-weight: 400; margin: 2;\">¡Bienvenido a Yendo!</h1>\r\n"
+				+ "                        </td>\r\n" + "                    </tr>\r\n" + "                </table>\r\n"
+				+ "            </td>\r\n" + "        </tr>\r\n" + "        <tr>\r\n"
+				+ "            <td bgcolor=\"#f4f4f4\" align=\"center\" style=\"padding: 0px 10px 0px 10px;\">\r\n"
+				+ "                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 600px;\">\r\n"
+				+ "                    <tr>\r\n"
+				+ "                        <td bgcolor=\"#ffffff\" align=\"left\" style=\"padding: 20px 30px 40px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;\">\r\n"
+				+ "                            <p style=\"margin: 0;\">Para poder comenzar a usar nuestros servicios, por favor verifique su cuenta.</p>\r\n"
+				+ "                        </td>\r\n" + "                    </tr>\r\n" + "                    <tr>\r\n"
+				+ "                        <td bgcolor=\"#ffffff\" align=\"left\">\r\n"
+				+ "                            <table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\r\n"
+				+ "                                <tr>\r\n"
+				+ "                                    <td bgcolor=\"#ffffff\" align=\"center\" style=\"padding: 20px 30px 60px 30px;\">\r\n"
+				+ "                                        <table border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\r\n"
+				+ "                                            <tr>\r\n"
+				+ "                                                <td align=\"center\" style=\"border-radius: 3px;\" bgcolor=\"#FFA73B\"><a href=\""
+				+ link
+				+ "\" target=\"\" style=\"font-size: 20px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; color: #ffffff; text-decoration: none; padding: 15px 25px; border-radius: 2px; border: 1px solid #FFA73B; display: inline-block;\">Confirmar Cuenta</a></td>\r\n"
+				+ "                                            </tr>\r\n"
+				+ "                                        </table>\r\n"
+				+ "                                    </td>\r\n" + "                                </tr>\r\n"
+				+ "                            </table>\r\n" + "                        </td>\r\n"
+				+ "                    </tr>\r\n" + "                    <tr>\r\n"
+				+ "                        <td bgcolor=\"#ffffff\" align=\"left\" style=\"padding: 0px 30px 20px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;\">\r\n"
+				+ "                            <p style=\"margin: 0;\">En caso de tener alguna consulta, por favor acudir a nuestro centro de atención al cliente.</p>\r\n"
+				+ "                        </td>\r\n" + "                    </tr>\r\n" + "                    <tr>\r\n"
+				+ "                        <td bgcolor=\"#ffffff\" align=\"left\" style=\"padding: 0px 30px 40px 30px; border-radius: 0px 0px 4px 4px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;\">\r\n"
+				+ "                            <p style=\"margin: 0;\">Saludos,<br> Yendo team</p>\r\n"
+				+ "                        </td>\r\n" + "                    </tr>\r\n" + "                </table>\r\n"
+				+ "            </td>\r\n" + "        </tr>\r\n" + "    </table>\r\n" + "</body>\r\n" + "</html>";
+	}
+
+	private String getPasswordReset(String pass) {
+		return "<html>\r\n"
+				+ "<body style=\"background-color: #f4f4f4; margin: 0 !important; padding: 0 !important;\">\r\n"
+				+ "    <div style=\"display: none; font-size: 1px; color: #fefefe; line-height: 1px; font-family: 'Lato', Helvetica, Arial, sans-serif; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden;\"> We're thrilled to have you here! Get ready to dive into your new account. </div>\r\n"
+				+ "    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">\r\n" + "        <tr>\r\n"
+				+ "            <td bgcolor=\"#FFA73B\" align=\"center\">\r\n"
+				+ "                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 600px;\">\r\n"
+				+ "                    <tr>\r\n"
+				+ "                        <td align=\"center\" valign=\"top\" style=\"padding: 40px 10px 40px 10px;\"> </td>\r\n"
+				+ "                    </tr>\r\n" + "                </table>\r\n" + "            </td>\r\n"
+				+ "        </tr>\r\n" + "        <tr>\r\n"
+				+ "            <td bgcolor=\"#FFA73B\" align=\"center\" style=\"padding: 0px 10px 0px 10px;\">\r\n"
+				+ "                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 600px;\">\r\n"
+				+ "                    <tr>\r\n"
+				+ "                        <td bgcolor=\"#ffffff\" align=\"center\" valign=\"top\" style=\"padding: 40px 20px 20px 20px; border-radius: 4px 4px 0px 0px; color: #111111; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 48px; font-weight: 400; letter-spacing: 4px; line-height: 48px;\">\r\n"
+				+ "                            <h1 style=\"font-size: 48px; font-weight: 400; margin: 2;\">Su contraseña fue cambiada.</h1>\r\n"
+				+ "                        </td>\r\n" + "                    </tr>\r\n" + "                </table>\r\n"
+				+ "            </td>\r\n" + "        </tr>\r\n" + "        <tr>\r\n"
+				+ "            <td bgcolor=\"#f4f4f4\" align=\"center\" style=\"padding: 0px 10px 0px 10px;\">\r\n"
+				+ "                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 600px;\">\r\n"
+				+ "                    <tr>\r\n"
+				+ "                        <td bgcolor=\"#ffffff\" align=\"left\" style=\"padding: 20px 30px 40px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;\">\r\n"
+				+ "                            <p style=\"margin: 0;\">Por favor ingrese a su cuenta y cambie su contraseña.</p>\r\n"
+				+ "                        </td>\r\n" + "                    </tr>\r\n" + "                    <tr>\r\n"
+				+ "                        <td bgcolor=\"#ffffff\" align=\"left\">\r\n"
+				+ "                            <table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\r\n"
+				+ "                                <tr>\r\n"
+				+ "                                    <td bgcolor=\"#ffffff\" align=\"center\" style=\"padding: 20px 30px 60px 30px;\">\r\n"
+				+ "                                        <table border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\r\n"
+				+ "                                            <tr>\r\n"
+				+ "                                                <td align=\"center\" style=\"border-radius: 3px;\" bgcolor=\"#FFA73B\"><p style=\"font-size: 20px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; color: #ffffff; text-decoration: none; padding: 15px 25px; border-radius: 2px; border: 1px solid #FFA73B; display: inline-block;\"> "
+				+ pass + "</a></td>\r\n" + "                                            </tr>\r\n"
+				+ "                                        </table>\r\n"
+				+ "                                    </td>\r\n" + "                                </tr>\r\n"
+				+ "                            </table>\r\n" + "                        </td>\r\n"
+				+ "                    </tr>\r\n" + "                    <tr>\r\n"
+				+ "                        <td bgcolor=\"#ffffff\" align=\"left\" style=\"padding: 0px 30px 20px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;\">\r\n"
+				+ "                            <p style=\"margin: 0;\">En caso de que no haya pedido reestablecer su contraseña, por favor cambie sus datos cuanto antes, y acuda\r\n"
+				+ "                                 a nuestro centro de atención al cliente.</p>\r\n"
+				+ "                        </td>\r\n" + "                    </tr>\r\n" + "                    <tr>\r\n"
+				+ "                        <td bgcolor=\"#ffffff\" align=\"left\" style=\"padding: 0px 30px 40px 30px; border-radius: 0px 0px 4px 4px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;\">\r\n"
+				+ "                            <p style=\"margin: 0;\">Saludos,<br> Yendo team</p>\r\n"
+				+ "                        </td>\r\n" + "                    </tr>\r\n" + "                </table>\r\n"
+				+ "            </td>\r\n" + "        </tr>\r\n" + "    </table>\r\n" + "</body>\r\n" + "</html>";
+	}
 
 	@Override
 	public String iniciarSesion(String mail, String password) throws Exception {
@@ -120,9 +217,24 @@ public class GeneralService implements GeneralServicioInterfaz {
 	}
 //--------------------------------------------
 
+	private String randomPass(int length) {
+		String SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+		StringBuilder salt = new StringBuilder();
+		Random rnd = new Random();
+		while (salt.length() < 18) { // length of the random string.
+			int index = (int) (rnd.nextFloat() * SALTCHARS.length());
+			salt.append(SALTCHARS.charAt(index));
+		}
+		String saltStr = salt.toString();
+		return saltStr;
+	}
+
+	@Override
 	public DTRespuesta recuperarPassword(String mail) throws UsuarioException {
+		String randomPass = randomPass(6);
+		
 		// Se tiene que ver cómo se genera la contraseña opcional
-		String pass = passwordEncoder.encode("123456");
+		String pass = passwordEncoder.encode(randomPass);
 		String to = "";
 
 		Optional<Cliente> optionalCliente = clienteRepo.findById(mail);
@@ -152,86 +264,49 @@ public class GeneralService implements GeneralServicioInterfaz {
 		}
 
 		// Enviamos el mail a la cuenta del usuario
-		// Verificamos que tiene @ por si acaso
 		if (to.contains("@")) {
 			String topic = "Cambio de contraseña.";
-			String body = "Su contraseña fue cambiada a 123456.\n"
-					+ "Por favor cambie su contraseña al ingresar a su cuenta.";
-			mailSender.sendMail(to, body, topic);
-			return new DTRespuesta("Mail enviado con contraseña.");
-		} else {
-			return new DTRespuesta("Mail de usuario inválido.");
-		}
-
-	}
-
-	public DTRespuesta verificarMail(String mail) throws UsuarioException {
-		String to = "";
-		int tipo;
-
-		Optional<Cliente> optionalCliente = clienteRepo.findById(mail);
-		if (optionalCliente.isPresent()) { // cliente
-			Cliente cliente = optionalCliente.get();
-			to = cliente.getMail();
-			tipo = 0;
-		} else {
-			Optional<Restaurante> optionalRestaurante = resRepo.findById(mail);
-			if (optionalRestaurante.isPresent()) { // restaurante
-				Restaurante restaurante = optionalRestaurante.get();
-				to = restaurante.getMail();
-				tipo = 1;
-			} else {
-				Optional<Administrador> optionalAdmin = adminRepo.findById(mail);
-				if (optionalAdmin.isPresent()) { // administrador
-					Administrador administrador = optionalAdmin.get();
-					to = administrador.getMail();
-					tipo = 2;
-				} else {
-					throw new UsuarioException(UsuarioException.NotFoundException(mail));
-				}
+			String body = getPasswordReset(randomPass);
+			try {
+				mailSender.sendMail(to, body, topic);
+			} catch (MessagingException e) {
+				System.out.println("Error al mandar mail: " + e.getMessage());
 			}
-		}
-
-		// TODO Tenemos que ver de qué forma el usuario verifica su cuenta
-		// Mandar el link no funciona
-		String servicio = "localhost:8080/api/general/activar/?mail=" + mail + "&tipo=" + tipo;
-
-		if (to.contains("@") && to.contains(".com")) {
-			String topic = "Verificación de mail.";
-			String body = "Para verificar su mail, por favor use el siguiente link: \n" + servicio;
-			mailSender.sendMail(to, body, topic);
 			return new DTRespuesta("Mail enviado con contraseña.");
 		} else {
 			return new DTRespuesta("Mail de usuario inválido.");
 		}
 	}
 
-	// Para activar la cuenta del usuario al enviar el mail
-	// 0 -> cliente
-	// 1 -> restaurante
-	// 2 -> administrador
-	public DTRespuesta activarCuenta(String mail, int tipoUsuario) {
-		switch (tipoUsuario) {
-		case 0:
-			Optional<Cliente> optionalCliente = clienteRepo.findById(mail);
-			Cliente cliente = optionalCliente.get();
-			cliente.setActivo(true);
-			clienteRepo.save(cliente);
-			break;
-		case 1:
-			Optional<Restaurante> optionalRestaurante = resRepo.findById(mail);
-			Restaurante res = optionalRestaurante.get();
-			res.setActivo(true);
-			resRepo.save(res);
-			break;
-		case 2:
-			Optional<Administrador> optionalAdmin = adminRepo.findById(mail);
-			Administrador admin = optionalAdmin.get();
-			admin.setActivo(true);
-			adminRepo.save(admin);
-			break;
+	@Override
+	public DTRespuesta activarCuenta(String token) {
+		TokenVerificacion verificacion = tokenRepo.findByToken(token);
+
+		if (verificacion == null) {
+			return new DTRespuesta("El token no pudo ser encontrado.");
+		}
+		Cliente cliente = verificacion.getUsuario();
+
+		// Verificamos que el token del cliente siga vigente
+		Calendar cal = Calendar.getInstance();
+		if ((verificacion.getFechaExpiracion().getTime() - cal.getTime().getTime()) <= 0) {
+			TokenVerificacion newToken = new TokenVerificacion(cliente);
+			tokenRepo.save(newToken);
+
+			String to = cliente.getMail();
+			String body = getMailVerificacion("https://www.youtube.com/");
+			String topic = "Verificación de usuario " + cliente.getNickname() + ".";
+			try {
+				mailSender.sendMail(to, body, topic);
+			} catch (MessagingException e) {
+				return new DTRespuesta("No se pudo mandar mail: " + e.getMessage());
+			}
+
+			return new DTRespuesta("El token expiró. Se ha reenviado un nuevo mail de verificación.");
 		}
 
+		cliente.setVerificado(true);
+		clienteRepo.save(cliente);
 		return new DTRespuesta("Cuenta activada");
 	}
 
@@ -280,7 +355,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 	}
 
 	@Override
-	public Map<String, Object> listarRestaurantes(int page, int size, int horarioApertura, String nombre, 
+	public Map<String, Object> listarRestaurantes(int page, int size, int horarioApertura, String nombre,
 			String categoria, String sort, int order) throws RestauranteException {
 		Map<String, Object> response = new HashMap<>();
 		List<DTListarRestaurante> DTListarRestaurantes = new ArrayList<DTListarRestaurante>();
@@ -288,7 +363,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 
 		Sort sorting;
 		Pageable paging;
-		
+
 		if (!sort.equalsIgnoreCase("")) {
 			if (order == 1) {
 				sorting = Sort.by(Sort.Order.desc(sort));
@@ -305,7 +380,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 		// Devuelve los restaurantes aceptados no bloqueados y activos
 		if (!nombre.equalsIgnoreCase("")) {
 			if (!categoria.equalsIgnoreCase("")) {
-				//Aplico nombre y categoria
+				// Aplico nombre y categoria
 				pageRestaurante = resRepo.listarRestauranteDesdeClientePorNombreYCategoria(nombre, categoria,
 						EnumEstadoRestaurante.ACEPTADO, paging);
 			} else {
@@ -313,17 +388,17 @@ public class GeneralService implements GeneralServicioInterfaz {
 				pageRestaurante = resRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivosPorNombre(nombre,
 						EnumEstadoRestaurante.ACEPTADO, paging);
 			}
-			
-		} if (!categoria.equalsIgnoreCase("")) {
+
+		}
+		if (!categoria.equalsIgnoreCase("")) {
 			// Aplico solo categoria
-			pageRestaurante = resRepo.listarRestauranteDesdeClientePorCategoria(categoria, 
+			pageRestaurante = resRepo.listarRestauranteDesdeClientePorCategoria(categoria,
 					EnumEstadoRestaurante.ACEPTADO, paging);
 		} else {
-			//No aplico ni categoria ni nombre
+			// No aplico ni categoria ni nombre
 			pageRestaurante = resRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivos(EnumEstadoRestaurante.ACEPTADO,
 					paging);
 		}
-		
 
 		restaurantes = pageRestaurante.getContent();
 		int pagina = pageRestaurante.getNumber();
@@ -352,44 +427,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 		return response;
 	}
 
-//	public Map<String, Object> listarMenusRestaurante(String attr, int order, int page, int size,
-//			String mailRestaurante) throws RestauranteException {
-//		Optional<Restaurante> optionalRestaurante = resRepo.findById(mailRestaurante);
-//		if (!optionalRestaurante.isPresent()) {
-//			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(mailRestaurante));
-//		}
-//
-//		Pageable paging;
-//		if (attr == null || attr.isEmpty())
-//			paging = PageRequest.of(page, size);
-//		else {
-//			Sort sort;
-//			if (order == 1)
-//				sort = Sort.by(attr).descending();
-//			else
-//				sort = Sort.by(attr).ascending();
-//			paging = PageRequest.of(page, size, sort);
-//		}
-//
-//		Restaurante restaurante = optionalRestaurante.get();
-//		Map<String, Object> response = new HashMap<>();
-//		Page<Producto> pageProducto = proRepo.findAllByRestaurante(restaurante, paging);
-//		List<DTProducto> retorno = new ArrayList<DTProducto>();
-//		List<Producto> productos = pageProducto.getContent();
-//
-//		response.put("currentPage", pageProducto.getNumber());
-//		response.put("totalItems", pageProducto.getTotalElements());
-//
-//		for (Producto p : productos) {
-//			if (!(p.getClass() == Promocion.class)) {
-//				retorno.add(new DTProducto(p));
-//			}
-//		}
-//
-//		response.put("productos", retorno);
-//		return response;
-//	}
-
+	@Override
 	public List<DTCategoriaProducto> listarMenus(String mailRestaurante) throws RestauranteException {
 		Optional<Restaurante> optionalRestaurante = resRepo.findById(mailRestaurante);
 		if (!optionalRestaurante.isPresent()) {
@@ -476,7 +514,8 @@ public class GeneralService implements GeneralServicioInterfaz {
 	}
 
 	@Override
-	public Map<String, Object> buscarMenusPromociones(String mailRestaurante, String producto) throws RestauranteException {
+	public Map<String, Object> buscarMenusPromociones(String mailRestaurante, String producto)
+			throws RestauranteException {
 		Optional<Restaurante> optionalRestaurante = resRepo.findById(mailRestaurante);
 		if (!optionalRestaurante.isPresent()) {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(mailRestaurante));
@@ -488,8 +527,8 @@ public class GeneralService implements GeneralServicioInterfaz {
 		List<DTPromocion> dtpromociones = new ArrayList<>();
 		List<Producto> productos = proRepo.findAllByParametro(restaurante, producto);
 
-		for(Producto p : productos) {
-			if(p instanceof Promocion) {
+		for (Producto p : productos) {
+			if (p instanceof Promocion) {
 				Promocion promocion = (Promocion) p;
 				dtpromociones.add(new DTPromocion(promocion));
 			} else {

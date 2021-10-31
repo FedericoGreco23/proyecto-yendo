@@ -47,23 +47,16 @@ public class PublicRest {
 
 	@Autowired
 	private JwtUtil jwtTokenUtil;
-
 	@Autowired
 	private MyUserDetailsService userDetailsService;
-
 	@Autowired
 	private GeneralService service;
-
 	@Autowired
 	private ClienteService clienteService;
-
 	@Autowired
 	private RestauranteService restService;
-	
-
-	
-    @Autowired
-    private SimpMessagingTemplate simpMessagingTemplate;
+	@Autowired
+	private SimpMessagingTemplate simpMessagingTemplate;
 
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
@@ -110,6 +103,16 @@ public class PublicRest {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
+	@PostMapping("/activarCuenta")
+	public ResponseEntity<?> activarCuenta(@RequestParam(required = true) String token) {
+		try {
+			return new ResponseEntity<>(service.activarCuenta(token), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 	@PostMapping("/crearRestaurante")
 	public ResponseEntity<?> crearRestaurante(@RequestBody Restaurante rest) {
@@ -130,20 +133,10 @@ public class PublicRest {
 		}
 	}
 
-	@CrossOrigin(origins = "*", allowedHeaders = "*")
-	@RequestMapping(value = "/verificar", method = RequestMethod.POST)
-	public ResponseEntity<?> verificarMail(@RequestParam String mail) {
-		try {
-			return new ResponseEntity<>(service.verificarMail(mail), HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
-
 	@GetMapping("/listarRestaurantes")
 	public Map<String, Object> listarRestaurantesAbiertos(@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "0") int horarioApertura, 
-			@RequestParam(defaultValue = "") String nombre, @RequestParam(defaultValue = "")String categoria, 
+			@RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "0") int horarioApertura,
+			@RequestParam(defaultValue = "") String nombre, @RequestParam(defaultValue = "") String categoria,
 			@RequestParam(defaultValue = "") String sort, @RequestParam(defaultValue = "0") int order) {
 		try {
 			return service.listarRestaurantes(page, size, horarioApertura, nombre, categoria, sort, order);
@@ -167,9 +160,10 @@ public class PublicRest {
 			return new ResponseEntity<DTRestaurante>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@GetMapping("/buscarRestaurante")
-	public ResponseEntity<?> buscarRestaurante(@RequestParam(defaultValue = "") String texto, @RequestParam(defaultValue = "") String nombreCategoria) {
+	public ResponseEntity<?> buscarRestaurante(@RequestParam(defaultValue = "") String texto,
+			@RequestParam(defaultValue = "") String nombreCategoria) {
 		try {
 			List<DTBuscarRestaurante> respuesta = service.buscarRestaurante(texto, nombreCategoria);
 			return new ResponseEntity<>(respuesta, HttpStatus.OK);
@@ -191,7 +185,7 @@ public class PublicRest {
 //			return null;
 //		}
 //	}
-	
+
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@GetMapping("/getMenus/{restaurante}")
 	public ResponseEntity<?> listarMenus(@PathVariable(required = true) String restaurante) {
@@ -215,7 +209,7 @@ public class PublicRest {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@GetMapping("/buscarMenusPromociones/{restaurante}")
 	public ResponseEntity<?> buscarMenusPromociones(@PathVariable(required = true) String restaurante,
@@ -245,20 +239,19 @@ public class PublicRest {
 	@PostMapping("/cargarDatos")
 	public String cargarDatos() {
 		try {
-			//restService.cargarDatos();
+			// restService.cargarDatos();
 			restService.cargarDatos();
-		}catch(Exception e) {
-			return "oops, estimado frontend algo se ha ido a la mierda. Consulte a su backend de confianza"; 
+		} catch (Exception e) {
+			return "oops, estimado frontend algo se ha ido a la mierda. Consulte a su backend de confianza";
 		}
 		return "rock and roll nene!";
 	}
-	
-	
+
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/cargarDatos2")
 	public String cargarDatos2() {
 		try {
-			//restService.cargarDatos();
+			// restService.cargarDatos();
 			restService.cargarDatos2();
 		} catch (Exception e) {
 			return "oops, estimado frontend algo se ha ido a la mierda. Consulte a su backend de confianza";
