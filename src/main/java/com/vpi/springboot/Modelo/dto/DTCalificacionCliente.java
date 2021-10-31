@@ -11,6 +11,7 @@ public class DTCalificacionCliente extends DTCalificacion implements Serializabl
 
 	private String restaurante;
 	private String cliente;
+	private String fotoCliente;
 
 	public DTCalificacionCliente() {
 		super();
@@ -27,6 +28,7 @@ public class DTCalificacionCliente extends DTCalificacion implements Serializabl
 		super(cal.getId(), cal.getPuntaje(), cal.getComentario(), cal.getFoto(), cal.getFecha());
 		this.restaurante = cal.getRestaurante().getNombre();
 		this.cliente = cal.getCliente().getNombre();
+		this.fotoCliente = cal.getFoto();
 	}
 	
 	public DTCalificacionCliente(Calificacion cal, String restaurante, String cliente) {
@@ -49,5 +51,13 @@ public class DTCalificacionCliente extends DTCalificacion implements Serializabl
 
 	public void setCliente(String cliente) {
 		this.cliente = cliente;
+	}
+
+	public String getFotoCliente() {
+		return fotoCliente;
+	}
+
+	public void setFotoCliente(String fotoCliente) {
+		this.fotoCliente = fotoCliente;
 	}
 }
