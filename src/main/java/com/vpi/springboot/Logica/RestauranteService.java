@@ -1230,6 +1230,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 		response.put("currentPage", pagina);
 		response.put("totalItems", totalElements);
+		response.put("calificacionGlobal", restaurante.getCalificacionPromedio());
 		response.put("restaurantes", DTCalificacionesRestaurante);
 
 		return response;

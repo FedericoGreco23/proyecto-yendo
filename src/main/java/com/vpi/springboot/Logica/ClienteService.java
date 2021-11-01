@@ -796,6 +796,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 		
 		response.put("currentPage", pagina);
 		response.put("totalItems", totalElements);
+		response.put("calificacionGlobal", cliente.getCalificacionPromedio());
 		response.put("restaurantes", DTCalificacionesCliente);
 
 		return response;
