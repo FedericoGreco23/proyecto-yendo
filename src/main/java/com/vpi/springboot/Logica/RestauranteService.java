@@ -894,10 +894,15 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				calificacion = 5;
 			}
 			try {
-				Double rand = (Double) (Math.random() * 1);
-				Double latitud = BigDecimal.valueOf(lat + rand).setScale(4, RoundingMode.HALF_UP).doubleValue();
-				Double longitud = BigDecimal.valueOf(lon + rand).setScale(4, RoundingMode.HALF_UP).doubleValue();
 
+				Double rand = (Double) (Math.random() * 0.1);
+				Double latitud = BigDecimal.valueOf(lat+rand)
+					    .setScale(4, RoundingMode.HALF_UP)
+					    .doubleValue();
+				Double longitud = BigDecimal.valueOf(lon+rand)
+					    .setScale(4, RoundingMode.HALF_UP)
+					    .doubleValue();
+				
 				Integer i = (int) (Math.random() * 2 + 1);
 				Integer envio = (int) (Math.random() * 30 + 1);
 				Integer randomFoto = (int) (Math.random() * 10);
@@ -1030,9 +1035,15 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		for (String c : clientesList) {
 			try {
 
-				Double rand = (Double) (Math.random() * 1);
-				Double latitud = BigDecimal.valueOf(lat + rand).setScale(4, RoundingMode.HALF_UP).doubleValue();
-				Double longitud = BigDecimal.valueOf(lon + rand).setScale(4, RoundingMode.HALF_UP).doubleValue();
+
+				Double rand = (Double) (Math.random() * 0.1);
+				Double latitud = BigDecimal.valueOf(lat+rand)
+					    .setScale(4, RoundingMode.HALF_UP)
+					    .doubleValue();
+				Double longitud = BigDecimal.valueOf(lon+rand)
+					    .setScale(4, RoundingMode.HALF_UP)
+					    .doubleValue();
+								
 
 				GeoLocalizacion GeoCliente = new GeoLocalizacion(latitud, longitud);
 
