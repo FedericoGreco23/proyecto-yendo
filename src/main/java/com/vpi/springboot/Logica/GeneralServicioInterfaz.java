@@ -29,7 +29,7 @@ public interface GeneralServicioInterfaz {
 	
 	public DTRestaurante getRestaurante(String mail) throws RestauranteException;
 	
-	public List<DTBuscarRestaurante> buscarRestaurante(String nombre, String nombreCategoria) throws RestauranteException;
+	public List<DTBuscarRestaurante> buscarRestaurante(String nombre, String nombreCategoria, int idDireccion) throws RestauranteException;
 	
 	public List<Categoria> listarCategorias();
 	

@@ -162,9 +162,9 @@ public class PublicRest {
 
 	@GetMapping("/buscarRestaurante")
 	public ResponseEntity<?> buscarRestaurante(@RequestParam(defaultValue = "") String texto,
-			@RequestParam(defaultValue = "") String nombreCategoria) {
+			@RequestParam(defaultValue = "") String nombreCategoria, @RequestParam(defaultValue = "0") int idDireccion) {
 		try {
-			List<DTBuscarRestaurante> respuesta = service.buscarRestaurante(texto, nombreCategoria);
+			List<DTBuscarRestaurante> respuesta = service.buscarRestaurante(texto, nombreCategoria, idDireccion);
 			return new ResponseEntity<>(respuesta, HttpStatus.OK);
 		} catch (RestauranteException e) {
 			e.printStackTrace();
