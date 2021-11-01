@@ -38,7 +38,7 @@ public interface RestauranteRepositorio extends UserBaseRepository<Restaurante> 
 	@Query("SELECT u FROM Restaurante u WHERE u.estado = :estado AND u.bloqueado = FALSE AND u.activo = TRUE")
 	Page<Restaurante> buscarRestaurantesPorEstadoNoBloqueadosYActivos(@Param("estado") EnumEstadoRestaurante estado, Pageable pageable);
 
-	@Query("SELECT u FROM Restaurante u WHERE UPPER(u.nombre) LIKE CONCAT('%',UPPER(:nombre),'%') AND u.estado = :estado AND u.bloqueado = FALSE AND u.activo = TRUE")
+	@Query("SELECT r FROM Restaurante r WHERE UPPER(r.nombre) LIKE CONCAT('%',UPPER(:nombre),'%') AND r.estado = :estado AND r.bloqueado = FALSE AND r.activo = TRUE")
 	Page<Restaurante> buscarRestaurantesPorEstadoNoBloqueadosYActivosPorNombre(@Param("nombre") String nombre, @Param("estado") EnumEstadoRestaurante estado, Pageable pageable);
 	
 	//	@Query("SELECT u FROM User u WHERE u.status = :status and u.name = :name")
@@ -48,22 +48,22 @@ public interface RestauranteRepositorio extends UserBaseRepository<Restaurante> 
 	
 //PARA BUSCAR RESTAURANTES
 	
-	@Query("SELECT r FROM Restaurante r WHERE UPPER(r.nombre) LIKE CONCAT('%',UPPER(:texto),'%') AND r.estado = :estado AND r.bloqueado = FALSE AND r.activo = TRUE")
+	@Query("SELECT r FROM Restaurante r WHERE UPPER(r.nombre) LIKE CONCAT('%',UPPER(:texto),'%') AND r.estado = :estado AND r.bloqueado = FALSE AND r.activo = TRUE LIMIT 5")
 	List<Restaurante> buscarRestauranteDesdeClientePorNombre(@Param("texto") String texto, @Param("estado") EnumEstadoRestaurante estado);
 	
-	@Query("SELECT r FROM Restaurante r INNER JOIN r.categorias c WHERE UPPER(c.nombre) LIKE UPPER(:categoria) AND UPPER(r.nombre) LIKE CONCAT('%',UPPER(:texto),'%') AND r.estado = :estado AND r.bloqueado = FALSE AND r.activo = TRUE")
-	List<Restaurante> buscarRestauranteDesdeClientePorNombreYCategoria(@Param("texto") String texto, @Param("categoria") String categoria, @Param("estado") EnumEstadoRestaurante estado);
+	@Query("SELECT r FROM Restaurante r INNER JOIN r.categorias c WHERE UPPER(c.nombre) LIKE UPPER(:categoria) AND UPPER(r.nombre) LIKE CONCAT('%',UPPER(:nombre),'%') AND r.estado = :estado AND r.bloqueado = FALSE AND r.activo = TRUE LIMIT 5")
+	List<Restaurante> buscarRestauranteDesdeClientePorNombreYCategoria(@Param("nombre") String nombre, @Param("categoria") String categoria, @Param("estado") EnumEstadoRestaurante estado);
 	
-	@Query("SELECT r FROM Restaurante r INNER JOIN r.categorias c WHERE UPPER(c.nombre) LIKE UPPER(:categoria) AND r.estado = :estado AND r.bloqueado = FALSE AND r.activo = TRUE")
+	@Query("SELECT r FROM Restaurante r INNER JOIN r.categorias c WHERE UPPER(c.nombre) LIKE UPPER(:categoria) AND r.estado = :estado AND r.bloqueado = FALSE AND r.activo = TRUE LIMIT 5")
 	List<Restaurante> buscarRestauranteDesdeClientePorCategoria(@Param("categoria") String categoria, @Param("estado") EnumEstadoRestaurante estado);
 	
 //PARA LISTAR RESTAURANTES
 	
-	@Query("SELECT r FROM Restaurante r WHERE UPPER(r.nombre) LIKE CONCAT('%',UPPER(:texto),'%') AND r.estado = :estado AND r.bloqueado = FALSE AND r.activo = TRUE")
-	Page<Restaurante> listarRestauranteDesdeClientePorNombre(@Param("texto") String texto, @Param("estado") EnumEstadoRestaurante estado, Pageable pageable);
+	@Query("SELECT r FROM Restaurante r WHERE UPPER(r.nombre) LIKE CONCAT('%',UPPER(:nombre),'%') AND r.estado = :estado AND r.bloqueado = FALSE AND r.activo = TRUE")
+	Page<Restaurante> listarRestauranteDesdeClientePorNombre(@Param("nombre") String nombre, @Param("estado") EnumEstadoRestaurante estado, Pageable pageable);
 	
-	@Query("SELECT r FROM Restaurante r INNER JOIN r.categorias c WHERE UPPER(c.nombre) LIKE UPPER(:categoria) AND UPPER(r.nombre) LIKE CONCAT('%',UPPER(:texto),'%') AND r.estado = :estado AND r.bloqueado = FALSE AND r.activo = TRUE")
-	Page<Restaurante> listarRestauranteDesdeClientePorNombreYCategoria(@Param("texto") String texto, @Param("categoria") String categoria, @Param("estado") EnumEstadoRestaurante estado, Pageable pageable);
+	@Query("SELECT r FROM Restaurante r INNER JOIN r.categorias c WHERE UPPER(c.nombre) LIKE UPPER(:categoria) AND UPPER(r.nombre) LIKE CONCAT('%',UPPER(:nombre),'%') AND r.estado = :estado AND r.bloqueado = FALSE AND r.activo = TRUE")
+	Page<Restaurante> listarRestauranteDesdeClientePorNombreYCategoria(@Param("nombre") String nombre, @Param("categoria") String categoria, @Param("estado") EnumEstadoRestaurante estado, Pageable pageable);
 	
 	@Query("SELECT r FROM Restaurante r INNER JOIN r.categorias c WHERE UPPER(c.nombre) LIKE UPPER(:categoria) AND r.estado = :estado AND r.bloqueado = FALSE AND r.activo = TRUE")
 	Page<Restaurante> listarRestauranteDesdeClientePorCategoria(@Param("categoria") String categoria, @Param("estado") EnumEstadoRestaurante estado, Pageable pageable);

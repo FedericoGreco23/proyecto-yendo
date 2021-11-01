@@ -382,7 +382,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 			                * Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2));  
 			        double va2 = 2 * Math.atan2(Math.sqrt(va1), Math.sqrt(1 - va1));  
 			        double distancia = radioTierra * va2; 
-					if (distancia < 5) {
+					if (distancia < 15) {
 						DTBuscarRestaurantes.add(new DTBuscarRestaurante(restaurante.getNombre(), restaurante.getFoto(),
 								restaurante.getDireccion(), restaurante.getMail(), false));
 					} else {
@@ -431,8 +431,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 						EnumEstadoRestaurante.ACEPTADO, paging);
 			}
 
-		}
-		if (!categoria.equalsIgnoreCase("")) {
+		} else if (!categoria.equalsIgnoreCase("")) {
 			// Aplico solo categoria
 			pageRestaurante = resRepo.listarRestauranteDesdeClientePorCategoria(categoria,
 					EnumEstadoRestaurante.ACEPTADO, paging);
@@ -441,6 +440,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 			pageRestaurante = resRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivos(EnumEstadoRestaurante.ACEPTADO,
 					paging);
 		}
+		
 
 		restaurantes = pageRestaurante.getContent();
 		int pagina = pageRestaurante.getNumber();

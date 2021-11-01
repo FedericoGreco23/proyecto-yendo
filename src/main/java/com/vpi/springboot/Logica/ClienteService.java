@@ -879,7 +879,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 	                * Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2));  
 	        double va2 = 2 * Math.atan2(Math.sqrt(va1), Math.sqrt(1 - va1));  
 	        double distancia = radioTierra * va2; 
-			if (distancia < 5) {
+			if (distancia < 15) {
 				if (horarioApertura > 0) {
 					if (r.getHorarioApertura().getHour() >= horarioApertura) {
 						DTListarRestaurantes.add(new DTListarRestaurante(r));
