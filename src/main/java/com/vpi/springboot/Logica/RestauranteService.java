@@ -726,11 +726,12 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			optionalDt = resPedRepo.findById((String) object[0]);
 			if (optionalDt.isPresent()) {
 				dt = optionalDt.get();
-
-				dt.setCantPedidos((int)object[1]);
+				BigInteger big1 =  (BigInteger) object[1];
+				dt.setCantPedidos(big1.intValue());
 				resPedRepo.save(dt);
 			}else {
-				dt = new DTRestaurantePedido((String) object[0], (int) object[1]);
+				BigInteger big =  (BigInteger) object[1];
+				dt = new DTRestaurantePedido((String) object[0], big.intValue());
 				dt.setNombre(res.getNombre());
 				resPedRepo.save(dt);
 			}
