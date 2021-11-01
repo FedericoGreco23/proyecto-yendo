@@ -1,7 +1,5 @@
 package com.vpi.springboot.Logica;
 
-import static org.assertj.core.api.Assertions.assertThatNullPointerException;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -83,7 +81,6 @@ import com.vpi.springboot.exception.ProductoException;
 import com.vpi.springboot.exception.PromocionException;
 import com.vpi.springboot.exception.RestauranteException;
 import com.vpi.springboot.exception.UsuarioException;
-import com.vpi.springboot.security.util.JwtUtil.keyInfoJWT;
 
 @Service
 @EnableScheduling
@@ -91,8 +88,6 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 	@Autowired
 	private RestauranteRepositorio restauranteRepo;
-	@Autowired
-	private GeoLocalizacionRepositorio geoRepo;
 	@Autowired
 	private PedidoRepositorio pedidoRepo;
 	@Autowired
@@ -505,7 +500,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			Promocion promocion = optionalPromocion.get();
 
 			promocion.setActivo(false);
-			proRepo.save(promocion);
+			promoRepo.save(promocion);
 			return new DTRespuesta("Promocion dada de baja correctamente.");
 		} else {
 			throw new PromocionException(PromocionException.NotFoundExceptionId(idPromo));
@@ -719,8 +714,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	@Scheduled(cron = "*/59 */5 * * * *") // 1 vez cada 5 minutos
 	public DTRespuesta guaradarEnMongo() {
 		List<Object[]> lista = restauranteRepo.buscarRestaurantesConMasPedidos();
-		// Map<String, Integer> restpedidos = new HashMap<String, Integer>();
-		List<DTRestaurantePedido> restaurantesPedidos = new ArrayList<DTRestaurantePedido>();
+		//Map<String, Integer> restpedidos = new HashMap<String, Integer>();
+		//List<DTRestaurantePedido> restaurantesPedidos = new ArrayList<DTRestaurantePedido>();
 		Optional<DTRestaurantePedido> optionalDt;
 		Optional<Restaurante> optionalRes;
 		Restaurante res;
@@ -731,11 +726,11 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			optionalDt = resPedRepo.findById((String) object[0]);
 			if (optionalDt.isPresent()) {
 				dt = optionalDt.get();
-				dt.setCantPedidos((BigInteger) object[1]);
-				resPedRepo.save(dt);
 
-			} else {
-				dt = new DTRestaurantePedido((String) object[0], (BigInteger) object[1]);
+				dt.setCantPedidos((int)object[1]);
+				resPedRepo.save(dt);
+			}else {
+				dt = new DTRestaurantePedido((String) object[0], (int) object[1]);
 				dt.setNombre(res.getNombre());
 				resPedRepo.save(dt);
 			}

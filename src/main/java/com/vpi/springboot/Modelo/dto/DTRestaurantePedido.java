@@ -14,7 +14,7 @@ public class DTRestaurantePedido implements Serializable {
 	@Id
 	private String _id;
 	private String nombre;
-	private BigInteger cantPedidos;
+	private int cantPedidos;
 	
 	
 	public DTRestaurantePedido() {
@@ -22,7 +22,7 @@ public class DTRestaurantePedido implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public DTRestaurantePedido(String mailRestaurante, BigInteger cantPedidos) {
+	public DTRestaurantePedido(String mailRestaurante, int cantPedidos) {
 		super();
 		this._id = mailRestaurante;
 		this.cantPedidos = cantPedidos;
@@ -52,11 +52,11 @@ public class DTRestaurantePedido implements Serializable {
 		this._id = mailRestaurante;
 	}
 
-	public BigInteger getCantPedidos() {
+	public int getCantPedidos() {
 		return cantPedidos;
 	}
 
-	public void setCantPedidos(BigInteger cantPedidos) {
+	public void setCantPedidos(int cantPedidos) {
 		this.cantPedidos = cantPedidos;
 	}
 	

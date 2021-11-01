@@ -10,6 +10,11 @@ public class DTProductoIdCantidad implements Serializable {
 		super();
 		// TODO Auto-generated constructor stub
 	}
+	public DTProductoIdCantidad(Integer id, Integer cantidad) {
+		super();
+		this.id = id;
+		this.cantidad = cantidad;
+	}
 	public Integer getId() {
 		return id;
 	}

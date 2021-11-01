@@ -426,11 +426,10 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 	@Override
 	public Map<String, Object> restaurantesConMasPedidos(int page, int size){
 		Pageable paging;
-		
 		Map<String, Object> response = new HashMap<>();
 		Page<DTRestaurantePedido> pageRestaurantePedido;
 		Sort sort = Sort.by(Sort.Order.desc("cantPedidos"));
-		paging = PageRequest.of(page, size,sort);
+		paging = PageRequest.of(page, size, sort);
 		pageRestaurantePedido = restaurantePedidosRepo.findAll(paging);
 		List<DTRestaurantePedido> restauranteList = new ArrayList<DTRestaurantePedido>();
 		restauranteList = pageRestaurantePedido.getContent();

@@ -22,6 +22,8 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.vpi.springboot.Logica.RestauranteService;
+import com.vpi.springboot.Modelo.Calificacion;
+import com.vpi.springboot.Modelo.CalificacionCliente;
 import com.vpi.springboot.Modelo.Carrito;
 import com.vpi.springboot.Modelo.Categoria;
 import com.vpi.springboot.Modelo.Cliente;
@@ -29,20 +31,27 @@ import com.vpi.springboot.Modelo.Direccion;
 import com.vpi.springboot.Modelo.GeoLocalizacion;
 import com.vpi.springboot.Modelo.Pedido;
 import com.vpi.springboot.Modelo.Producto;
+import com.vpi.springboot.Modelo.Promocion;
 import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.dto.DTProducto;
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
+import com.vpi.springboot.Modelo.dto.DTProductoIdCantidad;
+import com.vpi.springboot.Modelo.dto.DTPromocionConPrecio;
 import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
+import com.vpi.springboot.Repositorios.CalificacionClienteRepositorio;
 import com.vpi.springboot.Repositorios.CategoriaRepositorio;
+import com.vpi.springboot.Repositorios.ClienteRepositorio;
 import com.vpi.springboot.Repositorios.MongoRepositorioCarrito;
 import com.vpi.springboot.Repositorios.PedidoRepositorio;
 import com.vpi.springboot.Repositorios.ProductoRepositorio;
+import com.vpi.springboot.Repositorios.PromocionRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
 import com.vpi.springboot.exception.CategoriaException;
 import com.vpi.springboot.exception.PedidoException;
 import com.vpi.springboot.exception.ProductoException;
+import com.vpi.springboot.exception.PromocionException;
 import com.vpi.springboot.exception.RestauranteException;
 
 class RestauranteServiceTest {
@@ -56,11 +65,20 @@ class RestauranteServiceTest {
 	@Mock
 	private ProductoRepositorio prodRepo;
 	@Mock
+	private ProductoRepositorio productoRepo;
+	@Mock
 	private PedidoRepositorio pedidoRepo;
 	@Mock
 	private SimpMessagingTemplate simpMessagingTemplate;
 	@Mock
 	private MongoRepositorioCarrito mongoRepo;
+	@Mock
+	private PromocionRepositorio promoRepo;
+	@Mock
+	private ClienteRepositorio clienteRepo;
+	@Mock
+	private CalificacionClienteRepositorio calClienteRepo;
+	
 	
 	@InjectMocks
 	private RestauranteService mockRestaurante;
@@ -78,7 +96,6 @@ class RestauranteServiceTest {
 	private Categoria categoria;
 	private Optional<Categoria> optionalCategoria;
 	private List<Categoria> categorias = new ArrayList<>();
-	private Producto productoVacio;
     private Producto productoSinRes;
     private Pedido pedido;
     private Optional<Pedido> optionalPedido;
@@ -88,8 +105,15 @@ class RestauranteServiceTest {
 	private List<DTProductoCarrito> listProductoCarrito = new ArrayList<DTProductoCarrito>();
     private Carrito carrito;
 	private Optional<Carrito> optionalCarritoLleno;
-	
-	
+	private List<Promocion> promocionList = new ArrayList<Promocion>();
+	private Promocion promo;
+	private Optional<Promocion> optionalPromocion;
+	private DTPromocionConPrecio promoConprecio;
+	private DTProductoIdCantidad dtproductoIdCant;
+	private List<DTProductoIdCantidad> listdtproductoIdCant = new ArrayList<DTProductoIdCantidad>();
+	private CalificacionCliente calCliente;
+	private List<CalificacionCliente> calClienteList = new ArrayList<CalificacionCliente>();
+	private Calificacion calificacion;
 
 	@BeforeEach
 	public void init() {
@@ -124,6 +148,15 @@ class RestauranteServiceTest {
 		listProductoCarrito.add(dtProductoCarrito);
 		carrito = new Carrito(50, cliente.getMail(), restaurante.getMail(), listProductoCarrito, true);
 		optionalCarritoLleno = Optional.of(carrito);
+		promo = new Promocion("promo1", "descripcion", 329, null, 0, true);
+		optionalPromocion = Optional.of(promo);
+		promocionList.add(promo);
+		dtproductoIdCant = new DTProductoIdCantidad(producto.getId(), 2);
+		listdtproductoIdCant.add(dtproductoIdCant);
+		promoConprecio = new DTPromocionConPrecio(listdtproductoIdCant, 230, 25, "promo1", "descri", null);
+		calificacion = new Calificacion(5, "comentario", null, LocalDateTime.now());
+		calCliente = new CalificacionCliente(calificacion, restaurante, cliente);
+		calClienteList.add(calCliente);
 	}
 	
 	@Test
@@ -256,5 +289,44 @@ class RestauranteServiceTest {
 		Mockito.when(prodRepo.findById(Mockito.anyInt())).thenReturn(optionalProducto);
 		Mockito.doReturn(producto).when(prodRepo).save(Mockito.any(Producto.class));
 		mockRestaurante.modificarDescuentoProducto(producto.getId(), 10);
+	}
+	
+	@Test
+	public void testAltaPromocion() throws RestauranteException, PromocionException {
+		Mockito.when(restauranteRepo.findById(Mockito.anyString())).thenReturn(optionalRestaurante);
+		Mockito.when(promoRepo.findAllByRestauranteSimple(Mockito.any(Restaurante.class))).thenReturn(promocionList);
+		Mockito.when(prodRepo.findByIdAndRest(Mockito.anyInt(), Mockito.any(Restaurante.class))).thenReturn(producto);
+		Mockito.doReturn(promo).when(promoRepo).save(Mockito.any(Promocion.class));
+		mockRestaurante.altaPromocion(promoConprecio, restaurante.getMail());
+	}
+	
+	@Test
+	public void testBajaPromocion() throws PromocionException {
+		Mockito.when(promoRepo.findById(Mockito.anyInt())).thenReturn(optionalPromocion);
+		Mockito.doReturn(promo).when(promoRepo).save(Mockito.any(Promocion.class));
+		mockRestaurante.bajaPromocion(promo.getId());
+	}
+	
+	@Test
+	public void testModificarPromocion() throws PromocionException, ProductoException {
+		Mockito.when(promoRepo.findById(Mockito.anyInt())).thenReturn(optionalPromocion);
+		Mockito.when(prodRepo.findByIdAndRest(Mockito.anyInt(), Mockito.any(Restaurante.class))).thenReturn(producto);
+		Mockito.doReturn(promo).when(promoRepo).save(Mockito.any(Promocion.class));
+		mockRestaurante.modificarPromocion(promo);
+	}
+	
+	@Test
+	public void testRechazarPedido() throws PedidoException {
+		Mockito.when(pedidoRepo.findById(Mockito.anyInt())).thenReturn(optionalPedido);
+		Mockito.doReturn(pedido).when(pedidoRepo).save(Mockito.any(Pedido.class));
+		Mockito.doNothing().when(simpMessagingTemplate).convertAndSend(Mockito.anyString(),Mockito.anyString());
+		mockRestaurante.rechazarPedido(pedido.getId());
+	}
+	
+	@Test
+	public void testCalificarCliente() {
+		Mockito.when(restauranteRepo.findById(Mockito.anyString())).thenReturn(optionalRestaurante);
+		Mockito.when(clienteRepo.findById(Mockito.anyString())).thenReturn(optionalCliente);
+		Mockito.when(pedidoRepo.findByClienteRestaurante(Mockito.any(Cliente.class), Mockito.any(Restaurante.class))).thenReturn(pedidos);
 	}
 }
