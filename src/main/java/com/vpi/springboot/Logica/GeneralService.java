@@ -51,6 +51,8 @@ public class GeneralService implements GeneralServicioInterfaz {
 	@Autowired
 	private ClienteRepositorio clienteRepo;
 	@Autowired
+	private DireccionRepositorio dirRepo;
+	@Autowired
 	private RestauranteRepositorio resRepo;
 	@Autowired
 	private AdministradorRepositorio adminRepo;
@@ -331,7 +333,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 	}
 
 	@Override
-	public List<DTBuscarRestaurante> buscarRestaurante(String texto, String nombreCategoria)
+	public List<DTBuscarRestaurante> buscarRestaurante(String texto, String nombreCategoria, int idDireccion)
 			throws RestauranteException {
 		List<Restaurante> restaurantes = new ArrayList<Restaurante>();
 		List<DTBuscarRestaurante> DTBuscarRestaurantes = new ArrayList<DTBuscarRestaurante>();
@@ -350,10 +352,46 @@ public class GeneralService implements GeneralServicioInterfaz {
 					EnumEstadoRestaurante.ACEPTADO);
 		}
 		if (restaurantes != null) {
-			for (Restaurante restaurante : restaurantes) {
-				DTBuscarRestaurantes.add(new DTBuscarRestaurante(restaurante.getNombre(), restaurante.getFoto(),
-						restaurante.getDireccion(), restaurante.getMail()));
+			if (idDireccion == 0) {
+				for (Restaurante restaurante : restaurantes) {
+					DTBuscarRestaurantes.add(new DTBuscarRestaurante(restaurante.getNombre(), restaurante.getFoto(),
+							restaurante.getDireccion(), restaurante.getMail()));
+				}
+			} else {
+				//Calculo de distancia entre restaurante y cliente
+				double lat1;
+				double lng1;
+				double lat2;
+				double lng2; 
+				//Obtengo los datos de latitud y longitud del cliente que recibo su idDireccion
+				Optional<Direccion> optionalDireccion = dirRepo.findById(idDireccion);
+				Direccion direccion = optionalDireccion.get();
+				lat1 = direccion.getGeoLocalizacion().getLatitud();
+				lng1 = direccion.getGeoLocalizacion().getLongitud();
+				
+				for (Restaurante restaurante : restaurantes) {
+					lat2 = restaurante.getGeoLocalizacion().getLatitud();
+					lng2 = restaurante.getGeoLocalizacion().getLongitud();
+					
+					double radioTierra = 6371;//en kilómetros  
+			        double dLat = Math.toRadians(lat2 - lat1);  
+			        double dLng = Math.toRadians(lng2 - lng1);  
+			        double sindLat = Math.sin(dLat / 2);  
+			        double sindLng = Math.sin(dLng / 2);  
+			        double va1 = Math.pow(sindLat, 2) + Math.pow(sindLng, 2)  
+			                * Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2));  
+			        double va2 = 2 * Math.atan2(Math.sqrt(va1), Math.sqrt(1 - va1));  
+			        double distancia = radioTierra * va2; 
+					if (distancia < 5) {
+						DTBuscarRestaurantes.add(new DTBuscarRestaurante(restaurante.getNombre(), restaurante.getFoto(),
+								restaurante.getDireccion(), restaurante.getMail(), false));
+					} else {
+						DTBuscarRestaurantes.add(new DTBuscarRestaurante(restaurante.getNombre(), restaurante.getFoto(),
+								restaurante.getDireccion(), restaurante.getMail(), true));
+					}
+				}
 			}
+			
 		}
 		return DTBuscarRestaurantes;
 	}

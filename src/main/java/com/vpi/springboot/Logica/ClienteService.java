@@ -39,10 +39,12 @@ import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.TokenVerificacion;
 import com.vpi.springboot.Modelo.LastDireccioClientenMongo;
 import com.vpi.springboot.Modelo.Pedido;
+import com.vpi.springboot.Modelo.dto.DTCalificacionCliente;
 import com.vpi.springboot.Modelo.dto.DTCalificacionRestaurante;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTCliente;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
+import com.vpi.springboot.Modelo.dto.DTListarRestaurante;
 import com.vpi.springboot.Modelo.dto.DTPedido;
 import com.vpi.springboot.Modelo.dto.DTPedidoParaAprobar;
 import com.vpi.springboot.Modelo.dto.DTProducto;
@@ -51,6 +53,7 @@ import com.vpi.springboot.Modelo.dto.DTReclamo;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoReclamo;
+import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
 import com.vpi.springboot.Repositorios.CalificacionClienteRepositorio;
 import com.vpi.springboot.Repositorios.CalificacionRestauranteRepositorio;
@@ -754,7 +757,152 @@ public class ClienteService implements ClienteServicioInterfaz {
 
 		return DTpedido;
 	}
+	
+	//ConsultarCalificacionesCliente
+	@Override
+	public Map<String, Object> consultarCalificacion(int page, int size, String sort, int order, String mailCliente) {
+		Map<String, Object> response = new HashMap<>();
+		//List<DTCalificacionRestaurante> DTCalificacionesRestaurante = new ArrayList<DTCalificacionRestaurante>();
+		//List<CalificacionRestaurante> calificacionRestaurantes = new ArrayList<CalificacionRestaurante>();
+		List<DTCalificacionCliente> DTCalificacionesCliente = new ArrayList<DTCalificacionCliente>();
+		List<CalificacionCliente> calificacionClientes = new ArrayList<CalificacionCliente>();
+		
+		Sort sorting;
+		Pageable paging;
+		
+		if (!sort.equalsIgnoreCase("")) {
+			if (order == 1) {
+				sorting = Sort.by(Sort.Order.desc(sort));
+			} else {
+				sorting = Sort.by(Sort.Order.asc(sort));
+			}
+			paging = PageRequest.of(page, size, sorting);
+		} else {
+			paging = PageRequest.of(page, size);
+		}
+		
+		Optional<Cliente> optionalCliente = userRepo.findById(mailCliente);
+		Cliente cliente = optionalCliente.get();
+		
+		Page<CalificacionCliente> pageCalificacion;
+		pageCalificacion = calClienteRepo.consultarCalificacion(cliente, paging);
+		calificacionClientes = pageCalificacion.getContent();
+		int pagina = pageCalificacion.getNumber();
+		long totalElements = pageCalificacion.getTotalElements();
+		
+		for (CalificacionCliente c : calificacionClientes) {
+			DTCalificacionesCliente.add(new DTCalificacionCliente(c));
+		}
+		
+		response.put("currentPage", pagina);
+		response.put("totalItems", totalElements);
+		response.put("calificacionGlobal", cliente.getCalificacionPromedio());
+		response.put("restaurantes", DTCalificacionesCliente);
 
+		return response;
+	}
+	
+	//Listo los restaurantes abiertos cercanos a la direccion activa del usuario
+	@Override
+	public Map<String, Object> listarRestaurantesPorZona(int page, int size, int horarioApertura, String nombre,
+			String categoria, String sort, int order, int idDireccion) throws UsuarioException {
+		Map<String, Object> response = new HashMap<>();
+		List<DTListarRestaurante> DTListarRestaurantes = new ArrayList<DTListarRestaurante>();
+		List<Restaurante> restaurantes = new ArrayList<Restaurante>();
+
+		Sort sorting;
+		Pageable paging;
+
+		if (!sort.equalsIgnoreCase("")) {
+			if (order == 1) {
+				sorting = Sort.by(Sort.Order.desc(sort));
+			} else {
+				sorting = Sort.by(Sort.Order.asc(sort));
+			}
+			paging = PageRequest.of(page, size, sorting);
+		} else {
+			paging = PageRequest.of(page, size);
+		}
+
+		Page<Restaurante> pageRestaurante;
+
+		// Devuelve los restaurantes aceptados no bloqueados y activos
+		if (!nombre.equalsIgnoreCase("")) {
+			if (!categoria.equalsIgnoreCase("")) {
+				// Aplico nombre y categoria
+				pageRestaurante = restauranteRepo.listarRestauranteDesdeClientePorNombreYCategoria(nombre, categoria,
+						EnumEstadoRestaurante.ACEPTADO, paging);
+			} else {
+				// Aplico solo nombre
+				pageRestaurante = restauranteRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivosPorNombre(nombre,
+						EnumEstadoRestaurante.ACEPTADO, paging);
+			}
+
+		}
+		if (!categoria.equalsIgnoreCase("")) {
+			// Aplico solo categoria
+			pageRestaurante = restauranteRepo.listarRestauranteDesdeClientePorCategoria(categoria,
+					EnumEstadoRestaurante.ACEPTADO, paging);
+		} else {
+			// No aplico ni categoria ni nombre
+			pageRestaurante = restauranteRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivos(EnumEstadoRestaurante.ACEPTADO,
+					paging);
+		}
+
+		restaurantes = pageRestaurante.getContent();
+		int pagina = pageRestaurante.getNumber();
+		long totalElements = pageRestaurante.getTotalElements();
+		
+		//Calculo de distancia entre restaurante y cliente
+		double lat1;
+		double lng1;
+		double lat2;
+		double lng2; 
+		//Obtengo los datos de latitud y longitud del cliente que recibo su idDireccion
+		Optional<Direccion> optionalDireccion = dirRepo.findById(idDireccion);
+		Direccion direccion = optionalDireccion.get();
+		lat1 = direccion.getGeoLocalizacion().getLatitud();
+		lng1 = direccion.getGeoLocalizacion().getLongitud();
+		
+		// Si el horarioApertura en el filtro es menor o igual que el horarioApertura
+		// del restaurante se muestra
+		for (Restaurante r : restaurantes) {
+			lat2 = r.getGeoLocalizacion().getLatitud();
+			lng2 = r.getGeoLocalizacion().getLongitud();
+			
+			double radioTierra = 6371;//en kilómetros  
+	        double dLat = Math.toRadians(lat2 - lat1);  
+	        double dLng = Math.toRadians(lng2 - lng1);  
+	        double sindLat = Math.sin(dLat / 2);  
+	        double sindLng = Math.sin(dLng / 2);  
+	        double va1 = Math.pow(sindLat, 2) + Math.pow(sindLng, 2)  
+	                * Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2));  
+	        double va2 = 2 * Math.atan2(Math.sqrt(va1), Math.sqrt(1 - va1));  
+	        double distancia = radioTierra * va2; 
+			if (distancia < 5) {
+				if (horarioApertura > 0) {
+					if (r.getHorarioApertura().getHour() >= horarioApertura) {
+						DTListarRestaurantes.add(new DTListarRestaurante(r));
+					} else {
+						totalElements = totalElements - 1;
+					}
+				} else {
+					DTListarRestaurantes.add(new DTListarRestaurante(r));
+				}
+			} else {
+				totalElements = totalElements - 1;
+			}
+		}
+		
+		// response.put("currentPage", pageRestaurante.getNumber());
+		// response.put("totalItems", pageRestaurante.getTotalElements());
+		response.put("currentPage", pagina);
+		response.put("totalItems", totalElements);
+		response.put("restaurantes", DTListarRestaurantes);
+
+		return response;
+	}
+	
 	@Override
 	public DTCalificacionRestaurante getCalificacionRestaurante(String mailCliente, String mailRestaurante)
 			throws UsuarioException, RestauranteException {

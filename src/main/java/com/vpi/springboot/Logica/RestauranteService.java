@@ -1,7 +1,5 @@
 package com.vpi.springboot.Logica;
 
-import static org.assertj.core.api.Assertions.assertThatNullPointerException;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -17,7 +15,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 
@@ -27,8 +24,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -58,17 +53,13 @@ import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.dto.DTCalificacionCliente;
 import com.vpi.springboot.Modelo.dto.DTCalificacionRestaurante;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
-import com.vpi.springboot.Modelo.dto.DTListarRestaurante;
 import com.vpi.springboot.Modelo.dto.DTPedido;
-import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.Modelo.dto.DTProductoIdCantidad;
 import com.vpi.springboot.Modelo.dto.DTPromocionConPrecio;
 import com.vpi.springboot.Modelo.dto.DTReclamo;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
-import com.vpi.springboot.Modelo.dto.DTRestaurante;
 import com.vpi.springboot.Modelo.dto.DTRestaurantePedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
-import com.vpi.springboot.Modelo.dto.EnumEstadoReclamo;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
 import com.vpi.springboot.Repositorios.CalificacionClienteRepositorio;
@@ -87,11 +78,9 @@ import com.vpi.springboot.exception.AdministradorException;
 import com.vpi.springboot.exception.CategoriaException;
 import com.vpi.springboot.exception.PedidoException;
 import com.vpi.springboot.exception.ProductoException;
-import com.vpi.springboot.exception.ReclamoException;
 import com.vpi.springboot.exception.PromocionException;
 import com.vpi.springboot.exception.RestauranteException;
 import com.vpi.springboot.exception.UsuarioException;
-import com.vpi.springboot.security.util.JwtUtil.keyInfoJWT;
 
 @Service
 @EnableScheduling
@@ -99,8 +88,6 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 	@Autowired
 	private RestauranteRepositorio restauranteRepo;
-	@Autowired
-	private GeoLocalizacionRepositorio geoRepo;
 	@Autowired
 	private PedidoRepositorio pedidoRepo;
 	@Autowired
@@ -513,7 +500,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			Promocion promocion = optionalPromocion.get();
 
 			promocion.setActivo(false);
-			proRepo.save(promocion);
+			promoRepo.save(promocion);
 			return new DTRespuesta("Promocion dada de baja correctamente.");
 		} else {
 			throw new PromocionException(PromocionException.NotFoundExceptionId(idPromo));
@@ -727,8 +714,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	@Scheduled(cron = "*/59 */5 * * * *") // 1 vez cada 5 minutos
 	public DTRespuesta guaradarEnMongo() {
 		List<Object[]> lista = restauranteRepo.buscarRestaurantesConMasPedidos();
-		// Map<String, Integer> restpedidos = new HashMap<String, Integer>();
-		List<DTRestaurantePedido> restaurantesPedidos = new ArrayList<DTRestaurantePedido>();
+		//Map<String, Integer> restpedidos = new HashMap<String, Integer>();
+		//List<DTRestaurantePedido> restaurantesPedidos = new ArrayList<DTRestaurantePedido>();
 		Optional<DTRestaurantePedido> optionalDt;
 		Optional<Restaurante> optionalRes;
 		Restaurante res;
@@ -739,11 +726,12 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			optionalDt = resPedRepo.findById((String) object[0]);
 			if (optionalDt.isPresent()) {
 				dt = optionalDt.get();
-				dt.setCantPedidos((BigInteger) object[1]);
+				BigInteger big1 =  (BigInteger) object[1];
+				dt.setCantPedidos(big1.intValue());
 				resPedRepo.save(dt);
-
-			} else {
-				dt = new DTRestaurantePedido((String) object[0], (BigInteger) object[1]);
+			}else {
+				BigInteger big =  (BigInteger) object[1];
+				dt = new DTRestaurantePedido((String) object[0], big.intValue());
 				dt.setNombre(res.getNombre());
 				resPedRepo.save(dt);
 			}
@@ -906,10 +894,15 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				calificacion = 5;
 			}
 			try {
-				Double rand = (Double) (Math.random() * 1);
-				Double latitud = BigDecimal.valueOf(lat + rand).setScale(4, RoundingMode.HALF_UP).doubleValue();
-				Double longitud = BigDecimal.valueOf(lon + rand).setScale(4, RoundingMode.HALF_UP).doubleValue();
 
+				Double rand = (Double) (Math.random() * 0.1);
+				Double latitud = BigDecimal.valueOf(lat+rand)
+					    .setScale(4, RoundingMode.HALF_UP)
+					    .doubleValue();
+				Double longitud = BigDecimal.valueOf(lon+rand)
+					    .setScale(4, RoundingMode.HALF_UP)
+					    .doubleValue();
+				
 				Integer i = (int) (Math.random() * 2 + 1);
 				Integer envio = (int) (Math.random() * 30 + 1);
 				Integer randomFoto = (int) (Math.random() * 10);
@@ -1042,9 +1035,15 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		for (String c : clientesList) {
 			try {
 
-				Double rand = (Double) (Math.random() * 1);
-				Double latitud = BigDecimal.valueOf(lat + rand).setScale(4, RoundingMode.HALF_UP).doubleValue();
-				Double longitud = BigDecimal.valueOf(lon + rand).setScale(4, RoundingMode.HALF_UP).doubleValue();
+
+				Double rand = (Double) (Math.random() * 0.1);
+				Double latitud = BigDecimal.valueOf(lat+rand)
+					    .setScale(4, RoundingMode.HALF_UP)
+					    .doubleValue();
+				Double longitud = BigDecimal.valueOf(lon+rand)
+					    .setScale(4, RoundingMode.HALF_UP)
+					    .doubleValue();
+								
 
 				GeoLocalizacion GeoCliente = new GeoLocalizacion(latitud, longitud);
 
@@ -1205,19 +1204,17 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			}
 		}
 	}
-
-	// Uso esta funcion tanto para consultarCalificacionRestaurante como
-	// clienteConsultaCalificacionRestaurante
+	
+	//Uso esta funcion tanto para consultarCalificacionRestaurante como clienteConsultaCalificacionRestaurante
 	@Override
-	public Map<String, Object> consultarCalificacion(int page, int size, String sort, int order, String mailRestaurante)
-			throws RestauranteException {
+	public Map<String, Object> consultarCalificacion(int page, int size, String sort, int order, String mailRestaurante) throws RestauranteException {
 		Map<String, Object> response = new HashMap<>();
 		List<DTCalificacionRestaurante> DTCalificacionesRestaurante = new ArrayList<DTCalificacionRestaurante>();
 		List<CalificacionRestaurante> calificacionRestaurantes = new ArrayList<CalificacionRestaurante>();
 
 		Sort sorting;
 		Pageable paging;
-
+		
 		if (!sort.equalsIgnoreCase("")) {
 			if (order == 1) {
 				sorting = Sort.by(Sort.Order.desc(sort));
@@ -1228,58 +1225,57 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		} else {
 			paging = PageRequest.of(page, size);
 		}
-
+		
 		Optional<Restaurante> optionalRestaurante = restauranteRepo.findById(mailRestaurante);
 		Restaurante restaurante = optionalRestaurante.get();
-
+		
 		Page<CalificacionRestaurante> pageCalificacion;
 		pageCalificacion = calRestauranteRepo.consultarCalificacion(restaurante, paging);
 		calificacionRestaurantes = pageCalificacion.getContent();
 		int pagina = pageCalificacion.getNumber();
 		long totalElements = pageCalificacion.getTotalElements();
-
+		
 		for (CalificacionRestaurante c : calificacionRestaurantes) {
 			DTCalificacionesRestaurante.add(new DTCalificacionRestaurante(c));
 		}
 
 		response.put("currentPage", pagina);
 		response.put("totalItems", totalElements);
+		response.put("calificacionGlobal", restaurante.getCalificacionPromedio());
 		response.put("restaurantes", DTCalificacionesRestaurante);
 
 		return response;
 	}
-
+	
 	@Override
 	public DTRespuesta registrarPago(int idPedido) {
-		MongoClientURI uri = new MongoClientURI(
-				"mongodb+srv://grupo1:grupo1@cluster0.l17sm.mongodb.net/prueba-concepto");
+		MongoClientURI uri = new MongoClientURI("mongodb+srv://grupo1:grupo1@cluster0.l17sm.mongodb.net/prueba-concepto");
 		MongoClient mongoClient = new MongoClient(uri);
 		MongoDatabase dataBase = mongoClient.getDatabase("prueba-concepto");
 		MongoCollection<Document> collectionCarrito = dataBase.getCollection("carrito");
-
+		
 		Optional<Pedido> optionalPedido = pedidoRepo.findById(idPedido);
 		Pedido pedido = optionalPedido.get();
 		if (pedido.getMetodoDePago().equals(EnumMetodoDePago.EFECTIVO)) {
 			pedido.setPago(true);
 			pedidoRepo.save(pedido);
 		}
-
-		// Document buscado = (Document) collectionPedidos.find(new Document("_id",
-		// idPedido)).first();
-		// String idProducto = buscado.getString("productoCarrito");
-
-		// Obtengo la informacion de los productos pedidos de un carrito
+		
+		//Document buscado = (Document) collectionPedidos.find(new Document("_id", idPedido)).first();
+		//String idProducto = buscado.getString("productoCarrito");
+		
+		//Obtengo la informacion de los productos pedidos de un carrito
 		Document carritoBuscado = collectionCarrito.find(new Document("_id", pedido.getCarrito())).first();
 		List<BasicDBObject> listaDBObject = (List<BasicDBObject>) carritoBuscado.get("productoCarrito");
-
+		
 		Document carritoDocument;
 		Document productoDocument;
-
+		
 		String idProducto;
 		String cantidad;
 		String categoria;
 		String fecha;
-
+		
 		for (Object obj : listaDBObject) {
 			carritoDocument = (Document) obj;
 			cantidad = carritoDocument.get("cantidad").toString();
@@ -1287,40 +1283,42 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			idProducto = productoDocument.get("_id").toString();
 			categoria = productoDocument.getString("categoria");
 			fecha = pedido.getFecha().toString();
-
+			
 			ventaProducto(idProducto, cantidad, categoria, fecha);
 		}
-
+		
 		return new DTRespuesta("Pago registrado con éxito.");
 	}
-
+	
 	@Override
 	public void ventaProducto(String idProducto, String cantidad, String categoria, String fecha) {
-		MongoClientURI uri = new MongoClientURI(
-				"mongodb+srv://grupo1:grupo1@cluster0.l17sm.mongodb.net/prueba-concepto");
+		MongoClientURI uri = new MongoClientURI("mongodb+srv://grupo1:grupo1@cluster0.l17sm.mongodb.net/prueba-concepto");
 		MongoClient mongoClient = new MongoClient(uri);
 		MongoDatabase dataBase = mongoClient.getDatabase("prueba-concepto");
 		MongoCollection<Document> collectionPedidos = dataBase.getCollection("pedidos");
-
+		
 		Document document = new Document();
-
+		
 		document.put("idProducto", idProducto);
 		document.put("cantidad", cantidad);
 		document.put("categoria", categoria);
 		document.put("fecha", fecha);
 		collectionPedidos.insertOne(document);
 	}
-
+	
 	@Override
-	public DTRespuesta devolucionPedido(Pedido pedido) {
-		Pedido devolucion = new Pedido(pedido.getFecha(), pedido.getCostoTotal() * -1, pedido.getEstadoPedido(),
-				pedido.getMetodoDePago(), pedido.getCarrito(), pedido.getDireccion(), pedido.getRestaurante(),
-				pedido.getCliente(), pedido.getComentario(), pedido.getPago());
-
+	public DTRespuesta devolucionPedido(int idPedido) {
+		Optional<Pedido> optionalPedido = pedidoRepo.findById(idPedido);
+		Pedido pedido = optionalPedido.get();
+		Pedido devolucion = new Pedido(pedido.getFecha(), pedido.getCostoTotal()*-1, pedido.getEstadoPedido(), 
+				pedido.getMetodoDePago(), pedido.getCarrito(), pedido.getDireccion(), 
+				pedido.getRestaurante(), pedido.getCliente(), pedido.getComentario(), 
+				pedido.getPago());
+		
 		pedidoRepo.save(devolucion);
 		return new DTRespuesta("Devolucion registrada con éxito.");
 	}
-
+	
 	@Override
 	public DTCalificacionCliente getCalificacionCliente(String mailCliente, String mailRestaurante) throws UsuarioException, RestauranteException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mailCliente);

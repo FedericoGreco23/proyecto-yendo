@@ -31,6 +31,7 @@ public class DTCalificacionRestaurante extends DTCalificacion implements Seriali
 	public DTCalificacionRestaurante(CalificacionRestaurante c) {
 		super(c.getPuntaje(), c.getComentario(), c.getFoto(), c.getFecha());
 		this.cliente = c.getCliente().getNickname();
+		this.fotoCliente = c.getCliente().getFoto();
 	}
 
 	public DTCalificacionRestaurante(CalificacionCliente cal) {

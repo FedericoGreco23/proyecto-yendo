@@ -332,9 +332,9 @@ public class RestauranteController {
 	}
 
 	@PostMapping("devolucionPedido")
-	public ResponseEntity<?> devolucionPedido(@RequestBody(required = true) Pedido pedido) {
+	public ResponseEntity<?> devolucionPedido(@RequestBody(required = true) int idPedido) {
 		try {
-			return new ResponseEntity<>(service.devolucionPedido(pedido), HttpStatus.OK);
+			return new ResponseEntity<>(service.devolucionPedido(idPedido), HttpStatus.OK);
 		} catch (ConstraintViolationException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {
@@ -366,6 +366,7 @@ public class RestauranteController {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
 	
 	/// PRIVADAS PARA JWT ///
 	/////////////////////////

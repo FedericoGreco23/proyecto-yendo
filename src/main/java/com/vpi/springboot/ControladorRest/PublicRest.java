@@ -162,9 +162,9 @@ public class PublicRest {
 
 	@GetMapping("/buscarRestaurante")
 	public ResponseEntity<?> buscarRestaurante(@RequestParam(defaultValue = "") String texto,
-			@RequestParam(defaultValue = "") String nombreCategoria) {
+			@RequestParam(defaultValue = "") String nombreCategoria, @RequestParam(defaultValue = "0") int idDireccion) {
 		try {
-			List<DTBuscarRestaurante> respuesta = service.buscarRestaurante(texto, nombreCategoria);
+			List<DTBuscarRestaurante> respuesta = service.buscarRestaurante(texto, nombreCategoria, idDireccion);
 			return new ResponseEntity<>(respuesta, HttpStatus.OK);
 		} catch (RestauranteException e) {
 			e.printStackTrace();
@@ -222,12 +222,24 @@ public class PublicRest {
 		}
 	}
 	
-	@GetMapping("/clienteConsultaCalificacion")
-    public ResponseEntity<?> clienteConsultaCalificacionRestaurante(@RequestParam(defaultValue = "0") int page,
+	@GetMapping("/consultarCalificacionesRestaurante")
+    public ResponseEntity<?> consultarCalificacionesRestaurante(@RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "") String sort,
             @RequestParam(defaultValue = "0") int order, @RequestParam(defaultValue = "") String restauranteMail) {
         try {
             return new ResponseEntity<>(restService.consultarCalificacion(page, size, sort, order, restauranteMail), HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+	
+	@GetMapping("/consultarCalificacionesCliente")
+    public ResponseEntity<?> consultarCalificacionesCliente(@RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "") String sort,
+            @RequestParam(defaultValue = "0") int order, @RequestParam(defaultValue = "") String clienteMail) {
+        try {
+            return new ResponseEntity<>(clienteService.consultarCalificacion(page, size, sort, order, clienteMail), HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return null;

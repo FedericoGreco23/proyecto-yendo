@@ -21,6 +21,18 @@ public class DTPromocionConPrecio implements Serializable {
     private String descripcion;
     private String foto;
 	
+    
+	public DTPromocionConPrecio(List<DTProductoIdCantidad> productos, Integer precio, Integer descuento, String nombre,
+			String descripcion, String foto) {
+		super();
+		this.productos = productos;
+		this.precio = precio;
+		this.descuento = descuento;
+		this.nombre = nombre;
+		this.descripcion = descripcion;
+		this.foto = foto;
+	}
+
 	public DTPromocionConPrecio() {
 		super();
 	}
