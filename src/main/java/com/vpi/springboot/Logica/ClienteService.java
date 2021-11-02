@@ -278,6 +278,16 @@ public class ClienteService implements ClienteServicioInterfaz {
 			if (cliente.getActivo() != false) {
 				cliente.setActivo(false);
 				userRepo.save(cliente);
+				
+				//Elimina las calificaciones
+				List<CalificacionCliente> calificacionesCliente = calClienteRepo.findByCliente(cliente);
+				for(CalificacionCliente c : calificacionesCliente)
+					calClienteRepo.delete(c);
+				
+				List<CalificacionRestaurante> calificacionesRestaurante = calRestauranteRepo.findByCliente(cliente);
+				for(CalificacionRestaurante c : calificacionesRestaurante)
+					calRestauranteRepo.delete(c);
+				
 				return new DTRespuesta("Cuenta dada de baja con éxito.");
 			} else {
 				throw new UsuarioException("El usuario " + mail + " ya esta inactivo");

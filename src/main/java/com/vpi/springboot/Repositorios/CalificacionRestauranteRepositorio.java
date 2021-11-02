@@ -24,6 +24,9 @@ public interface CalificacionRestauranteRepositorio
 	@Query("SELECT c FROM CalificacionRestaurante c WHERE c.restaurante = :restaurante")
 	Page<CalificacionRestaurante> consultarCalificacion(Restaurante restaurante, Pageable pageable);
 	
+	@Query("SELECT c FROM CalificacionRestaurante c WHERE c.cliente = :cliente")
+	List<CalificacionRestaurante> findByCliente(Cliente cliente);
+	
 	@Query("SELECT u FROM CalificacionRestaurante u WHERE u.cliente = :cliente and u.restaurante = :restaurante")
 	CalificacionRestaurante findByClienteRestaurante(@Param("cliente") Cliente cliente,
 			@Param("restaurante") Restaurante restaurante);
