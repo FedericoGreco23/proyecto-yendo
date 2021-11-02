@@ -985,14 +985,14 @@ public class ClienteService implements ClienteServicioInterfaz {
 		
 		Optional<Restaurante> optionalRestaurante = restauranteRepo.findById(mailRestaurante);
 		if (!optionalRestaurante.isPresent()) {
-//			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(mailRestaurante));
-			return null;
+			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(mailRestaurante));
 		}
 		Restaurante restaurante = optionalRestaurante.get();
 		
 		CalificacionRestaurante calRestaurante = calRestauranteRepo.findByClienteRestaurante(cliente, restaurante);
 		if(calRestaurante == null)
-			throw new UsuarioException(UsuarioException.SinCalificacion(mailRestaurante));
+			return null;
+//			throw new UsuarioException(UsuarioException.SinCalificacion(mailRestaurante));
 		return new DTCalificacionRestaurante(calRestaurante);
 	}
 }

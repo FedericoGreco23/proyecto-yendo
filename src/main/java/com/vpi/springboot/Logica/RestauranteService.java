@@ -1385,15 +1385,15 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		
 		Optional<Cliente> optionalCliente = userRepo.findById(mailCliente);
 		if (!optionalCliente.isPresent()) {
-//			throw new UsuarioException(UsuarioException.NotFoundException(mailCliente));
-			return null;
+			throw new UsuarioException(UsuarioException.NotFoundException(mailCliente));
 		}
 		Cliente cliente = optionalCliente.get();
 
 		CalificacionCliente calCliente = calClienteRepo.findByClienteRestaurante(cliente, restaurante);
 
 		if (calCliente == null)
-			throw new UsuarioException(RestauranteException.SinCalificacion(mailCliente));
+			return null;
+//			throw new UsuarioException(RestauranteException.SinCalificacion(mailCliente));
 		return new DTCalificacionCliente(calCliente);
 	}
 }
