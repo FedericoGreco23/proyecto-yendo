@@ -395,10 +395,19 @@ public class GeneralService implements GeneralServicioInterfaz {
 		}
 		
 		List<DTBuscarRestaurante> DTBuscarRestaurantesSolo5 = new ArrayList<DTBuscarRestaurante>();
-		int i = 0;
-		while (i < 5) {
-			DTBuscarRestaurantesSolo5.add(DTBuscarRestaurantes.get(i));
-			i = i + 1;
+		if (DTBuscarRestaurantes != null) {
+			int i = 0;
+			if (DTBuscarRestaurantes.size() >= 5) {
+				while (i < 5) {
+					DTBuscarRestaurantesSolo5.add(DTBuscarRestaurantes.get(i));
+					i = i + 1;
+				}
+			} else if (DTBuscarRestaurantes.size() < 5 && DTBuscarRestaurantes.size() > 0) {
+				while (i < DTBuscarRestaurantes.size()) {
+					DTBuscarRestaurantesSolo5.add(DTBuscarRestaurantes.get(i));
+					i = i + 1;
+				}
+			}
 		}
 		//return DTBuscarRestaurantes;
 		return DTBuscarRestaurantesSolo5;
