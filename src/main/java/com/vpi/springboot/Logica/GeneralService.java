@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -391,9 +392,16 @@ public class GeneralService implements GeneralServicioInterfaz {
 					}
 				}
 			}
-			
 		}
-		return DTBuscarRestaurantes;
+		
+		List<DTBuscarRestaurante> DTBuscarRestaurantesSolo5 = new ArrayList<DTBuscarRestaurante>();
+		int i = 0;
+		while (i < 5) {
+			DTBuscarRestaurantesSolo5.add(DTBuscarRestaurantes.get(i));
+			i = i + 1;
+		}
+		//return DTBuscarRestaurantes;
+		return DTBuscarRestaurantesSolo5;
 	}
 
 	@Override
