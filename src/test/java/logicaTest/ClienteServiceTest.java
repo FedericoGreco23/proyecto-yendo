@@ -357,10 +357,10 @@ class ClienteServiceTest {
 		mockCliente.bajaCalificacionRestaurante(cliente.getMail(), restaurante.getMail());
 	}
 	
-	@Test 
-	public void testListarReclamos() throws UsuarioException {
-		Mockito.when(clienteRepo.findById(Mockito.anyString())).thenReturn(optionalCliente);
-		Mockito.when(recRepo.findAllByClienteRestaurante(Mockito.any(Cliente.class), Mockito.anyString(), Mockito.any())).thenReturn(pageReclamo);
-		mockCliente.listarReclamos(5, 5, restaurante.getMail(), "", 0, cliente.getMail());
-	}
+//	@Test 
+//	public void testListarReclamos() throws UsuarioException {
+//		Mockito.when(clienteRepo.findById(Mockito.anyString())).thenReturn(optionalCliente);
+//		Mockito.when(recRepo.findAllByClienteRestaurante(Mockito.any(Cliente.class), Mockito.anyString(), Mockito.any())).thenReturn(pageReclamo);
+//		mockCliente.listarReclamos(5, 5, restaurante.getMail(), "", 0, cliente.getMail());
+//	}
 }
