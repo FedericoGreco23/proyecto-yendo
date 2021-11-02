@@ -224,12 +224,13 @@ public class ClienteController {
 
 	@GetMapping("/getReclamos")
 	public ResponseEntity<?> listarReclamos(@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "") String restaurante,
-			@RequestParam(defaultValue = "") String fecha, @RequestParam(defaultValue = "") String sort,
+			@RequestParam(defaultValue = "5") int size, 
+			@RequestParam(defaultValue = "") String estado, @RequestParam(defaultValue = "") String fecha, 
+			@RequestParam(defaultValue = "") String restaurante, @RequestParam(defaultValue = "") String sort,
 			@RequestParam(defaultValue = "1") int order) {
 		try {
 			return new ResponseEntity<>(
-					clienteService.listarReclamos(size, page, restaurante, sort, order, getMailFromJwt()),
+					clienteService.listarReclamos(size, page, estado, fecha, restaurante, sort, order, getMailFromJwt()),
 					HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);

@@ -40,6 +40,49 @@ public interface ReclamoRepositorio extends JpaRepository<Reclamo, Integer> {
 	Page<Reclamo> findAllByClienteRestaurante(@Param("cliente") Cliente cliente, @Param("restaurante") String restaurante, 
 			Pageable pageable);
 	
+	//ESTADO
+	final static String queryClienteEstado = 
+			"SELECT r "
+			+ "FROM Reclamo r "
+			+ "WHERE r.estado = :estado "
+			+ "and r.pedido IN "
+			+ "(SELECT ped.id "
+			+ "FROM Pedido ped "
+			+ "WHERE ped.cliente = :cliente)";
+		
+	@Query(queryClienteEstado)
+	Page<Reclamo> findAllByClienteEstado(@Param("cliente") Cliente cliente, @Param("estado") EnumEstadoReclamo estado, 
+			Pageable pageable);
+	
+	//FECHA
+	final static String queryClienteFecha = 
+			"SELECT r "
+			+ "FROM Reclamo r "
+			+ "WHERE r.fecha > :dateI and r.fecha < :dateF "
+			+ "and r.pedido IN "
+			+ "(SELECT ped.id "
+			+ "FROM Pedido ped "
+			+ "WHERE ped.cliente = :cliente)";
+		
+	@Query(queryClienteFecha)
+	Page<Reclamo> findAllByClienteFecha(@Param("cliente") Cliente cliente, @Param("dateI") LocalDateTime dateI, 
+			@Param("dateF") LocalDateTime dateF, Pageable pageable);
+	
+	//ESTADO + FECHA
+	final static String queryClienteEstadoFecha = 
+			"SELECT r "
+			+ "FROM Reclamo r "
+			+ "WHERE r.estado = :estado "
+			+ "and r.fecha > :dateI and r.fecha < :dateF "
+			+ "and r.pedido IN "
+			+ "(SELECT ped.id "
+			+ "FROM Pedido ped "
+			+ "WHERE ped.cliente = :cliente)";
+		
+	@Query(queryClienteEstadoFecha)
+	Page<Reclamo> findAllByClienteEstadoFecha(@Param("cliente") Cliente cliente, @Param("estado") EnumEstadoReclamo estado, 
+			@Param("dateI") LocalDateTime dateI, @Param("dateF") LocalDateTime dateF, Pageable pageable);
+	
 	//RESTAURANTE + ESTADO
 	final static String queryClienteRestauranteEstado = 
 			"SELECT r "

@@ -699,7 +699,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 	}
 
 	@Override
-	public Map<String, Object> listarReclamos(int size, int page, String restaurante, String sort, int order,
+	public Map<String, Object> listarReclamos(int size, int page, String estado, String fecha, String restaurante, String sort, int order,
 			String mailCliente) throws UsuarioException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mailCliente);
 		if (!optionalCliente.isPresent())
@@ -721,10 +721,67 @@ public class ClienteService implements ClienteServicioInterfaz {
 
 		Page<Reclamo> pageReclamo;
 		List<Reclamo> reclamos = new ArrayList<>();
+		
+		if (!restaurante.equalsIgnoreCase("") || !estado.equalsIgnoreCase("") || !fecha.equalsIgnoreCase("")) {
+			// restaurante + estado + fecha
+			if (!restaurante.equalsIgnoreCase("") && !estado.equalsIgnoreCase("") && !fecha.equalsIgnoreCase("")) {
+				EnumEstadoReclamo estadoReclamo = EnumEstadoReclamo.valueOf(estado.toUpperCase());
+				LocalDate ld = LocalDate.parse(fecha, DATEFORMATTER);
+				LocalDateTime dateI = LocalDateTime.of(ld, LocalTime.of(00, 00));
+				LocalDateTime dateF = LocalDateTime.of(ld, LocalTime.of(23, 59));
+				pageReclamo = recRepo.findAllByClienteRestauranteEstadoFecha(cliente, restaurante, estadoReclamo, dateI,
+						dateF, paging);
+			} 
+			
+			// restaurante + estado
+			else if (!restaurante.equalsIgnoreCase("") && !estado.equalsIgnoreCase("")) {
+				EnumEstadoReclamo estadoReclamo = EnumEstadoReclamo.valueOf(estado.toUpperCase());
+				pageReclamo = recRepo.findAllByClienteRestauranteEstado(cliente, restaurante, estadoReclamo, paging);
+			} 
+			
+			// restaurante + fecha
+			else if (!restaurante.equalsIgnoreCase("") && !fecha.equalsIgnoreCase("")) {
+				LocalDate ld = LocalDate.parse(fecha, DATEFORMATTER);
+				LocalDateTime dateI = LocalDateTime.of(ld, LocalTime.of(00, 00));
+				LocalDateTime dateF = LocalDateTime.of(ld, LocalTime.of(23, 59));
+				pageReclamo = recRepo.findAllByClienteRestauranteFecha(cliente, restaurante, dateI, dateF, paging);
+			} 
+			
+			// estado + fecha
+			else if(!estado.equalsIgnoreCase("") && !fecha.equalsIgnoreCase("")) {
+				System.out.println("estado y fecha");
+				EnumEstadoReclamo estadoReclamo = EnumEstadoReclamo.valueOf(estado.toUpperCase());
+				LocalDate ld = LocalDate.parse(fecha, DATEFORMATTER);
+				LocalDateTime dateI = LocalDateTime.of(ld, LocalTime.of(00, 00));
+				LocalDateTime dateF = LocalDateTime.of(ld, LocalTime.of(23, 59));
+				System.out.println(dateI);
+				System.out.println(dateF);
+				pageReclamo = recRepo.findAllByClienteEstadoFecha(cliente, estadoReclamo, dateI,
+						dateF, paging);
+			}
+			
+			// restaurante
+			else if (!restaurante.equalsIgnoreCase("")) {
+				pageReclamo = recRepo.findAllByClienteRestaurante(cliente, restaurante, paging);
+			}
 
-		if (!restaurante.equalsIgnoreCase("")) {
-			pageReclamo = recRepo.findAllByClienteRestaurante(cliente, restaurante, paging);
-		} else {
+			// estado
+			else if (!estado.equalsIgnoreCase("")) {
+				EnumEstadoReclamo estadoReclamo = EnumEstadoReclamo.valueOf(estado.toUpperCase());
+				pageReclamo = recRepo.findAllByClienteEstado(cliente, estadoReclamo, paging);
+			}
+
+			// fecha
+			else if (!fecha.equalsIgnoreCase("")) {
+				LocalDate ld = LocalDate.parse(fecha, DATEFORMATTER);
+				LocalDateTime dateI = LocalDateTime.of(ld, LocalTime.of(00, 00));
+				LocalDateTime dateF = LocalDateTime.of(ld, LocalTime.of(23, 59));
+				pageReclamo = recRepo.findAllByClienteFecha(cliente, dateI, dateF, paging);
+				
+			} else { //genérico
+				pageReclamo = recRepo.findAllByCliente(cliente, paging);
+			}
+		} else { //genérico
 			pageReclamo = recRepo.findAllByCliente(cliente, paging);
 		}
 
