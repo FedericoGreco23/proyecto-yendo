@@ -236,7 +236,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 	 * @Override public List<Cliente> obtenerClientes() { Iterable<Cliente> usuario
 	 * = userRepo.findAll(); List<Cliente> clientes = new ArrayList<Cliente>();
 	 * usuario.forEach(c -> clientes.add(c));
-	 * 
+	 *
 	 * return clientes; }
 	 */
 
@@ -278,16 +278,16 @@ public class ClienteService implements ClienteServicioInterfaz {
 			if (cliente.getActivo() != false) {
 				cliente.setActivo(false);
 				userRepo.save(cliente);
-				
+
 				//Elimina las calificaciones
 				List<CalificacionCliente> calificacionesCliente = calClienteRepo.findByCliente(cliente);
 				for(CalificacionCliente c : calificacionesCliente)
 					calClienteRepo.delete(c);
-				
+
 				List<CalificacionRestaurante> calificacionesRestaurante = calRestauranteRepo.findByCliente(cliente);
 				for(CalificacionRestaurante c : calificacionesRestaurante)
 					calRestauranteRepo.delete(c);
-				
+
 				return new DTRespuesta("Cuenta dada de baja con éxito.");
 			} else {
 				throw new UsuarioException("El usuario " + mail + " ya esta inactivo");
@@ -654,7 +654,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 			calificacion.setPuntaje(5);
 		else if (calificacion.getPuntaje() < 1)
 			calificacion.setPuntaje(1);
-		
+
 		calificacion.setFecha(LocalDateTime.now());
 		CalificacionRestaurante calRestaurante = new CalificacionRestaurante(calificacion, cliente, restaurante);
 		calRestauranteRepo.save(calRestaurante);
@@ -704,7 +704,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 				avg += c.getPuntaje();
 			}
 		} else
-			avg = 0.5f;
+			avg = 5.0f;
 
 		restaurante.setCalificacionPromedio(avg);
 		restauranteRepo.save(restaurante);
@@ -736,7 +736,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 
 		Page<Reclamo> pageReclamo;
 		List<Reclamo> reclamos = new ArrayList<>();
-		
+
 		if (!restaurante.equalsIgnoreCase("") || !estado.equalsIgnoreCase("") || !fecha.equalsIgnoreCase("")) {
 			// restaurante + estado + fecha
 			if (!restaurante.equalsIgnoreCase("") && !estado.equalsIgnoreCase("") && !fecha.equalsIgnoreCase("")) {
@@ -746,22 +746,22 @@ public class ClienteService implements ClienteServicioInterfaz {
 				LocalDateTime dateF = LocalDateTime.of(ld, LocalTime.of(23, 59));
 				pageReclamo = recRepo.findAllByClienteRestauranteEstadoFecha(cliente, restaurante, estadoReclamo, dateI,
 						dateF, paging);
-			} 
-			
+			}
+
 			// restaurante + estado
 			else if (!restaurante.equalsIgnoreCase("") && !estado.equalsIgnoreCase("")) {
 				EnumEstadoReclamo estadoReclamo = EnumEstadoReclamo.valueOf(estado.toUpperCase());
 				pageReclamo = recRepo.findAllByClienteRestauranteEstado(cliente, restaurante, estadoReclamo, paging);
-			} 
-			
+			}
+
 			// restaurante + fecha
 			else if (!restaurante.equalsIgnoreCase("") && !fecha.equalsIgnoreCase("")) {
 				LocalDate ld = LocalDate.parse(fecha, DATEFORMATTER);
 				LocalDateTime dateI = LocalDateTime.of(ld, LocalTime.of(00, 00));
 				LocalDateTime dateF = LocalDateTime.of(ld, LocalTime.of(23, 59));
 				pageReclamo = recRepo.findAllByClienteRestauranteFecha(cliente, restaurante, dateI, dateF, paging);
-			} 
-			
+			}
+
 			// estado + fecha
 			else if(!estado.equalsIgnoreCase("") && !fecha.equalsIgnoreCase("")) {
 				System.out.println("estado y fecha");
@@ -774,7 +774,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 				pageReclamo = recRepo.findAllByClienteEstadoFecha(cliente, estadoReclamo, dateI,
 						dateF, paging);
 			}
-			
+
 			// restaurante
 			else if (!restaurante.equalsIgnoreCase("")) {
 				pageReclamo = recRepo.findAllByClienteRestaurante(cliente, restaurante, paging);
@@ -792,7 +792,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 				LocalDateTime dateI = LocalDateTime.of(ld, LocalTime.of(00, 00));
 				LocalDateTime dateF = LocalDateTime.of(ld, LocalTime.of(23, 59));
 				pageReclamo = recRepo.findAllByClienteFecha(cliente, dateI, dateF, paging);
-				
+
 			} else { //genérico
 				pageReclamo = recRepo.findAllByCliente(cliente, paging);
 			}
@@ -829,7 +829,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 
 		return DTpedido;
 	}
-	
+
 	//ConsultarCalificacionesCliente
 	@Override
 	public Map<String, Object> consultarCalificacion(int page, int size, String sort, int order, String mailCliente) {
@@ -838,10 +838,10 @@ public class ClienteService implements ClienteServicioInterfaz {
 		//List<CalificacionRestaurante> calificacionRestaurantes = new ArrayList<CalificacionRestaurante>();
 		List<DTCalificacionCliente> DTCalificacionesCliente = new ArrayList<DTCalificacionCliente>();
 		List<CalificacionCliente> calificacionClientes = new ArrayList<CalificacionCliente>();
-		
+
 		Sort sorting;
 		Pageable paging;
-		
+
 		if (!sort.equalsIgnoreCase("")) {
 			if (order == 1) {
 				sorting = Sort.by(Sort.Order.desc(sort));
@@ -852,20 +852,20 @@ public class ClienteService implements ClienteServicioInterfaz {
 		} else {
 			paging = PageRequest.of(page, size);
 		}
-		
+
 		Optional<Cliente> optionalCliente = userRepo.findById(mailCliente);
 		Cliente cliente = optionalCliente.get();
-		
+
 		Page<CalificacionCliente> pageCalificacion;
 		pageCalificacion = calClienteRepo.consultarCalificacion(cliente, paging);
 		calificacionClientes = pageCalificacion.getContent();
 		int pagina = pageCalificacion.getNumber();
 		long totalElements = pageCalificacion.getTotalElements();
-		
+
 		for (CalificacionCliente c : calificacionClientes) {
 			DTCalificacionesCliente.add(new DTCalificacionCliente(c));
 		}
-		
+
 		response.put("currentPage", pagina);
 		response.put("totalItems", totalElements);
 		response.put("calificacionGlobal", cliente.getCalificacionPromedio());
@@ -873,7 +873,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 
 		return response;
 	}
-	
+
 	//Listo los restaurantes abiertos cercanos a la direccion activa del usuario
 	@Override
 	public Map<String, Object> listarRestaurantesPorZona(int page, int size, int horarioApertura, String nombre,
@@ -924,33 +924,33 @@ public class ClienteService implements ClienteServicioInterfaz {
 		restaurantes = pageRestaurante.getContent();
 		int pagina = pageRestaurante.getNumber();
 		long totalElements = pageRestaurante.getTotalElements();
-		
+
 		//Calculo de distancia entre restaurante y cliente
 		double lat1;
 		double lng1;
 		double lat2;
-		double lng2; 
+		double lng2;
 		//Obtengo los datos de latitud y longitud del cliente que recibo su idDireccion
 		Optional<Direccion> optionalDireccion = dirRepo.findById(idDireccion);
 		Direccion direccion = optionalDireccion.get();
 		lat1 = direccion.getGeoLocalizacion().getLatitud();
 		lng1 = direccion.getGeoLocalizacion().getLongitud();
-		
+
 		// Si el horarioApertura en el filtro es menor o igual que el horarioApertura
 		// del restaurante se muestra
 		for (Restaurante r : restaurantes) {
 			lat2 = r.getGeoLocalizacion().getLatitud();
 			lng2 = r.getGeoLocalizacion().getLongitud();
-			
-			double radioTierra = 6371;//en kilómetros  
-	        double dLat = Math.toRadians(lat2 - lat1);  
-	        double dLng = Math.toRadians(lng2 - lng1);  
-	        double sindLat = Math.sin(dLat / 2);  
-	        double sindLng = Math.sin(dLng / 2);  
-	        double va1 = Math.pow(sindLat, 2) + Math.pow(sindLng, 2)  
-	                * Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2));  
-	        double va2 = 2 * Math.atan2(Math.sqrt(va1), Math.sqrt(1 - va1));  
-	        double distancia = radioTierra * va2; 
+
+			double radioTierra = 6371;//en kilómetros
+	        double dLat = Math.toRadians(lat2 - lat1);
+	        double dLng = Math.toRadians(lng2 - lng1);
+	        double sindLat = Math.sin(dLat / 2);
+	        double sindLng = Math.sin(dLng / 2);
+	        double va1 = Math.pow(sindLat, 2) + Math.pow(sindLng, 2)
+	                * Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2));
+	        double va2 = 2 * Math.atan2(Math.sqrt(va1), Math.sqrt(1 - va1));
+	        double distancia = radioTierra * va2;
 			if (distancia < 15) {
 				if (horarioApertura > 0) {
 					if (r.getHorarioApertura().getHour() >= horarioApertura) {
@@ -965,7 +965,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 				totalElements = totalElements - 1;
 			}
 		}
-		
+
 		// response.put("currentPage", pageRestaurante.getNumber());
 		// response.put("totalItems", pageRestaurante.getTotalElements());
 		response.put("currentPage", pagina);
@@ -974,7 +974,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 
 		return response;
 	}
-	
+
 	@Override
 	public DTCalificacionRestaurante getCalificacionRestaurante(String mailCliente, String mailRestaurante)
 			throws UsuarioException, RestauranteException {
@@ -982,13 +982,13 @@ public class ClienteService implements ClienteServicioInterfaz {
 		if (!optionalCliente.isPresent())
 			throw new UsuarioException(UsuarioException.NotFoundException(mailCliente));
 		Cliente cliente = optionalCliente.get();
-		
+
 		Optional<Restaurante> optionalRestaurante = restauranteRepo.findById(mailRestaurante);
 		if (!optionalRestaurante.isPresent()) {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(mailRestaurante));
 		}
 		Restaurante restaurante = optionalRestaurante.get();
-		
+
 		CalificacionRestaurante calRestaurante = calRestauranteRepo.findByClienteRestaurante(cliente, restaurante);
 		if(calRestaurante == null)
 			return null;
