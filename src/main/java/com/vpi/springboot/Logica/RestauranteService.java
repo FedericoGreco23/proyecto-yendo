@@ -60,6 +60,7 @@ import com.vpi.springboot.Modelo.dto.DTReclamo;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.DTRestaurantePedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
+import com.vpi.springboot.Modelo.dto.EnumEstadoReclamo;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
 import com.vpi.springboot.Repositorios.CalificacionClienteRepositorio;
@@ -382,8 +383,6 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		response.put("currentPage", pagePedido.getNumber());
 		response.put("totalItems", pagePedido.getTotalElements());
 
-		System.out.println("Llega antes de pedidos");
-
 		for (Pedido p : pedidos) {
 			Optional<Carrito> optionalCarrito = mongoRepo.findById(p.getCarrito());
 			if (optionalCarrito.isPresent())
@@ -651,8 +650,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		return new DTRespuesta("Calificación de cliente " + mailCliente + " eliminada correctamente");
 	}
 
-	public Map<String, Object> listarReclamos(int page, int size, String cliente, String sort, int order,
-			String mailRestaurante) throws RestauranteException {
+	public Map<String, Object> listarReclamos(int page, int size, String cliente, String estado, String fecha,
+			String sort, int order, String mailRestaurante) throws RestauranteException {
 		Optional<Restaurante> optionalRestaurante = restauranteRepo.findById(mailRestaurante);
 		if (!optionalRestaurante.isPresent()) {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(mailRestaurante));
@@ -675,9 +674,65 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		Page<Reclamo> pageReclamo;
 		List<Reclamo> reclamos = new ArrayList<>();
 
-		if (!cliente.equalsIgnoreCase("")) {
-			pageReclamo = recRepo.findAllByRestauranteCliente(cliente, restaurante, paging);
-		} else {
+		if (!cliente.equalsIgnoreCase("") || !estado.equalsIgnoreCase("") || !fecha.equalsIgnoreCase("")) {
+			// cliente + estado + fecha
+			if (!cliente.equalsIgnoreCase("") && !estado.equalsIgnoreCase("") && !fecha.equalsIgnoreCase("")) {
+				EnumEstadoReclamo estadoReclamo = EnumEstadoReclamo.valueOf(estado.toUpperCase());
+				LocalDate ld = LocalDate.parse(fecha, DATEFORMATTER);
+				LocalDateTime dateI = LocalDateTime.of(ld, LocalTime.of(00, 00));
+				LocalDateTime dateF = LocalDateTime.of(ld, LocalTime.of(23, 59));
+				pageReclamo = recRepo.findAllByRestauranteClienteEstadoFecha(cliente, restaurante, estadoReclamo, dateI,
+						dateF, paging);
+			} 
+			
+			// cliente + estado
+			else if (!cliente.equalsIgnoreCase("") && !estado.equalsIgnoreCase("")) {
+				EnumEstadoReclamo estadoReclamo = EnumEstadoReclamo.valueOf(estado.toUpperCase());
+				pageReclamo = recRepo.findAllByRestauranteClienteEstado(cliente, restaurante, estadoReclamo, paging);
+			} 
+			
+			// cliente + fecha
+			else if (!cliente.equalsIgnoreCase("") && !fecha.equalsIgnoreCase("")) {
+				LocalDate ld = LocalDate.parse(fecha, DATEFORMATTER);
+				LocalDateTime dateI = LocalDateTime.of(ld, LocalTime.of(00, 00));
+				LocalDateTime dateF = LocalDateTime.of(ld, LocalTime.of(23, 59));
+				pageReclamo = recRepo.findAllByRestauranteClienteFecha(cliente, restaurante, dateI, dateF, paging);
+			} 
+			
+			// estado + fecha
+			else if(!estado.equalsIgnoreCase("") && !fecha.equalsIgnoreCase("")) {
+				System.out.println("estado y fecha");
+				EnumEstadoReclamo estadoReclamo = EnumEstadoReclamo.valueOf(estado.toUpperCase());
+				LocalDate ld = LocalDate.parse(fecha, DATEFORMATTER);
+				LocalDateTime dateI = LocalDateTime.of(ld, LocalTime.of(00, 00));
+				LocalDateTime dateF = LocalDateTime.of(ld, LocalTime.of(23, 59));
+				System.out.println(dateI);
+				System.out.println(dateF);
+				pageReclamo = recRepo.findAllByRestauranteEstadoFecha(restaurante, estadoReclamo, dateI,
+						dateF, paging);
+			}
+			
+			// cliente
+			else if (!cliente.equalsIgnoreCase("")) {
+				pageReclamo = recRepo.findAllByRestauranteCliente(cliente, restaurante, paging);
+			}
+
+			// estado
+			else if (!estado.equalsIgnoreCase("")) {
+				EnumEstadoReclamo estadoReclamo = EnumEstadoReclamo.valueOf(estado.toUpperCase());
+				pageReclamo = recRepo.findAllByRestauranteEstado(estadoReclamo, restaurante, paging);
+			}
+
+			// fecha
+			else if (!fecha.equalsIgnoreCase("")) {
+				LocalDate ld = LocalDate.parse(fecha, DATEFORMATTER);
+				LocalDateTime dateI = LocalDateTime.of(ld, LocalTime.of(00, 00));
+				LocalDateTime dateF = LocalDateTime.of(ld, LocalTime.of(23, 59));
+				pageReclamo = recRepo.findAllByRestauranteFecha(dateI, dateF, restaurante, paging);
+			} else { //genérico
+				pageReclamo = recRepo.findAllByRestaurante(restaurante, paging);
+			}
+		} else { //genérico
 			pageReclamo = recRepo.findAllByRestaurante(restaurante, paging);
 		}
 
@@ -714,8 +769,9 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	@Scheduled(cron = "*/59 */5 * * * *") // 1 vez cada 5 minutos
 	public DTRespuesta guaradarEnMongo() {
 		List<Object[]> lista = restauranteRepo.buscarRestaurantesConMasPedidos();
-		//Map<String, Integer> restpedidos = new HashMap<String, Integer>();
-		//List<DTRestaurantePedido> restaurantesPedidos = new ArrayList<DTRestaurantePedido>();
+		// Map<String, Integer> restpedidos = new HashMap<String, Integer>();
+		// List<DTRestaurantePedido> restaurantesPedidos = new
+		// ArrayList<DTRestaurantePedido>();
 		Optional<DTRestaurantePedido> optionalDt;
 		Optional<Restaurante> optionalRes;
 		Restaurante res;
@@ -726,11 +782,11 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			optionalDt = resPedRepo.findById((String) object[0]);
 			if (optionalDt.isPresent()) {
 				dt = optionalDt.get();
-				BigInteger big1 =  (BigInteger) object[1];
+				BigInteger big1 = (BigInteger) object[1];
 				dt.setCantPedidos(big1.intValue());
 				resPedRepo.save(dt);
-			}else {
-				BigInteger big =  (BigInteger) object[1];
+			} else {
+				BigInteger big = (BigInteger) object[1];
 				dt = new DTRestaurantePedido((String) object[0], big.intValue());
 				dt.setNombre(res.getNombre());
 				resPedRepo.save(dt);
@@ -896,13 +952,9 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			try {
 
 				Double rand = (Double) (Math.random() * 0.1);
-				Double latitud = BigDecimal.valueOf(lat+rand)
-					    .setScale(4, RoundingMode.HALF_UP)
-					    .doubleValue();
-				Double longitud = BigDecimal.valueOf(lon+rand)
-					    .setScale(4, RoundingMode.HALF_UP)
-					    .doubleValue();
-				
+				Double latitud = BigDecimal.valueOf(lat + rand).setScale(4, RoundingMode.HALF_UP).doubleValue();
+				Double longitud = BigDecimal.valueOf(lon + rand).setScale(4, RoundingMode.HALF_UP).doubleValue();
+
 				Integer i = (int) (Math.random() * 2 + 1);
 				Integer envio = (int) (Math.random() * 30 + 1);
 				Integer randomFoto = (int) (Math.random() * 10);
@@ -1035,15 +1087,9 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		for (String c : clientesList) {
 			try {
 
-
 				Double rand = (Double) (Math.random() * 0.1);
-				Double latitud = BigDecimal.valueOf(lat+rand)
-					    .setScale(4, RoundingMode.HALF_UP)
-					    .doubleValue();
-				Double longitud = BigDecimal.valueOf(lon+rand)
-					    .setScale(4, RoundingMode.HALF_UP)
-					    .doubleValue();
-								
+				Double latitud = BigDecimal.valueOf(lat + rand).setScale(4, RoundingMode.HALF_UP).doubleValue();
+				Double longitud = BigDecimal.valueOf(lon + rand).setScale(4, RoundingMode.HALF_UP).doubleValue();
 
 				GeoLocalizacion GeoCliente = new GeoLocalizacion(latitud, longitud);
 
@@ -1204,17 +1250,19 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			}
 		}
 	}
-	
-	//Uso esta funcion tanto para consultarCalificacionRestaurante como clienteConsultaCalificacionRestaurante
+
+	// Uso esta funcion tanto para consultarCalificacionRestaurante como
+	// clienteConsultaCalificacionRestaurante
 	@Override
-	public Map<String, Object> consultarCalificacion(int page, int size, String sort, int order, String mailRestaurante) throws RestauranteException {
+	public Map<String, Object> consultarCalificacion(int page, int size, String sort, int order, String mailRestaurante)
+			throws RestauranteException {
 		Map<String, Object> response = new HashMap<>();
 		List<DTCalificacionRestaurante> DTCalificacionesRestaurante = new ArrayList<DTCalificacionRestaurante>();
 		List<CalificacionRestaurante> calificacionRestaurantes = new ArrayList<CalificacionRestaurante>();
 
 		Sort sorting;
 		Pageable paging;
-		
+
 		if (!sort.equalsIgnoreCase("")) {
 			if (order == 1) {
 				sorting = Sort.by(Sort.Order.desc(sort));
@@ -1225,16 +1273,16 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		} else {
 			paging = PageRequest.of(page, size);
 		}
-		
+
 		Optional<Restaurante> optionalRestaurante = restauranteRepo.findById(mailRestaurante);
 		Restaurante restaurante = optionalRestaurante.get();
-		
+
 		Page<CalificacionRestaurante> pageCalificacion;
 		pageCalificacion = calRestauranteRepo.consultarCalificacion(restaurante, paging);
 		calificacionRestaurantes = pageCalificacion.getContent();
 		int pagina = pageCalificacion.getNumber();
 		long totalElements = pageCalificacion.getTotalElements();
-		
+
 		for (CalificacionRestaurante c : calificacionRestaurantes) {
 			DTCalificacionesRestaurante.add(new DTCalificacionRestaurante(c));
 		}
@@ -1246,36 +1294,38 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 		return response;
 	}
-	
+
 	@Override
 	public DTRespuesta registrarPago(int idPedido) {
-		MongoClientURI uri = new MongoClientURI("mongodb+srv://grupo1:grupo1@cluster0.l17sm.mongodb.net/prueba-concepto");
+		MongoClientURI uri = new MongoClientURI(
+				"mongodb+srv://grupo1:grupo1@cluster0.l17sm.mongodb.net/prueba-concepto");
 		MongoClient mongoClient = new MongoClient(uri);
 		MongoDatabase dataBase = mongoClient.getDatabase("prueba-concepto");
 		MongoCollection<Document> collectionCarrito = dataBase.getCollection("carrito");
-		
+
 		Optional<Pedido> optionalPedido = pedidoRepo.findById(idPedido);
 		Pedido pedido = optionalPedido.get();
 		if (pedido.getMetodoDePago().equals(EnumMetodoDePago.EFECTIVO)) {
 			pedido.setPago(true);
 			pedidoRepo.save(pedido);
 		}
-		
-		//Document buscado = (Document) collectionPedidos.find(new Document("_id", idPedido)).first();
-		//String idProducto = buscado.getString("productoCarrito");
-		
-		//Obtengo la informacion de los productos pedidos de un carrito
+
+		// Document buscado = (Document) collectionPedidos.find(new Document("_id",
+		// idPedido)).first();
+		// String idProducto = buscado.getString("productoCarrito");
+
+		// Obtengo la informacion de los productos pedidos de un carrito
 		Document carritoBuscado = collectionCarrito.find(new Document("_id", pedido.getCarrito())).first();
 		List<BasicDBObject> listaDBObject = (List<BasicDBObject>) carritoBuscado.get("productoCarrito");
-		
+
 		Document carritoDocument;
 		Document productoDocument;
-		
+
 		String idProducto;
 		String cantidad;
 		String categoria;
 		String fecha;
-		
+
 		for (Object obj : listaDBObject) {
 			carritoDocument = (Document) obj;
 			cantidad = carritoDocument.get("cantidad").toString();
@@ -1283,58 +1333,59 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			idProducto = productoDocument.get("_id").toString();
 			categoria = productoDocument.getString("categoria");
 			fecha = pedido.getFecha().toString();
-			
+
 			ventaProducto(idProducto, cantidad, categoria, fecha);
 		}
-		
+
 		return new DTRespuesta("Pago registrado con éxito.");
 	}
-	
+
 	@Override
 	public void ventaProducto(String idProducto, String cantidad, String categoria, String fecha) {
-		MongoClientURI uri = new MongoClientURI("mongodb+srv://grupo1:grupo1@cluster0.l17sm.mongodb.net/prueba-concepto");
+		MongoClientURI uri = new MongoClientURI(
+				"mongodb+srv://grupo1:grupo1@cluster0.l17sm.mongodb.net/prueba-concepto");
 		MongoClient mongoClient = new MongoClient(uri);
 		MongoDatabase dataBase = mongoClient.getDatabase("prueba-concepto");
 		MongoCollection<Document> collectionPedidos = dataBase.getCollection("pedidos");
-		
+
 		Document document = new Document();
-		
+
 		document.put("idProducto", idProducto);
 		document.put("cantidad", cantidad);
 		document.put("categoria", categoria);
 		document.put("fecha", fecha);
 		collectionPedidos.insertOne(document);
 	}
-	
+
 	@Override
 	public DTRespuesta devolucionPedido(int idPedido) {
 		Optional<Pedido> optionalPedido = pedidoRepo.findById(idPedido);
 		Pedido pedido = optionalPedido.get();
-		Pedido devolucion = new Pedido(pedido.getFecha(), pedido.getCostoTotal()*-1, pedido.getEstadoPedido(), 
-				pedido.getMetodoDePago(), pedido.getCarrito(), pedido.getDireccion(), 
-				pedido.getRestaurante(), pedido.getCliente(), pedido.getComentario(), 
-				pedido.getPago());
-		
+		Pedido devolucion = new Pedido(pedido.getFecha(), pedido.getCostoTotal() * -1, pedido.getEstadoPedido(),
+				pedido.getMetodoDePago(), pedido.getCarrito(), pedido.getDireccion(), pedido.getRestaurante(),
+				pedido.getCliente(), pedido.getComentario(), pedido.getPago());
+
 		pedidoRepo.save(devolucion);
 		return new DTRespuesta("Devolucion registrada con éxito.");
 	}
-	
+
 	@Override
-	public DTCalificacionCliente getCalificacionCliente(String mailCliente, String mailRestaurante) throws UsuarioException, RestauranteException {
+	public DTCalificacionCliente getCalificacionCliente(String mailCliente, String mailRestaurante)
+			throws UsuarioException, RestauranteException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mailCliente);
 		if (!optionalCliente.isPresent())
 			throw new UsuarioException(UsuarioException.NotFoundException(mailCliente));
 		Cliente cliente = optionalCliente.get();
-		
+
 		Optional<Restaurante> optionalRestaurante = restauranteRepo.findById(mailRestaurante);
 		if (!optionalRestaurante.isPresent()) {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(mailRestaurante));
 		}
 		Restaurante restaurante = optionalRestaurante.get();
-		
+
 		CalificacionCliente calCliente = calClienteRepo.findByClienteRestaurante(cliente, restaurante);
-				
-		if(calCliente == null)
+
+		if (calCliente == null)
 			throw new UsuarioException(RestauranteException.SinCalificacion(mailCliente));
 		return new DTCalificacionCliente(calCliente);
 	}
