@@ -985,7 +985,8 @@ public class ClienteService implements ClienteServicioInterfaz {
 		
 		Optional<Restaurante> optionalRestaurante = restauranteRepo.findById(mailRestaurante);
 		if (!optionalRestaurante.isPresent()) {
-			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(mailRestaurante));
+//			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(mailRestaurante));
+			return null;
 		}
 		Restaurante restaurante = optionalRestaurante.get();
 		

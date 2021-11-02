@@ -1377,16 +1377,18 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	@Override
 	public DTCalificacionCliente getCalificacionCliente(String mailCliente, String mailRestaurante)
 			throws UsuarioException, RestauranteException {
-		Optional<Cliente> optionalCliente = userRepo.findById(mailCliente);
-		if (!optionalCliente.isPresent())
-			throw new UsuarioException(UsuarioException.NotFoundException(mailCliente));
-		Cliente cliente = optionalCliente.get();
-
 		Optional<Restaurante> optionalRestaurante = restauranteRepo.findById(mailRestaurante);
 		if (!optionalRestaurante.isPresent()) {
 			throw new RestauranteException(RestauranteException.NotFoundExceptionMail(mailRestaurante));
 		}
 		Restaurante restaurante = optionalRestaurante.get();
+		
+		Optional<Cliente> optionalCliente = userRepo.findById(mailCliente);
+		if (!optionalCliente.isPresent()) {
+//			throw new UsuarioException(UsuarioException.NotFoundException(mailCliente));
+			return null;
+		}
+		Cliente cliente = optionalCliente.get();
 
 		CalificacionCliente calCliente = calClienteRepo.findByClienteRestaurante(cliente, restaurante);
 
