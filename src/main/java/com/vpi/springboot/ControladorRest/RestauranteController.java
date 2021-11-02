@@ -292,6 +292,7 @@ public class RestauranteController {
 	@GetMapping("/getReclamos")
 	public ResponseEntity<?> listarReclamos(@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "") String cliente,
+			@RequestParam(defaultValue = "") String fecha, @RequestParam(defaultValue = "") String estado,
 			@RequestParam(defaultValue = "") String sort, @RequestParam(defaultValue = "1") int order) {
 		if (!esRestaurante()) {
 			return new ResponseEntity<>(
@@ -301,7 +302,7 @@ public class RestauranteController {
 
 		try {
 			return new ResponseEntity<>(
-					service.listarReclamos(page, size, cliente, sort, order, getMailFromJwt()),
+					service.listarReclamos(page, size, cliente, estado, fecha, sort, order, getMailFromJwt()),
 					HttpStatus.OK);
 		} catch (RestauranteException e) {
 			e.printStackTrace();

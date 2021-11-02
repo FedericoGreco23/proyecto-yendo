@@ -30,14 +30,14 @@ public class DTCalificacionCliente extends DTCalificacion implements Serializabl
 		this.restaurante = cal.getRestaurante().getNombre();
 		this.cliente = cal.getCliente().getNombre();
 	}*/
-	
+
 	//Este uso para consultarCalificacion del cliente
 	public DTCalificacionCliente(CalificacionCliente c) {
 		super(c.getPuntaje(), c.getComentario(), c.getFoto(), c.getFecha());
 		this.restaurante = c.getRestaurante().getNombre();
 		this.fotoRestaurante = c.getRestaurante().getFoto();
 	}
-	
+
 	public DTCalificacionCliente(Calificacion cal, String restaurante, String cliente) {
 		super(cal.getId(), cal.getPuntaje(), cal.getComentario(), cal.getFoto(), cal.getFecha());
 		this.restaurante = restaurante;
