@@ -650,6 +650,11 @@ public class ClienteService implements ClienteServicioInterfaz {
 		if (pedidos.size() == 0)
 			throw new UsuarioException(UsuarioException.SinPedido(mailRestaurante));
 
+		if(calificacion.getPuntaje() > 5)
+			calificacion.setPuntaje(5);
+		else if (calificacion.getPuntaje() < 1)
+			calificacion.setPuntaje(1);
+		
 		calificacion.setFecha(LocalDateTime.now());
 		CalificacionRestaurante calRestaurante = new CalificacionRestaurante(calificacion, cliente, restaurante);
 		calRestauranteRepo.save(calRestaurante);
