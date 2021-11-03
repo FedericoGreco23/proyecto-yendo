@@ -64,9 +64,9 @@ public interface RestauranteServicioInterfaz {
 
 	public DTPedido buscarPedidoRecibido(int numeroPedido) throws PedidoException;
 
-	//public void cargarDatos();
+	public void cargarDatos();
 
-	//void corregirDatos();
+	void corregirDatos();
 
 	public Map<String, Object> consultarCalificacion(int page, int size, String sort, int order, String mailRestaurante) throws RestauranteException;
 
@@ -80,5 +80,5 @@ public interface RestauranteServicioInterfaz {
 	
 	public DTCalificacionCliente getCalificacionCliente(String mailCliente, String mailRestaurante) throws UsuarioException, RestauranteException;
 	
-	//void cargarDatos2();
+	void cargarDatos2();
 }
