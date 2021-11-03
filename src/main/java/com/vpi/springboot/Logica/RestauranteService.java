@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
+
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -146,6 +148,17 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	 * 
 	 * return null; }
 	 */
+	
+	@PostConstruct
+	public void init() throws IOException {
+		FileInputStream serviceAccount = new FileInputStream("src/main/java/Resource/yendo-5c371-firebase-adminsdk-rczst-500b815097.json");
+
+		FirebaseOptions options = new FirebaseOptions.Builder()
+		  .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+		  .build();
+
+		FirebaseApp.initializeApp(options);
+	}
 
 	@Override
 	public DTRespuesta altaRestaurante(Restaurante rest) throws RestauranteException, CategoriaException {
@@ -1394,14 +1407,6 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		String token = reclamo.getPedido().getCliente().getTokenDispositivo();
 		String restaurante = reclamo.getRestaurante().getNombre();
 		Message message;
-		String appAndroid = "android";
-		FileInputStream serviceAccount = new FileInputStream("src/main/java/Resource/yendo-5c371-firebase-adminsdk-rczst-500b815097.json");
-
-		FirebaseOptions options = new FirebaseOptions.Builder()
-		  .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-		  .build();
-
-		FirebaseApp.initializeApp(options);
 		
 		Map<String, String> map = new HashMap<>();
 		
@@ -1460,7 +1465,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		                  .build();
 				try {
 					//DUDA QUE ES appAndroid
-					FirebaseMessaging.getInstance(FirebaseApp.getInstance(appAndroid)).send(message);
+					FirebaseMessaging.getInstance().send(message);
+					//FirebaseMessaging.getInstance(FirebaseApp.getInstance(appAndroid)).send(message);
 					System.out.println("PRUEBA SE ENVIA NOTIFICACION");
 				} catch (FirebaseMessagingException e) {
 					System.out.println(e.getStackTrace());
