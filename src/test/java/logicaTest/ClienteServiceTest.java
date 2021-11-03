@@ -485,4 +485,11 @@ class ClienteServiceTest {
 		
 	}	
 	
+	@Test
+	public void testSetToken() {
+		Mockito.when(clienteRepo.findById(Mockito.anyString())).thenReturn(optionalCliente);
+		Mockito.doReturn(cliente).when(clienteRepo).save(Mockito.any(Cliente.class));	
+		mockCliente.setToken("sfsf1fd", cliente.getMail());
+	}
+	
 }

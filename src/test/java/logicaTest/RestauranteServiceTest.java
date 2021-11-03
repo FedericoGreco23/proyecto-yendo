@@ -1,6 +1,7 @@
 package logicaTest;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -39,6 +40,7 @@ import com.vpi.springboot.Modelo.dto.DTProducto;
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.Modelo.dto.DTProductoIdCantidad;
 import com.vpi.springboot.Modelo.dto.DTPromocionConPrecio;
+import com.vpi.springboot.Modelo.dto.DTRestaurantePedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoReclamo;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
@@ -53,6 +55,7 @@ import com.vpi.springboot.Repositorios.ProductoRepositorio;
 import com.vpi.springboot.Repositorios.PromocionRepositorio;
 import com.vpi.springboot.Repositorios.ReclamoRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
+import com.vpi.springboot.Repositorios.mongo.RestaurantePedidosRepositorio;
 import com.vpi.springboot.exception.CategoriaException;
 import com.vpi.springboot.exception.PedidoException;
 import com.vpi.springboot.exception.ProductoException;
@@ -88,6 +91,8 @@ class RestauranteServiceTest {
 	private ReclamoRepositorio recRepo;
 	@Mock 
 	private CalificacionRestauranteRepositorio calRestauranteRepo;
+	@Mock
+	RestaurantePedidosRepositorio resPedRepo;
 	
 	@InjectMocks
 	private RestauranteService mockRestaurante;
@@ -131,7 +136,12 @@ class RestauranteServiceTest {
 	private CalificacionRestaurante calRestaurante;
 	private Page<CalificacionRestaurante> pageCalificacion;
 	private List<CalificacionRestaurante> calRestauranteList = new ArrayList<CalificacionRestaurante>();
-
+	private DTRestaurantePedido dtResPed;
+	private Optional<DTRestaurantePedido> optionalDtResPed;
+	private Optional<DTRestaurantePedido> optionalDtResPedVacio = Optional.empty();
+	private List<Object[]> listObject = new ArrayList<>();
+	private Object[] ob = new Object[2];
+			
 	@BeforeEach
 	public void init() {
 		MockitoAnnotations.initMocks(this);
@@ -184,6 +194,12 @@ class RestauranteServiceTest {
 		calRestaurante = new  CalificacionRestaurante(5, null, null, null, restaurante, cliente);
 		calRestauranteList.add(calRestaurante);
 		pageCalificacion = new PageImpl<>(calRestauranteList);
+		dtResPed = new DTRestaurantePedido(restaurante.getMail(), 34);
+		dtResPed.set_id(restaurante.getMail());
+		optionalDtResPed = Optional.of(dtResPed);
+		ob[0] = restaurante.getMail();
+		ob[1] = BigInteger.valueOf(25);
+		listObject.add(ob);
 		
 	}
 	
@@ -456,9 +472,55 @@ class RestauranteServiceTest {
 		mockRestaurante.consultarCalificacion(0, 5, "", 1, restaurante.getMail());
 	}
 	
+	@Test
+	public void testConsultarCalificacion2() throws RestauranteException {
+		Mockito.when(restauranteRepo.findById(Mockito.anyString())).thenReturn(optionalRestaurante);
+		Mockito.when(calRestauranteRepo.consultarCalificacion(Mockito.any(Restaurante.class), Mockito.any())).thenReturn(pageCalificacion);
+		mockRestaurante.consultarCalificacion(0, 5, "1", 1, restaurante.getMail());
+	}
+	
+	@Test
+	public void testConsultarCalificacion3() throws RestauranteException {
+		Mockito.when(restauranteRepo.findById(Mockito.anyString())).thenReturn(optionalRestaurante);
+		Mockito.when(calRestauranteRepo.consultarCalificacion(Mockito.any(Restaurante.class), Mockito.any())).thenReturn(pageCalificacion);
+		mockRestaurante.consultarCalificacion(0, 5, "2", 2, restaurante.getMail());
+	}
+	
 	/*@Test
 	public void testResolucionReclamo() throws IOException {
 		Mockito.when(recRepo.findById(Mockito.anyInt())).thenReturn(optionalReclamo);
 		mockRestaurante.resolucionReclamo(reclamo.getId(), true);
 	}*/
+	
+	@Test
+	public void testGuardarEnMongo() {
+		Mockito.when(restauranteRepo.buscarRestaurantesConMasPedidos()).thenReturn(listObject);
+		Mockito.when(restauranteRepo.findById(Mockito.anyString())).thenReturn(optionalRestaurante);
+		Mockito.when(resPedRepo.findById(Mockito.anyString())).thenReturn(optionalDtResPed);
+		Mockito.doReturn(dtResPed).when(resPedRepo).save(Mockito.any(DTRestaurantePedido.class));
+		mockRestaurante.guaradarEnMongo();
+
+	}
+	
+	@Test
+	public void testGuardarEnMongo2() {
+		Mockito.when(restauranteRepo.buscarRestaurantesConMasPedidos()).thenReturn(listObject);
+		Mockito.when(restauranteRepo.findById(Mockito.anyString())).thenReturn(optionalRestaurante);
+		Mockito.when(resPedRepo.findById(Mockito.anyString())).thenReturn(optionalDtResPedVacio);
+		Mockito.doReturn(dtResPed).when(resPedRepo).save(Mockito.any(DTRestaurantePedido.class));
+		mockRestaurante.guaradarEnMongo();
+
+	}
+	
+	/*@Test
+	public void testVentaProducto() {
+		mockRestaurante.ventaProducto("pro2", "2", "minutas", "22/10/2021");
+	}*/
+	
+	@Test
+	public void testDevolucionPedido() {
+		Mockito.when(pedidoRepo.findById(Mockito.anyInt())).thenReturn(optionalPedido);
+		Mockito.doReturn(pedido).when(pedidoRepo).save(Mockito.any(Pedido.class));
+		mockRestaurante.devolucionPedido(pedido.getId());
+	}
 }
