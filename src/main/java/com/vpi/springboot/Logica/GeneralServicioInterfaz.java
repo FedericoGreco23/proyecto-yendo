@@ -21,7 +21,7 @@ import com.vpi.springboot.exception.RestauranteException;
 import com.vpi.springboot.exception.UsuarioException;
 
 public interface GeneralServicioInterfaz {
-	public String iniciarSesion(String mail, String password) throws UsuarioException, Exception;
+//	public String iniciarSesion(String mail, String password) throws UsuarioException, Exception;
 
 	public DTRespuesta recuperarPassword(String mail) throws UsuarioException;
 

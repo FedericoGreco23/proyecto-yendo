@@ -168,7 +168,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 				+ "            </td>\r\n" + "        </tr>\r\n" + "    </table>\r\n" + "</body>\r\n" + "</html>";
 	}
 
-	@Override
+/*	@Override
 	public String iniciarSesion(String mail, String password) throws Exception {
 		Optional<Cliente> optionalCliente = clienteRepo.findById(mail);
 		if (optionalCliente.isPresent()) { // cliente
@@ -201,7 +201,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 	}
 
 	// Compara las contraseñas
-	private Boolean decodePass(String passGuardada, String passIngresada) throws Exception {
+	public Boolean decodePass(String passGuardada, String passIngresada) throws Exception {
 		String[] guardada = passGuardada.split("\\$");
 		String ingresada = hash(passIngresada, Base64.getDecoder().decode(guardada[0]));
 		if (ingresada.equals(guardada[1])) {
@@ -217,7 +217,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 		SecretKeyFactory f = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
 		SecretKey key = f.generateSecret(new PBEKeySpec(password.toCharArray(), salt, iterations, desiredKeyLen));
 		return Base64.getEncoder().encodeToString(key.getEncoded());
-	}
+	}*/
 //--------------------------------------------
 
 	private String randomPass(int length) {

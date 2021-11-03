@@ -1222,6 +1222,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	private boolean emailExist(String mail) {
 		return userRepo.findById(mail).isPresent();
 	}
+	
 
 	@Override
 	public void corregirDatos() {
@@ -1250,6 +1251,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			}
 		}
 	}
+
 
 	// Uso esta funcion tanto para consultarCalificacionRestaurante como
 	// clienteConsultaCalificacionRestaurante
@@ -1372,7 +1374,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	@Override
 	public DTCalificacionCliente getCalificacionCliente(String mailCliente, String mailRestaurante)
 			throws UsuarioException, RestauranteException {
-		Optional<Cliente> optionalCliente = userRepo.findById(mailCliente);
+		Optional<Cliente> optionalCliente = clienteRepo.findById(mailCliente);
 		if (!optionalCliente.isPresent())
 			throw new UsuarioException(UsuarioException.NotFoundException(mailCliente));
 		Cliente cliente = optionalCliente.get();

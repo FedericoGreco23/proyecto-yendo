@@ -344,42 +344,47 @@ public class ClienteService implements ClienteServicioInterfaz {
 
 	@Override
 	public DTRespuesta agregarACarrito(int producto, int cantidad, String mail, String mailRestaurante)
-			throws ProductoException {
-		Optional<Producto> optionalProducto = productoRepo.findById(producto);
-		if (optionalProducto.isPresent()) {
-			DTProducto dtProducto = new DTProducto(optionalProducto.get());
-			int descuento = dtProducto.getDescuento();
-			double precioInicial = dtProducto.getPrecio();
-			double precio = 0;
-			if (descuento > 0) {
-				precio = precioInicial - ((precioInicial * descuento) / 100);
-				dtProducto.setPrecio(precio);
-			}
-			Carrito optionalCarrito = mongoRepo.findByMailAndActivo(mail, true);
-			DTProductoCarrito dtPC = new DTProductoCarrito(dtProducto, cantidad);
-			Restaurante restaurante = restauranteRepo.getById(mailRestaurante);
-			Boolean existeProd = false;
-			if (optionalCarrito != null) { // TIENE CARRITO ACTIVO
-				for (DTProductoCarrito dtp : optionalCarrito.getProductoCarrito()) {
-					if (dtp.getProducto().getId() == producto) {
-						existeProd = true;
-						dtp.setCantidad(cantidad + dtp.getCantidad());
+			throws ProductoException, RestauranteException {
+		Restaurante restaurante = restauranteRepo.getById(mailRestaurante);
+		if(restaurante.getAbierto() == true) {
+			Optional<Producto> optionalProducto = productoRepo.findById(producto);
+			if (optionalProducto.isPresent()) {
+				DTProducto dtProducto = new DTProducto(optionalProducto.get());
+				int descuento = dtProducto.getDescuento();
+				double precioInicial = dtProducto.getPrecio();
+				double precio = 0;
+				if (descuento > 0) {
+					precio = precioInicial - ((precioInicial * descuento) / 100);
+					dtProducto.setPrecio(precio);
+				}
+				Carrito optionalCarrito = mongoRepo.findByMailAndActivo(mail, true);
+				DTProductoCarrito dtPC = new DTProductoCarrito(dtProducto, cantidad);
+				//Restaurante restaurante = restauranteRepo.getById(mailRestaurante);
+				Boolean existeProd = false;
+				if (optionalCarrito != null) { // TIENE CARRITO ACTIVO
+					for (DTProductoCarrito dtp : optionalCarrito.getProductoCarrito()) {
+						if (dtp.getProducto().getId() == producto) {
+							existeProd = true;
+							dtp.setCantidad(cantidad + dtp.getCantidad());
+						}
 					}
+					if (existeProd == false) {
+						optionalCarrito.addProductoCarrito(dtPC);
+					}
+					mongoRepo.save(optionalCarrito);
+				} else { // TIENE CARRITO INACTIVO O NO TIENE
+					List<DTProductoCarrito> productos = new ArrayList<DTProductoCarrito>();
+					productos.add(dtPC);
+					Carrito carrito = new Carrito(restaurante.getCostoDeEnvio(), mail, mailRestaurante, productos, true);
+					carrito.setId(nextSequence.getNextSequence("customSequences"));
+					mongoRepo.save(carrito);
 				}
-				if (existeProd == false) {
-					optionalCarrito.addProductoCarrito(dtPC);
-				}
-				mongoRepo.save(optionalCarrito);
-			} else { // TIENE CARRITO INACTIVO O NO TIENE
-				List<DTProductoCarrito> productos = new ArrayList<DTProductoCarrito>();
-				productos.add(dtPC);
-				Carrito carrito = new Carrito(restaurante.getCostoDeEnvio(), mail, mailRestaurante, productos, true);
-				carrito.setId(nextSequence.getNextSequence("customSequences"));
-				mongoRepo.save(carrito);
+				return new DTRespuesta("Carrito actualizado.");
+			} else {
+				throw new ProductoException(ProductoException.NotFoundExceptionId(producto));
 			}
-			return new DTRespuesta("Carrito actualizado.");
-		} else {
-			throw new ProductoException(ProductoException.NotFoundExceptionId(producto));
+		}else {
+			throw new RestauranteException("El restaurante esta cerrado.");
 		}
 	}
 
@@ -906,7 +911,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 			}
 
 		}
-		if (!categoria.equalsIgnoreCase("")) {
+		else if (!categoria.equalsIgnoreCase("")) {
 			// Aplico solo categoria
 			pageRestaurante = restauranteRepo.listarRestauranteDesdeClientePorCategoria(categoria,
 					EnumEstadoRestaurante.ACEPTADO, paging);
