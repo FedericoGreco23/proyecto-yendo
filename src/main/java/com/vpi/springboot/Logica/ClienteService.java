@@ -910,8 +910,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 						EnumEstadoRestaurante.ACEPTADO, paging);
 			}
 
-		}
-		if (!categoria.equalsIgnoreCase("")) {
+		} else if (!categoria.equalsIgnoreCase("")) {
 			// Aplico solo categoria
 			pageRestaurante = restauranteRepo.listarRestauranteDesdeClientePorCategoria(categoria,
 					EnumEstadoRestaurante.ACEPTADO, paging);
