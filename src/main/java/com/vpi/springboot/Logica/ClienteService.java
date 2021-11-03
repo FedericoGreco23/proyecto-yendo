@@ -820,13 +820,17 @@ public class ClienteService implements ClienteServicioInterfaz {
 	@Override
 	public DTPedido buscarPedidoRealizado(int numeroPedido) throws PedidoException {
 		DTPedido DTpedido = null;
-
+		
 		if (numeroPedido > 0) {
 			Pedido pedido = pedidoRepo.buscarPedidoPorNumero(numeroPedido);
 			if (pedido == null) {
 				throw new PedidoException(PedidoException.NotFoundExceptionId(numeroPedido));
 			} else {
-				DTpedido = new DTPedido(pedido);
+				Optional<Carrito> optionalCarrito = mongoRepo.findById(pedido.getCarrito());
+				if (optionalCarrito.isPresent())
+					DTpedido = new DTPedido(pedido, new DTCarrito(optionalCarrito.get()));
+				else
+					DTpedido = new DTPedido(pedido);
 			}
 		} else {
 			throw new PedidoException(PedidoException.NotValidId());
