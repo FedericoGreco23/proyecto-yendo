@@ -1,10 +1,5 @@
 package com.vpi.springboot.ControladorRest;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 
@@ -22,12 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.vpi.springboot.Logica.RestauranteService;
 import com.vpi.springboot.Modelo.Calificacion;
-import com.vpi.springboot.Modelo.Pedido;
 import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.Modelo.dto.DTPromocionConPrecio;
 import com.vpi.springboot.Modelo.Promocion;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
-import com.vpi.springboot.Modelo.dto.DTRestaurante;
 import com.vpi.springboot.exception.PermisosException;
 import com.vpi.springboot.exception.RestauranteException;
 import com.vpi.springboot.exception.UsuarioException;
@@ -146,7 +139,7 @@ public class RestauranteController {
 		}
 
 		try {
-			return new ResponseEntity<>(service.abrirRestaurante(getMailFromJwt()), HttpStatus.OK);
+			return new ResponseEntity<>(service.cerrarRestaurante(getMailFromJwt()), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -327,6 +320,19 @@ public class RestauranteController {
 		try {
 			DTRespuesta respuesta = service.registrarPago(idPedido);
 			return new ResponseEntity<>(respuesta, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@PostMapping("resolucionReclamo")
+	public ResponseEntity<?> resolucionReclamo(@RequestParam(required = true) int idReclamo, 
+			@RequestParam(required = true) Boolean aceptoReclamo) {
+		try {
+			DTRespuesta respuesta = service.resolucionReclamo(idReclamo, aceptoReclamo);
+			return new ResponseEntity<>(respuesta, HttpStatus.OK);
+		} catch (ConstraintViolationException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}

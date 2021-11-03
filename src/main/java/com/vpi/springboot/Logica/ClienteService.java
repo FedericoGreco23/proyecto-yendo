@@ -995,4 +995,13 @@ public class ClienteService implements ClienteServicioInterfaz {
 //			throw new UsuarioException(UsuarioException.SinCalificacion(mailRestaurante));
 		return new DTCalificacionRestaurante(calRestaurante);
 	}
+	
+	@Override
+	public DTRespuesta setToken(String token, String mailCliente) {
+		Optional<Cliente> optionalCliente = userRepo.findById(mailCliente);
+		Cliente cliente = optionalCliente.get();
+		cliente.setTokenDispositivo(token);
+		userRepo.save(cliente);
+		return new DTRespuesta("Token guardado.");
+	}
 }

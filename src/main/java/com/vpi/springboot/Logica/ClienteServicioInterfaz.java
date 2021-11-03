@@ -71,4 +71,6 @@ public interface ClienteServicioInterfaz {
 			String categoria, String sort, int order, int idDireccion) throws UsuarioException;
 	
 	public DTCalificacionRestaurante getCalificacionRestaurante(String mailCliente, String mailRestaurante) throws UsuarioException, RestauranteException;
+
+	public DTRespuesta setToken(String token, String mailCliente);
 }

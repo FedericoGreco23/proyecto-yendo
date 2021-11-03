@@ -1,5 +1,9 @@
 package com.vpi.springboot.Logica;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -32,6 +36,13 @@ import org.springframework.stereotype.Service;
 
 import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Direccion;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.Notification;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
@@ -1372,6 +1383,81 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 		pedidoRepo.save(devolucion);
 		return new DTRespuesta("Devolucion registrada con éxito.");
+	}
+	
+	@Override
+	public DTRespuesta resolucionReclamo(int idReclamo, Boolean aceptoReclamo) throws IOException {
+		Optional<Reclamo> optionalReclamo = recRepo.findById(idReclamo);
+		Reclamo reclamo = optionalReclamo.get();
+		String token = reclamo.getPedido().getCliente().getTokenDispositivo();
+		String restaurante = reclamo.getRestaurante().getNombre();
+		Message message;
+		String appAndroid = "android";
+		FileInputStream serviceAccount = new FileInputStream("src/main/java/Resource/yendo-5c371-firebase-adminsdk-rczst-500b815097.json");
+
+		FirebaseOptions options = new FirebaseOptions.Builder()
+		  .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+		  .build();
+
+		FirebaseApp.initializeApp(options);
+		
+		Map<String, String> map = new HashMap<>();
+		
+		map.put("llave", "valor");
+		
+		if (aceptoReclamo) {
+			//Se acepta el reclamo
+			//Se llama devolucion pedido
+			//Se envia notificacion con mensaje
+			
+			reclamo.setEstado(EnumEstadoReclamo.ACEPTADO);
+			//Envio notificacion al mobile
+			
+			Notification notification = Notification.builder()
+					.setTitle("Resolucion de reclamo")
+					.setBody("Su reclamo ha sido aceptado por el restaurante " + restaurante)
+					.build();
+			message = Message.builder()
+	                  .putAllData(map)
+	                  .putData("mensaje","Nuevo mensaje de sus reclamos")
+	                  .setToken(token) // deviceId
+	                  .setNotification(notification)
+	                  .build();
+			try {
+				//DUDA QUE ES appAndroid
+				FirebaseMessaging.getInstance(FirebaseApp.getInstance(appAndroid)).send(message);
+				System.out.println("PRUEBA SE ENVIA NOTIFICACION");
+			} catch (FirebaseMessagingException e) {
+				System.out.println(e.getStackTrace());
+				System.out.println("Mensaje de error: " + e.getMessagingErrorCode());
+			}
+			devolucionPedido(reclamo.getPedido().getId());
+		} else {
+			//No se acepta el reclamo
+			//Se envia notificacion con mensaje
+			
+			reclamo.setEstado(EnumEstadoReclamo.RECHAZADO);
+			//Envio notificacion al mobile
+			Notification notification = Notification.builder()
+					.setTitle("Resolucion de reclamo")
+					.setBody("Su reclamo ha sido rechazado por el restaurante " + restaurante)
+					.build();
+			message = Message.builder()
+	                  .putAllData(map)
+	                  .putData("mensaje","Nuevo mensaje de sus reclamos")
+	                  .setToken(token) // deviceId
+	                  .setNotification(notification)
+	                  .build();
+			try {
+				//DUDA QUE ES appAndroid
+				FirebaseMessaging.getInstance(FirebaseApp.getInstance(appAndroid)).send(message);
+				System.out.println("PRUEBA SE ENVIA NOTIFICACION");
+			} catch (FirebaseMessagingException e) {
+				System.out.println(e.getStackTrace());
+				System.out.println("Mensaje de error: " + e.getMessagingErrorCode());
+			}
+		}
+		return new DTRespuesta("Se envio la notificacion mobile.");
 	}
 
 	@Override
