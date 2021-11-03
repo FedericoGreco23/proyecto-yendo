@@ -1,5 +1,6 @@
 package logicaTest;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -179,6 +180,7 @@ class RestauranteServiceTest {
 		reclamo.setRestaurante(restaurante);
 		reclamos.add(reclamo);
 		pageReclamo=new PageImpl<>(reclamos);
+		optionalReclamo = Optional.of(reclamo);
 		calRestaurante = new  CalificacionRestaurante(5, null, null, null, restaurante, cliente);
 		calRestauranteList.add(calRestaurante);
 		pageCalificacion = new PageImpl<>(calRestauranteList);
@@ -454,4 +456,9 @@ class RestauranteServiceTest {
 		mockRestaurante.consultarCalificacion(0, 5, "", 1, restaurante.getMail());
 	}
 	
+	/*@Test
+	public void testResolucionReclamo() throws IOException {
+		Mockito.when(recRepo.findById(Mockito.anyInt())).thenReturn(optionalReclamo);
+		mockRestaurante.resolucionReclamo(reclamo.getId(), true);
+	}*/
 }

@@ -2,6 +2,7 @@ package logicaTest;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,18 +22,22 @@ import org.springframework.web.servlet.mvc.condition.ProducesRequestCondition;
 import com.vpi.springboot.Logica.GeneralService;
 import com.vpi.springboot.Logica.MailService;
 import com.vpi.springboot.Modelo.Administrador;
+import com.vpi.springboot.Modelo.Categoria;
 import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Direccion;
 import com.vpi.springboot.Modelo.GeoLocalizacion;
 import com.vpi.springboot.Modelo.Producto;
+import com.vpi.springboot.Modelo.Promocion;
 import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.TokenVerificacion;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Repositorios.AdministradorRepositorio;
+import com.vpi.springboot.Repositorios.CategoriaRepositorio;
 import com.vpi.springboot.Repositorios.ClienteRepositorio;
 import com.vpi.springboot.Repositorios.DireccionRepositorio;
 import com.vpi.springboot.Repositorios.ProductoRepositorio;
+import com.vpi.springboot.Repositorios.PromocionRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
 import com.vpi.springboot.Repositorios.VerificacionRepositorio;
 import com.vpi.springboot.exception.RestauranteException;
@@ -53,7 +58,10 @@ class GeneralServiceTest {
 	private DireccionRepositorio dirRepo;
 	@Mock
 	private ProductoRepositorio proRepo;
-
+	@Mock
+	private PromocionRepositorio promoRepo;
+	@Mock
+	private CategoriaRepositorio catRepo;
 	@Mock
 	private MailService mailSender;
 
@@ -62,24 +70,23 @@ class GeneralServiceTest {
 	
 	private Restaurante restaurante;
 	private Optional<Restaurante> optionalRestaurante;
-	private Optional<Restaurante> optionalRestauranteVacio = Optional.empty();
 	private Optional<Cliente> optionalCliente;
 	private Cliente cliente;
 	private Administrador admin;
 	private Optional<Administrador> optionalAdmin;
 	private GeoLocalizacion geo;
 	private Direccion dir;
-	private Direccion dir2;
-	private List<Cliente> clientes = new ArrayList<Cliente>();
-	private DTDireccion dtDir;
 	private Optional<Direccion> optionalDireccion;
 	private List<Direccion> direcciones = new ArrayList<Direccion>();
-	private Optional<Producto> optionalProducto;
 	private Producto producto;
 	private List<Producto> productos = new ArrayList<Producto>();
 	private TokenVerificacion token;
 	private List<Restaurante> restauranteList = new ArrayList<Restaurante>();
 	private Page<Restaurante> restaurantePage;
+	private Promocion promo;
+	private List<Promocion> promoList = new ArrayList<Promocion>();
+	private Categoria cat;
+	private List<Categoria> catList = new ArrayList<Categoria>();
 
 	@BeforeEach
 	public void init() {
@@ -92,23 +99,30 @@ class GeneralServiceTest {
 		restaurante = new Restaurante("restaurante1@gmail.com", "123456", "25125325", "foto", false, true, "resto1","dire 3223", 5.0f, EnumEstadoRestaurante.ACEPTADO,
 				LocalTime.now(), LocalTime.now(), LocalDate.now(), 50, geo, productos, "SDLM", true);
 				restaurante.setCostoDeEnvio(50);
+		cat = new Categoria("minutas", null);
+		catList.add(cat);
 		producto = new Producto("producto1", "producto1", 50,"foto",25,true);
+		producto.setCategoria(cat);
 		producto.setRestaurante(restaurante);
 		productos.add(producto);
 		restaurante.setProductos(productos);
-		optionalProducto = Optional.of(producto);
 		optionalRestaurante = Optional.of(restaurante);
 		geo = new GeoLocalizacion(2210.0, 2515.2);
 		restaurante.setGeoLocalizacion(geo);
 		restauranteList.add(restaurante);
 		restaurantePage = new PageImpl<Restaurante>(restauranteList);
 		dir = new Direccion("calle1 4555", geo);
+		dir.setId(3);
 		optionalDireccion = Optional.of(dir);
-		dir2 = new Direccion("calle1 3433", geo);
 		direcciones.add(dir);
 		cliente.setDirecciones(direcciones);
 		token = new TokenVerificacion(cliente);
-				
+		token.setFechaExpiracion(Calendar.getInstance().getTime());
+		promo = new Promocion("promo1", "descripcion", 232, null, 0, true);
+		promo.setCategoria(cat);
+		promo.setRestaurante(restaurante);
+		restaurante.addProducto(promo);
+		promoList.add(promo);
 		
 	}
 	
@@ -160,7 +174,7 @@ class GeneralServiceTest {
 	public void testBuscarRestaurante() throws RestauranteException {
 		Mockito.when(resRepo.buscarRestauranteDesdeClientePorNombreYCategoria(Mockito.anyString(),Mockito.anyString(),Mockito.any())).thenReturn(restauranteList);
 		Mockito.when(dirRepo.findById(Mockito.anyInt())).thenReturn(optionalDireccion);
-		mockGeneral.buscarRestaurante("re", "minutas", dir.getId());
+		mockGeneral.buscarRestaurante("re", "minutas", 0);
 	}
 	
 	@Test
@@ -207,6 +221,25 @@ class GeneralServiceTest {
 		mockGeneral.listarMenus(restaurante.getMail());
 	}
 	
+	@Test
+	public void testListarPromocionesRestaurantes() throws RestauranteException {
+		Mockito.when(resRepo.findById(Mockito.anyString())).thenReturn(optionalRestaurante);
+		Mockito.when(promoRepo.findAllByRestaurante(restaurante)).thenReturn(promoList);
+		mockGeneral.listarPromocionesRestaurante(restaurante.getMail());
+	}
+	
+	@Test
+	public void testBuscarMenusPromociones() throws RestauranteException {
+		Mockito.when(resRepo.findById(Mockito.anyString())).thenReturn(optionalRestaurante);
+		Mockito.when(proRepo.findAllByParametro(Mockito.any(Restaurante.class), Mockito.anyString())).thenReturn(productos);
+		mockGeneral.buscarMenusPromociones(restaurante.getMail(), producto.getNombre());
+	}
+	
+	@Test
+	public void testListarCategorias() {
+		Mockito.when(catRepo.findAll()).thenReturn(catList);
+		mockGeneral.listarCategorias();
+	}
 	
 	
 }
