@@ -7,9 +7,12 @@ import com.vpi.springboot.Modelo.dto.DTPedido;
 import com.vpi.springboot.Modelo.dto.DTPromocionConPrecio;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.vpi.springboot.Modelo.Calificacion;
 import com.vpi.springboot.Modelo.Pedido;
 import com.vpi.springboot.Modelo.Producto;
@@ -72,6 +75,8 @@ public interface RestauranteServicioInterfaz {
 	public void ventaProducto(String idProducto, String cantidad, String categoria, String fecha);
 
 	public DTRespuesta devolucionPedido(int idPedido);
+	
+	public DTRespuesta resolucionReclamo(int idReclamo, Boolean aceptoReclamo) throws FileNotFoundException, IOException;
 	
 	public DTCalificacionCliente getCalificacionCliente(String mailCliente, String mailRestaurante) throws UsuarioException, RestauranteException;
 	

@@ -148,6 +148,7 @@ class ClienteServiceTest {
 				LocalTime.now(), LocalTime.now(), LocalDate.now(), 50, geo, productos, "SDLM", true);
 		restaurante.setCostoDeEnvio(50);
 		restaurante.setGeoLocalizacion(geo);
+		restaurante.setAbierto(true);
 		restauranteList.add(restaurante);
 		pageRestaurante = new PageImpl<>(restauranteList);
 		optionalRestaurante = Optional.of(restaurante);
@@ -251,6 +252,7 @@ class ClienteServiceTest {
 		Mockito.when(productoRepo.findById(Mockito.anyInt())).thenReturn(optionalProducto);
 		Mockito.when(mongoRepo.findByMailAndActivo(Mockito.anyString(), Mockito.anyBoolean())).thenReturn(carrito);
 		Mockito.when(restauranteRepo.findById(Mockito.anyString())).thenReturn(optionalRestaurante);
+		Mockito.when(restauranteRepo.getById(Mockito.anyString())).thenReturn(restaurante);
 		Mockito.doReturn(carrito).when(mongoRepo).save(Mockito.any(Carrito.class));
 		mockCliente.agregarACarrito(producto.getId(), 1, cliente.getMail(), restaurante.getMail());
 	}

@@ -17,6 +17,7 @@ public class DTPedido implements Serializable {
 	private EnumMetodoDePago metodoDePago;
 //	private int carrito;
 	private String cliente;
+	private Float calificacionCliente;
 	private String restaurante;
 //	private List<DTReclamo> reclamos = new ArrayList<>();
 	private DTCarrito carrito;
@@ -46,6 +47,7 @@ public class DTPedido implements Serializable {
 		this.estadoPedido = ped.getEstadoPedido();
 		this.metodoDePago = ped.getMetodoDePago();
 		this.cliente = ped.getCliente().getMail();
+		this.calificacionCliente = ped.getCliente().getCalificacionPromedio();
 		this.restaurante = ped.getRestaurante().getNombre();
 		this.comentario = ped.getComentario();
 		this.direccion = ped.getDireccion();
@@ -60,6 +62,7 @@ public class DTPedido implements Serializable {
 		this.estadoPedido = ped.getEstadoPedido();
 		this.metodoDePago = ped.getMetodoDePago();
 		this.cliente = ped.getCliente().getMail();
+		this.calificacionCliente = ped.getCliente().getCalificacionPromedio();
 		this.carrito = carrito;
 		this.restaurante = ped.getRestaurante().getNombre();
 		this.comentario = ped.getComentario();
@@ -173,5 +176,13 @@ public class DTPedido implements Serializable {
 
 	public void setPago(Boolean pago) {
 		this.pago = pago;
+	}
+
+	public Float getCalificacionCliente() {
+		return calificacionCliente;
+	}
+
+	public void setCalificacionCliente(Float calificacionCliente) {
+		this.calificacionCliente = calificacionCliente;
 	}
 }

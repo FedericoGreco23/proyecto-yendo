@@ -282,4 +282,13 @@ public class ClienteController {
 			return null;
 		}
 	}
+	
+	@PostMapping("/setToken")
+	public ResponseEntity<?> setToken(@RequestParam(required = true) String token, @RequestParam(defaultValue = "") String mailCliente) {
+		try {
+			return new ResponseEntity<>(clienteService.setToken(token, mailCliente), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }
