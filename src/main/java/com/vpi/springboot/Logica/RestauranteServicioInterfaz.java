@@ -76,7 +76,7 @@ public interface RestauranteServicioInterfaz {
 
 	public DTRespuesta devolucionPedido(int idPedido);
 	
-	public DTRespuesta resolucionReclamo(int idReclamo, Boolean aceptoReclamo) throws FileNotFoundException, IOException;
+	public DTRespuesta resolucionReclamo(int idReclamo, Boolean aceptoReclamo, String comentario) throws FileNotFoundException, IOException;
 	
 	public DTCalificacionCliente getCalificacionCliente(String mailCliente, String mailRestaurante) throws UsuarioException, RestauranteException;
 	

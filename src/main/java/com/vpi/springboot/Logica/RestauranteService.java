@@ -1388,7 +1388,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	}
 	
 	@Override
-	public DTRespuesta resolucionReclamo(int idReclamo, Boolean aceptoReclamo) throws IOException {
+	public DTRespuesta resolucionReclamo(int idReclamo, Boolean aceptoReclamo, String comentario) throws IOException {
 		Optional<Reclamo> optionalReclamo = recRepo.findById(idReclamo);
 		Reclamo reclamo = optionalReclamo.get();
 		String token = reclamo.getPedido().getCliente().getTokenDispositivo();
@@ -1413,26 +1413,32 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			//Se envia notificacion con mensaje
 			
 			reclamo.setEstado(EnumEstadoReclamo.ACEPTADO);
+			reclamo.setResolucion(comentario);
 			//Envio notificacion al mobile
 			
-			Notification notification = Notification.builder()
-					.setTitle("Resolucion de reclamo")
-					.setBody("Su reclamo ha sido aceptado por el restaurante " + restaurante)
-					.build();
-			message = Message.builder()
-	                  .putAllData(map)
-	                  .putData("mensaje","Nuevo mensaje de sus reclamos")
-	                  .setToken(token) // deviceId
-	                  .setNotification(notification)
-	                  .build();
-			try {
-				//DUDA QUE ES appAndroid
-				FirebaseMessaging.getInstance(FirebaseApp.getInstance(appAndroid)).send(message);
-				System.out.println("PRUEBA SE ENVIA NOTIFICACION");
-			} catch (FirebaseMessagingException e) {
-				System.out.println(e.getStackTrace());
-				System.out.println("Mensaje de error: " + e.getMessagingErrorCode());
+			if (token != null) {
+			
+				Notification notification = Notification.builder()
+						.setTitle("Resolucion de reclamo")
+						.setBody("Su reclamo ha sido aceptado por el restaurante " + restaurante)
+						.build();
+				message = Message.builder()
+		                  .putAllData(map)
+		                  .putData("mensaje","Nuevo mensaje de sus reclamos")
+		                  .setToken(token) // deviceId
+		                  .setNotification(notification)
+		                  .build();
+				try {
+					//DUDA QUE ES appAndroid
+					FirebaseMessaging.getInstance().send(message);
+					//FirebaseMessaging.getInstance(FirebaseApp.getInstance(appAndroid)).send(message);
+					System.out.println("PRUEBA SE ENVIA NOTIFICACION");
+				} catch (FirebaseMessagingException e) {
+					System.out.println(e.getStackTrace());
+					System.out.println("Mensaje de error: " + e.getMessagingErrorCode());
+				}
 			}
+			
 			devolucionPedido(reclamo.getPedido().getId());
 		} else {
 			//No se acepta el reclamo
@@ -1440,25 +1446,29 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			
 			reclamo.setEstado(EnumEstadoReclamo.RECHAZADO);
 			//Envio notificacion al mobile
-			Notification notification = Notification.builder()
-					.setTitle("Resolucion de reclamo")
-					.setBody("Su reclamo ha sido rechazado por el restaurante " + restaurante)
-					.build();
-			message = Message.builder()
-	                  .putAllData(map)
-	                  .putData("mensaje","Nuevo mensaje de sus reclamos")
-	                  .setToken(token) // deviceId
-	                  .setNotification(notification)
-	                  .build();
-			try {
-				//DUDA QUE ES appAndroid
-				FirebaseMessaging.getInstance(FirebaseApp.getInstance(appAndroid)).send(message);
-				System.out.println("PRUEBA SE ENVIA NOTIFICACION");
-			} catch (FirebaseMessagingException e) {
-				System.out.println(e.getStackTrace());
-				System.out.println("Mensaje de error: " + e.getMessagingErrorCode());
+			
+			if (token != null) {
+				Notification notification = Notification.builder()
+						.setTitle("Resolucion de reclamo")
+						.setBody("Su reclamo ha sido rechazado por el restaurante " + restaurante)
+						.build();
+				message = Message.builder()
+		                  .putAllData(map)
+		                  .putData("mensaje","Nuevo mensaje de sus reclamos")
+		                  .setToken(token) // deviceId
+		                  .setNotification(notification)
+		                  .build();
+				try {
+					//DUDA QUE ES appAndroid
+					FirebaseMessaging.getInstance(FirebaseApp.getInstance(appAndroid)).send(message);
+					System.out.println("PRUEBA SE ENVIA NOTIFICACION");
+				} catch (FirebaseMessagingException e) {
+					System.out.println(e.getStackTrace());
+					System.out.println("Mensaje de error: " + e.getMessagingErrorCode());
+				}
 			}
 		}
+		recRepo.save(reclamo);
 		return new DTRespuesta("Se envio la notificacion mobile.");
 	}
 

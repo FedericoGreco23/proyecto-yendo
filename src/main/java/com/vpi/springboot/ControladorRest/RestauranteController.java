@@ -327,9 +327,9 @@ public class RestauranteController {
 	
 	@PostMapping("resolucionReclamo")
 	public ResponseEntity<?> resolucionReclamo(@RequestParam(required = true) int idReclamo, 
-			@RequestParam(required = true) Boolean aceptoReclamo) {
+			@RequestParam(required = true) Boolean aceptoReclamo, @RequestParam(defaultValue = "") String comentario) {
 		try {
-			DTRespuesta respuesta = service.resolucionReclamo(idReclamo, aceptoReclamo);
+			DTRespuesta respuesta = service.resolucionReclamo(idReclamo, aceptoReclamo, comentario);
 			return new ResponseEntity<>(respuesta, HttpStatus.OK);
 		} catch (ConstraintViolationException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
