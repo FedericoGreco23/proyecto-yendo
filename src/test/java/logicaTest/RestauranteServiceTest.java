@@ -176,6 +176,7 @@ class RestauranteServiceTest {
 		carrito = new Carrito(50, cliente.getMail(), restaurante.getMail(), listProductoCarrito, true);
 		optionalCarritoLleno = Optional.of(carrito);
 		promo = new Promocion("promo1", "descripcion", 329, null, 0, true);
+		promo.setProductos(productos);
 		optionalPromocion = Optional.of(promo);
 		promocionList.add(promo);
 		dtproductoIdCant = new DTProductoIdCantidad(producto.getId(), 2);
@@ -210,9 +211,9 @@ class RestauranteServiceTest {
 		Mockito.when(catRepo.findById(Mockito.anyString())).thenReturn(optionalCategoria);
 		Mockito.when(passwordEncoder.encode(Mockito.anyString())).thenReturn("1234");
 		Mockito.doReturn(restaurante).when(restauranteRepo).save(Mockito.any(Restaurante.class));
-		mockRestaurante.altaRestaurante(restaurante);
-		
+		mockRestaurante.altaRestaurante(restaurante);	
 	}
+
 	
 	@Test
 	public void testAltaMenu() throws ProductoException, RestauranteException, CategoriaException, Exception {
@@ -295,7 +296,7 @@ class RestauranteServiceTest {
 		Mockito.when(restauranteRepo.findById(Mockito.anyString())).thenReturn(optionalRestaurante);
 		Mockito.when(pedidoRepo.findByEstado(Mockito.any(), Mockito.any(Restaurante.class),	Mockito.any(Pageable.class))).thenReturn(pagePedido);
 		Mockito.when(mongoRepo.findById(Mockito.anyInt())).thenReturn(optionalCarritoLleno);
-		mockRestaurante.listarPedidos(5, 5, "", "", "", "ACEPTADO", "costoTotal", 0);
+		mockRestaurante.listarPedidos(5, 5, "", "", "", "ACEPTADO", "costoTotal", 1);
 	}
 	
 	@Test 
@@ -303,7 +304,34 @@ class RestauranteServiceTest {
 		Mockito.when(restauranteRepo.findById(Mockito.anyString())).thenReturn(optionalRestaurante);
 		Mockito.when(pedidoRepo.findAllByRestaurante(Mockito.any(Restaurante.class), Mockito.any(Pageable.class))).thenReturn(pagePedido);
 		Mockito.when(mongoRepo.findById(Mockito.anyInt())).thenReturn(optionalCarritoLleno);
-		mockRestaurante.listarPedidos(5, 5, restaurante.getMail(), "", "", "", "costoTotal", 0);
+		mockRestaurante.listarPedidos(5, 5, restaurante.getMail(), "", "", "", "", 0);
+	}
+	
+	@Test 
+	public void testListarPedidos9() throws RestauranteException {
+		Mockito.when(restauranteRepo.findById(Mockito.anyString())).thenReturn(optionalRestaurante);
+		Mockito.when(pedidoRepo.findByIdFechaEstado(Mockito.anyInt(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(Restaurante.class),
+				Mockito.any(Pageable.class))).thenReturn(pagePedido);
+		Mockito.when(mongoRepo.findById(Mockito.anyInt())).thenReturn(optionalCarritoLleno);
+		mockRestaurante.listarPedidos(5, 5, restaurante.getMail(), String.valueOf(pedido.getId()), "25/10/2021", "ACEPTADO", "costoTotal", 0);
+	}
+	
+	@Test 
+	public void testListarPedidos10() throws RestauranteException {
+		Mockito.when(restauranteRepo.findById(Mockito.anyString())).thenReturn(optionalRestaurante);
+		Mockito.when(pedidoRepo.findByIdFecha(Mockito.anyInt(), Mockito.any(), Mockito.any(), Mockito.any(Restaurante.class),
+				Mockito.any(Pageable.class))).thenReturn(pagePedido);	
+		Mockito.when(mongoRepo.findById(Mockito.anyInt())).thenReturn(optionalCarritoLleno);
+		mockRestaurante.listarPedidos(5, 5, "", String.valueOf(pedido.getId()), "25/10/2021", "", "costoTotal", 0);
+	}
+	
+	@Test 
+	public void testListarPedidos11() throws RestauranteException {
+		Mockito.when(restauranteRepo.findById(Mockito.anyString())).thenReturn(optionalRestaurante);
+		Mockito.when(pedidoRepo.findByIdEstado(Mockito.anyInt(),Mockito.any(), Mockito.any(Restaurante.class),
+				Mockito.any(Pageable.class))).thenReturn(pagePedido);
+		Mockito.when(mongoRepo.findById(Mockito.anyInt())).thenReturn(optionalCarritoLleno);
+		mockRestaurante.listarPedidos(5, 5, "",String.valueOf(pedido.getId()), "", "ACEPTADO", "costoTotal", 0);
 	}
 	
 	@Test
@@ -354,7 +382,7 @@ class RestauranteServiceTest {
 	@Test
 	public void testModificarPromocion() throws PromocionException, ProductoException {
 		Mockito.when(promoRepo.findById(Mockito.anyInt())).thenReturn(optionalPromocion);
-		Mockito.when(prodRepo.findByIdAndRest(Mockito.anyInt(), Mockito.any(Restaurante.class))).thenReturn(producto);
+		Mockito.when(prodRepo.findById(Mockito.anyInt())).thenReturn(optionalProducto);
 		Mockito.doReturn(promo).when(promoRepo).save(Mockito.any(Promocion.class));
 		mockRestaurante.modificarPromocion(promo);
 	}

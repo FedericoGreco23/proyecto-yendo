@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.vpi.springboot.Logica.ClienteService;
+import com.vpi.springboot.Logica.MailService;
 import com.vpi.springboot.Logica.NextSequenceService;
 import com.vpi.springboot.Modelo.Calificacion;
 import com.vpi.springboot.Modelo.CalificacionCliente;
@@ -31,6 +32,7 @@ import com.vpi.springboot.Modelo.Pedido;
 import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.Modelo.Reclamo;
 import com.vpi.springboot.Modelo.Restaurante;
+import com.vpi.springboot.Modelo.TokenVerificacion;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
 import com.vpi.springboot.Modelo.dto.DTProducto;
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
@@ -48,6 +50,7 @@ import com.vpi.springboot.Repositorios.PedidoRepositorio;
 import com.vpi.springboot.Repositorios.ProductoRepositorio;
 import com.vpi.springboot.Repositorios.ReclamoRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
+import com.vpi.springboot.Repositorios.VerificacionRepositorio;
 import com.vpi.springboot.Repositorios.mongo.UltimaDireccionRepositorio;
 import com.vpi.springboot.exception.CarritoException;
 import com.vpi.springboot.exception.DireccionException;
@@ -90,6 +93,10 @@ class ClienteServiceTest {
 	private NextSequenceService nextSequence;
 	@Mock
 	private CalificacionClienteRepositorio calClienteRepo;
+	@Mock
+	private VerificacionRepositorio tokenRepo;
+	@Mock
+	private MailService mailSender;
 	
 	@InjectMocks
 	private ClienteService mockCliente;
@@ -136,6 +143,7 @@ class ClienteServiceTest {
 	private Page<CalificacionCliente> pageCalificacion;
 	private List<Restaurante> restauranteList = new ArrayList<Restaurante>();
 	private Page<Restaurante> pageRestaurante;
+	private TokenVerificacion token;
 	
 	@BeforeEach
 	public void init() {
@@ -192,6 +200,7 @@ class ClienteServiceTest {
 		calRestaurante = new  CalificacionRestaurante(5, null, null, null, restaurante, cliente);
 		calRestauranteList.add(calRestaurante);
 		pageCalificacion = new PageImpl<>(calClienteList);
+		token = new TokenVerificacion(cliente);
 		
 	}
 	
@@ -200,7 +209,8 @@ class ClienteServiceTest {
 		Mockito.when(clienteRepo.findById(Mockito.anyString())).thenReturn(optionalClienteVacio);
 		Mockito.when(passwordEncoder.encode(Mockito.anyString())).thenReturn("1234");
 		Mockito.doReturn(cliente).when(clienteRepo).save(Mockito.any(Cliente.class));
-		//Mockito.doNothing().when(clienteRepo).save(Mockito.any(Cliente.class));
+		Mockito.doReturn(token).when(tokenRepo).save(Mockito.any(TokenVerificacion.class));
+		Mockito.doNothing().when(mailSender).sendMail(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
 		mockCliente.altaCliente(cliente);
 	}
 	
@@ -340,13 +350,13 @@ class ClienteServiceTest {
 		mockCliente.listarPedidos(5, 5, "","" , "costoTotal", 0, cliente.getMail());
 	}
 	
-	/*@Test 
+	@Test 
 	public void testListarPedidos4() throws UsuarioException {
 		Mockito.when(clienteRepo.findById(Mockito.anyString())).thenReturn(optionalCliente);
-		Mockito.when(pedidoRepo.findByFecha(Mockito.any(), Mockito.any(), Mockito.any(Restaurante.class),
+		Mockito.when(pedidoRepo.findByFecha(Mockito.any(), Mockito.any(), Mockito.any(Cliente.class),
 				Mockito.any(Pageable.class))).thenReturn(pagePedido);	
-		mockCliente.listarPedidos(5, 5, "","12/09/2021" , "costoTotal", 0, cliente.getMail());
-	}*/
+		mockCliente.listarPedidos(5, 0, "","12/09/2021" , "costoTotal", 0, cliente.getMail());
+	}
 	
 	@Test
 	public void testBuscarPedidoRealizado() throws PedidoException, UsuarioException {
@@ -446,6 +456,20 @@ class ClienteServiceTest {
 		Mockito.when(clienteRepo.findById(Mockito.anyString())).thenReturn(optionalCliente);
 		Mockito.when(calClienteRepo.consultarCalificacion(Mockito.any(Cliente.class), Mockito.any())).thenReturn(pageCalificacion);
 		mockCliente.consultarCalificacion(0, 5, "", 1, cliente.getMail());
+	}
+	
+	@Test
+	public void testConsultarCalificacion2() throws RestauranteException {
+		Mockito.when(clienteRepo.findById(Mockito.anyString())).thenReturn(optionalCliente);
+		Mockito.when(calClienteRepo.consultarCalificacion(Mockito.any(Cliente.class), Mockito.any())).thenReturn(pageCalificacion);
+		mockCliente.consultarCalificacion(0, 5, "1", 1, cliente.getMail());
+	}
+	
+	@Test
+	public void testConsultarCalificacion3() throws RestauranteException {
+		Mockito.when(clienteRepo.findById(Mockito.anyString())).thenReturn(optionalCliente);
+		Mockito.when(calClienteRepo.consultarCalificacion(Mockito.any(Cliente.class), Mockito.any())).thenReturn(pageCalificacion);
+		mockCliente.consultarCalificacion(0, 5, "1", 2, cliente.getMail());
 	}
 	
 	@Test
