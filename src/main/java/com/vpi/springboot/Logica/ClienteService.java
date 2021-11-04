@@ -1045,8 +1045,8 @@ public class ClienteService implements ClienteServicioInterfaz {
 						precioTotal = precioTotal + (DTpc.getProducto().getPrecio() * DTpc.getCantidad());
 					}
 					precioTotal = precioTotal + restaurante.getCostoDeEnvio();
-					int mesRandom= (int) (Math.random() * 11);
-					Pedido pedido = new Pedido(LocalDateTime.of(2021,mesRandom+1,01, 19,02,0), precioTotal, estado, pago, idCarrito, direccion,
+					int mesRandom= (int) (Math.random() * 7);
+					Pedido pedido = new Pedido(LocalDateTime.of(2021,mesRandom+5,01, 19,02,0), precioTotal, estado, pago, idCarrito, direccion,
 							restaurante, cliente, comentario);
 					if (pago.equals(EnumMetodoDePago.PAYPAL)) {
 						pedido.setPago(true);

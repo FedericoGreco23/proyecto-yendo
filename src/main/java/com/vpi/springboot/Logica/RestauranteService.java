@@ -77,6 +77,7 @@ import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoReclamo;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
+import com.vpi.springboot.Modelo.dto.PedidoMonto;
 import com.vpi.springboot.Repositorios.CalificacionClienteRepositorio;
 import com.vpi.springboot.Repositorios.CalificacionRestauranteRepositorio;
 import com.vpi.springboot.Repositorios.CategoriaRepositorio;
@@ -1508,9 +1509,9 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 //////////////////////////////////////////ESTADISTICAS///////////////////////////////////
 
 /**
-* VALANCE DE VENTAS
+* BALANCE DE VENTAS
 */
-@Scheduled(cron = "*/59 */5 * * * *") // 1 vez cada 5 minutos
+@Scheduled(cron = "*/59 */1 * * * *") // 1 vez cada 5 minutos
 public DTRespuesta actualizarBalanceVentas() {
 // cuando se hagan cada 24 horas cambiar a findAllFromToday()
 List<Pedido> pedidosList = pedidoRepo.findAll();
@@ -1521,22 +1522,45 @@ for (Pedido pedido : pedidosList) {
 	Optional<BalanceVentaDTO> balanceByMailOp = balanceVentasRepo.findById(pedido.getRestaurante().getMail());
 	if (balanceByMailOp.isPresent()) {
 		BalanceVentaDTO balanceByMail = balanceByMailOp.get();
-		if (!balanceByMail.getIdPedidoMonto().containsKey(pedido.getId())) {
-			Map<Integer, Double> idPedidoMonto = balanceByMail.getIdPedidoMonto();
+		
+		//primera venta con esa fecha
+		if (!balanceByMail.getFechaidPedidoMonto().containsKey(pedido.getFecha().toLocalDate())) {
+			
+			Map<LocalDate, Map<Integer, Double>> fecha_PedidoMonto = balanceByMail.getFechaidPedidoMonto();
+			Map<Integer, Double> idPedidoMonto = new HashMap<>();
 			idPedidoMonto.put(Integer.valueOf(pedido.getId()),
 					BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue());
-			balanceByMail.setTotal(BigDecimal.valueOf(balanceByMail.getTotal() + pedido.getCostoTotal())
-					.setScale(4, RoundingMode.HALF_UP).doubleValue());
+			fecha_PedidoMonto.put(pedido.getFecha().toLocalDate(), idPedidoMonto);
+			
+		
 			balanceVentasRepo.save(balanceByMail);
+		}else {//ya hay pedidos en esa fecha
+			
+			Map<LocalDate, Map<Integer, Double>> fecha_PedidoMonto = balanceByMail.getFechaidPedidoMonto();
+			Map<Integer, Double> idPedidoMonto = balanceByMail.getFechaidPedidoMonto().get(pedido.getFecha().toLocalDate());
+			
+			idPedidoMonto.put(Integer.valueOf(pedido.getId()),
+					BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue());
+			fecha_PedidoMonto.put(pedido.getFecha().toLocalDate(), idPedidoMonto);
+			
+		
+			balanceVentasRepo.save(balanceByMail);
+				balanceByMail.setTotal(BigDecimal.valueOf(balanceByMail.getTotal() + pedido.getCostoTotal())
+					.setScale(4, RoundingMode.HALF_UP).doubleValue());
 		}
-	} else {
-
+	} else {//el resto no está aun guardado
+		
 		BalanceVentaDTO balanceByMail = new BalanceVentaDTO();
-		Map<Integer, Double> idPedidoMonto = balanceByMail.getIdPedidoMonto();
+		Map<LocalDate, Map<Integer, Double>> fecha_PedidoMonto = balanceByMail.getFechaidPedidoMonto();
+		Map<Integer, Double> idPedidoMonto = new HashMap<>();
 		idPedidoMonto.put(Integer.valueOf(pedido.getId()),
 				BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue());
+		fecha_PedidoMonto.put(pedido.getFecha().toLocalDate(), idPedidoMonto);
+		
+				
 		balanceByMail.setTotal(pedido.getCostoTotal());
 		balanceByMail.set_id(pedido.getRestaurante().getMail());
+		
 		balanceVentasRepo.save(balanceByMail);
 
 	}

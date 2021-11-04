@@ -1,6 +1,7 @@
 package com.vpi.springboot.Modelo.dto;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,7 +20,7 @@ public class BalanceVentaDTO implements Serializable {
 	@Id
 	private String _id;//mail
 	private Double total;
-	private Map<Integer, Double> idPedidoMonto= new HashMap<>();
+	private Map<LocalDate, Map<Integer, Double>> fechaidPedidoMonto= new HashMap<>();
 	
 	
 
@@ -44,13 +45,13 @@ public class BalanceVentaDTO implements Serializable {
 	}
 
 
-	public Map<Integer, Double> getIdPedidoMonto() {
-		return idPedidoMonto;
+	public Map<LocalDate, Map<Integer, Double>> getFechaidPedidoMonto() {
+		return fechaidPedidoMonto;
 	}
 
 
-	public void setIdPedidoMonto(Map<Integer, Double> idPedidoMonto) {
-		this.idPedidoMonto = idPedidoMonto;
+	public void setFechaidPedidoMonto( Map<LocalDate, Map<Integer, Double>> fechaidPedidoMonto) {
+		this.fechaidPedidoMonto = fechaidPedidoMonto;
 	}
 
 
