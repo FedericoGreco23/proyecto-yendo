@@ -1573,8 +1573,19 @@ return new DTRespuesta("Balance de Ventas actualizado");
 public Object getBalanceVentaByFecha(String fecha, String mailFromJwt) {
 	Optional<BalanceVentaDTO> balanceByMailOp = balanceVentasRepo.findById(mailFromJwt);
 	if(balanceByMailOp.isPresent()) {
-		return balanceByMailOp.get();
+		String[] fechas = fecha.split("-");
+		Integer dia=Integer.valueOf(fechas[2]);
+		Integer mes=Integer.valueOf(fechas[1]);
+		Integer anho=Integer.valueOf(fechas[0]);
+		
+		if(balanceByMailOp.get().getFechaidPedidoMonto().containsKey(LocalDate.of(anho,mes, dia))) {
+			return balanceByMailOp.get().getFechaidPedidoMonto().get(LocalDate.of(anho,mes, dia));
+		}else {
+			
+			return "El restaurante no tuvo ventas en esa fecha. Consulte una de las siguientes: " +balanceByMailOp.get().getFechaidPedidoMonto().keySet().toString();
+		}
+			
 	}else
-		return "Balance de Ventas no encontrado";
+		return "Balance de Ventas actualizado";
 }
 }
