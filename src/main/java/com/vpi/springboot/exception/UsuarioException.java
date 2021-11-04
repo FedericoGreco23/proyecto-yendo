@@ -33,6 +33,6 @@ public class UsuarioException extends Exception {
 	}
 	
 	public static String SinPedido(String nombre) {
-		return "Cliente no tiene ningún pedido en restaurante " + nombre + ".";
+		return "Necesita realizar un pedido antes de calificar.";
 	}
 }

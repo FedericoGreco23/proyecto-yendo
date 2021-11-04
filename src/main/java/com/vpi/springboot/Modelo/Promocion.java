@@ -30,5 +30,4 @@ public class Promocion extends Producto {
 	public void setProductos(List<Producto> productos) {
 		this.productos = productos;
 	}
-
 }
