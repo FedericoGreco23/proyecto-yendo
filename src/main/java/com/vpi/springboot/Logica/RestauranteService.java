@@ -1585,14 +1585,14 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			if(valanceByMailOp.isPresent()) {
 				ValanceVentaDTO valanceByMail= valanceByMailOp.get();
 				Map<Integer, Double> idPedidoMonto =valanceByMail.getIdPedidoMonto();
-				idPedidoMonto.put(Integer.valueOf(pedido.getId()), pedido.getCostoTotal());
-				valanceByMail.setTotal(valanceByMail.getTotal()+pedido.getCostoTotal());
+				idPedidoMonto.put(Integer.valueOf(pedido.getId()), BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue());
+				valanceByMail.setTotal(BigDecimal.valueOf(valanceByMail.getTotal()+pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue());
 				valanceVentasRepo.save(valanceByMail);
 			}else {
 				
 				ValanceVentaDTO valanceByMail= new ValanceVentaDTO();
 				Map<Integer, Double> idPedidoMonto =valanceByMail.getIdPedidoMonto();
-				idPedidoMonto.put(Integer.valueOf(pedido.getId()), pedido.getCostoTotal());
+				idPedidoMonto.put(Integer.valueOf(pedido.getId()), BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue());
 				valanceByMail.setTotal(pedido.getCostoTotal());
 				valanceByMail.set_id(pedido.getRestaurante().getMail());
 				valanceVentasRepo.save(valanceByMail);
