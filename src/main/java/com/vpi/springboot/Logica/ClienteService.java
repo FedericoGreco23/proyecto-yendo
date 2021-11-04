@@ -839,12 +839,15 @@ public class ClienteService implements ClienteServicioInterfaz {
 		return DTpedido;
 	}
 
-	//ConsultarCalificacionesCliente
+
+	// ConsultarCalificacionesCliente
 	@Override
 	public Map<String, Object> consultarCalificacion(int page, int size, String sort, int order, String mailCliente) {
 		Map<String, Object> response = new HashMap<>();
-		//List<DTCalificacionRestaurante> DTCalificacionesRestaurante = new ArrayList<DTCalificacionRestaurante>();
-		//List<CalificacionRestaurante> calificacionRestaurantes = new ArrayList<CalificacionRestaurante>();
+		// List<DTCalificacionRestaurante> DTCalificacionesRestaurante = new
+		// ArrayList<DTCalificacionRestaurante>();
+		// List<CalificacionRestaurante> calificacionRestaurantes = new
+		// ArrayList<CalificacionRestaurante>();
 		List<DTCalificacionCliente> DTCalificacionesCliente = new ArrayList<DTCalificacionCliente>();
 		List<CalificacionCliente> calificacionClientes = new ArrayList<CalificacionCliente>();
 
@@ -883,7 +886,9 @@ public class ClienteService implements ClienteServicioInterfaz {
 		return response;
 	}
 
-	//Listo los restaurantes abiertos cercanos a la direccion activa del usuario
+
+
+	// Listo los restaurantes abiertos cercanos a la direccion activa del usuario
 	@Override
 	public Map<String, Object> listarRestaurantesPorZona(int page, int size, int horarioApertura, String nombre,
 			String categoria, String sort, int order, int idDireccion) throws UsuarioException {
@@ -925,15 +930,16 @@ public class ClienteService implements ClienteServicioInterfaz {
 					EnumEstadoRestaurante.ACEPTADO, paging);
 		} else {
 			// No aplico ni categoria ni nombre
-			pageRestaurante = restauranteRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivos(EnumEstadoRestaurante.ACEPTADO,
-					paging);
+			pageRestaurante = restauranteRepo
+					.buscarRestaurantesPorEstadoNoBloqueadosYActivos(EnumEstadoRestaurante.ACEPTADO, paging);
 		}
 
 		restaurantes = pageRestaurante.getContent();
 		int pagina = pageRestaurante.getNumber();
 		long totalElements = pageRestaurante.getTotalElements();
 
-		//Calculo de distancia entre restaurante y cliente
+
+		// Calculo de distancia entre restaurante y cliente
 		double lat1;
 		double lng1;
 		double lat2;
@@ -960,6 +966,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 	        double va2 = 2 * Math.atan2(Math.sqrt(va1), Math.sqrt(1 - va1));
 	        double distancia = radioTierra * va2;
 			if (distancia < 15) {
+
 				if (horarioApertura > 0) {
 					if (r.getHorarioApertura().getHour() >= horarioApertura) {
 						DTListarRestaurantes.add(new DTListarRestaurante(r));
@@ -1001,6 +1008,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 		if(calRestaurante == null)
 			return null;
 //			throw new UsuarioException(UsuarioException.SinCalificacion(mailRestaurante));
+
 		return new DTCalificacionRestaurante(calRestaurante);
 	}
 	
@@ -1008,8 +1016,11 @@ public class ClienteService implements ClienteServicioInterfaz {
 	public DTRespuesta setToken(String token, String mailCliente) {
 		Optional<Cliente> optionalCliente = userRepo.findById(mailCliente);
 		Cliente cliente = optionalCliente.get();
-		cliente.setTokenDispositivo(token);
-		userRepo.save(cliente);
-		return new DTRespuesta("Token guardado.");
+		if (cliente.getTokenDispositivo() == null || !cliente.getTokenDispositivo().equalsIgnoreCase(token)) {
+			cliente.setTokenDispositivo(token);
+			userRepo.save(cliente);
+			return new DTRespuesta("Token guardado.");
+		}
+		return new DTRespuesta("Token no guardado, es igual al existente");
 	}
 }

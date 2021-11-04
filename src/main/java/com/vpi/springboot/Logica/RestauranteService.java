@@ -76,6 +76,7 @@ import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoReclamo;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
+import com.vpi.springboot.Modelo.dto.BalanceVentaDTO;
 import com.vpi.springboot.Repositorios.CalificacionClienteRepositorio;
 import com.vpi.springboot.Repositorios.CalificacionRestauranteRepositorio;
 import com.vpi.springboot.Repositorios.CategoriaRepositorio;
@@ -88,6 +89,7 @@ import com.vpi.springboot.Repositorios.PromocionRepositorio;
 import com.vpi.springboot.Repositorios.ReclamoRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
 import com.vpi.springboot.Repositorios.mongo.RestaurantePedidosRepositorio;
+import com.vpi.springboot.Repositorios.mongo.BalanceVentasRepositorio;
 import com.vpi.springboot.exception.AdministradorException;
 import com.vpi.springboot.exception.CategoriaException;
 import com.vpi.springboot.exception.PedidoException;
@@ -136,6 +138,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	private RestaurantePedidosRepositorio resPedRepo;
 	@Autowired
 	private ClienteService clienteService;
+	@Autowired
+	private BalanceVentasRepositorio balanceVentasRepo;
 
 	private DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");;
 
@@ -458,6 +462,36 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 					"Su pedido ha sido aceptado y se está siendo preparado");
 
 			// fin notificacion
+			
+			//Notificacion mobile
+			String token = pedido.getCliente().getTokenDispositivo();
+			if (token != null) {
+				String restaurante = pedido.getRestaurante().getNombre();
+				Message message;
+				
+				Map<String, String> map = new HashMap<>();
+				
+				map.put("llave", "valor");
+				
+				Notification notification = Notification.builder()
+						.setTitle("Pedido confirmado")
+						.setBody("Su pedido ha sido aceptado por el restaurante " + restaurante)
+						.build();
+				message = Message.builder()
+		                  .putAllData(map)
+		                  .putData("mensaje","Nuevo mensaje de sus pedidos")
+		                  .setToken(token) // deviceId
+		                  .setNotification(notification)
+		                  .build();
+				try {
+					//DUDA QUE ES appAndroid
+					FirebaseMessaging.getInstance().send(message);
+				} catch (FirebaseMessagingException e) {
+					System.out.println(e.getStackTrace());
+					System.out.println("Mensaje de error: " + e.getMessagingErrorCode());
+				}
+			}
+			//fin notificacion mobile
 
 			return new DTRespuesta("Pedido " + idPedido + " confirmado.");
 		} else {
@@ -589,6 +623,36 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, "Su pedido ha sido rechazado");
 
 			// fin notificacion
+			
+			//Notificacion mobile
+			String token = pedido.getCliente().getTokenDispositivo();
+			if (token != null) {
+				String restaurante = pedido.getRestaurante().getNombre();
+				Message message;
+				
+				Map<String, String> map = new HashMap<>();
+				
+				map.put("llave", "valor");
+				
+				Notification notification = Notification.builder()
+						.setTitle("Pedido denegado")
+						.setBody("Su pedido ha sido rechazado por el restaurante " + restaurante)
+						.build();
+				message = Message.builder()
+		                  .putAllData(map)
+		                  .putData("mensaje","Nuevo mensaje de sus pedidos")
+		                  .setToken(token) // deviceId
+		                  .setNotification(notification)
+		                  .build();
+				try {
+					//DUDA QUE ES appAndroid
+					FirebaseMessaging.getInstance().send(message);
+				} catch (FirebaseMessagingException e) {
+					System.out.println(e.getStackTrace());
+					System.out.println("Mensaje de error: " + e.getMessagingErrorCode());
+				}
+			}
+			//fin notificacion mobile
 
 			return new DTRespuesta("Pedido " + idPedido + " rechazado.");
 
@@ -1399,7 +1463,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		pedidoRepo.save(devolucion);
 		return new DTRespuesta("Devolucion registrada con éxito.");
 	}
-	
+
 	@Override
 	public DTRespuesta resolucionReclamo(int idReclamo, Boolean aceptoReclamo, String comentario) throws IOException {
 		Optional<Reclamo> optionalReclamo = recRepo.findById(idReclamo);
@@ -1436,8 +1500,6 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				try {
 					//DUDA QUE ES appAndroid
 					FirebaseMessaging.getInstance().send(message);
-					//FirebaseMessaging.getInstance(FirebaseApp.getInstance(appAndroid)).send(message);
-					System.out.println("PRUEBA SE ENVIA NOTIFICACION");
 				} catch (FirebaseMessagingException e) {
 					System.out.println(e.getStackTrace());
 					System.out.println("Mensaje de error: " + e.getMessagingErrorCode());
@@ -1450,6 +1512,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			//Se envia notificacion con mensaje
 			
 			reclamo.setEstado(EnumEstadoReclamo.RECHAZADO);
+			reclamo.setResolucion(comentario);
 			//Envio notificacion al mobile
 			
 			if (token != null) {
@@ -1466,8 +1529,6 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				try {
 					//DUDA QUE ES appAndroid
 					FirebaseMessaging.getInstance().send(message);
-					//FirebaseMessaging.getInstance(FirebaseApp.getInstance(appAndroid)).send(message);
-					System.out.println("PRUEBA SE ENVIA NOTIFICACION");
 				} catch (FirebaseMessagingException e) {
 					System.out.println(e.getStackTrace());
 					System.out.println("Mensaje de error: " + e.getMessagingErrorCode());
@@ -1475,13 +1536,18 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			}
 		}
 		recRepo.save(reclamo);
-		return new DTRespuesta("Se envio la notificacion mobile.");
+		if (aceptoReclamo) {
+			return new DTRespuesta("Se acepto el reclamo.");
+		} else {
+			return new DTRespuesta("Se rechazó el reclamo.");
+		}
 	}
 
 	@Override
 	public DTCalificacionCliente getCalificacionCliente(String mailCliente, String mailRestaurante)
 			throws UsuarioException, RestauranteException {
 		Optional<Cliente> optionalCliente = clienteRepo.findById(mailCliente);
+
 		if (!optionalCliente.isPresent())
 			throw new UsuarioException(UsuarioException.NotFoundException(mailCliente));
 		Cliente cliente = optionalCliente.get();
@@ -1498,6 +1564,45 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		if (calCliente == null)
 			return null;
 //			throw new UsuarioException(RestauranteException.SinCalificacion(mailCliente));
+
 		return new DTCalificacionCliente(calCliente);
+	}
+
+	////////////////////////////////////////// ESTADISTICAS///////////////////////////////////
+
+	/**
+	 * VALANCE DE VENTAS
+	 */
+	@Scheduled(cron = "*/59 */1 * * * *") // 1 vez cada 5 minutos
+	public DTRespuesta actualizarBalanceVentas() {
+		// cuando se hagan cada 24 horas cambiar a findAllFromToday()
+		List<Pedido> pedidosList = pedidoRepo.findAll();
+		
+
+
+		for (Pedido pedido : pedidosList) {
+			Optional<BalanceVentaDTO> balanceByMailOp= balanceVentasRepo.findById(pedido.getRestaurante().getMail());
+			if(balanceByMailOp.isPresent()) {
+				BalanceVentaDTO balanceByMail= balanceByMailOp.get();
+				if(!balanceByMail.getIdPedidoMonto().containsKey(pedido.getId())) {
+				Map<Integer, Double> idPedidoMonto =balanceByMail.getIdPedidoMonto();
+				idPedidoMonto.put(Integer.valueOf(pedido.getId()), BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue());
+				balanceByMail.setTotal(BigDecimal.valueOf(balanceByMail.getTotal()+pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue());
+				balanceVentasRepo.save(balanceByMail);
+				}
+			}else {
+				
+				BalanceVentaDTO balanceByMail= new BalanceVentaDTO();
+				Map<Integer, Double> idPedidoMonto =balanceByMail.getIdPedidoMonto();
+				idPedidoMonto.put(Integer.valueOf(pedido.getId()), BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue());
+				balanceByMail.setTotal(pedido.getCostoTotal());
+				balanceByMail.set_id(pedido.getRestaurante().getMail());
+				balanceVentasRepo.save(balanceByMail);
+				
+			}
+		}
+
+		// resPedRepo.saveAll(restaurantesPedidos);
+		return new DTRespuesta("Balance de Ventas actualizado");
 	}
 }
