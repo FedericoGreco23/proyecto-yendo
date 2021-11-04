@@ -1569,4 +1569,12 @@ for (Pedido pedido : pedidosList) {
 // resPedRepo.saveAll(restaurantesPedidos);
 return new DTRespuesta("Balance de Ventas actualizado");
 }
+
+public Object getBalanceVentaByFecha(String fecha, String mailFromJwt) {
+	Optional<BalanceVentaDTO> balanceByMailOp = balanceVentasRepo.findById(mailFromJwt);
+	if(balanceByMailOp.isPresent()) {
+		return balanceByMailOp.get();
+	}else
+		return "Balance de Ventas no encontrado";
+}
 }
