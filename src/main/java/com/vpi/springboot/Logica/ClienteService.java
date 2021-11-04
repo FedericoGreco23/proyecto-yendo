@@ -1023,4 +1023,88 @@ public class ClienteService implements ClienteServicioInterfaz {
 		}
 		return new DTRespuesta("Token no guardado, es igual al existente");
 	}
+	
+	
+	//solo de uso interno
+	public DTPedido altaPedidosParaCargadeDatos(int idCarrito, EnumMetodoDePago pago, int idDireccion, String mail, String comentario)
+			throws RestauranteException, CarritoException, DireccionException {
+		Optional<Cliente> optionalCliente = userRepo.findById(mail);
+		Cliente cliente = optionalCliente.get();
+		Optional<Carrito> optionalCarrito = mongoRepo.findById(idCarrito);
+		Carrito carrito = optionalCarrito.get();
+		if (optionalCarrito.isPresent()) {
+			Optional<Restaurante> optionalRestaurante = restauranteRepo.findById(carrito.getMailRestaurante());
+			if (optionalRestaurante.isPresent()) {
+				Restaurante restaurante = optionalRestaurante.get();
+				Optional<Direccion> optionalDireccion = dirRepo.findById(idDireccion);
+				if (optionalDireccion.isPresent()) {
+					String direccion = optionalDireccion.get().getCalleNro();
+					EnumEstadoPedido estado = EnumEstadoPedido.PROCESADO;
+					double precioTotal = 0;
+					for (DTProductoCarrito DTpc : carrito.getProductoCarrito()) {
+						precioTotal = precioTotal + (DTpc.getProducto().getPrecio() * DTpc.getCantidad());
+					}
+					precioTotal = precioTotal + restaurante.getCostoDeEnvio();
+					int mesRandom= (int) (Math.random() * 11);
+					Pedido pedido = new Pedido(LocalDateTime.of(2021,mesRandom+1,01, 19,02,0), precioTotal, estado, pago, idCarrito, direccion,
+							restaurante, cliente, comentario);
+					if (pago.equals(EnumMetodoDePago.PAYPAL)) {
+						pedido.setPago(true);
+					} else if (pago.equals(EnumMetodoDePago.EFECTIVO)) {
+						pedido.setPago(false);
+					}
+					pedidoRepo.save(pedido);
+					// AGREGAR PEDIDO AL RESTAURANTE
+					if (restaurante.getPedidos() == null) {
+						List<Pedido> pedidos = new ArrayList<Pedido>();
+						pedidos.add(pedido);
+						restaurante.setPedidos(pedidos);
+					} else {
+						restaurante.addPedido(pedido);
+					}
+					restauranteRepo.save(restaurante);
+					// AGREGAR PEDIDO AL CLIENTE
+					if (cliente.getPedidos() == null) {
+						List<Pedido> pedidosCliente = new ArrayList<Pedido>();
+						pedidosCliente.add(pedido);
+						cliente.setPedidos(pedidosCliente);
+					} else {
+						cliente.addPedido(pedido);
+					}
+					userRepo.save(cliente);
+					carrito.setActivo(false);
+					mongoRepo.save(carrito);
+					// return new DTRespuesta("Pedido agregado correctamente.");
+
+					// notificamos al restaurante
+					// Push notifications to front-end
+
+					String base64EncodedEmail = Base64.getEncoder()
+							.encodeToString(pedido.getRestaurante().getMail().getBytes(StandardCharsets.UTF_8));
+					DTPedidoParaAprobar pedidoDT = new DTPedidoParaAprobar(pedido);
+					pedidoDT.setComentario(comentario);
+					pedidoDT.setDireccion(pedido.getDireccion());
+					pedidoDT.setCarrito(carrito.getProductoCarrito());
+					pedidoDT.setCliente(new DTCliente(pedido.getCliente()));
+
+					simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, pedidoDT);
+
+					// System.out.println(base64EncodedEmail);
+
+					// simpMessagingTemplate.convertAndSendToUser(base64EncodedEmail,
+					// "/topic/pedido", pedidoDTO);
+
+					return new DTPedido(pedido);
+				} else {
+					throw new DireccionException(DireccionException.NotFoundExceptionId(idDireccion));
+				}
+			} else {
+				throw new RestauranteException(
+						RestauranteException.NotFoundExceptionMail(carrito.getMailRestaurante()));
+			}
+		} else {
+			throw new CarritoException(CarritoException.NotFoundExceptionId(idCarrito));
+
+		}
+	}
 }

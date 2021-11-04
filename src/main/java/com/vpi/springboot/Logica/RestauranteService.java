@@ -63,6 +63,7 @@ import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.Modelo.Promocion;
 import com.vpi.springboot.Modelo.Reclamo;
 import com.vpi.springboot.Modelo.Restaurante;
+import com.vpi.springboot.Modelo.dto.BalanceVentaDTO;
 import com.vpi.springboot.Modelo.dto.DTCalificacionCliente;
 import com.vpi.springboot.Modelo.dto.DTCalificacionRestaurante;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
@@ -87,6 +88,7 @@ import com.vpi.springboot.Repositorios.ProductoRepositorio;
 import com.vpi.springboot.Repositorios.PromocionRepositorio;
 import com.vpi.springboot.Repositorios.ReclamoRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
+import com.vpi.springboot.Repositorios.mongo.BalanceVentasRepositorio;
 import com.vpi.springboot.Repositorios.mongo.RestaurantePedidosRepositorio;
 import com.vpi.springboot.exception.AdministradorException;
 import com.vpi.springboot.exception.CategoriaException;
@@ -136,6 +138,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	private RestaurantePedidosRepositorio resPedRepo;
 	@Autowired
 	private ClienteService clienteService;
+	@Autowired
+	private BalanceVentasRepositorio balanceVentasRepo;
 
 	private DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");;
 
@@ -1154,7 +1158,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 						clienteService.agregarACarrito(resOp.get().getProductos().get(0).getId(), 3, cliente.getMail(),
 								resOp.get().getMail());
 						DTCarrito carrito = clienteService.verCarrito(cliente.getMail());
-						clienteService.altaPedido((int) carrito.getId(), EnumMetodoDePago.EFECTIVO,
+						clienteService.altaPedidosParaCargadeDatos((int) carrito.getId(), EnumMetodoDePago.EFECTIVO,
 								cli.get().getDirecciones().get(0).getId(), cliente.getMail(), "Muero de hambre");
 					} catch (Exception e) {
 
@@ -1500,4 +1504,45 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 //			throw new UsuarioException(RestauranteException.SinCalificacion(mailCliente));
 		return new DTCalificacionCliente(calCliente);
 	}
+	
+//////////////////////////////////////////ESTADISTICAS///////////////////////////////////
+
+/**
+* VALANCE DE VENTAS
+*/
+@Scheduled(cron = "*/59 */5 * * * *") // 1 vez cada 5 minutos
+public DTRespuesta actualizarBalanceVentas() {
+// cuando se hagan cada 24 horas cambiar a findAllFromToday()
+List<Pedido> pedidosList = pedidoRepo.findAll();
+
+
+
+for (Pedido pedido : pedidosList) {
+	Optional<BalanceVentaDTO> balanceByMailOp = balanceVentasRepo.findById(pedido.getRestaurante().getMail());
+	if (balanceByMailOp.isPresent()) {
+		BalanceVentaDTO balanceByMail = balanceByMailOp.get();
+		if (!balanceByMail.getIdPedidoMonto().containsKey(pedido.getId())) {
+			Map<Integer, Double> idPedidoMonto = balanceByMail.getIdPedidoMonto();
+			idPedidoMonto.put(Integer.valueOf(pedido.getId()),
+					BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue());
+			balanceByMail.setTotal(BigDecimal.valueOf(balanceByMail.getTotal() + pedido.getCostoTotal())
+					.setScale(4, RoundingMode.HALF_UP).doubleValue());
+			balanceVentasRepo.save(balanceByMail);
+		}
+	} else {
+
+		BalanceVentaDTO balanceByMail = new BalanceVentaDTO();
+		Map<Integer, Double> idPedidoMonto = balanceByMail.getIdPedidoMonto();
+		idPedidoMonto.put(Integer.valueOf(pedido.getId()),
+				BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue());
+		balanceByMail.setTotal(pedido.getCostoTotal());
+		balanceByMail.set_id(pedido.getRestaurante().getMail());
+		balanceVentasRepo.save(balanceByMail);
+
+	}
+}
+
+// resPedRepo.saveAll(restaurantesPedidos);
+return new DTRespuesta("Balance de Ventas actualizado");
+}
 }
