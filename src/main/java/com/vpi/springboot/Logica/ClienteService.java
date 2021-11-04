@@ -1008,8 +1008,11 @@ public class ClienteService implements ClienteServicioInterfaz {
 	public DTRespuesta setToken(String token, String mailCliente) {
 		Optional<Cliente> optionalCliente = userRepo.findById(mailCliente);
 		Cliente cliente = optionalCliente.get();
-		cliente.setTokenDispositivo(token);
-		userRepo.save(cliente);
-		return new DTRespuesta("Token guardado.");
+		if (cliente.getTokenDispositivo() == null || !cliente.getTokenDispositivo().equalsIgnoreCase(token)) {
+			cliente.setTokenDispositivo(token);
+			userRepo.save(cliente);
+			return new DTRespuesta("Token guardado.");
+		}
+		return new DTRespuesta("Token no guardado, es igual al existente");
 	}
 }

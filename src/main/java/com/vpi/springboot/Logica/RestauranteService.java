@@ -458,6 +458,36 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 					"Su pedido ha sido aceptado y se está siendo preparado");
 
 			// fin notificacion
+			
+			//Notificacion mobile
+			String token = pedido.getCliente().getTokenDispositivo();
+			if (token != null) {
+				String restaurante = pedido.getRestaurante().getNombre();
+				Message message;
+				
+				Map<String, String> map = new HashMap<>();
+				
+				map.put("llave", "valor");
+				
+				Notification notification = Notification.builder()
+						.setTitle("Pedido confirmado")
+						.setBody("Su pedido ha sido aceptado por el restaurante " + restaurante)
+						.build();
+				message = Message.builder()
+		                  .putAllData(map)
+		                  .putData("mensaje","Nuevo mensaje de sus pedidos")
+		                  .setToken(token) // deviceId
+		                  .setNotification(notification)
+		                  .build();
+				try {
+					//DUDA QUE ES appAndroid
+					FirebaseMessaging.getInstance().send(message);
+				} catch (FirebaseMessagingException e) {
+					System.out.println(e.getStackTrace());
+					System.out.println("Mensaje de error: " + e.getMessagingErrorCode());
+				}
+			}
+			//fin notificacion mobile
 
 			return new DTRespuesta("Pedido " + idPedido + " confirmado.");
 		} else {
@@ -589,6 +619,36 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, "Su pedido ha sido rechazado");
 
 			// fin notificacion
+			
+			//Notificacion mobile
+			String token = pedido.getCliente().getTokenDispositivo();
+			if (token != null) {
+				String restaurante = pedido.getRestaurante().getNombre();
+				Message message;
+				
+				Map<String, String> map = new HashMap<>();
+				
+				map.put("llave", "valor");
+				
+				Notification notification = Notification.builder()
+						.setTitle("Pedido denegado")
+						.setBody("Su pedido ha sido rechazado por el restaurante " + restaurante)
+						.build();
+				message = Message.builder()
+		                  .putAllData(map)
+		                  .putData("mensaje","Nuevo mensaje de sus pedidos")
+		                  .setToken(token) // deviceId
+		                  .setNotification(notification)
+		                  .build();
+				try {
+					//DUDA QUE ES appAndroid
+					FirebaseMessaging.getInstance().send(message);
+				} catch (FirebaseMessagingException e) {
+					System.out.println(e.getStackTrace());
+					System.out.println("Mensaje de error: " + e.getMessagingErrorCode());
+				}
+			}
+			//fin notificacion mobile
 
 			return new DTRespuesta("Pedido " + idPedido + " rechazado.");
 
@@ -1436,8 +1496,6 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				try {
 					//DUDA QUE ES appAndroid
 					FirebaseMessaging.getInstance().send(message);
-					//FirebaseMessaging.getInstance(FirebaseApp.getInstance(appAndroid)).send(message);
-					System.out.println("PRUEBA SE ENVIA NOTIFICACION");
 				} catch (FirebaseMessagingException e) {
 					System.out.println(e.getStackTrace());
 					System.out.println("Mensaje de error: " + e.getMessagingErrorCode());
@@ -1450,6 +1508,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			//Se envia notificacion con mensaje
 			
 			reclamo.setEstado(EnumEstadoReclamo.RECHAZADO);
+			reclamo.setResolucion(comentario);
 			//Envio notificacion al mobile
 			
 			if (token != null) {
@@ -1466,8 +1525,6 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				try {
 					//DUDA QUE ES appAndroid
 					FirebaseMessaging.getInstance().send(message);
-					//FirebaseMessaging.getInstance(FirebaseApp.getInstance(appAndroid)).send(message);
-					System.out.println("PRUEBA SE ENVIA NOTIFICACION");
 				} catch (FirebaseMessagingException e) {
 					System.out.println(e.getStackTrace());
 					System.out.println("Mensaje de error: " + e.getMessagingErrorCode());
@@ -1475,7 +1532,11 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			}
 		}
 		recRepo.save(reclamo);
-		return new DTRespuesta("Se envio la notificacion mobile.");
+		if (aceptoReclamo) {
+			return new DTRespuesta("Se acepto el reclamo.");
+		} else {
+			return new DTRespuesta("Se rechazó el reclamo.");
+		}
 	}
 
 	@Override
