@@ -2,7 +2,10 @@ package com.vpi.springboot.Modelo.dto;
 
 import java.io.Serializable;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.vpi.springboot.Modelo.Categoria;
 import com.vpi.springboot.Modelo.Restaurante;
 
 public class DTListarRestaurante implements Serializable {
@@ -21,6 +24,7 @@ public class DTListarRestaurante implements Serializable {
 	private Integer costoDeEnvio;
 	private String diasAbierto;
 	private Boolean abierto;
+	private List<DTCategoria> categorias;
 	
 	public DTListarRestaurante() {
 		// TODO Auto-generated constructor stub
@@ -59,6 +63,10 @@ public class DTListarRestaurante implements Serializable {
 		this.costoDeEnvio = r.getCostoDeEnvio();
 		this.diasAbierto = r.getDiasAbierto();
 		this.abierto = r.getAbierto();
+		this.categorias = new ArrayList<DTCategoria>();
+		for(Categoria cat :r.getCategorias()) {
+			this.categorias.add(new DTCategoria(cat.getNombre(),cat.getFoto()));
+		}
 	}
 
 	
