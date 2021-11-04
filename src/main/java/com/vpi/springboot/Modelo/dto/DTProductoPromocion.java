@@ -21,7 +21,7 @@ public class DTProductoPromocion implements Serializable {
 		this.id = producto.getId();
 		this.nombre = producto.getNombre();
 		this.categoria = producto.getCategoria().getNombre();
-		this.cantidad = 0;
+		this.cantidad = 1;
 	}
 	
 	public DTProductoPromocion(Producto producto, int cantidad) {

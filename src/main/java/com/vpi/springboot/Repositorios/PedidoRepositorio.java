@@ -20,7 +20,7 @@ public interface PedidoRepositorio extends JpaRepository<Pedido, Integer> {
 	@Query("SELECT u FROM Pedido u WHERE u.restaurante = :restaurante")
 	Page<Pedido> findAllByRestaurante(@Param("restaurante") Restaurante restaurante, Pageable pageable);
 
-	@Query("SELECT u FROM Pedido u WHERE u.cliente = :cliente")
+	@Query("SELECT u FROM Pedido u WHERE u.cliente = :cliente and u.costoTotal > 10")
 	Page<Pedido> findAllByCliente(@Param("cliente") Cliente cliente, Pageable pageable);
 
 //	@Query("SELECT u FROM Pedido u WHERE u.cliente = :cliente")
@@ -45,6 +45,7 @@ public interface PedidoRepositorio extends JpaRepository<Pedido, Integer> {
 	final static String queryClienteFechaEstado = 
 			"SELECT ped FROM Pedido ped "
 			+ "WHERE ped.restaurante = :restaurante "
+			+ "and ped.costoTotal > 0 "
 			+ "and ped.fecha > :dateI "
 			+ "and ped.fecha < :dateF "
 			+ "and ped.estadoPedido = :estado "
@@ -62,6 +63,7 @@ public interface PedidoRepositorio extends JpaRepository<Pedido, Integer> {
 	final static String queryClienteFecha = 
 			"SELECT ped FROM Pedido ped "
 			+ "WHERE ped.restaurante = :restaurante "
+			+ "and ped.costoTotal > 0 "
 			+ "and ped.fecha > :dateI "
 			+ "and ped.fecha < :dateF "
 			+ "and ped.cliente IN "
@@ -78,6 +80,7 @@ public interface PedidoRepositorio extends JpaRepository<Pedido, Integer> {
 	final static String queryClienteEstado = 
 			"SELECT ped FROM Pedido ped "
 			+ "WHERE ped.restaurante = :restaurante "
+			+ "and ped.costoTotal > 0 "
 			+ "and ped.estadoPedido = :estado "
 			+ "and ped.cliente IN "
 			+ "(SELECT u.mail "
@@ -93,6 +96,7 @@ public interface PedidoRepositorio extends JpaRepository<Pedido, Integer> {
 	final static String queryCliente = 
 			"SELECT ped FROM Pedido ped "
 			+ "WHERE ped.restaurante = :restaurante "
+			+ "and ped.costoTotal > 0 "
 			+ "and ped.cliente IN "
 			+ "(SELECT u.mail "
 			+ "FROM Cliente u "
@@ -108,6 +112,7 @@ public interface PedidoRepositorio extends JpaRepository<Pedido, Integer> {
 	final static String queryIdFechaEstado = 
 			"SELECT ped FROM Pedido ped "
 			+ "WHERE ped.restaurante = :restaurante "
+			+ "and ped.costoTotal > 0 "
 			+ "and ped.id = :id "
 			+ "and ped.fecha > :dateI "
 			+ "and ped.fecha < :dateF "
@@ -121,6 +126,7 @@ public interface PedidoRepositorio extends JpaRepository<Pedido, Integer> {
 	final static String queryIdFecha = 
 			"SELECT ped FROM Pedido ped "
 			+ "WHERE ped.restaurante = :restaurante "
+			+ "and ped.costoTotal > 0 "
 			+ "and ped.id = :id "
 			+ "and ped.fecha > :dateI "
 			+ "and ped.fecha < :dateF";
@@ -133,6 +139,7 @@ public interface PedidoRepositorio extends JpaRepository<Pedido, Integer> {
 	final static String queryIdEstado = 
 			"SELECT ped FROM Pedido ped "
 			+ "WHERE ped.restaurante = :restaurante "
+			+ "and ped.costoTotal > 0 "
 			+ "and ped.id = :id "
 			+ "and ped.estadoPedido = :estado";
 	
@@ -144,6 +151,7 @@ public interface PedidoRepositorio extends JpaRepository<Pedido, Integer> {
 	final static String queryId = 
 			"SELECT ped FROM Pedido ped "
 			+ "WHERE ped.restaurante = :restaurante "
+			+ "and ped.costoTotal > 0 "
 			+ "and ped.id = :id";
 	
 	@Query(queryId)
@@ -155,6 +163,7 @@ public interface PedidoRepositorio extends JpaRepository<Pedido, Integer> {
 	final static String queryFechaEstado = 
 			"SELECT ped FROM Pedido ped "
 			+ "WHERE ped.restaurante = :restaurante "
+			+ "and ped.costoTotal > 0 "
 			+ "and ped.fecha > :dateI "
 			+ "and ped.fecha < :dateF "
 			+ "and ped.estadoPedido = :estado";
@@ -167,6 +176,7 @@ public interface PedidoRepositorio extends JpaRepository<Pedido, Integer> {
 	final static String queryFecha = 
 			"SELECT ped FROM Pedido ped "
 			+ "WHERE ped.restaurante = :restaurante "
+			+ "and ped.costoTotal > 0 "
 			+ "and ped.fecha > :dateI "
 			+ "and ped.fecha < :dateF";
 	
@@ -178,6 +188,7 @@ public interface PedidoRepositorio extends JpaRepository<Pedido, Integer> {
 	final static String queryEstado = 
 			"SELECT ped FROM Pedido ped "
 			+ "WHERE ped.restaurante = :restaurante "
+			+ "and ped.costoTotal > 0 "
 			+ "and ped.estadoPedido = :estado";
 	
 	@Query(queryEstado)
@@ -191,6 +202,7 @@ public interface PedidoRepositorio extends JpaRepository<Pedido, Integer> {
 	final static String queryRestauranteFecha = 
 		"SELECT ped FROM Pedido ped "
 		+ "WHERE ped.cliente = :cliente "
+		+ "and ped.costoTotal > 0 "
 		+ "and ped.fecha > :dateI "
 		+ "and ped.fecha < :dateF "
 		+ "and ped.restaurante IN "
@@ -207,6 +219,7 @@ public interface PedidoRepositorio extends JpaRepository<Pedido, Integer> {
 	final static String queryRestaurante = 
 		"SELECT ped FROM Pedido ped "
 		+ "WHERE ped.cliente = :cliente "
+		+ "and ped.costoTotal > 0 "
 		+ "and ped.restaurante IN "
 		+ "(SELECT u.mail "
 		+ "FROM Restaurante u "
@@ -220,6 +233,7 @@ public interface PedidoRepositorio extends JpaRepository<Pedido, Integer> {
 	final static String queryFecha2 = 
 		"SELECT ped FROM Pedido ped "
 		+ "WHERE ped.cliente = :cliente "
+		+ "and ped.costoTotal > 0 "
 		+ "and ped.fecha > :dateI "
 		+ "and ped.fecha < :dateF";
 	

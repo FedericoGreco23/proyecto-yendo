@@ -29,40 +29,17 @@ public class DTPromocion extends DTProducto implements Serializable {
 
 		Map<Integer, DTProductoPromocion> items = new HashMap<>();
 		for (Producto p : promocion.getProductos()) {
-			System.out.println("PRODUCTO: " + p.getNombre() + " - "  + p.getId());
 			if (items.containsKey(p.getId())) {
 				items.get(p.getId()).addCantidad();
 			} else {
 				items.put(p.getId(), new DTProductoPromocion(p));
 			}
-//
-//			String nombreProducto;
-//			String nombreAnterior = "";
-//			if (items.get(p.getNombre()) == 1) {
-//				nombreProducto = p.getNombre();
-//			} else if (items.get(p.getNombre()) == 2) {
-//				nombreAnterior = p.getNombre() + " x" + items.get(p.getNombre());
-//				nombreProducto = p.getNombre();
-//			} else {
-//				nombreAnterior = p.getNombre() + " x" + items.get(p.getNombre());
-//				nombreProducto = p.getNombre() + " x" + (items.get(p.getNombre()) - 1);
-//			}
-//
-//			if (!this.productos.contains(nombreProducto)) {
-//				this.productos.add(nombreProducto);
-//			} else {
-//				this.productos.remove(nombreProducto);
-//				this.productos.add(nombreAnterior);
-//			}
 		}
 		
 		List<DTProductoPromocion> retorno = new ArrayList<>();
 		retorno = items.entrySet().stream().map(e -> (e.getValue()))
 				.collect(Collectors.toList());
-		System.out.println("Lista final: " + retorno);
-		
-		this.productos = items.entrySet().stream().map(e -> (e.getValue()))
-				.collect(Collectors.toList());
+		this.productos = retorno;
 	}
 
 	public DTPromocion(List<DTProductoPromocion> productos) {
