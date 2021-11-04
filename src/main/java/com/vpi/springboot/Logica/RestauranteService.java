@@ -1459,7 +1459,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		pedidoRepo.save(devolucion);
 		return new DTRespuesta("Devolucion registrada con éxito.");
 	}
-	
+
 	@Override
 	public DTRespuesta resolucionReclamo(int idReclamo, Boolean aceptoReclamo, String comentario) throws IOException {
 		Optional<Reclamo> optionalReclamo = recRepo.findById(idReclamo);
@@ -1543,6 +1543,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	public DTCalificacionCliente getCalificacionCliente(String mailCliente, String mailRestaurante)
 			throws UsuarioException, RestauranteException {
 		Optional<Cliente> optionalCliente = clienteRepo.findById(mailCliente);
+
 		if (!optionalCliente.isPresent())
 			throw new UsuarioException(UsuarioException.NotFoundException(mailCliente));
 		Cliente cliente = optionalCliente.get();
@@ -1559,6 +1560,37 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		if (calCliente == null)
 			return null;
 //			throw new UsuarioException(RestauranteException.SinCalificacion(mailCliente));
+
 		return new DTCalificacionCliente(calCliente);
+	}
+
+	////////////////////////////////////////// ESTADISTICAS///////////////////////////////////
+
+	/**
+	 * VALANCE DE VENTAS
+	 */
+	@Scheduled(cron = "*/59 */5 * * * *") // 1 vez cada 5 minutos
+	public DTRespuesta actualizarValanceVentas() {
+		// cuando se hagan cada 24 horas cambiar a findAllFromToday()
+		List<Pedido> pedidosList = pedidoRepo.findAll();
+
+		// Map<String, Integer> restpedidos = new HashMap<String, Integer>();
+		// List<DTRestaurantePedido> restaurantesPedidos = new
+		// ArrayList<DTRestaurantePedido>();
+		/*
+		 * Optional<DTRestaurantePedido> optionalDt; Optional<Restaurante> optionalRes;
+		 * Restaurante res; DTRestaurantePedido dt; for (Object[] object : lista) {
+		 * optionalRes = restauranteRepo.findById((String) object[0]); res =
+		 * optionalRes.get(); optionalDt = resPedRepo.findById((String) object[0]); if
+		 * (optionalDt.isPresent()) { dt = optionalDt.get(); BigInteger big1 =
+		 * (BigInteger) object[1]; dt.setCantPedidos(big1.intValue());
+		 * resPedRepo.save(dt); } else { BigInteger big = (BigInteger) object[1]; dt =
+		 * new DTRestaurantePedido((String) object[0], big.intValue());
+		 * dt.setNombre(res.getNombre()); resPedRepo.save(dt); } }
+		 * 
+		 */ //resPedRepo.saveAll(restaurantesPedidos); 
+		 return new
+		  DTRespuesta("Base de datos actualizada");
+		 
 	}
 }
