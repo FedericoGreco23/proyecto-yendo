@@ -169,4 +169,11 @@ public class DTListarRestaurante implements Serializable {
 		this.abierto = abierto;
 	}
 
+	public List<DTCategoria> getCategorias() {
+		return categorias;
+	}
+
+	public void setCategorias(List<DTCategoria> categorias) {
+		this.categorias = categorias;
+	}
 }
