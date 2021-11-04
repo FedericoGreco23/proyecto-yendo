@@ -1511,7 +1511,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 /**
 * BALANCE DE VENTAS
 */
-@Scheduled(cron = "*/59 */1 * * * *") // 1 vez cada 5 minutos
+@Scheduled(cron = "*/59 */5 * * * *") // 1 vez cada 5 minutos
 public DTRespuesta actualizarBalanceVentas() {
 // cuando se hagan cada 24 horas cambiar a findAllFromToday()
 List<Pedido> pedidosList = pedidoRepo.findAll();
