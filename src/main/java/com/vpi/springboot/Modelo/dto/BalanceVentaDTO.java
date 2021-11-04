@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection="ValanceVenta")
-public class ValanceVentaDTO implements Serializable {
+@Document(collection="BalanceVenta")
+public class BalanceVentaDTO implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
 	private String _id;//mail

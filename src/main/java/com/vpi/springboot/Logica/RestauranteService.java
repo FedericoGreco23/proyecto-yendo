@@ -76,7 +76,7 @@ import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoReclamo;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
-import com.vpi.springboot.Modelo.dto.ValanceVentaDTO;
+import com.vpi.springboot.Modelo.dto.BalanceVentaDTO;
 import com.vpi.springboot.Repositorios.CalificacionClienteRepositorio;
 import com.vpi.springboot.Repositorios.CalificacionRestauranteRepositorio;
 import com.vpi.springboot.Repositorios.CategoriaRepositorio;
@@ -89,7 +89,7 @@ import com.vpi.springboot.Repositorios.PromocionRepositorio;
 import com.vpi.springboot.Repositorios.ReclamoRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
 import com.vpi.springboot.Repositorios.mongo.RestaurantePedidosRepositorio;
-import com.vpi.springboot.Repositorios.mongo.ValanceVentasRepositorio;
+import com.vpi.springboot.Repositorios.mongo.BalanceVentasRepositorio;
 import com.vpi.springboot.exception.AdministradorException;
 import com.vpi.springboot.exception.CategoriaException;
 import com.vpi.springboot.exception.PedidoException;
@@ -139,7 +139,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	@Autowired
 	private ClienteService clienteService;
 	@Autowired
-	private ValanceVentasRepositorio valanceVentasRepo;
+	private BalanceVentasRepositorio balanceVentasRepo;
 
 	private DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");;
 
@@ -1574,33 +1574,35 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	 * VALANCE DE VENTAS
 	 */
 	@Scheduled(cron = "*/59 */1 * * * *") // 1 vez cada 5 minutos
-	public DTRespuesta actualizarValanceVentas() {
+	public DTRespuesta actualizarBalanceVentas() {
 		// cuando se hagan cada 24 horas cambiar a findAllFromToday()
 		List<Pedido> pedidosList = pedidoRepo.findAll();
 		
 
 
 		for (Pedido pedido : pedidosList) {
-			Optional<ValanceVentaDTO> valanceByMailOp= valanceVentasRepo.findById(pedido.getRestaurante().getMail());
-			if(valanceByMailOp.isPresent()) {
-				ValanceVentaDTO valanceByMail= valanceByMailOp.get();
-				Map<Integer, Double> idPedidoMonto =valanceByMail.getIdPedidoMonto();
+			Optional<BalanceVentaDTO> balanceByMailOp= balanceVentasRepo.findById(pedido.getRestaurante().getMail());
+			if(balanceByMailOp.isPresent()) {
+				BalanceVentaDTO balanceByMail= balanceByMailOp.get();
+				if(!balanceByMail.getIdPedidoMonto().containsKey(pedido.getId())) {
+				Map<Integer, Double> idPedidoMonto =balanceByMail.getIdPedidoMonto();
 				idPedidoMonto.put(Integer.valueOf(pedido.getId()), BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue());
-				valanceByMail.setTotal(BigDecimal.valueOf(valanceByMail.getTotal()+pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue());
-				valanceVentasRepo.save(valanceByMail);
+				balanceByMail.setTotal(BigDecimal.valueOf(balanceByMail.getTotal()+pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue());
+				balanceVentasRepo.save(balanceByMail);
+				}
 			}else {
 				
-				ValanceVentaDTO valanceByMail= new ValanceVentaDTO();
-				Map<Integer, Double> idPedidoMonto =valanceByMail.getIdPedidoMonto();
+				BalanceVentaDTO balanceByMail= new BalanceVentaDTO();
+				Map<Integer, Double> idPedidoMonto =balanceByMail.getIdPedidoMonto();
 				idPedidoMonto.put(Integer.valueOf(pedido.getId()), BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue());
-				valanceByMail.setTotal(pedido.getCostoTotal());
-				valanceByMail.set_id(pedido.getRestaurante().getMail());
-				valanceVentasRepo.save(valanceByMail);
+				balanceByMail.setTotal(pedido.getCostoTotal());
+				balanceByMail.set_id(pedido.getRestaurante().getMail());
+				balanceVentasRepo.save(balanceByMail);
 				
 			}
 		}
 
 		// resPedRepo.saveAll(restaurantesPedidos);
-		return new DTRespuesta("Valance de Ventas actualizado");
+		return new DTRespuesta("Balance de Ventas actualizado");
 	}
 }
