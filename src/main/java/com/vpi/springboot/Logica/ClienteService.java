@@ -1105,7 +1105,8 @@ public class ClienteService implements ClienteServicioInterfaz {
 					pedidoDT.setCarrito(carrito.getProductoCarrito());
 					pedidoDT.setCliente(new DTCliente(pedido.getCliente()));
 
-					simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, pedidoDT);
+					//simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, pedidoDT);
+					simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, new DTNotificacionSoket(pedidoDT, "Reclamo"));
 
 					// System.out.println(base64EncodedEmail);
 
