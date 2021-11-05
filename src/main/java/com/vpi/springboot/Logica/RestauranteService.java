@@ -68,6 +68,7 @@ import com.vpi.springboot.Modelo.dto.BalanceVentaDTO;
 import com.vpi.springboot.Modelo.dto.DTCalificacionCliente;
 import com.vpi.springboot.Modelo.dto.DTCalificacionRestaurante;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
+import com.vpi.springboot.Modelo.dto.DTNotificacionSoket;
 import com.vpi.springboot.Modelo.dto.DTPedido;
 import com.vpi.springboot.Modelo.dto.DTProductoIdCantidad;
 import com.vpi.springboot.Modelo.dto.DTPromocionConPrecio;
@@ -1490,6 +1491,17 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				}
 			}
 		}
+		
+		//NOTIFICAR A CLIENTE
+		// se notifica a cliente
+		String base64EncodedEmail = Base64.getEncoder()
+				.encodeToString(reclamo.getPedido().getCliente().getMail().getBytes(StandardCharsets.UTF_8));
+
+		simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, new DTNotificacionSoket("Su pedido ha sido aceptado y se está siendo preparado", "Reclamo"));
+
+
+		//simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail,"Su pedido ha sido aceptado y se está siendo preparado");
+		
 		recRepo.save(reclamo);
 		return new DTRespuesta("Se envio la notificacion mobile.");
 	}
