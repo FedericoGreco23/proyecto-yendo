@@ -337,17 +337,6 @@ public class RestauranteController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-
-	@PostMapping("devolucionPedido")
-	public ResponseEntity<?> devolucionPedido(@RequestBody(required = true) int idPedido) {
-		try {
-			return new ResponseEntity<>(service.devolucionPedido(idPedido), HttpStatus.OK);
-		} catch (ConstraintViolationException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
-		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
 	
 	@GetMapping("/getCalCliente/{cliente}")
 	ResponseEntity<?> getCalificacionCliente(@PathVariable String cliente) {

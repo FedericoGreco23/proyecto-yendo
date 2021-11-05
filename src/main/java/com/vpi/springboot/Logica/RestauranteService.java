@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -99,6 +100,8 @@ import com.vpi.springboot.exception.PromocionException;
 import com.vpi.springboot.exception.RestauranteException;
 import com.vpi.springboot.exception.UsuarioException;
 
+import BeanFirebase.SingletonFirebase;
+
 @Service
 @EnableScheduling
 public class RestauranteService implements RestauranteServicioInterfaz {
@@ -154,16 +157,16 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	 * return null; }
 	 */
 	
-	@PostConstruct
+	/*@PostConstruct
 	public void init() throws IOException {
 		FileInputStream serviceAccount = new FileInputStream("src/main/java/Resource/yendo-5c371-firebase-adminsdk-rczst-500b815097.json");
-
+		System.out.println("SE CARGA FIREBASE EN RESTAURANTE");
 		FirebaseOptions options = new FirebaseOptions.Builder()
 		  .setCredentials(GoogleCredentials.fromStream(serviceAccount))
 		  .build();
 
 		FirebaseApp.initializeApp(options);
-	}
+	}*/
 
 	@Override
 	public DTRespuesta altaRestaurante(Restaurante rest) throws RestauranteException, CategoriaException {
@@ -1394,14 +1397,22 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	}
 
 	@Override
-	public DTRespuesta devolucionPedido(int idPedido) {
+	public DTRespuesta devolucionPedido(int idPedido, int idReclamo) {
 		Optional<Pedido> optionalPedido = pedidoRepo.findById(idPedido);
 		Pedido pedido = optionalPedido.get();
 		Pedido devolucion = new Pedido(pedido.getFecha(), pedido.getCostoTotal() * -1, pedido.getEstadoPedido(),
 				pedido.getMetodoDePago(), pedido.getCarrito(), pedido.getDireccion(), pedido.getRestaurante(),
 				pedido.getCliente(), pedido.getComentario(), pedido.getPago());
-
+		devolucion.setEstadoPedido(EnumEstadoPedido.REEMBOLZADO);
+		List<Reclamo> reclamos = pedido.getReclamos();
+		for (Reclamo reclamo : reclamos) {
+			if (reclamo.getId() != idReclamo) {
+				reclamo.setEstado(EnumEstadoReclamo.RECHAZADO);
+				reclamo.setResolucion("El pedido ha sido devuelto");
+			}
+		}
 		pedidoRepo.save(devolucion);
+		pedidoRepo.save(pedido);
 		return new DTRespuesta("Devolucion registrada con éxito.");
 	}
 	
@@ -1449,7 +1460,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				}
 			}
 			
-			devolucionPedido(reclamo.getPedido().getId());
+			devolucionPedido(reclamo.getPedido().getId(), idReclamo);
 		} else {
 			//No se acepta el reclamo
 			//Se envia notificacion con mensaje
@@ -1508,94 +1519,94 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	
 //////////////////////////////////////////ESTADISTICAS///////////////////////////////////
 
-/**
-* BALANCE DE VENTAS
-*/
-@Scheduled(cron = "*/59 */5 * * * *") // 1 vez cada 5 minutos
-public DTRespuesta actualizarBalanceVentas() {
-// cuando se hagan cada 24 horas cambiar a findAllFromToday()
-List<Pedido> pedidosList = pedidoRepo.findAll();
-
-
-
-for (Pedido pedido : pedidosList) {
-	Optional<BalanceVentaDTO> balanceByMailOp = balanceVentasRepo.findById(pedido.getRestaurante().getMail());
-	if (balanceByMailOp.isPresent()) {
-		BalanceVentaDTO balanceByMail = balanceByMailOp.get();
+	/**
+	* BALANCE DE VENTAS
+	*/
+	@Scheduled(cron = "*/59 */5 * * * *") // 1 vez cada 5 minutos
+	public DTRespuesta actualizarBalanceVentas() {
+		// cuando se hagan cada 24 horas cambiar a findAllFromToday()
+		List<Pedido> pedidosList = pedidoRepo.findAll();
 		
-		//primera venta con esa fecha
-		if (!balanceByMail.getFechaidPedidoMonto().containsKey(pedido.getFecha().toLocalDate())) {
-			
-			Map<LocalDate, Map<Integer, Double>> fecha_PedidoMonto = balanceByMail.getFechaidPedidoMonto();
-			Map<Integer, Double> idPedidoMonto = new HashMap<>();
-			idPedidoMonto.put(Integer.valueOf(pedido.getId()),
-					BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue());
-			fecha_PedidoMonto.put(pedido.getFecha().toLocalDate(), idPedidoMonto);
-			
 		
-			balanceVentasRepo.save(balanceByMail);
-		}else {//ya hay pedidos en esa fecha
-			
-			Map<LocalDate, Map<Integer, Double>> fecha_PedidoMonto = balanceByMail.getFechaidPedidoMonto();
-			Map<Integer, Double> idPedidoMonto = balanceByMail.getFechaidPedidoMonto().get(pedido.getFecha().toLocalDate());
-			
-			idPedidoMonto.put(Integer.valueOf(pedido.getId()),
-					BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue());
-			fecha_PedidoMonto.put(pedido.getFecha().toLocalDate(), idPedidoMonto);
-			
 		
-			balanceVentasRepo.save(balanceByMail);
-				balanceByMail.setTotal(BigDecimal.valueOf(balanceByMail.getTotal() + pedido.getCostoTotal())
-					.setScale(4, RoundingMode.HALF_UP).doubleValue());
-		}
-	} else {//el resto no está aun guardado
-		
-		BalanceVentaDTO balanceByMail = new BalanceVentaDTO();
-		Map<LocalDate, Map<Integer, Double>> fecha_PedidoMonto = balanceByMail.getFechaidPedidoMonto();
-		Map<Integer, Double> idPedidoMonto = new HashMap<>();
-		idPedidoMonto.put(Integer.valueOf(pedido.getId()),
-				BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue());
-		fecha_PedidoMonto.put(pedido.getFecha().toLocalDate(), idPedidoMonto);
-		
+		for (Pedido pedido : pedidosList) {
+			Optional<BalanceVentaDTO> balanceByMailOp = balanceVentasRepo.findById(pedido.getRestaurante().getMail());
+			if (balanceByMailOp.isPresent()) {
+				BalanceVentaDTO balanceByMail = balanceByMailOp.get();
 				
-		balanceByMail.setTotal(pedido.getCostoTotal());
-		balanceByMail.set_id(pedido.getRestaurante().getMail());
+				//primera venta con esa fecha
+				if (!balanceByMail.getFechaidPedidoMonto().containsKey(pedido.getFecha().toLocalDate())) {
+					
+					Map<LocalDate, Map<Integer, Double>> fecha_PedidoMonto = balanceByMail.getFechaidPedidoMonto();
+					Map<Integer, Double> idPedidoMonto = new HashMap<>();
+					idPedidoMonto.put(Integer.valueOf(pedido.getId()),
+							BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue());
+					fecha_PedidoMonto.put(pedido.getFecha().toLocalDate(), idPedidoMonto);
+					
+				
+					balanceVentasRepo.save(balanceByMail);
+				}else {//ya hay pedidos en esa fecha
+					
+					Map<LocalDate, Map<Integer, Double>> fecha_PedidoMonto = balanceByMail.getFechaidPedidoMonto();
+					Map<Integer, Double> idPedidoMonto = balanceByMail.getFechaidPedidoMonto().get(pedido.getFecha().toLocalDate());
+					
+					idPedidoMonto.put(Integer.valueOf(pedido.getId()),
+							BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue());
+					fecha_PedidoMonto.put(pedido.getFecha().toLocalDate(), idPedidoMonto);
+					
+				
+					balanceVentasRepo.save(balanceByMail);
+						balanceByMail.setTotal(BigDecimal.valueOf(balanceByMail.getTotal() + pedido.getCostoTotal())
+							.setScale(4, RoundingMode.HALF_UP).doubleValue());
+				}
+			} else {//el resto no está aun guardado
+				
+				BalanceVentaDTO balanceByMail = new BalanceVentaDTO();
+				Map<LocalDate, Map<Integer, Double>> fecha_PedidoMonto = balanceByMail.getFechaidPedidoMonto();
+				Map<Integer, Double> idPedidoMonto = new HashMap<>();
+				idPedidoMonto.put(Integer.valueOf(pedido.getId()),
+						BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue());
+				fecha_PedidoMonto.put(pedido.getFecha().toLocalDate(), idPedidoMonto);
+				
+						
+				balanceByMail.setTotal(pedido.getCostoTotal());
+				balanceByMail.set_id(pedido.getRestaurante().getMail());
+				
+				balanceVentasRepo.save(balanceByMail);
 		
-		balanceVentasRepo.save(balanceByMail);
-
+			}
 	}
-}
-
-// resPedRepo.saveAll(restaurantesPedidos);
-return new DTRespuesta("Balance de Ventas actualizado");
-}
-
-public Object getBalanceVentaByFecha(String fecha, String mailFromJwt) {
-	Optional<BalanceVentaDTO> balanceByMailOp = balanceVentasRepo.findById(mailFromJwt);
-	if(balanceByMailOp.isPresent()) {
-		String[] fechas = fecha.split("-");
-		Integer dia=Integer.valueOf(fechas[2]);
-		Integer mes=Integer.valueOf(fechas[1]);
-		Integer anho=Integer.valueOf(fechas[0]);
-		
-		if(balanceByMailOp.get().getFechaidPedidoMonto().containsKey(LocalDate.of(anho,mes, dia))) {
-			return balanceByMailOp.get().getFechaidPedidoMonto().get(LocalDate.of(anho,mes, dia));
-		}else {
+	
+	// resPedRepo.saveAll(restaurantesPedidos);
+	return new DTRespuesta("Balance de Ventas actualizado");
+	}
+	
+	public Object getBalanceVentaByFecha(String fecha, String mailFromJwt) {
+		Optional<BalanceVentaDTO> balanceByMailOp = balanceVentasRepo.findById(mailFromJwt);
+		if(balanceByMailOp.isPresent()) {
+			String[] fechas = fecha.split("-");
+			Integer dia=Integer.valueOf(fechas[2]);
+			Integer mes=Integer.valueOf(fechas[1]);
+			Integer anho=Integer.valueOf(fechas[0]);
 			
-			return "El restaurante no tuvo ventas en esa fecha. Consulte una de las siguientes: " +balanceByMailOp.get().getFechaidPedidoMonto().keySet().toString();
+			if(balanceByMailOp.get().getFechaidPedidoMonto().containsKey(LocalDate.of(anho,mes, dia))) {
+				return balanceByMailOp.get().getFechaidPedidoMonto().get(LocalDate.of(anho,mes, dia));
+			}else {
+				
+				return "El restaurante no tuvo ventas en esa fecha. Consulte una de las siguientes: " +balanceByMailOp.get().getFechaidPedidoMonto().keySet().toString();
+			}
+				
+		}else
+			return "Balance de Ventas actualizado";
+	}
+	
+	public Object getEstado(String mailFromJwt) {
+		Optional<Restaurante> restOp= restauranteRepo.findById(mailFromJwt);
+		if(restOp.isPresent()) {
+			String resp= restOp.get().getAbierto()?"Abierto":"cerrado";
+			return new DTRespuesta(resp);
 		}
-			
-	}else
-		return "Balance de Ventas actualizado";
-}
-
-public Object getEstado(String mailFromJwt) {
-	Optional<Restaurante> restOp= restauranteRepo.findById(mailFromJwt);
-	if(restOp.isPresent()) {
-		String resp= restOp.get().getAbierto()?"Abierto":"cerrado";
-		return new DTRespuesta(resp);
+	
+		return new DTRespuesta("Restaurante no encontrado");
 	}
-
-	return new DTRespuesta("Restaurante no encontrado");
-}
 }

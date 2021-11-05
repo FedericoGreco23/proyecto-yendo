@@ -74,7 +74,7 @@ public interface RestauranteServicioInterfaz {
 	
 	public void ventaProducto(String idProducto, String cantidad, String categoria, String fecha);
 
-	public DTRespuesta devolucionPedido(int idPedido);
+	public DTRespuesta devolucionPedido(int idPedido, int idReclamo);
 	
 	public DTRespuesta resolucionReclamo(int idReclamo, Boolean aceptoReclamo, String comentario) throws FileNotFoundException, IOException;
 	
