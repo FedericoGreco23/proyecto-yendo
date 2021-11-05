@@ -1497,7 +1497,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		String base64EncodedEmail = Base64.getEncoder()
 				.encodeToString(reclamo.getPedido().getCliente().getMail().getBytes(StandardCharsets.UTF_8));
 
-		simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, new DTNotificacionSoket("Su pedido ha sido aceptado y se está siendo preparado", "Reclamo"));
+		simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, "Reclamo");//new DTNotificacionSoket("Su pedido ha sido aceptado y se está siendo preparado", "Reclamo"));
 
 
 		//simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail,"Su pedido ha sido aceptado y se está siendo preparado");
