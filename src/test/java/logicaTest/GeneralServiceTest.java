@@ -209,10 +209,24 @@ class GeneralServiceTest {
 		mockGeneral.listarRestaurantes(0, 5, 5, "", "minutas", "1", 0);
 	}
 	
+	
+	
 	@Test
 	public void testListarRestaurantes4() throws RestauranteException {
 		Mockito.when(resRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivos(Mockito.any(),Mockito.any())).thenReturn(restaurantePage);
 		mockGeneral.listarRestaurantes(0, 5, 5, "", "", "1", 0);
+	}
+	
+	@Test
+	public void testListarRestaurantes5() throws RestauranteException {
+		Mockito.when(resRepo.listarRestauranteDesdeClientePorCategoria(Mockito.anyString(),Mockito.any(),Mockito.any())).thenReturn(restaurantePage);
+		mockGeneral.listarRestaurantes(0, 5, 5, "", "minutas", "1", 1);
+	}
+	
+	@Test
+	public void testListarRestaurantes6() throws RestauranteException {
+		Mockito.when(resRepo.listarRestauranteDesdeClientePorCategoria(Mockito.anyString(),Mockito.any(),Mockito.any())).thenReturn(restaurantePage);
+		mockGeneral.listarRestaurantes(0, 5, 5, "", "minutas", "", 1);
 	}
 	@Test
 	public void testListarMenus() throws RestauranteException {

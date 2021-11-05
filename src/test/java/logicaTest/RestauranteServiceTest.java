@@ -6,7 +6,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -36,6 +38,7 @@ import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.Modelo.Promocion;
 import com.vpi.springboot.Modelo.Reclamo;
 import com.vpi.springboot.Modelo.Restaurante;
+import com.vpi.springboot.Modelo.dto.BalanceVentaDTO;
 import com.vpi.springboot.Modelo.dto.DTProducto;
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.Modelo.dto.DTProductoIdCantidad;
@@ -45,6 +48,7 @@ import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoReclamo;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
+import com.vpi.springboot.Modelo.dto.PedidoMonto;
 import com.vpi.springboot.Repositorios.CalificacionClienteRepositorio;
 import com.vpi.springboot.Repositorios.CalificacionRestauranteRepositorio;
 import com.vpi.springboot.Repositorios.CategoriaRepositorio;
@@ -55,6 +59,7 @@ import com.vpi.springboot.Repositorios.ProductoRepositorio;
 import com.vpi.springboot.Repositorios.PromocionRepositorio;
 import com.vpi.springboot.Repositorios.ReclamoRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
+import com.vpi.springboot.Repositorios.mongo.BalanceVentasRepositorio;
 import com.vpi.springboot.Repositorios.mongo.RestaurantePedidosRepositorio;
 import com.vpi.springboot.exception.CategoriaException;
 import com.vpi.springboot.exception.PedidoException;
@@ -62,6 +67,8 @@ import com.vpi.springboot.exception.ProductoException;
 import com.vpi.springboot.exception.PromocionException;
 import com.vpi.springboot.exception.RestauranteException;
 import com.vpi.springboot.exception.UsuarioException;
+
+import javassist.expr.NewArray;
 
 class RestauranteServiceTest {
 
@@ -92,7 +99,9 @@ class RestauranteServiceTest {
 	@Mock 
 	private CalificacionRestauranteRepositorio calRestauranteRepo;
 	@Mock
-	RestaurantePedidosRepositorio resPedRepo;
+	private RestaurantePedidosRepositorio resPedRepo;
+	@Mock
+	private BalanceVentasRepositorio balanceVentasRepo;
 	
 	@InjectMocks
 	private RestauranteService mockRestaurante;
@@ -141,6 +150,9 @@ class RestauranteServiceTest {
 	private Optional<DTRestaurantePedido> optionalDtResPedVacio = Optional.empty();
 	private List<Object[]> listObject = new ArrayList<>();
 	private Object[] ob = new Object[2];
+	private BalanceVentaDTO balanceVenta;
+	private Optional<BalanceVentaDTO> balanceByMailOp;
+	private PedidoMonto pm;
 			
 	@BeforeEach
 	public void init() {
@@ -149,7 +161,7 @@ class RestauranteServiceTest {
 				LocalTime.now(), LocalTime.now(), LocalDate.now(), 50, geo, productos, "SDLM", true);
 		optionalRestaurante = Optional.of(restaurante);
 		optionalCliente = Optional.of(new Cliente("cliente1@gmail.com", "1234","25222355" , "linkFoto", false, 
-				true, LocalDate.now(), "cliente1", 5.0f, 0.0f, "cliente1", "apellido", "token"));
+				true, LocalDate.now(), "cliente1", 5.0f, 0.0f, "cliente1", "apellido", null));
 		cliente = optionalCliente.get();
 		producto = new Producto("producto1", "producto1", 50,"foto",25,true);
 		producto.setRestaurante(restaurante);
@@ -201,7 +213,14 @@ class RestauranteServiceTest {
 		ob[0] = restaurante.getMail();
 		ob[1] = BigInteger.valueOf(25);
 		listObject.add(ob);
-		
+		balanceVenta = new BalanceVentaDTO();
+		Map<LocalDate, Map<Integer, Double>> fechaidPedidoMonto= new HashMap<>();
+		Map<Integer, Double> pedidoMonto = new HashMap<>();
+		pedidoMonto.put(pedido.getId(), pedido.getCostoTotal());
+		fechaidPedidoMonto.put(LocalDate.now(), pedidoMonto);
+		balanceVenta.setTotal(2505.2);
+		balanceVenta.setFechaidPedidoMonto(fechaidPedidoMonto);
+		balanceByMailOp = Optional.of(balanceVenta);
 	}
 	
 	@Test
@@ -514,11 +533,21 @@ class RestauranteServiceTest {
 		mockRestaurante.consultarCalificacion(0, 5, "2", 2, restaurante.getMail());
 	}
 	
-	/*@Test
+	@Test
 	public void testResolucionReclamo() throws IOException {
 		Mockito.when(recRepo.findById(Mockito.anyInt())).thenReturn(optionalReclamo);
-		mockRestaurante.resolucionReclamo(reclamo.getId(), true);
-	}*/
+		Mockito.when(pedidoRepo.findById(Mockito.anyInt())).thenReturn(optionalPedido);
+		Mockito.doReturn(pedido).when(pedidoRepo).save(Mockito.any(Pedido.class));
+		mockRestaurante.resolucionReclamo(reclamo.getId(), true, "comentario");
+	}
+	
+	@Test
+	public void testResolucionReclamo2() throws IOException {
+		Mockito.when(recRepo.findById(Mockito.anyInt())).thenReturn(optionalReclamo);
+		Mockito.when(pedidoRepo.findById(Mockito.anyInt())).thenReturn(optionalPedido);
+		Mockito.doReturn(pedido).when(pedidoRepo).save(Mockito.any(Pedido.class));
+		mockRestaurante.resolucionReclamo(reclamo.getId(), false, "comentario");
+	}
 	
 	@Test
 	public void testGuardarEnMongo() {
@@ -545,10 +574,28 @@ class RestauranteServiceTest {
 		mockRestaurante.ventaProducto("pro2", "2", "minutas", "22/10/2021");
 	}*/
 	
-	/*@Test
+	@Test
 	public void testDevolucionPedido() {
 		Mockito.when(pedidoRepo.findById(Mockito.anyInt())).thenReturn(optionalPedido);
 		Mockito.doReturn(pedido).when(pedidoRepo).save(Mockito.any(Pedido.class));
-		mockRestaurante.devolucionPedido(pedido.getId());
-	}*/
+		mockRestaurante.devolucionPedido(pedido.getId(), reclamo.getId());
+	}
+	
+	@Test
+	public void testGetEstado() {
+		Mockito.when(restauranteRepo.findById(Mockito.anyString())).thenReturn(optionalRestaurante);
+		mockRestaurante.getEstado(restaurante.getMail());
+	}
+	
+	@Test
+	public void testGetBalanceVenta() {
+		Mockito.when(balanceVentasRepo.findById(Mockito.anyString())).thenReturn(balanceByMailOp);
+		mockRestaurante.getBalanceVentaByFecha("2021-12-25", restaurante.getMail());
+	}
+	
+	@Test
+	public void testGetBalanceVenta2() {
+		Mockito.when(balanceVentasRepo.findById(Mockito.anyString())).thenReturn(balanceByMailOp);
+		mockRestaurante.getBalanceVentaByFecha(LocalDate.now().toString(), restaurante.getMail());
+	}
 }

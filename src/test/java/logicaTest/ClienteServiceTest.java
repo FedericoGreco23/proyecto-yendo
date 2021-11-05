@@ -157,7 +157,9 @@ class ClienteServiceTest {
 		restaurante.setCostoDeEnvio(50);
 		restaurante.setGeoLocalizacion(geo);
 		restaurante.setAbierto(true);
+		restaurante.setPedidos(null);
 		restauranteList.add(restaurante);
+		
 		pageRestaurante = new PageImpl<>(restauranteList);
 		optionalRestaurante = Optional.of(restaurante);
 		

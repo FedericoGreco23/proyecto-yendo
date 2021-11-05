@@ -260,6 +260,19 @@ class AdministradorServiceTest {
 	}
 	
 	@Test
+	public void testBuscarUsuario13() {
+		Mockito.when(clienteRepo.buscarCliente(Mockito.any())).thenReturn(clientePage);		
+		mockAdmin.buscarUsuario(0, 1, 0, 0, "", "1", 1);
+	}
+	
+	@Test
+	public void testBuscarUsuario14() {
+		Mockito.when(clienteRepo.buscarCliente(Mockito.any())).thenReturn(clientePage);		
+		mockAdmin.buscarUsuario(0, 1, 0, 0, "", "", 1);
+	}
+	
+	
+	@Test
 	public void testListarRestaurantes() {
 		Mockito.when(resRepo.findByEstado(Mockito.any(), Mockito.any())).thenReturn(restaurantePage);	
 		mockAdmin.listarRestaurantes(0, 5, 0);

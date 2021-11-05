@@ -509,10 +509,6 @@ public class ClienteService implements ClienteServicioInterfaz {
 				throw new ReclamoException(ReclamoException.UserPedidoException(idPedido, mailCliente));
 			}
 
-			
-			
-			
-			
 
 			Restaurante restaurante = pedido.getRestaurante();
 			// reclamo
@@ -1042,7 +1038,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 		return new DTRespuesta("Token no guardado, es igual al existente");
 	}
 	
-	
+
 	//solo de uso interno
 	public DTPedido altaPedidosParaCargadeDatos(int idCarrito, EnumMetodoDePago pago, int idDireccion, String mail, String comentario)
 			throws RestauranteException, CarritoException, DireccionException {
@@ -1126,4 +1122,5 @@ public class ClienteService implements ClienteServicioInterfaz {
 
 		}
 	}
+	
 }
