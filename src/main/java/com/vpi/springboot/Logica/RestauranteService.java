@@ -1588,4 +1588,14 @@ public Object getBalanceVentaByFecha(String fecha, String mailFromJwt) {
 	}else
 		return "Balance de Ventas actualizado";
 }
+
+public Object getEstado(String mailFromJwt) {
+	Optional<Restaurante> restOp= restauranteRepo.findById(mailFromJwt);
+	if(restOp.isPresent()) {
+		String resp= restOp.get().getAbierto()?"Abierto":"cerrado";
+		return new DTRespuesta(resp);
+	}
+
+	return new DTRespuesta("Restaurante no encontrado");
+}
 }
