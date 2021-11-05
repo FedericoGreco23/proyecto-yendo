@@ -45,6 +45,7 @@ import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTCliente;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
 import com.vpi.springboot.Modelo.dto.DTListarRestaurante;
+import com.vpi.springboot.Modelo.dto.DTNotificacionSoket;
 import com.vpi.springboot.Modelo.dto.DTPedido;
 import com.vpi.springboot.Modelo.dto.DTPedidoParaAprobar;
 import com.vpi.springboot.Modelo.dto.DTProducto;
@@ -507,9 +508,11 @@ public class ClienteService implements ClienteServicioInterfaz {
 
 				throw new ReclamoException(ReclamoException.UserPedidoException(idPedido, mailCliente));
 			}
-			/**
-			 * guarda el reclamo y envia mail
-			 */
+
+			
+			
+			
+			
 
 			Restaurante restaurante = pedido.getRestaurante();
 			// reclamo
@@ -529,6 +532,21 @@ public class ClienteService implements ClienteServicioInterfaz {
 			// pedidoRepo.save(pedido);
 			recRepo.save(reclamo);
 			// restauranteRepo.save(restaurante);
+			
+			
+			/**
+			 * notifica
+			 */
+			// notificamos al restaurante
+			// Push notifications to front-end
+
+			String base64EncodedEmail = Base64.getEncoder()
+					.encodeToString(pedido.getRestaurante().getMail().getBytes(StandardCharsets.UTF_8));
+
+			DTReclamo reclamoDT= new DTReclamo(reclamo);
+
+			simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, new DTNotificacionSoket(reclamoDT, "Reclamo"));
+			
 			return new DTRespuesta(
 					"Reclamo ingresado con éxito. Le llegará un mail con la resulución. Disculpe las molestias.");
 		} else {
@@ -1087,7 +1105,8 @@ public class ClienteService implements ClienteServicioInterfaz {
 					pedidoDT.setCarrito(carrito.getProductoCarrito());
 					pedidoDT.setCliente(new DTCliente(pedido.getCliente()));
 
-					simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, pedidoDT);
+					//simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, pedidoDT);
+					simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, new DTNotificacionSoket(pedidoDT, "Reclamo"));
 
 					// System.out.println(base64EncodedEmail);
 
