@@ -541,7 +541,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 
 			DTReclamo reclamoDT= new DTReclamo(reclamo);
 
-			simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, new DTNotificacionSoket(reclamoDT, "Reclamo"));
+			simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, "Reclamo");//new DTNotificacionSoket(reclamoDT, "Reclamo"));
 			
 			return new DTRespuesta(
 					"Reclamo ingresado con éxito. Le llegará un mail con la resulución. Disculpe las molestias.");
