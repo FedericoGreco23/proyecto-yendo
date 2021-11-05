@@ -5,5 +5,6 @@ public enum EnumEstadoPedido {
     ENTREGADO,
     ACEPTADO,
     RECHAZADO,
-    PROCESADO;
+    PROCESADO,
+	REEMBOLZADO;
 }

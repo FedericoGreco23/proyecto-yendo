@@ -545,10 +545,10 @@ class RestauranteServiceTest {
 		mockRestaurante.ventaProducto("pro2", "2", "minutas", "22/10/2021");
 	}*/
 	
-	@Test
+	/*@Test
 	public void testDevolucionPedido() {
 		Mockito.when(pedidoRepo.findById(Mockito.anyInt())).thenReturn(optionalPedido);
 		Mockito.doReturn(pedido).when(pedidoRepo).save(Mockito.any(Pedido.class));
 		mockRestaurante.devolucionPedido(pedido.getId());
-	}
+	}*/
 }
