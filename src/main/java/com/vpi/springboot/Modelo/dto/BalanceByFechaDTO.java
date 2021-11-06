@@ -12,10 +12,10 @@ public class BalanceByFechaDTO implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public BalanceByFechaDTO(Object lista, String total) {
+	public BalanceByFechaDTO(Object BalanceByFechas, String totalPeriodo) {
 		super();
-		this.BalanceByFechas = lista;
-		this.totalPeriodo = total;
+		this.BalanceByFechas = BalanceByFechas;
+		this.totalPeriodo = totalPeriodo;
 	}
 
 	public Object getLista() {
