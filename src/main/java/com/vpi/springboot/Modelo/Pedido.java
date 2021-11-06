@@ -46,7 +46,6 @@ public class Pedido {
 	private String direccion;
 	private String comentario;
 	private Boolean pago;
-	
 
 	public Pedido() {
 		super();
@@ -63,9 +62,9 @@ public class Pedido {
 		this.metodoDePago = metodoDePago;
 		this.carrito = carrito;
 	}
-	
-	public Pedido(LocalDateTime fecha, Double costoTotal, EnumEstadoPedido estadoPedido,
-			EnumMetodoDePago metodoDePago, Integer carrito, String direccion, Restaurante resto, Cliente cliente, String comentario) {
+
+	public Pedido(LocalDateTime fecha, Double costoTotal, EnumEstadoPedido estadoPedido, EnumMetodoDePago metodoDePago,
+			Integer carrito, String direccion, Restaurante resto, Cliente cliente, String comentario) {
 		super();
 		this.fecha = fecha;
 		this.costoTotal = costoTotal;
@@ -76,11 +75,11 @@ public class Pedido {
 		this.restaurante = resto;
 		this.cliente = cliente;
 		this.comentario = comentario;
-		
+
 	}
-	
-	public Pedido(LocalDateTime fecha, Double costoTotal, EnumEstadoPedido estadoPedido,
-			EnumMetodoDePago metodoDePago, Integer carrito, String direccion, Restaurante resto, Cliente cliente, String comentario, Boolean pago) {
+
+	public Pedido(LocalDateTime fecha, Double costoTotal, EnumEstadoPedido estadoPedido, EnumMetodoDePago metodoDePago,
+			Integer carrito, String direccion, Restaurante resto, Cliente cliente, String comentario, Boolean pago) {
 		super();
 		this.fecha = fecha;
 		this.costoTotal = costoTotal;
@@ -92,11 +91,12 @@ public class Pedido {
 		this.cliente = cliente;
 		this.comentario = comentario;
 		this.pago = pago;
-		
+
 	}
-	
+
 	public Pedido(int id, LocalDateTime fecha, Double costoTotal, EnumEstadoPedido estadoPedido,
-			EnumMetodoDePago metodoDePago, Integer carrito, String direccion, Restaurante resto, Cliente cliente, String comentario) {
+			EnumMetodoDePago metodoDePago, Integer carrito, String direccion, Restaurante resto, Cliente cliente,
+			String comentario) {
 		super();
 		this.id = id;
 		this.fecha = fecha;
@@ -108,9 +108,9 @@ public class Pedido {
 		this.restaurante = resto;
 		this.cliente = cliente;
 		this.comentario = comentario;
-		
+
 	}
-	
+
 	public Pedido(int id, LocalDateTime fecha, Double costoTotal, EnumEstadoPedido estadoPedido,
 			EnumMetodoDePago metodoDePago, Integer carrito, String direccion, String comentario) {
 		super();
@@ -123,10 +123,8 @@ public class Pedido {
 		this.direccion = direccion;
 		this.comentario = comentario;
 	}
-	
-	
+
 //----------------------GETTERS Y SETTERS---------------------------------------------------------
-	
 
 	public int getId() {
 		return id;

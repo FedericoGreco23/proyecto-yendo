@@ -145,6 +145,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	private ClienteService clienteService;
 	@Autowired
 	private BalanceVentasRepositorio balanceVentasRepo;
+	@Autowired
+	private MailService mailSender;
 
 	private DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");;
 
@@ -465,6 +467,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 			simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail,
 					"Su pedido ha sido aceptado y se está siendo preparado");
+			
+			DTPedido dtpedido = new DTPedido(pedido);
 
 			// fin notificacion
 
