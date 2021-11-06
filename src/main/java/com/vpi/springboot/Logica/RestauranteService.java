@@ -1464,7 +1464,9 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		Pedido devolucion = new Pedido(pedido.getFecha(), pedido.getCostoTotal() * -1, pedido.getEstadoPedido(),
 				pedido.getMetodoDePago(), pedido.getCarrito(), pedido.getDireccion(), pedido.getRestaurante(),
 				pedido.getCliente(), pedido.getComentario(), pedido.getPago());
-		devolucion.setEstadoPedido(EnumEstadoPedido.REEMBOLZADO);
+		//devolucion.setEstadoPedido(EnumEstadoPedido.REEMBOLZADO);
+		devolucion.setEstadoPedidido(null);
+		pedido.setEstadoPedido(EnumEstadoPedido.REEMBOLZADO);
 		List<Reclamo> reclamos = pedido.getReclamos();
 		for (Reclamo reclamo : reclamos) {
 			if (reclamo.getId() != idReclamo) {
