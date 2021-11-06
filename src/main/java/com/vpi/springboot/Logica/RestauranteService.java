@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
+import javax.mail.MessagingException;
 
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.*;
@@ -480,6 +481,15 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 					"Su pedido ha sido aceptado y se está siendo preparado");
 
 			DTPedido dtpedido = new DTPedido(pedido);
+			String to = pedido.getCliente().getMail();
+			//TODO hacer página para activar cuenta
+			String body = mailSender.getConfirmarPedido(dtpedido);
+			String topic = "Confirmación de pedido para " + pedido.getCliente().getNickname() + ".";
+			try {
+				mailSender.sendMail(to, body, topic);
+			} catch (MessagingException e) {
+				return new DTRespuesta("No se pudo mandar mail: " + e.getMessage());
+			}
 
 			// fin notificacion
 
