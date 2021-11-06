@@ -1,4 +1,4 @@
-package com.vpi.springboot.Logica;
+/*package com.vpi.springboot.Logica;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -56,4 +56,4 @@ public class UsuarioService implements UsuarioServicioInterfaz {
 	
 	
 	
-}
+}*/

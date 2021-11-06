@@ -1,4 +1,4 @@
-package com.vpi.springboot.Logica;
+/*package com.vpi.springboot.Logica;
 
 import java.util.List;
 import java.util.Map;
@@ -11,4 +11,4 @@ public interface UsuarioServicioInterfaz {
 	
 	public List<Cliente> getAllClientes();
 	
-}
+}*/

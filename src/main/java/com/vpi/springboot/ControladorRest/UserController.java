@@ -1,4 +1,4 @@
-package com.vpi.springboot.ControladorRest;
+/*package com.vpi.springboot.ControladorRest;
 
 import java.util.List;
 import java.util.Map;
@@ -29,7 +29,7 @@ public class UserController {
 	@Autowired
 	private UsuarioService userService;
 
-/*	@GetMapping("/getallClientes")
+	@GetMapping("/getallClientes")
 	public List<Cliente> getAllUser() {
 		return userService.getAllClientes();
 	}
@@ -43,7 +43,8 @@ public class UserController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	*/
+	
 
 
 }
+*/
