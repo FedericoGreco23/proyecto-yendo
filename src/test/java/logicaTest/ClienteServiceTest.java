@@ -388,14 +388,7 @@ class ClienteServiceTest {
 		Mockito.doReturn(restaurante).when(restauranteRepo).save(Mockito.any(Restaurante.class));
 		mockCliente.bajaCalificacionRestaurante(cliente.getMail(), restaurante.getMail());
 	}
-	
-//	@Test 
-//	public void testListarReclamos() throws UsuarioException {
-//		Mockito.when(clienteRepo.findById(Mockito.anyString())).thenReturn(optionalCliente);
-//		Mockito.when(recRepo.findAllByClienteRestaurante(Mockito.any(Cliente.class), Mockito.anyString(), Mockito.any())).thenReturn(pageReclamo);
-//		mockCliente.listarReclamos(5, 5, restaurante.getMail(), "", 0, cliente.getMail());
-//	}
-	
+		
 	@Test
 	public void testListarReclamos() throws RestauranteException, UsuarioException {
 		Mockito.when(clienteRepo.findById(Mockito.anyString())).thenReturn(optionalCliente);
@@ -454,6 +447,20 @@ class ClienteServiceTest {
 	}
 	
 	@Test
+	public void testListarReclamos9() throws RestauranteException, UsuarioException {
+		Mockito.when(clienteRepo.findById(Mockito.anyString())).thenReturn(optionalCliente);
+		Mockito.when(recRepo.findAllByCliente(Mockito.any(Cliente.class), Mockito.any())).thenReturn(pageReclamo);
+		mockCliente.listarReclamos(5, 0, "", "", "", "1", 1, cliente.getMail());
+	}
+	
+	@Test
+	public void testListarReclamos10() throws RestauranteException, UsuarioException {
+		Mockito.when(clienteRepo.findById(Mockito.anyString())).thenReturn(optionalCliente);
+		Mockito.when(recRepo.findAllByCliente(Mockito.any(Cliente.class), Mockito.any())).thenReturn(pageReclamo);
+		mockCliente.listarReclamos(5, 0, "", "", "", "", 1, cliente.getMail());
+	}
+	
+	@Test
 	public void testConsultarCalificacion() throws RestauranteException {
 		Mockito.when(clienteRepo.findById(Mockito.anyString())).thenReturn(optionalCliente);
 		Mockito.when(calClienteRepo.consultarCalificacion(Mockito.any(Cliente.class), Mockito.any())).thenReturn(pageCalificacion);
@@ -501,6 +508,21 @@ class ClienteServiceTest {
 		Mockito.when(dirRepo.findById(Mockito.anyInt())).thenReturn(optionalDireccion);
 		mockCliente.listarRestaurantesPorZona(0, 5, 1, "", "", "1", 1, dir.getId());
 	}
+	
+	@Test
+	public void testListarRestaurantePorZona5() throws UsuarioException {
+		Mockito.when(restauranteRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivos(Mockito.any(),Mockito.any())).thenReturn(pageRestaurante);
+		Mockito.when(dirRepo.findById(Mockito.anyInt())).thenReturn(optionalDireccion);
+		mockCliente.listarRestaurantesPorZona(0, 5, 1, "", "", "", 1, dir.getId());
+	}
+	
+	@Test
+	public void testListarRestaurantePorZona6() throws UsuarioException {
+		Mockito.when(restauranteRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivos(Mockito.any(),Mockito.any())).thenReturn(pageRestaurante);
+		Mockito.when(dirRepo.findById(Mockito.anyInt())).thenReturn(optionalDireccion);
+		mockCliente.listarRestaurantesPorZona(0, 5, 1, "", "", "1", 0, dir.getId());
+	}
+	
 	
 	@Test
 	public void testGetCalificacionRestaurante() throws UsuarioException, RestauranteException {

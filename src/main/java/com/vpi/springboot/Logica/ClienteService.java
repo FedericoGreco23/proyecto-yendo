@@ -541,7 +541,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 
 			DTReclamo reclamoDT= new DTReclamo(reclamo);
 
-			simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, new DTNotificacionSoket(reclamoDT, "Reclamo"));
+			simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, "Reclamo");//new DTNotificacionSoket(reclamoDT, "Reclamo"));
 			
 			return new DTRespuesta(
 					"Reclamo ingresado con éxito. Le llegará un mail con la resulución. Disculpe las molestias.");
@@ -820,8 +820,15 @@ public class ClienteService implements ClienteServicioInterfaz {
 		}
 
 		reclamos = pageReclamo.getContent();
+		DTCarrito DTcarrito = null;
 		for (Reclamo r : reclamos) {
-			retorno.add(new DTReclamo(r));
+			Optional<Carrito> optionalCarrito = mongoRepo.findById(r.getPedido().getCarrito());
+			if (optionalCarrito.isPresent()) {
+				DTcarrito = new DTCarrito(optionalCarrito.get());
+				retorno.add(new DTReclamo(r, DTcarrito));
+			} else {
+				retorno.add(new DTReclamo(r));
+			}
 		}
 
 		response.put("currentPage", pageReclamo.getTotalPages());

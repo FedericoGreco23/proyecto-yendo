@@ -240,4 +240,7 @@ public interface PedidoRepositorio extends JpaRepository<Pedido, Integer> {
 	@Query(queryFecha2)
 	Page<Pedido> findByFecha(@Param("dateI") LocalDateTime dateI, @Param("dateF") LocalDateTime dateF, 
 			@Param("cliente") Cliente cliente, Pageable pageable);
+
+	@Query("SELECT u FROM Pedido u WHERE u.pago = true")
+	List<Pedido> findAllPagos();
 }
