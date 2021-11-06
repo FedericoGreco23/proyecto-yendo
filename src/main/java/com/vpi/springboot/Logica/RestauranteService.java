@@ -87,6 +87,8 @@ import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoReclamo;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
+import com.vpi.springboot.Modelo.dto.FechaidPedidoMontoDTO;
+import com.vpi.springboot.Modelo.dto.IdPedidoMontoDTO;
 import com.vpi.springboot.Modelo.dto.PedidoMonto;
 import com.vpi.springboot.Repositorios.CalificacionClienteRepositorio;
 import com.vpi.springboot.Repositorios.CalificacionRestauranteRepositorio;
@@ -1612,54 +1614,59 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				BalanceVentaDTO balanceByMail = balanceByMailOp.get();
 				
 				//primera venta con esa fecha
-				if (!balanceByMail.getFechaidPedidoMonto().containsKey(pedido.getFecha().toLocalDate())) {
-					
-					Map<LocalDate, Map<Integer, List<String>>> fecha_PedidoMonto = balanceByMail.getFechaidPedidoMonto();
-					Map<Integer, List<String>> idPedidoMontoAndMetodoPago = new HashMap<>();
-					List<String> montoAndPago= new ArrayList<String>();
-					montoAndPago.add(String.valueOf(BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue()));
-					montoAndPago.add(pedido.getMetodoDePago().name());
-					idPedidoMontoAndMetodoPago.put(Integer.valueOf(pedido.getId()),montoAndPago);
-					
-					fecha_PedidoMonto.put(pedido.getFecha().toLocalDate(), idPedidoMontoAndMetodoPago);
-					
-				
+				if (!balanceByMail.getListaPedidos().stream().filter(o -> o.getFecha().equals(pedido.getFecha().toLocalDate())).findFirst().isPresent()) {
+										
+					List<FechaidPedidoMontoDTO> fecha_PedidoMonto = balanceByMail.getListaPedidos();
+					List<IdPedidoMontoDTO> pedidos= new ArrayList<IdPedidoMontoDTO>();
+					IdPedidoMontoDTO idPedidoMontoDTO = new IdPedidoMontoDTO(pedido.getId(), BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue(), pedido.getEstadoPedido().name());
+					pedidos.add(idPedidoMontoDTO);
+					FechaidPedidoMontoDTO fechaIdPedidoMonto= new FechaidPedidoMontoDTO(pedido.getFecha().toLocalDate(), pedidos);
+	
+					fecha_PedidoMonto.add(fechaIdPedidoMonto);
+					balanceByMail.setListaPedidos(fecha_PedidoMonto);
+					balanceByMail.setTotal(BigDecimal.valueOf(balanceByMail.getTotal() + pedido.getCostoTotal())
+							.setScale(4, RoundingMode.HALF_UP).doubleValue());
 					balanceVentasRepo.save(balanceByMail);
 				}else {//ya hay pedidos en esa fecha
 					
-					Map<LocalDate, Map<Integer, List<String>>> fecha_PedidoMonto = balanceByMail.getFechaidPedidoMonto();
-					Map<Integer, List<String>> idPedidoMonto = balanceByMail.getFechaidPedidoMonto().get(pedido.getFecha().toLocalDate());
+					List<FechaidPedidoMontoDTO> fecha_PedidoMonto = balanceByMail.getListaPedidos();
 					
-					List<String> montoAndPago= new ArrayList<String>();
-					montoAndPago.add(String.valueOf(BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue()));
-					montoAndPago.add(pedido.getMetodoDePago().name());
-					
-					idPedidoMonto.put(Integer.valueOf(pedido.getId()),montoAndPago);
-					
-					fecha_PedidoMonto.put(pedido.getFecha().toLocalDate(), idPedidoMonto);
+					Optional<FechaidPedidoMontoDTO> idPedidoMonto = fecha_PedidoMonto.stream().filter(o -> o.getFecha().equals(pedido.getFecha().toLocalDate())).findFirst();
+					if(idPedidoMonto.isPresent()) {
+						List<IdPedidoMontoDTO> listaPedidos= idPedidoMonto.get().getPedidos();
+						IdPedidoMontoDTO idPedidoMontoDTO = new IdPedidoMontoDTO(pedido.getId(), BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue(), pedido.getEstadoPedido().name());
+						listaPedidos.add(idPedidoMontoDTO);
+						idPedidoMonto.get().setPedidos(listaPedidos);
+
+						fecha_PedidoMonto.add(idPedidoMonto.get());
+						
+						
+						balanceByMail.setTotal(BigDecimal.valueOf(balanceByMail.getTotal() + pedido.getCostoTotal())
+							.setScale(4, RoundingMode.HALF_UP).doubleValue());
+						balanceByMail.setListaPedidos(fecha_PedidoMonto);
 					
 				
 					balanceVentasRepo.save(balanceByMail);
-						balanceByMail.setTotal(BigDecimal.valueOf(balanceByMail.getTotal() + pedido.getCostoTotal())
-							.setScale(4, RoundingMode.HALF_UP).doubleValue());
+
+					}
+					
+
 				}
 			} else {//el restaurante no está aun guardado
 				
-				BalanceVentaDTO balanceByMail = new BalanceVentaDTO();
-				Map<LocalDate, Map<Integer, List<String>>> fecha_PedidoMonto = balanceByMail.getFechaidPedidoMonto();
-				Map<Integer, List<String>> idPedidoMonto = new HashMap<>();
-				List<String> montoAndPago= new ArrayList<String>();
-				montoAndPago.add(String.valueOf(BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue()));
-				montoAndPago.add(pedido.getMetodoDePago().name());
-				
-				idPedidoMonto.put(Integer.valueOf(pedido.getId()),montoAndPago);
-				
-				fecha_PedidoMonto.put(pedido.getFecha().toLocalDate(), idPedidoMonto);
-				
-						
-				balanceByMail.setTotal(pedido.getCostoTotal());
+				BalanceVentaDTO balanceByMail= new BalanceVentaDTO();
 				balanceByMail.set_id(pedido.getRestaurante().getMail());
+				balanceByMail.setTotal(pedido.getCostoTotal());
 				
+				List<FechaidPedidoMontoDTO> fecha_PedidoMonto = balanceByMail.getListaPedidos();
+				List<IdPedidoMontoDTO> pedidos= new ArrayList<>();
+				IdPedidoMontoDTO idPedidoMontoDTO = new IdPedidoMontoDTO(pedido.getId(), BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue(), pedido.getEstadoPedido().name());
+				pedidos.add(idPedidoMontoDTO);
+				FechaidPedidoMontoDTO fechaPedidoMontoDto= new FechaidPedidoMontoDTO(pedido.getFecha().toLocalDate(), pedidos);
+				fecha_PedidoMonto.add(fechaPedidoMontoDto);
+				
+				balanceByMail.setListaPedidos(fecha_PedidoMonto);
+
 				balanceVentasRepo.save(balanceByMail);
 		
 			}
@@ -1686,27 +1693,26 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			
 			Double totalPeriodo=(double) 0;
 
-			List<Map<LocalDate, Map<Integer, List<String>>>> balanceByFechaList = new ArrayList<Map<LocalDate, Map<Integer, List<String>>>>();
+			List<FechaidPedidoMontoDTO> lista= new ArrayList<>();
+			
 
-			for (Map.Entry<LocalDate, Map<Integer, List<String>>> entry : balanceByMailOp.get().getFechaidPedidoMonto()
-					.entrySet()) {
-				if (entry.getKey().equals(inicio) ||  entry.getKey().equals(fin) || entry.getKey().isAfter(inicio) && entry.getKey().isBefore(fin)) {
-					Map<LocalDate, Map<Integer, List<String>>> aux = new HashMap<LocalDate, Map<Integer, List<String>>>();
-					aux.put(entry.getKey(), entry.getValue());
-					balanceByFechaList.add(aux);
-					for(Map.Entry<Integer, List<String>> entry2 : entry.getValue().entrySet()) {
-						totalPeriodo=totalPeriodo+Double.valueOf(entry2.getValue().get(0));
+			for (FechaidPedidoMontoDTO entry : balanceByMailOp.get().getListaPedidos()) {
+				
+				if (entry.getFecha().equals(inicio) ||  entry.getFecha().equals(fin) || entry.getFecha().isAfter(inicio) && entry.getFecha().isBefore(fin)) {
+
+					lista.add(entry);
+					for(IdPedidoMontoDTO entry2 : entry.getPedidos()) {
+						totalPeriodo=totalPeriodo+Double.valueOf(entry2.getMonto());
 					}
 				}
 
 			}
 
-			if (balanceByFechaList.size() > 0) {
-				return new BalanceByFechaDTO(balanceByFechaList, totalPeriodo.toString());
+			if (lista.size() > 0) {
+				return new BalanceByFechaDTO(lista, totalPeriodo.toString());
 			} else {
 
-				return "El restaurante no tuvo ventas en esa fecha. Consulte una de las siguientes: "
-						+ balanceByMailOp.get().getFechaidPedidoMonto().keySet().toString();
+				return "El restaurante no tuvo ventas entre esas fechas.";
 			}
 
 		} else
