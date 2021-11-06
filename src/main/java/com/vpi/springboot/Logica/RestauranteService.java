@@ -1599,7 +1599,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	/**
 	* BALANCE DE VENTAS
 	*/
-	@Scheduled(cron = "*/59 */5 * * * *") // 1 vez cada 5 minutos
+	@Scheduled(cron = "*/59 */1 * * * *") // 1 vez cada 5 minutos
 	public DTRespuesta actualizarBalanceVentas() {
 
 		//descomentar
@@ -1693,7 +1693,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			
 			Double totalPeriodo=(double) 0;
 
-			List<FechaidPedidoMontoDTO> lista= new ArrayList<>();
+			Set<FechaidPedidoMontoDTO> lista= new HashSet<>();
 			
 
 			for (FechaidPedidoMontoDTO entry : balanceByMailOp.get().getListaPedidos()) {
@@ -1716,7 +1716,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			}
 
 		} else
-			return "Balance de Ventas actualizado";
+			return "Balance de Ventas no disponible";
 	}
 
 	public Object getEstado(String mailFromJwt) {
