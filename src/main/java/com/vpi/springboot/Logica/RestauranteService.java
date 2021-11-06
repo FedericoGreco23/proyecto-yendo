@@ -1110,6 +1110,21 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			 */
 
 			// guardar resto
+			
+			/////////////promociones//////////////////
+			String fotoPromo="https://www.bolsalea.com/blog/media/Bolsa-take-away-personalizada.jpg";
+			Integer precioPromo= 1;
+			List<DTProductoIdCantidad>	productosPromo=new ArrayList<DTProductoIdCantidad>();
+			DTProductoIdCantidad pc= new DTProductoIdCantidad();
+			productosPromo.add(pc);
+			DTPromocionConPrecio promocion=  new DTPromocionConPrecio(productosPromo, precioPromo, 35, "Pomo del mes",
+					"Imperdible promo", fotoPromo);
+			try {
+				altaPromocion( promocion, restau.getMail());
+			} catch (RestauranteException | PromocionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 		}
 
