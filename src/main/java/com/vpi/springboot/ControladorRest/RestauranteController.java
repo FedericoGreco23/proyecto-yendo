@@ -1,5 +1,7 @@
 package com.vpi.springboot.ControladorRest;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 
@@ -353,8 +355,8 @@ public class RestauranteController {
 		}
 	}
 	
-	@GetMapping("/balanceVenta/{fecha}")
-	ResponseEntity<?> getBalanceVenta(@PathVariable String fecha) {
+	@GetMapping("/balanceVenta")
+	ResponseEntity<?> getBalanceVenta(@RequestBody Map<String, String> intervalo) {
 		if (!esRestaurante()) {
 			return new ResponseEntity<>(
 					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
@@ -362,7 +364,7 @@ public class RestauranteController {
 		}
 
 		try {
-			return new ResponseEntity<>(service.getBalanceVentaByFecha(fecha, getMailFromJwt()), HttpStatus.OK);
+			return new ResponseEntity<>(service.getBalanceVentaByFecha(intervalo.get("inicio"), intervalo.get("fin"), getMailFromJwt()), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}

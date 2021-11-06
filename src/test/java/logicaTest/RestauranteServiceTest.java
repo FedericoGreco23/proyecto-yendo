@@ -1,7 +1,9 @@
 package logicaTest;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -224,9 +226,12 @@ class RestauranteServiceTest {
 		ob[1] = BigInteger.valueOf(25);
 		listObject.add(ob);
 		balanceVenta = new BalanceVentaDTO();
-		Map<LocalDate, Map<Integer, Double>> fechaidPedidoMonto= new HashMap<>();
-		Map<Integer, Double> pedidoMonto = new HashMap<>();
-		pedidoMonto.put(pedido.getId(), pedido.getCostoTotal());
+		Map<LocalDate, Map<Integer,  List<String>>> fechaidPedidoMonto= new HashMap<>();
+		Map<Integer,  List<String>> pedidoMonto = new HashMap<>();
+		List<String> montoAndPago= new ArrayList<String>();
+		montoAndPago.add(String.valueOf(BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue()));
+		montoAndPago.add(pedido.getMetodoDePago().name());
+		pedidoMonto.put(pedido.getId(), montoAndPago);
 		fechaidPedidoMonto.put(LocalDate.now(), pedidoMonto);
 		balanceVenta.setTotal(2505.2);
 		balanceVenta.setFechaidPedidoMonto(fechaidPedidoMonto);
@@ -605,13 +610,13 @@ class RestauranteServiceTest {
 	@Test
 	public void testGetBalanceVenta() {
 		Mockito.when(balanceVentasRepo.findById(Mockito.anyString())).thenReturn(balanceByMailOp);
-		mockRestaurante.getBalanceVentaByFecha("2021-12-25", restaurante.getMail());
+		mockRestaurante.getBalanceVentaByFecha("2020-12-25", "2021-12-25", restaurante.getMail());
 	}
 	
 	@Test
 	public void testGetBalanceVenta2() {
 		Mockito.when(balanceVentasRepo.findById(Mockito.anyString())).thenReturn(balanceByMailOp);
-		mockRestaurante.getBalanceVentaByFecha(LocalDate.now().toString(), restaurante.getMail());
+		mockRestaurante.getBalanceVentaByFecha(LocalDate.now().toString(), LocalDate.now().toString(), restaurante.getMail());
 	}
 	
 	@Test
