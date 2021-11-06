@@ -1599,7 +1599,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	/**
 	* BALANCE DE VENTAS
 	*/
-	@Scheduled(cron = "*/59 */1 * * * *") // 1 vez cada 5 minutos
+	//@Scheduled(cron = "*/59 */1 * * * *") // 1 vez cada 5 minutos
 	public DTRespuesta actualizarBalanceVentas() {
 
 		//descomentar
