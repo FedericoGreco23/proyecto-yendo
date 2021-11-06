@@ -22,16 +22,16 @@ public class BalanceByFechaDTO implements Serializable {
 		return BalanceByFechas;
 	}
 
-	public void setLista(Object lista) {
-		this.BalanceByFechas = lista;
+	public void setLista(Object BalanceByFechas) {
+		this.BalanceByFechas = BalanceByFechas;
 	}
 
 	public String getTotal() {
 		return totalPeriodo;
 	}
 
-	public void setTotal(String total) {
-		this.totalPeriodo = total;
+	public void setTotal(String totalPeriodo) {
+		this.totalPeriodo = totalPeriodo;
 	}
 
 	
