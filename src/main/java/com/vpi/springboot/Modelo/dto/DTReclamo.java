@@ -42,6 +42,17 @@ public class DTReclamo implements Serializable {
 		this.pedido = new DTPedido(rec.getPedido());
 		this.restaurante = rec.getRestaurante().getNombre();
 	}
+	
+	public DTReclamo(Reclamo rec, DTCarrito carrito) {
+		super();
+		this.id = rec.getId();
+		this.comentario = rec.getComentario();
+		this.fecha = rec.getFecha();
+		this.estado = rec.getEstado();
+		this.resolucion = rec.getResolucion();
+		this.pedido = new DTPedido(rec.getPedido(), carrito);
+		this.restaurante = rec.getRestaurante().getNombre();
+	}
 
 	public int getId() {
 		return id;

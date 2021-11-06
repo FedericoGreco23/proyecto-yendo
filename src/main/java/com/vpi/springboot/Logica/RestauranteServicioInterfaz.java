@@ -72,7 +72,7 @@ public interface RestauranteServicioInterfaz {
 
 	public DTRespuesta registrarPago(int idPedido);
 	
-	public void ventaProducto(String idProducto, String cantidad, String categoria, String fecha);
+	public void ventaProducto(String idProducto, String cantidad, String categoria, String fecha, String nombreRestaurante, String nombreProducto);
 
 	public DTRespuesta devolucionPedido(int idPedido, int idReclamo);
 	
@@ -81,4 +81,6 @@ public interface RestauranteServicioInterfaz {
 	public DTCalificacionCliente getCalificacionCliente(String mailCliente, String mailRestaurante) throws UsuarioException, RestauranteException;
 	
 	void cargarDatos2();
+	
+	public Map<String, Object> topProductos(int page, int size);
 }

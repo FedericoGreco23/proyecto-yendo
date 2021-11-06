@@ -25,7 +25,12 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.*;
+
+import org.assertj.core.error.OptionalDoubleShouldHaveValueCloseToOffset;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -49,6 +54,7 @@ import com.google.firebase.messaging.Notification;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.vpi.springboot.IdCompuestas.CalificacionClienteId;
@@ -71,6 +77,7 @@ import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTNotificacionSoket;
 import com.vpi.springboot.Modelo.dto.DTPedido;
 import com.vpi.springboot.Modelo.dto.DTProductoIdCantidad;
+import com.vpi.springboot.Modelo.dto.DTProductoVendido;
 import com.vpi.springboot.Modelo.dto.DTPromocionConPrecio;
 import com.vpi.springboot.Modelo.dto.DTReclamo;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
@@ -92,6 +99,7 @@ import com.vpi.springboot.Repositorios.PromocionRepositorio;
 import com.vpi.springboot.Repositorios.ReclamoRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
 import com.vpi.springboot.Repositorios.mongo.BalanceVentasRepositorio;
+import com.vpi.springboot.Repositorios.mongo.ProductosVendidosRepositorio;
 import com.vpi.springboot.Repositorios.mongo.RestaurantePedidosRepositorio;
 import com.vpi.springboot.exception.AdministradorException;
 import com.vpi.springboot.exception.CategoriaException;
@@ -145,6 +153,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	private ClienteService clienteService;
 	@Autowired
 	private BalanceVentasRepositorio balanceVentasRepo;
+	@Autowired 
+	private ProductosVendidosRepositorio productosVendidosRepo;
 
 	private DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");;
 
@@ -1350,9 +1360,6 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			pedidoRepo.save(pedido);
 		}
 
-		// Document buscado = (Document) collectionPedidos.find(new Document("_id",
-		// idPedido)).first();
-		// String idProducto = buscado.getString("productoCarrito");
 
 		// Obtengo la informacion de los productos pedidos de un carrito
 		Document carritoBuscado = collectionCarrito.find(new Document("_id", pedido.getCarrito())).first();
@@ -1365,6 +1372,9 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		String cantidad;
 		String categoria;
 		String fecha;
+		String nombreProducto;
+		
+		String nombreRestaurante = pedido.getRestaurante().getNombre();
 
 		for (Object obj : listaDBObject) {
 			carritoDocument = (Document) obj;
@@ -1373,28 +1383,56 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			idProducto = productoDocument.get("_id").toString();
 			categoria = productoDocument.getString("categoria");
 			fecha = pedido.getFecha().toString();
+			nombreProducto = productoDocument.getString("nombre");
 
-			ventaProducto(idProducto, cantidad, categoria, fecha);
+			ventaProducto(idProducto, cantidad, categoria, fecha, nombreRestaurante, nombreProducto);
 		}
 
 		return new DTRespuesta("Pago registrado con éxito.");
 	}
 
 	@Override
-	public void ventaProducto(String idProducto, String cantidad, String categoria, String fecha) {
+	public void ventaProducto(String idProducto, String cantidad, String categoria, String fecha, String nombreRestaurante, String nombreProducto) {
 		MongoClientURI uri = new MongoClientURI(
 				"mongodb+srv://grupo1:grupo1@cluster0.l17sm.mongodb.net/prueba-concepto");
 		MongoClient mongoClient = new MongoClient(uri);
 		MongoDatabase dataBase = mongoClient.getDatabase("prueba-concepto");
 		MongoCollection<Document> collectionPedidos = dataBase.getCollection("pedidos");
 
-		Document document = new Document();
+		FindIterable<Document> elemento = collectionPedidos.find(new Document("_id", idProducto));
+		
+		if (elemento.first() != null) {
+			//Si existe el elemento con el idProducto se modifica
+			Document pedidoDocument = (Document) collectionPedidos.find(new Document("_id", idProducto)).first();
+			
+			//Conversiones a int y suma
+			String cantidadDocumento = pedidoDocument.getString("cantidad");
+			int cantidadDocumentoInt = Integer.parseInt(cantidadDocumento);
+			int cantidadSuma = Integer.parseInt(cantidad);
+			int cantidadSumada = cantidadDocumentoInt + cantidadSuma;
+			String cantidadSumadaString = Integer.toString(cantidadSumada);
+			
+			//Modifico el valor
+			Bson filter = eq("cantidad", pedidoDocument.get("cantidad"));
+			Bson updateOperation = set("cantidad", cantidadSumadaString);
+			collectionPedidos.updateOne(filter, updateOperation);
 
-		document.put("idProducto", idProducto);
-		document.put("cantidad", cantidad);
-		document.put("categoria", categoria);
-		document.put("fecha", fecha);
-		collectionPedidos.insertOne(document);
+		} else {
+			Document document = new Document();
+
+			document.put("_id", idProducto);
+			document.put("nombreProducto", nombreProducto);
+			document.put("nombreRestaurante", nombreRestaurante);
+			document.put("cantidad", cantidad);
+			document.put("categoria", categoria);
+			document.put("fecha", fecha);
+			
+			/*document.put("idProducto", idProducto);
+			document.put("cantidad", cantidad);
+			document.put("categoria", categoria);
+			document.put("fecha", fecha);*/
+			collectionPedidos.insertOne(document);
+		}
 	}
 
 	@Override
@@ -1436,6 +1474,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			
 			reclamo.setEstado(EnumEstadoReclamo.ACEPTADO);
 			reclamo.setResolucion(comentario);
+			recRepo.save(reclamo);
 			//Envio notificacion al mobile
 			
 			if (token != null) {
@@ -1497,12 +1536,12 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		String base64EncodedEmail = Base64.getEncoder()
 				.encodeToString(reclamo.getPedido().getCliente().getMail().getBytes(StandardCharsets.UTF_8));
 
-		simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, new DTNotificacionSoket("Su pedido ha sido aceptado y se está siendo preparado", "Reclamo"));
+		simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, "Reclamo");//new DTNotificacionSoket("Su pedido ha sido aceptado y se está siendo preparado", "Reclamo"));
 
 
 		//simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail,"Su pedido ha sido aceptado y se está siendo preparado");
 		
-		recRepo.save(reclamo);
+		//recRepo.save(reclamo); Lo muevo arriba porque sobreescribe
 		return new DTRespuesta("Se envio la notificacion mobile.");
 	}
 
@@ -1620,5 +1659,20 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		}
 	
 		return new DTRespuesta("Restaurante no encontrado");
+	}
+	
+	@Override
+	public Map<String, Object> topProductos(int page, int size) {
+		Sort sort = Sort.by(Sort.Order.desc("cantidad"));
+		Pageable paging = PageRequest.of(page, size, sort);
+		Map<String, Object> response = new HashMap<>();
+		Page<DTProductoVendido> pageProductos;
+		pageProductos = productosVendidosRepo.findAll(paging);
+		List<DTProductoVendido> DTproductosVendidos = pageProductos.getContent();
+		
+		response.put("currentPage", pageProductos.getNumber());
+		response.put("totalItems", pageProductos.getTotalElements());
+		response.put("restaurantes", DTproductosVendidos);
+		return response;
 	}
 }
