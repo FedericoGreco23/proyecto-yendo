@@ -1176,6 +1176,12 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 						DTCarrito carrito = clienteService.verCarrito(cliente.getMail());
 						clienteService.altaPedidosParaCargadeDatos((int) carrito.getId(), EnumMetodoDePago.EFECTIVO,
 								cli.get().getDirecciones().get(0).getId(), cliente.getMail(), "Muero de hambre");
+						//calificaciones
+						clienteService.calificarRestaurante(cliente.getMail(), resOp.get().getMail(), 
+								new Calificacion((int) (Math.random() * 2)+3, "mejor imposible", null, LocalDateTime.now()));
+						
+						calificarCliente(cliente.getMail(), resOp.get().getMail(), 
+								new Calificacion((int) (Math.random() * 2)+3, "Sos todo lo que está bien", null, LocalDateTime.now()));
 					} catch (Exception e) {
 
 					}
