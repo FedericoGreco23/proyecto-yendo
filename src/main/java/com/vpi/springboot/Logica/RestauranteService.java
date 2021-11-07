@@ -485,17 +485,17 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 					"Su pedido ha sido aceptado y se está siendo preparado");
 
 			// TESTEO ENVÍO MAIL
-			List<DTProductoCarrito> productos = new ArrayList<>();
-			System.out.println("entra FOR");
-			for(int i = 1; i < 5; i++) {
-				Optional<Producto> optionalProducto = productoRepo.findById(i);
-				DTProductoCarrito dtpc = new DTProductoCarrito(new DTProducto(optionalProducto.get()), i);
-				productos.add(dtpc);
-			}
-			Carrito carrito = new Carrito(500, "csuarez2211@gmail.com", "lapasiva@lapasiva.com", productos, true);
+//			List<DTProductoCarrito> productos = new ArrayList<>();
+//			System.out.println("entra FOR");
+//			for(int i = 1; i < 5; i++) {
+//				Optional<Producto> optionalProducto = productoRepo.findById(i);
+//				DTProductoCarrito dtpc = new DTProductoCarrito(new DTProducto(optionalProducto.get()), i);
+//				productos.add(dtpc);
+//			}
+//			Carrito carrito = new Carrito(500, "csuarez2211@gmail.com", "lapasiva@lapasiva.com", productos, true);
 
-//			Optional<Carrito> optionalCarrito = mongoRepo.findById(pedido.getCarrito());
-//			Carrito carrito = optionalCarrito.get();
+			Optional<Carrito> optionalCarrito = mongoRepo.findById(pedido.getCarrito());
+			Carrito carrito = optionalCarrito.get();
 			DTPedido dtpedido = new DTPedido(pedido, new DTCarrito(carrito));
 
 			String to = pedido.getCliente().getMail();
