@@ -355,7 +355,7 @@ public class RestauranteController {
 		}
 	}
 	
-	@GetMapping("/balanceVenta")
+	@PostMapping("/balanceVenta")
 	ResponseEntity<?> getBalanceVenta(@RequestBody Map<String, String> intervalo) {
 		if (!esRestaurante()) {
 			return new ResponseEntity<>(
