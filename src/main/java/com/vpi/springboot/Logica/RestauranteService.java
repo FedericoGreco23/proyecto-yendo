@@ -1114,12 +1114,19 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			// guardar resto
 			
 			/////////////promociones//////////////////
+
+			List<Producto> listProdu = productoRepo.findAllByRestaurante(restau);
+			Integer promoRandomNum = (int) (Math.random() * listProdu.size());
+			Integer promoRandomNum2 = (int) (Math.random() * listProdu.size());
 			String fotoPromo="https://www.bolsalea.com/blog/media/Bolsa-take-away-personalizada.jpg";
-			Integer precioPromo= 1;
+			
+			Integer precioPromo= (int) ((listProdu.get(promoRandomNum).getPrecio()+listProdu.get(promoRandomNum2).getPrecio())/2);
 			List<DTProductoIdCantidad>	productosPromo=new ArrayList<DTProductoIdCantidad>();
-			DTProductoIdCantidad pc= new DTProductoIdCantidad();
+			DTProductoIdCantidad pc= new DTProductoIdCantidad(listProdu.get(promoRandomNum).getId(), 2);
+			DTProductoIdCantidad pc2= new DTProductoIdCantidad(listProdu.get(promoRandomNum2).getId(), 3);
 			productosPromo.add(pc);
-			DTPromocionConPrecio promocion=  new DTPromocionConPrecio(productosPromo, precioPromo, 35, "Pomo del mes",
+			productosPromo.add(pc2);
+			DTPromocionConPrecio promocion=  new DTPromocionConPrecio(productosPromo, precioPromo, 10, "Pomo del mes",
 					"Imperdible promo", fotoPromo);
 			try {
 				altaPromocion( promocion, restau.getMail());
