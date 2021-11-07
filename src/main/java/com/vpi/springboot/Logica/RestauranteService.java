@@ -1599,7 +1599,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	/**
 	* BALANCE DE VENTAS
 	*/
-	//@Scheduled(cron = "*/59 */1 * * * *") // 1 vez cada 5 minutos
+	@Scheduled(cron = "*/59 */10 * * * *") // 1 vez cada 5 minutos
 	public DTRespuesta actualizarBalanceVentas() {
 
 		//descomentar
@@ -1628,25 +1628,42 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 							.setScale(4, RoundingMode.HALF_UP).doubleValue());
 					balanceVentasRepo.save(balanceByMail);
 				}else {//ya hay pedidos en esa fecha
-					
+					Boolean yaAgregado=false;
 					List<FechaidPedidoMontoDTO> fecha_PedidoMonto = balanceByMail.getListaPedidos();
 					
 					Optional<FechaidPedidoMontoDTO> idPedidoMonto = fecha_PedidoMonto.stream().filter(o -> o.getFecha().equals(pedido.getFecha().toLocalDate())).findFirst();
-					if(idPedidoMonto.isPresent()) {
-						List<IdPedidoMontoDTO> listaPedidos= idPedidoMonto.get().getPedidos();
-						IdPedidoMontoDTO idPedidoMontoDTO = new IdPedidoMontoDTO(pedido.getId(), BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue(), pedido.getEstadoPedido().name());
-						listaPedidos.add(idPedidoMontoDTO);
-						idPedidoMonto.get().setPedidos(listaPedidos);
+					if(idPedidoMonto!= null && idPedidoMonto.isPresent()) {
+						List<IdPedidoMontoDTO> listaPedidos= idPedidoMonto.get().getPedidos();//lista de pedidos de esa fecha
+						
+						for(IdPedidoMontoDTO l: listaPedidos) {
+							if(l.getIdPedido()==pedido.getId()) {
+								yaAgregado=true;
+							}
+						}
+						if (!yaAgregado) {
+							IdPedidoMontoDTO idPedidoMontoDTO = new IdPedidoMontoDTO(
+									pedido.getId(), BigDecimal.valueOf(pedido.getCostoTotal())
+											.setScale(4, RoundingMode.HALF_UP).doubleValue(),
+									pedido.getEstadoPedido().name());
+							listaPedidos.add(idPedidoMontoDTO);
+							idPedidoMonto.get().setPedidos(listaPedidos);
 
-						fecha_PedidoMonto.add(idPedidoMonto.get());
-						
-						
-						balanceByMail.setTotal(BigDecimal.valueOf(balanceByMail.getTotal() + pedido.getCostoTotal())
-							.setScale(4, RoundingMode.HALF_UP).doubleValue());
-						balanceByMail.setListaPedidos(fecha_PedidoMonto);
-					
-				
-					balanceVentasRepo.save(balanceByMail);
+							// elimino FechaidPedidoMontoDTO que habia y agrego el nuevo
+							// System.out.print(fecha_PedidoMonto!=null);
+							for (FechaidPedidoMontoDTO f : fecha_PedidoMonto) {
+								if (f.getFecha().equals(idPedidoMonto.get().getFecha())) {
+									fecha_PedidoMonto.remove(f);
+									break;
+								}
+							}
+							fecha_PedidoMonto.add(idPedidoMonto.get());
+
+							balanceByMail.setTotal(BigDecimal.valueOf(balanceByMail.getTotal() + pedido.getCostoTotal())
+									.setScale(4, RoundingMode.HALF_UP).doubleValue());
+							balanceByMail.setListaPedidos(fecha_PedidoMonto);
+
+							balanceVentasRepo.save(balanceByMail);
+						}
 
 					}
 					
@@ -1698,7 +1715,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 			for (FechaidPedidoMontoDTO entry : balanceByMailOp.get().getListaPedidos()) {
 				
-				if (entry.getFecha().equals(inicio) ||  entry.getFecha().equals(fin) || entry.getFecha().isAfter(inicio) && entry.getFecha().isBefore(fin)) {
+				if (entry.getFecha().equals(inicio) ||  entry.getFecha().equals(fin) || (entry.getFecha().isAfter(inicio) && entry.getFecha().isBefore(fin))) {
 
 					lista.add(entry);
 					for(IdPedidoMontoDTO entry2 : entry.getPedidos()) {
