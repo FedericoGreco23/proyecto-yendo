@@ -362,7 +362,7 @@ public class RestauranteController {
 	}
 
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
-	@GetMapping("/balanceVenta")
+	@PostMapping("/balanceVenta")
 	public ResponseEntity<?> getBalanceVenta(@RequestBody Map<String, String> intervalo) {
 		if (!esRestaurante()) {
 			return new ResponseEntity<>(
