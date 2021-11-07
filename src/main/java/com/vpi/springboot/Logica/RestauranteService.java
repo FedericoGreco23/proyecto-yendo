@@ -636,8 +636,15 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 			simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, "Su pedido ha sido rechazado");
 
-			// fin notificacion
-
+			String to = pedido.getCliente().getMail();
+			String body = mailSender.getRechazarPedido(pedido.getRestaurante().getNombre(), pedido.getCliente().getNombre() + " " + pedido.getCliente().getApellido());
+			String topic = "Rechazo de pedido para " + pedido.getCliente().getNickname() + ".";
+			try {
+				mailSender.sendMail(to, body, topic);
+			} catch (MessagingException e) {
+				return new DTRespuesta("No se pudo mandar mail: " + e.getMessage());
+			}
+			
 			return new DTRespuesta("Pedido " + idPedido + " rechazado.");
 
 		} else {
