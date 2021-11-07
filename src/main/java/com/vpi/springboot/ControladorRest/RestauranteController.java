@@ -117,8 +117,9 @@ public class RestauranteController {
 		}
 	}
 
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/abrirRestaurante")
-	ResponseEntity<?> abrirRestaurante() {
+	public ResponseEntity<?> abrirRestaurante() {
 		if (!esRestaurante()) {
 			return new ResponseEntity<>(
 					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
@@ -132,8 +133,9 @@ public class RestauranteController {
 		}
 	}
 
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/cerrarRestaurante")
-	ResponseEntity<?> cerrarRestaurante() {
+	public ResponseEntity<?> cerrarRestaurante() {
 		if (!esRestaurante()) {
 			return new ResponseEntity<>(
 					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
@@ -147,8 +149,9 @@ public class RestauranteController {
 		}
 	}
 
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/confirmarPedido")
-	ResponseEntity<?> confirmarPedido(@RequestParam int idPedido) {
+	public ResponseEntity<?> confirmarPedido(@RequestParam int idPedido) {
 		if (!esRestaurante()) {
 			return new ResponseEntity<>(
 					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
@@ -162,8 +165,9 @@ public class RestauranteController {
 		}
 	}
 
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/rechazarPedido")
-	ResponseEntity<?> rechazarPedido(@RequestParam int idPedido) {
+	public ResponseEntity<?> rechazarPedido(@RequestParam int idPedido) {
 		if (!esRestaurante()) {
 			return new ResponseEntity<>(
 					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
@@ -177,8 +181,9 @@ public class RestauranteController {
 		}
 	}
 
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/modificarDescuento/{idProducto}")
-	ResponseEntity<?> modificarDescuento(@PathVariable int idProducto, @RequestParam int descuento) {
+	public ResponseEntity<?> modificarDescuento(@PathVariable int idProducto, @RequestParam int descuento) {
 		if (!esRestaurante()) {
 			return new ResponseEntity<>(
 					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
@@ -340,8 +345,9 @@ public class RestauranteController {
 		}
 	}
 	
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@GetMapping("/getCalCliente/{cliente}")
-	ResponseEntity<?> getCalificacionCliente(@PathVariable String cliente) {
+	public ResponseEntity<?> getCalificacionCliente(@PathVariable String cliente) {
 		if (!esRestaurante()) {
 			return new ResponseEntity<>(
 					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
@@ -355,8 +361,9 @@ public class RestauranteController {
 		}
 	}
 	
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@GetMapping("/balanceVenta")
-	ResponseEntity<?> getBalanceVenta(@RequestBody Map<String, String> intervalo) {
+	public ResponseEntity<?> getBalanceVenta(@RequestBody Map<String, String> intervalo) {
 		if (!esRestaurante()) {
 			return new ResponseEntity<>(
 					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),
@@ -370,8 +377,9 @@ public class RestauranteController {
 		}
 	}
 	
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@GetMapping("/getEstado")
-	ResponseEntity<?> getEstado() {
+	public ResponseEntity<?> getEstado() {
 		if (!esRestaurante()) {
 			return new ResponseEntity<>(
 					new UsuarioException(PermisosException.NoPermisosException("RESTAURANTE")).getMessage(),

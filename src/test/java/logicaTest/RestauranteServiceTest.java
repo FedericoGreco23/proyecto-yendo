@@ -234,7 +234,7 @@ class RestauranteServiceTest {
 		pedidoMonto.put(pedido.getId(), montoAndPago);
 		fechaidPedidoMonto.put(LocalDate.now(), pedidoMonto);
 		balanceVenta.setTotal(2505.2);
-		balanceVenta.setFechaidPedidoMonto(fechaidPedidoMonto);
+		//balanceVenta.setFechaidPedidoMonto(fechaidPedidoMonto);
 		balanceByMailOp = Optional.of(balanceVenta);
 		dtProductoVendido = new DTProductoVendido(String.valueOf(producto.getId()), producto.getNombre(), restaurante.getNombre(), "5", "minutas", "2021-10-21");
 		dtProductoVendidoList.add(dtProductoVendido);
