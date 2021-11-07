@@ -2,6 +2,8 @@ package com.vpi.springboot.Logica;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl;
 
+import java.text.DecimalFormat;
+
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
@@ -20,6 +22,7 @@ public class MailService {
 
 	@Autowired
 	private JavaMailSender mailSender;
+	private DecimalFormat df = new DecimalFormat("#.##");
 
 	public void setMailSender(JavaMailSender mailSender) {
 		this.mailSender = mailSender;
@@ -207,7 +210,7 @@ public class MailService {
 							+ "                            <p style=\"margin: 0; margin-left: 20px;\">" + p.getProducto().getNombre() + " x" + p.getCantidad() + "</p>\r\n"
 							+ "                        </td>\r\n"
 							+ "                        <td bgcolor=\"#ffffff\" align=\"right\" style=\"padding: 0px 30px 0px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400;\">\r\n"
-							+ "                            <p style=\"margin: 0;\">" + p.getProducto().getPrecio() + "</p>\r\n"
+							+ "                            <p style=\"margin: 0;\">" + df.format(p.getProducto().getPrecio()) + "</p>\r\n"
 							+ "                        </td>\r\n"
 							+ "                    </tr>\r\n"
 							+ "                </table>\r\n"

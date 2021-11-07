@@ -486,7 +486,6 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 			// TESTEO ENVÍO MAIL
 //			List<DTProductoCarrito> productos = new ArrayList<>();
-//			System.out.println("entra FOR");
 //			for(int i = 1; i < 5; i++) {
 //				Optional<Producto> optionalProducto = productoRepo.findById(i);
 //				DTProductoCarrito dtpc = new DTProductoCarrito(new DTProducto(optionalProducto.get()), i);
