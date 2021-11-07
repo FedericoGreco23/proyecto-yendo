@@ -24,6 +24,7 @@ public class DTPedido implements Serializable {
 	private String direccion;
 	private String comentario;
 	private Boolean pago;
+	private String tiempoEspera;
 
 	public DTPedido() {
 		super();
@@ -52,8 +53,10 @@ public class DTPedido implements Serializable {
 		this.comentario = ped.getComentario();
 		this.direccion = ped.getDireccion();
 		this.pago = ped.getPago();
+		this.tiempoEspera = ped.getRestaurante().getTiempoEstimadoMinimo() + " a "
+				+ ped.getRestaurante().getTiempoEstimadoMaximo() + " minutos.";
 	}
-	
+
 	public DTPedido(Pedido ped, DTCarrito carrito) {
 		super();
 		this.id = ped.getId();
@@ -68,8 +71,10 @@ public class DTPedido implements Serializable {
 		this.comentario = ped.getComentario();
 		this.direccion = ped.getDireccion();
 		this.pago = ped.getPago();
+		this.tiempoEspera = ped.getRestaurante().getTiempoEstimadoMinimo().toString().substring(3) + " a "
+				+ ped.getRestaurante().getTiempoEstimadoMaximo().toString().substring(3) + " minutos.";
 	}
-	
+
 	public DTPedido(int id, LocalDateTime fecha, Double costoTotal, EnumEstadoPedido estadoPedidido,
 			EnumMetodoDePago metodoDePago, Integer carrito, String direccion, String comentario) {
 		super();
@@ -184,5 +189,13 @@ public class DTPedido implements Serializable {
 
 	public void setCalificacionCliente(Float calificacionCliente) {
 		this.calificacionCliente = calificacionCliente;
+	}
+
+	public String getTiempoEspera() {
+		return tiempoEspera;
+	}
+
+	public void setTiempoEspera(String tiempoEspera) {
+		this.tiempoEspera = tiempoEspera;
 	}
 }

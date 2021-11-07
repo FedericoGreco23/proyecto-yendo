@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
+import javax.mail.MessagingException;
 
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.*;
@@ -77,6 +78,8 @@ import com.vpi.springboot.Modelo.dto.DTCalificacionRestaurante;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTNotificacionSoket;
 import com.vpi.springboot.Modelo.dto.DTPedido;
+import com.vpi.springboot.Modelo.dto.DTProducto;
+import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.Modelo.dto.DTProductoIdCantidad;
 import com.vpi.springboot.Modelo.dto.DTProductoVendido;
 import com.vpi.springboot.Modelo.dto.DTPromocionConPrecio;
@@ -156,7 +159,9 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	private ClienteService clienteService;
 	@Autowired
 	private BalanceVentasRepositorio balanceVentasRepo;
-	@Autowired 
+	@Autowired
+	private MailService mailSender;
+	@Autowired
 	private ProductosVendidosRepositorio productosVendidosRepo;
 
 	private DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");;
@@ -167,20 +172,20 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	 * optionalCarrito.get(); DTCarrito dt = new DTCarrito(carrito.getId(),
 	 * carrito.getProductoCarrito(), carrito.getMailRestaurante(),
 	 * carrito.getCostoEnvio()); return dt; }
-	 * 
+	 *
 	 * return null; }
 	 */
-	
-	/*@PostConstruct
-	public void init() throws IOException {
-		FileInputStream serviceAccount = new FileInputStream("src/main/java/Resource/yendo-5c371-firebase-adminsdk-rczst-500b815097.json");
-		System.out.println("SE CARGA FIREBASE EN RESTAURANTE");
-		FirebaseOptions options = new FirebaseOptions.Builder()
-		  .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-		  .build();
 
-		FirebaseApp.initializeApp(options);
-	}*/
+	/*
+	 * @PostConstruct public void init() throws IOException { FileInputStream
+	 * serviceAccount = new FileInputStream(
+	 * "src/main/java/Resource/yendo-5c371-firebase-adminsdk-rczst-500b815097.json")
+	 * ; System.out.println("SE CARGA FIREBASE EN RESTAURANTE"); FirebaseOptions
+	 * options = new FirebaseOptions.Builder()
+	 * .setCredentials(GoogleCredentials.fromStream(serviceAccount)) .build();
+	 *
+	 * FirebaseApp.initializeApp(options); }
+	 */
 
 	@Override
 	public DTRespuesta altaRestaurante(Restaurante rest) throws RestauranteException, CategoriaException {
@@ -479,7 +484,28 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail,
 					"Su pedido ha sido aceptado y se está siendo preparado");
 
-			// fin notificacion
+			// TESTEO ENVÍO MAIL
+			List<DTProductoCarrito> productos = new ArrayList<>();
+			System.out.println("entra FOR");
+			for(int i = 1; i < 5; i++) {
+				Optional<Producto> optionalProducto = productoRepo.findById(i);
+				DTProductoCarrito dtpc = new DTProductoCarrito(new DTProducto(optionalProducto.get()), i);
+				productos.add(dtpc);
+			}
+			Carrito carrito = new Carrito(500, "csuarez2211@gmail.com", "lapasiva@lapasiva.com", productos, true);
+
+//			Optional<Carrito> optionalCarrito = mongoRepo.findById(pedido.getCarrito());
+//			Carrito carrito = optionalCarrito.get();
+			DTPedido dtpedido = new DTPedido(pedido, new DTCarrito(carrito));
+
+			String to = pedido.getCliente().getMail();
+			String body = mailSender.getConfirmarPedido(dtpedido, pedido.getCliente());
+			String topic = "Confirmación de pedido para " + pedido.getCliente().getNickname() + ".";
+			try {
+				mailSender.sendMail(to, body, topic);
+			} catch (MessagingException e) {
+				return new DTRespuesta("No se pudo mandar mail: " + e.getMessage());
+			}
 
 			return new DTRespuesta("Pedido " + idPedido + " confirmado.");
 		} else {
@@ -637,11 +663,11 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		if (pedidos.size() == 0)
 			throw new UsuarioException(UsuarioException.SinPedido(mailRestaurante));
 
-		if(calificacion.getPuntaje() > 5)
+		if (calificacion.getPuntaje() > 5)
 			calificacion.setPuntaje(5);
 		else if (calificacion.getPuntaje() < 1)
 			calificacion.setPuntaje(1);
-		
+
 		calificacion.setFecha(LocalDateTime.now());
 		CalificacionCliente calCliente = new CalificacionCliente(calificacion, restaurante, cliente);
 		calClienteRepo.save(calCliente);
@@ -734,24 +760,24 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				LocalDateTime dateF = LocalDateTime.of(ld, LocalTime.of(23, 59));
 				pageReclamo = recRepo.findAllByRestauranteClienteEstadoFecha(cliente, restaurante, estadoReclamo, dateI,
 						dateF, paging);
-			} 
-			
+			}
+
 			// cliente + estado
 			else if (!cliente.equalsIgnoreCase("") && !estado.equalsIgnoreCase("")) {
 				EnumEstadoReclamo estadoReclamo = EnumEstadoReclamo.valueOf(estado.toUpperCase());
 				pageReclamo = recRepo.findAllByRestauranteClienteEstado(cliente, restaurante, estadoReclamo, paging);
-			} 
-			
+			}
+
 			// cliente + fecha
 			else if (!cliente.equalsIgnoreCase("") && !fecha.equalsIgnoreCase("")) {
 				LocalDate ld = LocalDate.parse(fecha, DATEFORMATTER);
 				LocalDateTime dateI = LocalDateTime.of(ld, LocalTime.of(00, 00));
 				LocalDateTime dateF = LocalDateTime.of(ld, LocalTime.of(23, 59));
 				pageReclamo = recRepo.findAllByRestauranteClienteFecha(cliente, restaurante, dateI, dateF, paging);
-			} 
-			
+			}
+
 			// estado + fecha
-			else if(!estado.equalsIgnoreCase("") && !fecha.equalsIgnoreCase("")) {
+			else if (!estado.equalsIgnoreCase("") && !fecha.equalsIgnoreCase("")) {
 				System.out.println("estado y fecha");
 				EnumEstadoReclamo estadoReclamo = EnumEstadoReclamo.valueOf(estado.toUpperCase());
 				LocalDate ld = LocalDate.parse(fecha, DATEFORMATTER);
@@ -759,10 +785,9 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				LocalDateTime dateF = LocalDateTime.of(ld, LocalTime.of(23, 59));
 				System.out.println(dateI);
 				System.out.println(dateF);
-				pageReclamo = recRepo.findAllByRestauranteEstadoFecha(restaurante, estadoReclamo, dateI,
-						dateF, paging);
+				pageReclamo = recRepo.findAllByRestauranteEstadoFecha(restaurante, estadoReclamo, dateI, dateF, paging);
 			}
-			
+
 			// cliente
 			else if (!cliente.equalsIgnoreCase("")) {
 				pageReclamo = recRepo.findAllByRestauranteCliente(cliente, restaurante, paging);
@@ -780,10 +805,10 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				LocalDateTime dateI = LocalDateTime.of(ld, LocalTime.of(00, 00));
 				LocalDateTime dateF = LocalDateTime.of(ld, LocalTime.of(23, 59));
 				pageReclamo = recRepo.findAllByRestauranteFecha(dateI, dateF, restaurante, paging);
-			} else { //genérico
+			} else { // genérico
 				pageReclamo = recRepo.findAllByRestaurante(restaurante, paging);
 			}
-		} else { //genérico
+		} else { // genérico
 			pageReclamo = recRepo.findAllByRestaurante(restaurante, paging);
 		}
 
@@ -1112,14 +1137,14 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			 */
 
 			// guardar resto
-			
+
 			/////////////promociones//////////////////
 
 			List<Producto> listProdu = productoRepo.findAllByRestaurante(restau);
 			Integer promoRandomNum = (int) (Math.random() * listProdu.size());
 			Integer promoRandomNum2 = (int) (Math.random() * listProdu.size());
 			String fotoPromo="https://www.bolsalea.com/blog/media/Bolsa-take-away-personalizada.jpg";
-			
+
 			Integer precioPromo= (int) ((listProdu.get(promoRandomNum).getPrecio()+listProdu.get(promoRandomNum2).getPrecio())/2);
 			List<DTProductoIdCantidad>	productosPromo=new ArrayList<DTProductoIdCantidad>();
 			DTProductoIdCantidad pc= new DTProductoIdCantidad(listProdu.get(promoRandomNum).getId(), 2);
@@ -1129,7 +1154,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			DTPromocionConPrecio promocion=  new DTPromocionConPrecio(productosPromo, precioPromo, 10, "Pomo del mes",
 					"Imperdible promo", fotoPromo);
 			try {
-				altaPromocion( promocion, restau.getMail());
+				altaPromocion(promocion, restau.getMail());
 			} catch (RestauranteException | PromocionException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -1200,12 +1225,12 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 						DTCarrito carrito = clienteService.verCarrito(cliente.getMail());
 						clienteService.altaPedidosParaCargadeDatos((int) carrito.getId(), EnumMetodoDePago.EFECTIVO,
 								cli.get().getDirecciones().get(0).getId(), cliente.getMail(), "Muero de hambre");
-						//calificaciones
-						clienteService.calificarRestaurante(cliente.getMail(), resOp.get().getMail(), 
-								new Calificacion((int) (Math.random() * 2)+3, "mejor imposible", null, LocalDateTime.now()));
-						
-						calificarCliente(cliente.getMail(), resOp.get().getMail(), 
-								new Calificacion((int) (Math.random() * 2)+3, "Sos todo lo que está bien", null, LocalDateTime.now()));
+						// calificaciones
+						clienteService.calificarRestaurante(cliente.getMail(), resOp.get().getMail(), new Calificacion(
+								(int) (Math.random() * 2) + 3, "mejor imposible", null, LocalDateTime.now()));
+
+						calificarCliente(cliente.getMail(), resOp.get().getMail(), new Calificacion(
+								(int) (Math.random() * 2) + 3, "Sos todo lo que está bien", null, LocalDateTime.now()));
 					} catch (Exception e) {
 
 					}
@@ -1301,7 +1326,6 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	private boolean emailExist(String mail) {
 		return userRepo.findById(mail).isPresent();
 	}
-	
 
 	@Override
 	public void corregirDatos() {
@@ -1330,7 +1354,6 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			}
 		}
 	}
-
 
 	// Uso esta funcion tanto para consultarCalificacionRestaurante como
 	// clienteConsultaCalificacionRestaurante
@@ -1391,7 +1414,6 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			pedidoRepo.save(pedido);
 		}
 
-
 		// Obtengo la informacion de los productos pedidos de un carrito
 		Document carritoBuscado = collectionCarrito.find(new Document("_id", pedido.getCarrito())).first();
 		List<BasicDBObject> listaDBObject = (List<BasicDBObject>) carritoBuscado.get("productoCarrito");
@@ -1404,7 +1426,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		String categoria;
 		String fecha;
 		String nombreProducto;
-		
+
 		String nombreRestaurante = pedido.getRestaurante().getNombre();
 
 		for (Object obj : listaDBObject) {
@@ -1423,7 +1445,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	}
 
 	@Override
-	public void ventaProducto(String idProducto, String cantidad, String categoria, String fecha, String nombreRestaurante, String nombreProducto) {
+	public void ventaProducto(String idProducto, String cantidad, String categoria, String fecha,
+			String nombreRestaurante, String nombreProducto) {
 		MongoClientURI uri = new MongoClientURI(
 				"mongodb+srv://grupo1:grupo1@cluster0.l17sm.mongodb.net/prueba-concepto");
 		MongoClient mongoClient = new MongoClient(uri);
@@ -1431,19 +1454,19 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		MongoCollection<Document> collectionPedidos = dataBase.getCollection("pedidos");
 
 		FindIterable<Document> elemento = collectionPedidos.find(new Document("_id", idProducto));
-		
+
 		if (elemento.first() != null) {
-			//Si existe el elemento con el idProducto se modifica
+			// Si existe el elemento con el idProducto se modifica
 			Document pedidoDocument = (Document) collectionPedidos.find(new Document("_id", idProducto)).first();
-			
-			//Conversiones a int y suma
+
+			// Conversiones a int y suma
 			String cantidadDocumento = pedidoDocument.getString("cantidad");
 			int cantidadDocumentoInt = Integer.parseInt(cantidadDocumento);
 			int cantidadSuma = Integer.parseInt(cantidad);
 			int cantidadSumada = cantidadDocumentoInt + cantidadSuma;
 			String cantidadSumadaString = Integer.toString(cantidadSumada);
-			
-			//Modifico el valor
+
+			// Modifico el valor
 			Bson filter = eq("cantidad", pedidoDocument.get("cantidad"));
 			Bson updateOperation = set("cantidad", cantidadSumadaString);
 			collectionPedidos.updateOne(filter, updateOperation);
@@ -1457,11 +1480,11 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			document.put("cantidad", cantidad);
 			document.put("categoria", categoria);
 			document.put("fecha", fecha);
-			
-			/*document.put("idProducto", idProducto);
-			document.put("cantidad", cantidad);
-			document.put("categoria", categoria);
-			document.put("fecha", fecha);*/
+
+			/*
+			 * document.put("idProducto", idProducto); document.put("cantidad", cantidad);
+			 * document.put("categoria", categoria); document.put("fecha", fecha);
+			 */
 			collectionPedidos.insertOne(document);
 		}
 	}
@@ -1473,7 +1496,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		Pedido devolucion = new Pedido(pedido.getFecha(), pedido.getCostoTotal() * -1, pedido.getEstadoPedido(),
 				pedido.getMetodoDePago(), pedido.getCarrito(), pedido.getDireccion(), pedido.getRestaurante(),
 				pedido.getCliente(), pedido.getComentario(), pedido.getPago());
-		//devolucion.setEstadoPedido(EnumEstadoPedido.REEMBOLZADO);
+		// devolucion.setEstadoPedido(EnumEstadoPedido.REEMBOLZADO);
 		devolucion.setEstadoPedidido(null);
 		pedido.setEstadoPedido(EnumEstadoPedido.REEMBOLZADO);
 		List<Reclamo> reclamos = pedido.getReclamos();
@@ -1487,7 +1510,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		pedidoRepo.save(pedido);
 		return new DTRespuesta("Devolucion registrada con éxito.");
 	}
-	
+
 	@Override
 	public DTRespuesta resolucionReclamo(int idReclamo, Boolean aceptoReclamo, String comentario) throws IOException {
 		Optional<Reclamo> optionalReclamo = recRepo.findById(idReclamo);
@@ -1495,67 +1518,57 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		String token = reclamo.getPedido().getCliente().getTokenDispositivo();
 		String restaurante = reclamo.getRestaurante().getNombre();
 		Message message;
-		
+
 		Map<String, String> map = new HashMap<>();
-		
+
 		map.put("llave", "valor");
-		
+
 		if (aceptoReclamo) {
-			//Se acepta el reclamo
-			//Se llama devolucion pedido
-			//Se envia notificacion con mensaje
-			
+			// Se acepta el reclamo
+			// Se llama devolucion pedido
+			// Se envia notificacion con mensaje
+
 			reclamo.setEstado(EnumEstadoReclamo.ACEPTADO);
 			reclamo.setResolucion(comentario);
 			recRepo.save(reclamo);
-			//Envio notificacion al mobile
-			
+			// Envio notificacion al mobile
+
 			if (token != null) {
-			
-				Notification notification = Notification.builder()
-						.setTitle("Resolucion de reclamo")
-						.setBody("Su reclamo ha sido aceptado por el restaurante " + restaurante)
-						.build();
-				message = Message.builder()
-		                  .putAllData(map)
-		                  .putData("mensaje","Nuevo mensaje de sus reclamos")
-		                  .setToken(token) // deviceId
-		                  .setNotification(notification)
-		                  .build();
+
+				Notification notification = Notification.builder().setTitle("Resolucion de reclamo")
+						.setBody("Su reclamo ha sido aceptado por el restaurante " + restaurante).build();
+				message = Message.builder().putAllData(map).putData("mensaje", "Nuevo mensaje de sus reclamos")
+						.setToken(token) // deviceId
+						.setNotification(notification).build();
 				try {
-					//DUDA QUE ES appAndroid
+					// DUDA QUE ES appAndroid
 					FirebaseMessaging.getInstance().send(message);
-					//FirebaseMessaging.getInstance(FirebaseApp.getInstance(appAndroid)).send(message);
+					// FirebaseMessaging.getInstance(FirebaseApp.getInstance(appAndroid)).send(message);
 					System.out.println("PRUEBA SE ENVIA NOTIFICACION");
 				} catch (FirebaseMessagingException e) {
 					System.out.println(e.getStackTrace());
 					System.out.println("Mensaje de error: " + e.getMessagingErrorCode());
 				}
 			}
-			
+
 			devolucionPedido(reclamo.getPedido().getId(), idReclamo);
 		} else {
-			//No se acepta el reclamo
-			//Se envia notificacion con mensaje
-			
+			// No se acepta el reclamo
+			// Se envia notificacion con mensaje
+
 			reclamo.setEstado(EnumEstadoReclamo.RECHAZADO);
-			//Envio notificacion al mobile
-			
+			// Envio notificacion al mobile
+
 			if (token != null) {
-				Notification notification = Notification.builder()
-						.setTitle("Resolucion de reclamo")
-						.setBody("Su reclamo ha sido rechazado por el restaurante " + restaurante)
-						.build();
-				message = Message.builder()
-		                  .putAllData(map)
-		                  .putData("mensaje","Nuevo mensaje de sus reclamos")
-		                  .setToken(token) // deviceId
-		                  .setNotification(notification)
-		                  .build();
+				Notification notification = Notification.builder().setTitle("Resolucion de reclamo")
+						.setBody("Su reclamo ha sido rechazado por el restaurante " + restaurante).build();
+				message = Message.builder().putAllData(map).putData("mensaje", "Nuevo mensaje de sus reclamos")
+						.setToken(token) // deviceId
+						.setNotification(notification).build();
 				try {
-					//DUDA QUE ES appAndroid
+					// DUDA QUE ES appAndroid
 					FirebaseMessaging.getInstance().send(message);
-					//FirebaseMessaging.getInstance(FirebaseApp.getInstance(appAndroid)).send(message);
+					// FirebaseMessaging.getInstance(FirebaseApp.getInstance(appAndroid)).send(message);
 					System.out.println("PRUEBA SE ENVIA NOTIFICACION");
 				} catch (FirebaseMessagingException e) {
 					System.out.println(e.getStackTrace());
@@ -1563,18 +1576,21 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				}
 			}
 		}
-		
-		//NOTIFICAR A CLIENTE
+
+		// NOTIFICAR A CLIENTE
 		// se notifica a cliente
 		String base64EncodedEmail = Base64.getEncoder()
 				.encodeToString(reclamo.getPedido().getCliente().getMail().getBytes(StandardCharsets.UTF_8));
 
-		simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, "Reclamo");//new DTNotificacionSoket("Su pedido ha sido aceptado y se está siendo preparado", "Reclamo"));
+		simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, "Reclamo");// new DTNotificacionSoket("Su
+																						// pedido ha sido aceptado y se
+																						// está siendo preparado",
+																						// "Reclamo"));
 
+		// simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail,"Su
+		// pedido ha sido aceptado y se está siendo preparado");
 
-		//simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail,"Su pedido ha sido aceptado y se está siendo preparado");
-		
-		//recRepo.save(reclamo); Lo muevo arriba porque sobreescribe
+		// recRepo.save(reclamo); Lo muevo arriba porque sobreescribe
 		return new DTRespuesta("Se envio la notificacion mobile.");
 	}
 
@@ -1592,7 +1608,6 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		}
 		Restaurante restaurante = optionalRestaurante.get();
 
-
 		CalificacionCliente calCliente = calClienteRepo.findByClienteRestaurante(cliente, restaurante);
 
 		if (calCliente == null)
@@ -1600,7 +1615,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 //			throw new UsuarioException(RestauranteException.SinCalificacion(mailCliente));
 		return new DTCalificacionCliente(calCliente);
 	}
-	
+
 //////////////////////////////////////////ESTADISTICAS///////////////////////////////////
 
 	/**
@@ -1609,26 +1624,28 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	@Scheduled(cron = "*/59 */10 * * * *") // 1 vez cada 5 minutos
 	public DTRespuesta actualizarBalanceVentas() {
 
-		//descomentar
-		//List<Pedido> pedidosList = pedidoRepo.findAllPagos();
+		// descomentar
+		// List<Pedido> pedidosList = pedidoRepo.findAllPagos();
 		List<Pedido> pedidosList = pedidoRepo.findAll();
-		
-		
-		
+
 		for (Pedido pedido : pedidosList) {
 			Optional<BalanceVentaDTO> balanceByMailOp = balanceVentasRepo.findById(pedido.getRestaurante().getMail());
 			if (balanceByMailOp.isPresent()) {
 				BalanceVentaDTO balanceByMail = balanceByMailOp.get();
-				
-				//primera venta con esa fecha
-				if (!balanceByMail.getListaPedidos().stream().filter(o -> o.getFecha().equals(pedido.getFecha().toLocalDate())).findFirst().isPresent()) {
-										
+
+				// primera venta con esa fecha
+				if (!balanceByMail.getListaPedidos().stream()
+						.filter(o -> o.getFecha().equals(pedido.getFecha().toLocalDate())).findFirst().isPresent()) {
+
 					List<FechaidPedidoMontoDTO> fecha_PedidoMonto = balanceByMail.getListaPedidos();
-					List<IdPedidoMontoDTO> pedidos= new ArrayList<IdPedidoMontoDTO>();
-					IdPedidoMontoDTO idPedidoMontoDTO = new IdPedidoMontoDTO(pedido.getId(), BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue(), pedido.getEstadoPedido().name());
+					List<IdPedidoMontoDTO> pedidos = new ArrayList<IdPedidoMontoDTO>();
+					IdPedidoMontoDTO idPedidoMontoDTO = new IdPedidoMontoDTO(pedido.getId(),
+							BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue(),
+							pedido.getEstadoPedido().name());
 					pedidos.add(idPedidoMontoDTO);
-					FechaidPedidoMontoDTO fechaIdPedidoMonto= new FechaidPedidoMontoDTO(pedido.getFecha().toLocalDate(), pedidos);
-	
+					FechaidPedidoMontoDTO fechaIdPedidoMonto = new FechaidPedidoMontoDTO(
+							pedido.getFecha().toLocalDate(), pedidos);
+
 					fecha_PedidoMonto.add(fechaIdPedidoMonto);
 					balanceByMail.setListaPedidos(fecha_PedidoMonto);
 					balanceByMail.setTotal(BigDecimal.valueOf(balanceByMail.getTotal() + pedido.getCostoTotal())
@@ -1637,11 +1654,11 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				}else {//ya hay pedidos en esa fecha
 					Boolean yaAgregado=false;
 					List<FechaidPedidoMontoDTO> fecha_PedidoMonto = balanceByMail.getListaPedidos();
-					
+
 					Optional<FechaidPedidoMontoDTO> idPedidoMonto = fecha_PedidoMonto.stream().filter(o -> o.getFecha().equals(pedido.getFecha().toLocalDate())).findFirst();
 					if(idPedidoMonto!= null && idPedidoMonto.isPresent()) {
 						List<IdPedidoMontoDTO> listaPedidos= idPedidoMonto.get().getPedidos();//lista de pedidos de esa fecha
-						
+
 						for(IdPedidoMontoDTO l: listaPedidos) {
 							if(l.getIdPedido()==pedido.getId()) {
 								yaAgregado=true;
@@ -1673,33 +1690,35 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 						}
 
 					}
-					
 
 				}
-			} else {//el restaurante no está aun guardado
-				
-				BalanceVentaDTO balanceByMail= new BalanceVentaDTO();
+			} else {// el restaurante no está aun guardado
+
+				BalanceVentaDTO balanceByMail = new BalanceVentaDTO();
 				balanceByMail.set_id(pedido.getRestaurante().getMail());
 				balanceByMail.setTotal(pedido.getCostoTotal());
-				
+
 				List<FechaidPedidoMontoDTO> fecha_PedidoMonto = balanceByMail.getListaPedidos();
-				List<IdPedidoMontoDTO> pedidos= new ArrayList<>();
-				IdPedidoMontoDTO idPedidoMontoDTO = new IdPedidoMontoDTO(pedido.getId(), BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue(), pedido.getEstadoPedido().name());
+				List<IdPedidoMontoDTO> pedidos = new ArrayList<>();
+				IdPedidoMontoDTO idPedidoMontoDTO = new IdPedidoMontoDTO(pedido.getId(),
+						BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue(),
+						pedido.getEstadoPedido().name());
 				pedidos.add(idPedidoMontoDTO);
-				FechaidPedidoMontoDTO fechaPedidoMontoDto= new FechaidPedidoMontoDTO(pedido.getFecha().toLocalDate(), pedidos);
+				FechaidPedidoMontoDTO fechaPedidoMontoDto = new FechaidPedidoMontoDTO(pedido.getFecha().toLocalDate(),
+						pedidos);
 				fecha_PedidoMonto.add(fechaPedidoMontoDto);
-				
+
 				balanceByMail.setListaPedidos(fecha_PedidoMonto);
 
 				balanceVentasRepo.save(balanceByMail);
-		
+
 			}
+		}
+
+		// resPedRepo.saveAll(restaurantesPedidos);
+		return new DTRespuesta("Balance de Ventas actualizado");
 	}
-	
-	// resPedRepo.saveAll(restaurantesPedidos);
-	return new DTRespuesta("Balance de Ventas actualizado");
-	}
-	
+
 	public Object getBalanceVentaByFecha(String fechaInicio, String fechaHasta, String mailFromJwt) {
 		Optional<BalanceVentaDTO> balanceByMailOp = balanceVentasRepo.findById(mailFromJwt);
 		if (balanceByMailOp.isPresent()) {
@@ -1714,19 +1733,18 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			Integer mes1 = Integer.valueOf(fecha1[1]);
 			Integer anho1 = Integer.valueOf(fecha1[0]);
 			LocalDate fin = LocalDate.of(anho1, mes1, dia1);
-			
-			Double totalPeriodo=(double) 0;
 
-			Set<FechaidPedidoMontoDTO> lista= new HashSet<>();
-			
+			Double totalPeriodo = (double) 0;
+
+			Set<FechaidPedidoMontoDTO> lista = new HashSet<>();
 
 			for (FechaidPedidoMontoDTO entry : balanceByMailOp.get().getListaPedidos()) {
-				
+
 				if (entry.getFecha().equals(inicio) ||  entry.getFecha().equals(fin) || (entry.getFecha().isAfter(inicio) && entry.getFecha().isBefore(fin))) {
 
 					lista.add(entry);
-					for(IdPedidoMontoDTO entry2 : entry.getPedidos()) {
-						totalPeriodo=totalPeriodo+Double.valueOf(entry2.getMonto());
+					for (IdPedidoMontoDTO entry2 : entry.getPedidos()) {
+						totalPeriodo = totalPeriodo + Double.valueOf(entry2.getMonto());
 					}
 				}
 
@@ -1752,7 +1770,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 		return new DTRespuesta("Restaurante no encontrado");
 	}
-	
+
 	@Override
 	public Map<String, Object> topProductos(int page, int size) {
 		Sort sort = Sort.by(Sort.Order.desc("cantidad"));
@@ -1761,7 +1779,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		Page<DTProductoVendido> pageProductos;
 		pageProductos = productosVendidosRepo.findAll(paging);
 		List<DTProductoVendido> DTproductosVendidos = pageProductos.getContent();
-		
+
 		response.put("currentPage", pageProductos.getNumber());
 		response.put("totalItems", pageProductos.getTotalElements());
 		response.put("restaurantes", DTproductosVendidos);
