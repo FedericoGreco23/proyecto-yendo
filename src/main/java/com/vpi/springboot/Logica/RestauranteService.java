@@ -1033,7 +1033,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			}
 			try {
 
-				Double rand = (Double) (Math.random() * 0.1);
+				Double rand = (Double) (Math.random() * 0.07);
 				Double latitud = BigDecimal.valueOf(lat + rand).setScale(4, RoundingMode.HALF_UP).doubleValue();
 				Double longitud = BigDecimal.valueOf(lon + rand).setScale(4, RoundingMode.HALF_UP).doubleValue();
 
@@ -1151,13 +1151,13 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			Integer promoRandomNum2 = (int) (Math.random() * listProdu.size());
 			String fotoPromo="https://www.bolsalea.com/blog/media/Bolsa-take-away-personalizada.jpg";
 
-			Integer precioPromo= (int) ((listProdu.get(promoRandomNum).getPrecio()+listProdu.get(promoRandomNum2).getPrecio())/2);
+			Integer precioPromo= (int) ((listProdu.get(promoRandomNum).getPrecio()+listProdu.get(promoRandomNum2).getPrecio()));
 			List<DTProductoIdCantidad>	productosPromo=new ArrayList<DTProductoIdCantidad>();
 			DTProductoIdCantidad pc= new DTProductoIdCantidad(listProdu.get(promoRandomNum).getId(), 2);
 			DTProductoIdCantidad pc2= new DTProductoIdCantidad(listProdu.get(promoRandomNum2).getId(), 3);
 			productosPromo.add(pc);
 			productosPromo.add(pc2);
-			DTPromocionConPrecio promocion=  new DTPromocionConPrecio(productosPromo, precioPromo, 10, "Pomo del mes",
+			DTPromocionConPrecio promocion=  new DTPromocionConPrecio(productosPromo, precioPromo, 45, "Pomo del mes",
 					"Imperdible promo", fotoPromo);
 			try {
 				altaPromocion(promocion, restau.getMail());
