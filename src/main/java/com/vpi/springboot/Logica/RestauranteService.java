@@ -1593,6 +1593,17 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 																						// pedido ha sido aceptado y se
 																						// está siendo preparado",
 																						// "Reclamo"));
+		
+		DTReclamo dtr = new DTReclamo(reclamo);
+		String to = reclamo.getPedido().getCliente().getMail();
+		String body = mailSender.getResolucionReclamo(dtr, reclamo.getPedido().getCliente());
+		String topic = "Resolución de reclamo para cliente " + reclamo.getPedido().getCliente().getNickname() + ".";
+		try {
+			mailSender.sendMail(to, body, topic);
+		} catch (MessagingException e) {
+			return new DTRespuesta("No se pudo mandar mail: " + e.getMessage());
+		}
+		
 
 		// simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail,"Su
 		// pedido ha sido aceptado y se está siendo preparado");
