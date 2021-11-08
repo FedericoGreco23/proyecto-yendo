@@ -1,7 +1,5 @@
 package logicaTest;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -32,7 +30,6 @@ import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.dto.DTRestaurantePedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Repositorios.AdministradorRepositorio;
-import com.vpi.springboot.Repositorios.CalificacionRestauranteRepositorio;
 import com.vpi.springboot.Repositorios.ClienteRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
 import com.vpi.springboot.Repositorios.mongo.RestaurantePedidosRepositorio;
@@ -66,7 +63,6 @@ class AdministradorServiceTest {
 	private Restaurante restaurante;
 	private List<Restaurante> restaurantes = new ArrayList<Restaurante>();
 	private Page<Restaurante> restaurantePage;
-	private Optional<Administrador> optionalAdmin;
 	private List<Administrador> adminList = new ArrayList<Administrador>();
 	private Page<Administrador> adminPage;
 	private GeoLocalizacion geo;
@@ -82,6 +78,7 @@ class AdministradorServiceTest {
 	private Page<DTRestaurantePedido> pageRestaurantePedido;
 	
 	
+	@SuppressWarnings("deprecation")
 	@BeforeEach
 	public void init() {
 		MockitoAnnotations.initMocks(this);

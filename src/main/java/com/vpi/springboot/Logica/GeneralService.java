@@ -1,36 +1,15 @@
 package com.vpi.springboot.Logica;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
 import javax.mail.MessagingException;
-
-import org.bson.Document;
-import org.bson.conversions.Bson;
-
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
-
-import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Filters;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -40,11 +19,32 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.vpi.springboot.Modelo.*;
-import com.vpi.springboot.Modelo.dto.*;
-import com.vpi.springboot.Repositorios.*;
-import com.vpi.springboot.Repositorios.mongo.RestaurantePedidosRepositorio;
-import com.vpi.springboot.exception.*;
+import com.vpi.springboot.Modelo.Administrador;
+import com.vpi.springboot.Modelo.Categoria;
+import com.vpi.springboot.Modelo.Cliente;
+import com.vpi.springboot.Modelo.Direccion;
+import com.vpi.springboot.Modelo.Producto;
+import com.vpi.springboot.Modelo.Promocion;
+import com.vpi.springboot.Modelo.Restaurante;
+import com.vpi.springboot.Modelo.TokenVerificacion;
+import com.vpi.springboot.Modelo.dto.DTBuscarRestaurante;
+import com.vpi.springboot.Modelo.dto.DTCategoriaProducto;
+import com.vpi.springboot.Modelo.dto.DTListarRestaurante;
+import com.vpi.springboot.Modelo.dto.DTProducto;
+import com.vpi.springboot.Modelo.dto.DTPromocion;
+import com.vpi.springboot.Modelo.dto.DTRespuesta;
+import com.vpi.springboot.Modelo.dto.DTRestaurante;
+import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
+import com.vpi.springboot.Repositorios.AdministradorRepositorio;
+import com.vpi.springboot.Repositorios.CategoriaRepositorio;
+import com.vpi.springboot.Repositorios.ClienteRepositorio;
+import com.vpi.springboot.Repositorios.DireccionRepositorio;
+import com.vpi.springboot.Repositorios.ProductoRepositorio;
+import com.vpi.springboot.Repositorios.PromocionRepositorio;
+import com.vpi.springboot.Repositorios.RestauranteRepositorio;
+import com.vpi.springboot.Repositorios.VerificacionRepositorio;
+import com.vpi.springboot.exception.RestauranteException;
+import com.vpi.springboot.exception.UsuarioException;
 
 @Service
 public class GeneralService implements GeneralServicioInterfaz {
@@ -66,15 +66,9 @@ public class GeneralService implements GeneralServicioInterfaz {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	@Autowired
-	private PedidoRepositorio pedidoRepo;
-	@Autowired
 	private VerificacionRepositorio tokenRepo;
 	@Autowired
 	private MailService mailSender;
-
-	private static final int iterations = 20 * 1000;
-	private static final int desiredKeyLen = 256;
-
 	
 
 /*	@Override

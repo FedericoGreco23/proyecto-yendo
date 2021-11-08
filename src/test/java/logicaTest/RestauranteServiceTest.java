@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.mail.MessagingException;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -28,6 +30,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.vpi.springboot.IdCompuestas.CalificacionClienteId;
+import com.vpi.springboot.Logica.MailService;
 import com.vpi.springboot.Logica.RestauranteService;
 import com.vpi.springboot.Modelo.Calificacion;
 import com.vpi.springboot.Modelo.CalificacionCliente;
@@ -53,7 +56,8 @@ import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoReclamo;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
-import com.vpi.springboot.Modelo.dto.PedidoMonto;
+import com.vpi.springboot.Modelo.dto.FechaidPedidoMontoDTO;
+import com.vpi.springboot.Modelo.dto.IdPedidoMontoDTO;
 import com.vpi.springboot.Repositorios.CalificacionClienteRepositorio;
 import com.vpi.springboot.Repositorios.CalificacionRestauranteRepositorio;
 import com.vpi.springboot.Repositorios.CategoriaRepositorio;
@@ -73,8 +77,6 @@ import com.vpi.springboot.exception.ProductoException;
 import com.vpi.springboot.exception.PromocionException;
 import com.vpi.springboot.exception.RestauranteException;
 import com.vpi.springboot.exception.UsuarioException;
-
-import javassist.expr.NewArray;
 
 class RestauranteServiceTest {
 
@@ -110,6 +112,8 @@ class RestauranteServiceTest {
 	private BalanceVentasRepositorio balanceVentasRepo;
 	@Mock
 	private ProductosVendidosRepositorio productosVendidosRepo;
+	@Mock
+	private MailService mailSender;
 	
 	@InjectMocks
 	private RestauranteService mockRestaurante;
@@ -159,17 +163,28 @@ class RestauranteServiceTest {
 	private List<Object[]> listObject = new ArrayList<>();
 	private Object[] ob = new Object[2];
 	private BalanceVentaDTO balanceVenta;
+	private BalanceVentaDTO balanceVenta2;
+	private Optional<BalanceVentaDTO> balanceByMailOp3;
 	private Optional<BalanceVentaDTO> balanceByMailOp;
+	private Optional<BalanceVentaDTO> balanceByMailOp2 = Optional.empty();
 	private DTProductoVendido dtProductoVendido;
 	private List<DTProductoVendido> dtProductoVendidoList = new ArrayList<DTProductoVendido>();
 	private Page<DTProductoVendido> dtProductoVendidoPage;
+	private IdPedidoMontoDTO idpedidoMonto;
+	private List<IdPedidoMontoDTO> idpedidosMonto = new ArrayList<>();;
+	private FechaidPedidoMontoDTO pedidoMonto;
+	private List<FechaidPedidoMontoDTO> listaPedidos = new ArrayList<>();;
+	
 	private Pageable paging;
 			
+	@SuppressWarnings("deprecation")
 	@BeforeEach
 	public void init() {
 		MockitoAnnotations.initMocks(this);
 		restaurante = new Restaurante("restaurante1@gmail.com", "123456", "25125325", "foto", false, true, "resto1","dire 3223", 5.0f, EnumEstadoRestaurante.ACEPTADO,
-				LocalTime.now(), LocalTime.now(), LocalDate.now(), 50, geo, productos, "SDLM", true);
+				LocalTime.NOON, LocalTime.MAX, LocalDate.now(), 50, geo, productos, "SDLM", true);
+		restaurante.setTiempoEstimadoMinimo(LocalTime.of(0, 5));
+		restaurante.setTiempoEstimadoMaximo(LocalTime.of(0, 25));
 		optionalRestaurante = Optional.of(restaurante);
 		optionalCliente = Optional.of(new Cliente("cliente1@gmail.com", "1234","25222355" , "linkFoto", false, 
 				true, LocalDate.now(), "cliente1", 5.0f, 0.0f, "cliente1", "apellido", null));
@@ -225,7 +240,12 @@ class RestauranteServiceTest {
 		ob[0] = restaurante.getMail();
 		ob[1] = BigInteger.valueOf(25);
 		listObject.add(ob);
+		idpedidoMonto = new IdPedidoMontoDTO(pedido.getId(), 25.0, "ACEPTADO");
+		idpedidosMonto.add(idpedidoMonto);
+		pedidoMonto = new FechaidPedidoMontoDTO(LocalDate.now(), idpedidosMonto);
+		listaPedidos.add(pedidoMonto);
 		balanceVenta = new BalanceVentaDTO();
+		balanceVenta2 = new BalanceVentaDTO();
 		Map<LocalDate, Map<Integer,  List<String>>> fechaidPedidoMonto= new HashMap<>();
 		Map<Integer,  List<String>> pedidoMonto = new HashMap<>();
 		List<String> montoAndPago= new ArrayList<String>();
@@ -234,8 +254,12 @@ class RestauranteServiceTest {
 		pedidoMonto.put(pedido.getId(), montoAndPago);
 		fechaidPedidoMonto.put(LocalDate.now(), pedidoMonto);
 		balanceVenta.setTotal(2505.2);
-		//balanceVenta.setFechaidPedidoMonto(fechaidPedidoMonto);
+		balanceVenta.setListaPedidos(listaPedidos);
 		balanceByMailOp = Optional.of(balanceVenta);
+		balanceVenta2.setTotal(2505.2);
+		List<FechaidPedidoMontoDTO> pedidosNull = new ArrayList<>();
+		balanceVenta2.setListaPedidos(pedidosNull);
+		balanceByMailOp3 = Optional.of(balanceVenta2);
 		dtProductoVendido = new DTProductoVendido(String.valueOf(producto.getId()), producto.getNombre(), restaurante.getNombre(), "5", "minutas", "2021-10-21");
 		dtProductoVendidoList.add(dtProductoVendido);
 		dtProductoVendidoPage = new PageImpl<>(dtProductoVendidoList);
@@ -388,10 +412,12 @@ class RestauranteServiceTest {
 	}
 	
 	@Test
-	public void testConfirmarPedido() throws PedidoException {
+	public void testConfirmarPedido() throws PedidoException, MessagingException {
 		Mockito.when(pedidoRepo.findById(Mockito.anyInt())).thenReturn(optionalPedido);
 		Mockito.doReturn(pedido).when(pedidoRepo).save(Mockito.any(Pedido.class));
+		Mockito.when(mongoRepo.findById(Mockito.anyInt())).thenReturn(optionalCarritoLleno);
 		Mockito.doNothing().when(simpMessagingTemplate).convertAndSend(Mockito.anyString(),Mockito.anyString());
+		Mockito.doNothing().when(mailSender).sendMail(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
 		mockRestaurante.confirmarPedido(pedido.getId());
 	}
 	
@@ -427,10 +453,11 @@ class RestauranteServiceTest {
 	}
 	
 	@Test
-	public void testRechazarPedido() throws PedidoException {
+	public void testRechazarPedido() throws PedidoException, MessagingException {
 		Mockito.when(pedidoRepo.findById(Mockito.anyInt())).thenReturn(optionalPedido);
 		Mockito.doReturn(pedido).when(pedidoRepo).save(Mockito.any(Pedido.class));
 		Mockito.doNothing().when(simpMessagingTemplate).convertAndSend(Mockito.anyString(),Mockito.anyString());
+		Mockito.doNothing().when(mailSender).sendMail(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
 		mockRestaurante.rechazarPedido(pedido.getId());
 	}
 	
@@ -624,6 +651,22 @@ class RestauranteServiceTest {
 		Mockito.when(pedidoRepo.findAll()).thenReturn(pedidos);
 		Mockito.when(balanceVentasRepo.findById(Mockito.anyString())).thenReturn(balanceByMailOp);
 		Mockito.doReturn(balanceVenta).when(balanceVentasRepo).save(Mockito.any(BalanceVentaDTO.class));
+		mockRestaurante.actualizarBalanceVentas();
+	}
+	
+	@Test
+	public void testActualizarBalanceVentas2() {
+		Mockito.when(pedidoRepo.findAll()).thenReturn(pedidos);
+		Mockito.when(balanceVentasRepo.findById(Mockito.anyString())).thenReturn(balanceByMailOp2);
+		Mockito.doReturn(balanceVenta).when(balanceVentasRepo).save(Mockito.any(BalanceVentaDTO.class));
+		mockRestaurante.actualizarBalanceVentas();
+	}
+	
+	@Test
+	public void testActualizarBalanceVentas3() {
+		Mockito.when(pedidoRepo.findAll()).thenReturn(pedidos);
+		Mockito.when(balanceVentasRepo.findById(Mockito.anyString())).thenReturn(balanceByMailOp3);
+		Mockito.doReturn(balanceVenta2).when(balanceVentasRepo).save(Mockito.any(BalanceVentaDTO.class));
 		mockRestaurante.actualizarBalanceVentas();
 	}
 	

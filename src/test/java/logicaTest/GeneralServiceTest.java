@@ -17,7 +17,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.servlet.mvc.condition.ProducesRequestCondition;
 
 import com.vpi.springboot.Logica.GeneralService;
 import com.vpi.springboot.Logica.MailService;
@@ -30,7 +29,6 @@ import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.Modelo.Promocion;
 import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.TokenVerificacion;
-import com.vpi.springboot.Modelo.dto.DTDireccion;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Repositorios.AdministradorRepositorio;
 import com.vpi.springboot.Repositorios.CategoriaRepositorio;
@@ -88,6 +86,7 @@ class GeneralServiceTest {
 	private Categoria cat;
 	private List<Categoria> catList = new ArrayList<Categoria>();
 
+	@SuppressWarnings("deprecation")
 	@BeforeEach
 	public void init() {
 		MockitoAnnotations.initMocks(this);
@@ -121,6 +120,7 @@ class GeneralServiceTest {
 		promo = new Promocion("promo1", "descripcion", 232, null, 0, true);
 		promo.setCategoria(cat);
 		promo.setRestaurante(restaurante);
+		promo.setProductos(productos);
 		restaurante.addProducto(promo);
 		promoList.add(promo);
 		
