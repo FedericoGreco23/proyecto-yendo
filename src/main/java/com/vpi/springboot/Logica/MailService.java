@@ -1,8 +1,7 @@
 package com.vpi.springboot.Logica;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl;
-
 import java.text.DecimalFormat;
+import java.time.format.DateTimeFormatter;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -23,7 +22,8 @@ public class MailService {
 	@Autowired
 	private JavaMailSender mailSender;
 	private DecimalFormat df = new DecimalFormat("#.##");
-
+	private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+	
 	public void setMailSender(JavaMailSender mailSender) {
 		this.mailSender = mailSender;
 	}
@@ -43,8 +43,6 @@ public class MailService {
 
 		System.out.println("Mail mandado con éxito.");
 	}
-	
-	
 	
 	
 	///////////////////// FUNCIONES PARA RETORNAR MAILS /////////////////////
@@ -150,7 +148,7 @@ public class MailService {
 				+ "    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">\r\n"
 				+ "        <tr>\r\n"
 				+ "            <td bgcolor=\"#FFA73B\" align=\"center\">\r\n"
-				+ "                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 600px;\">\r\n"
+				+ "                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 700px;\">\r\n"
 				+ "                    <tr>\r\n"
 				+ "                        <td align=\"center\" valign=\"top\" style=\"padding: 40px 10px 40px 10px;\"> </td>\r\n"
 				+ "                    </tr>\r\n"
@@ -159,7 +157,7 @@ public class MailService {
 				+ "        </tr>\r\n"
 				+ "        <tr>\r\n"
 				+ "            <td bgcolor=\"#FFA73B\" align=\"center\" style=\"padding: 0px 10px 0px 10px;\">\r\n"
-				+ "                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 600px;\">\r\n"
+				+ "                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 700px;\">\r\n"
 				+ "                    <tr>\r\n"
 				+ "                        <td bgcolor=\"#ffffff\" align=\"center\" valign=\"top\" style=\"padding: 40px 20px 0px 20px; border-radius: 4px 4px 0px 0px; color: #111111; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 48px; font-weight: 400; letter-spacing: 4px; line-height: 48px;\">\r\n"
 				+ "                            <h1 style=\"font-size: 48px; font-weight: 400; margin: 2;\">Su pedido fue confirmado.</h1>\r\n"
@@ -177,7 +175,7 @@ public class MailService {
 				+ "\r\n"
 				+ "        <tr>\r\n"
 				+ "            <td bgcolor=\"#f4f4f4\" align=\"center\" style=\"padding: 0px 10px 0px 10px;\">\r\n"
-				+ "                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 600px;\">\r\n"
+				+ "                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 700px;\">\r\n"
 				+ "                    <tr>\r\n"
 				+ "                        <td bgcolor=\"#ffffff\" align=\"left\" style=\"text-align: center; padding: 0px 30px 0px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 25px; font-weight: 400; line-height: 20px;\">\r\n"
 				+ "                            <p style=\"margin: 0;\">Detalle órden n°: " + pedido.getId() + "</p>\r\n"
@@ -185,7 +183,7 @@ public class MailService {
 				+ "                    </tr>\r\n"
 				+ "                    <tr>\r\n"
 				+ "                        <td bgcolor=\"#ffffff\" align=\"left\" style=\"text-align: center; padding: 0px 30px 20px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 400; line-height: 50px;\">\r\n"
-				+ "                            <p style=\"margin: 0;\">" + pedido.getFecha() + "</p>\r\n"
+				+ "                            <p style=\"margin: 0;\">" + pedido.getFecha().format(dateTimeFormatter) + "</p>\r\n"
 				+ "                        </td>\r\n"
 				+ "                    </tr>\r\n"
 				+ "\r\n"
@@ -200,17 +198,23 @@ public class MailService {
 				+ "\r\n";
 		
 				// REPASAMOS TODOS LOS PEDIDOS DEL CLIENTE
+				int descuentoTotal = 0;
 				for(DTProductoCarrito p: pedido.getCarrito().getDtProductoCarritoList()) {
+					// Calculamos el descuento total de todos los productos seleccionados
+					descuentoTotal += (p.getProducto().getPrecio() * p.getProducto().getDescuento()) / 100;
 					retorno +=
 							"        <tr>\r\n"
 							+ "            <td bgcolor=\"#f4f4f4\" align=\"center\" style=\"padding: 0px 10px 0px 10px;\">\r\n"
-							+ "                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 600px;\">\r\n"
+							+ "                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 700px; table-layout: fixed;\">\r\n"
 							+ "                    <tr>\r\n"
-							+ "                        <td bgcolor=\"#ffffff\" align=\"left\" style=\"padding: 0px 30px 5px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400;\">\r\n"
+							+ "                        <td bgcolor=\"#ffffff\" align=\"right\" style=\"padding: 0; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400;\">\r\n"
+							+ "                            <p style=\"margin: 0;\">(" + p.getProducto().getCategoria() + ")</p>\r\n"
+							+ "                        </td>\r\n"
+							+ "                        <td bgcolor=\"#ffffff\" align=\"left\" style=\"padding: 0px 10px 5px 0px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400;\">\r\n"
 							+ "                            <p style=\"margin: 0; margin-left: 20px;\">" + p.getProducto().getNombre() + " x" + p.getCantidad() + "</p>\r\n"
 							+ "                        </td>\r\n"
 							+ "                        <td bgcolor=\"#ffffff\" align=\"right\" style=\"padding: 0px 30px 0px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400;\">\r\n"
-							+ "                            <p style=\"margin: 0;\">" + df.format(p.getProducto().getPrecio()) + "</p>\r\n"
+							+ "                            <p style=\"margin: 0;\">$" + df.format(p.getProducto().getPrecio()) + "</p>\r\n"
 							+ "                        </td>\r\n"
 							+ "                    </tr>\r\n"
 							+ "                </table>\r\n"
@@ -218,10 +222,52 @@ public class MailService {
 							+ "        </tr>\r\n";
 				}
 				
+				if(pedido.getCarrito().getCostoEnvio() > 0) {
+					retorno += "<tr>\r\n"
+							+ "            <td bgcolor=\"#f4f4f4\" align=\"center\" style=\"padding: 0px 10px 0px 10px;\">\r\n"
+							+ "                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 700px; table-layout: fixed;\">\r\n"
+							+ "                    <tr>\r\n"
+							+ "                        <td bgcolor=\"#ffffff\" align=\"right\" style=\"padding: 0; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400;\">\r\n"
+							+ "                            <p style=\"margin: 0; \"></p>\r\n"
+							+ "                        </td>\r\n"
+							+ "                        <td bgcolor=\"#ffffff\" align=\"left\" style=\"padding: 0px 10px 0px 0px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400;\">\r\n"
+							+ "                            <p style=\"margin: 0; margin-left: 20px;\">ENVÍO:</p>\r\n"
+							+ "                        </td>\r\n"
+							+ "                        <td bgcolor=\"#ffffff\" align=\"right\" style=\"padding: 0px 30px 0px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400;\">\r\n"
+							+ "                            <p style=\"margin: 0; \">$" + pedido.getCarrito().getCostoEnvio() + "</p>\r\n"
+							+ "                        </td>\r\n"
+							+ "                    </tr>\r\n"
+							+ "                    \r\n"
+							+ "                </table>\r\n"
+							+ "            </td>\r\n"
+							+ "        </tr>";
+				}
+				
+				if(descuentoTotal > 0) {
+					retorno += "<tr>\r\n"
+							+ "            <td bgcolor=\"#f4f4f4\" align=\"center\" style=\"padding: 0px 10px 0px 10px;\">\r\n"
+							+ "                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 700px; table-layout: fixed;\">\r\n"
+							+ "                    <tr>\r\n"
+							+ "                        <td bgcolor=\"#ffffff\" align=\"right\" style=\"padding: 0; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400;\">\r\n"
+							+ "                            <p style=\"margin: 0; \"></p>\r\n"
+							+ "                        </td>\r\n"
+							+ "                        <td bgcolor=\"#ffffff\" align=\"left\" style=\"padding: 0px 10px 0px 0px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400;\">\r\n"
+							+ "                            <p style=\"margin: 0; margin-left: 20px;\">DESCUENTO:</p>\r\n"
+							+ "                        </td>\r\n"
+							+ "                        <td bgcolor=\"#ffffff\" align=\"right\" style=\"padding: 0px 30px 0px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400;\">\r\n"
+							+ "                            <p style=\"margin: 0; \">-$" + descuentoTotal + "</p>\r\n"
+							+ "                        </td>\r\n"
+							+ "                    </tr>\r\n"
+							+ "                    \r\n"
+							+ "                </table>\r\n"
+							+ "            </td>\r\n"
+							+ "        </tr>";
+				}
+				
 				retorno += "\r\n"
 				+ "        <tr>\r\n"
 				+ "            <td bgcolor=\"#f4f4f4\" align=\"center\" style=\"padding: 0px 10px 0px 10px;\">\r\n"
-				+ "                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 600px;\">\r\n"
+				+ "                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 700px;\">\r\n"
 				+ " 					<tr>\r\n"
 				+ "                        <td bgcolor=\"#ffffff\" align=\"center\" style=\"padding: 0px 30px 0px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400;\">\r\n"
 				+ "                            <p style=\"margin: 0;\">-------------------------------------------------------------------------------</p>\r\n"
@@ -229,7 +275,7 @@ public class MailService {
 				+ "                    </tr>"
 				+ "                    <tr>\r\n"
 				+ "                        <td bgcolor=\"#ffffff\" align=\"right\" style=\"padding: 0px 30px 0px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400;\">\r\n"
-				+ "                            <p style=\"margin: 0;\">" + pedido.getCostoTotal() + "</p>\r\n"
+				+ "                            <p style=\"margin: 0;\">$" + df.format(pedido.getCostoTotal()) + "</p>\r\n"
 				+ "                        </td>\r\n"
 				+ "                    </tr>\r\n"
 				+ "                    <tr>\r\n"
