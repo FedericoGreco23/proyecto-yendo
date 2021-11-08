@@ -240,9 +240,9 @@ class RestauranteServiceTest {
 		ob[0] = restaurante.getMail();
 		ob[1] = BigInteger.valueOf(25);
 		listObject.add(ob);
-		idpedidoMonto = new IdPedidoMontoDTO(pedido.getId(), 25.0, "ACEPTADO", "EFECTIVO");
+		//idpedidoMonto = new IdPedidoMontoDTO(pedido.getId(), 25.0, "ACEPTADO", "EFECTIVO");
 		idpedidosMonto.add(idpedidoMonto);
-		pedidoMonto = new FechaidPedidoMontoDTO(LocalDate.now(), idpedidosMonto);
+		//pedidoMonto = new FechaidPedidoMontoDTO(LocalDate.now(), idpedidosMonto);
 		listaPedidos.add(pedidoMonto);
 		balanceVenta = new BalanceVentaDTO();
 		balanceVenta2 = new BalanceVentaDTO();
