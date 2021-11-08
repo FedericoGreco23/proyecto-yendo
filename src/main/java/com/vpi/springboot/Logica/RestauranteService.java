@@ -1658,7 +1658,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 					List<IdPedidoMontoDTO> pedidos = new ArrayList<IdPedidoMontoDTO>();
 					IdPedidoMontoDTO idPedidoMontoDTO = new IdPedidoMontoDTO(pedido.getId(),
 							BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue(),
-							pedido.getEstadoPedido().name());
+							pedido.getEstadoPedido().name(), pedido.getMetodoDePago().name());
 					pedidos.add(idPedidoMontoDTO);
 					FechaidPedidoMontoDTO fechaIdPedidoMonto = new FechaidPedidoMontoDTO(
 							pedido.getFecha().toLocalDate(), pedidos);
@@ -1685,7 +1685,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 							IdPedidoMontoDTO idPedidoMontoDTO = new IdPedidoMontoDTO(
 									pedido.getId(), BigDecimal.valueOf(pedido.getCostoTotal())
 											.setScale(4, RoundingMode.HALF_UP).doubleValue(),
-									pedido.getEstadoPedido().name());
+									pedido.getEstadoPedido().name(), pedido.getMetodoDePago().name());
 							listaPedidos.add(idPedidoMontoDTO);
 							idPedidoMonto.get().setPedidos(listaPedidos);
 
@@ -1719,7 +1719,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				List<IdPedidoMontoDTO> pedidos = new ArrayList<>();
 				IdPedidoMontoDTO idPedidoMontoDTO = new IdPedidoMontoDTO(pedido.getId(),
 						BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue(),
-						pedido.getEstadoPedido().name());
+						pedido.getEstadoPedido().name(), pedido.getMetodoDePago().name());
 				pedidos.add(idPedidoMontoDTO);
 				FechaidPedidoMontoDTO fechaPedidoMontoDto = new FechaidPedidoMontoDTO(pedido.getFecha().toLocalDate(),
 						pedidos);
@@ -1736,7 +1736,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		return new DTRespuesta("Balance de Ventas actualizado");
 	}
 
-	public Object getBalanceVentaByFecha(String fechaInicio, String fechaHasta, String mailFromJwt) {
+	public Object getBalanceVentaByFecha(String fechaInicio, String fechaHasta, String mailFromJwt, String devuelto, String metodoPago) {
 		Optional<BalanceVentaDTO> balanceByMailOp = balanceVentasRepo.findById(mailFromJwt);
 		if (balanceByMailOp.isPresent()) {
 			String[] fecha = fechaInicio.split("-");
@@ -1757,12 +1757,18 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 			for (FechaidPedidoMontoDTO entry : balanceByMailOp.get().getListaPedidos()) {
 
-				if (entry.getFecha().equals(inicio) ||  entry.getFecha().equals(fin) || (entry.getFecha().isAfter(inicio) && entry.getFecha().isBefore(fin))) {
+				if (entry.getFecha().equals(inicio) || entry.getFecha().equals(fin)
+						|| (entry.getFecha().isAfter(inicio) && entry.getFecha().isBefore(fin))) {
 
-					lista.add(entry);
-					for (IdPedidoMontoDTO entry2 : entry.getPedidos()) {
-						totalPeriodo = totalPeriodo + Double.valueOf(entry2.getMonto());
+					List<IdPedidoMontoDTO> filtrados = inFiltro(entry.getPedidos(), devuelto, metodoPago!=null?metodoPago.toUpperCase():metodoPago);
+					if (!filtrados.isEmpty()) {
+						entry.setPedidos(filtrados);
+						lista.add(entry);
+						for (IdPedidoMontoDTO entry2 : filtrados) {
+							totalPeriodo = totalPeriodo + Double.valueOf(entry2.getMonto());
+						}
 					}
+
 				}
 
 			}
@@ -1776,6 +1782,20 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 		} else
 			return "Balance de Ventas no disponible";
+	}
+
+	private List<IdPedidoMontoDTO> inFiltro(List<IdPedidoMontoDTO> entry, String devuelto, String metodoPago) {
+		List<IdPedidoMontoDTO> retorno= new ArrayList<>();
+		
+		for(IdPedidoMontoDTO pedido: entry) {
+			if(((devuelto.contains("true") && pedido.getEstado().contains(EnumEstadoPedido.REEMBOLZADO.name()))
+					|| devuelto.contains("false")) && (metodoPago==null || metodoPago.contains(pedido.getMetodoPago()))) {
+				retorno.add(pedido);
+			}
+				
+			
+		}
+		return retorno;
 	}
 
 	public Object getEstado(String mailFromJwt) {

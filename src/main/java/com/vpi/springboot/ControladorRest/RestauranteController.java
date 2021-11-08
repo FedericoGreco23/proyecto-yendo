@@ -371,7 +371,8 @@ public class RestauranteController {
 		}
 
 		try {
-			return new ResponseEntity<>(service.getBalanceVentaByFecha(intervalo.get("inicio"), intervalo.get("fin"), getMailFromJwt()), HttpStatus.OK);
+			return new ResponseEntity<>(service.getBalanceVentaByFecha(intervalo.get("inicio"), intervalo.get("fin"), getMailFromJwt(), 
+					intervalo.get("devuelto"),intervalo.get("metodoPago")), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}

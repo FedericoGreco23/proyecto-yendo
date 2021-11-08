@@ -7,6 +7,7 @@ public class IdPedidoMontoDTO implements Serializable {
 	private Integer idPedido;
 	private Double monto;
 	private String estado;
+	private String metodoPago;
 	
 	
 	public IdPedidoMontoDTO() {
@@ -14,11 +15,12 @@ public class IdPedidoMontoDTO implements Serializable {
 	}
 
 
-	public IdPedidoMontoDTO(Integer idPedido, Double monto, String estado) {
+	public IdPedidoMontoDTO(Integer idPedido, Double monto, String estado, String metodoPago) {
 		super();
 		this.idPedido = idPedido;
 		this.monto = monto;
 		this.estado = estado;
+		this.metodoPago = metodoPago;
 	}
 
 
@@ -49,6 +51,16 @@ public class IdPedidoMontoDTO implements Serializable {
 
 	public void setEstado(String estado) {
 		this.estado = estado;
+	}
+
+
+	public String getMetodoPago() {
+		return metodoPago;
+	}
+
+
+	public void setMetodoPago(String metodoPago) {
+		this.metodoPago = metodoPago;
 	}
 	
 	

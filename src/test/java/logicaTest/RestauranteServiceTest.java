@@ -637,13 +637,13 @@ class RestauranteServiceTest {
 	@Test
 	public void testGetBalanceVenta() {
 		Mockito.when(balanceVentasRepo.findById(Mockito.anyString())).thenReturn(balanceByMailOp);
-		mockRestaurante.getBalanceVentaByFecha("2020-12-25", "2021-12-25", restaurante.getMail());
+		mockRestaurante.getBalanceVentaByFecha("2020-12-25", "2021-12-25", restaurante.getMail(), "false", null);
 	}
 	
 	@Test
 	public void testGetBalanceVenta2() {
 		Mockito.when(balanceVentasRepo.findById(Mockito.anyString())).thenReturn(balanceByMailOp);
-		mockRestaurante.getBalanceVentaByFecha(LocalDate.now().toString(), LocalDate.now().toString(), restaurante.getMail());
+		mockRestaurante.getBalanceVentaByFecha(LocalDate.now().toString(), LocalDate.now().toString(), restaurante.getMail(), "false", null);
 	}
 	
 	@Test
