@@ -80,10 +80,10 @@ public class PublicRest {
 			throw new Exception("Este usuario se encuentra bloqueado, comuniquese con un administrador");
 		} else if (userDetails.getUser().getClass() == Restaurante.class) {
 			Restaurante r = (Restaurante) userDetails.getUser();
-			if (r.getEstado().name().contains(EnumEstadoRestaurante.EN_ESPERA.name())) {
+			/*if (r.getEstado().name().contains(EnumEstadoRestaurante.EN_ESPERA.name())) {
 
 				throw new Exception("Este restaurante se encuentra en espera de aprobación");
-			} else if (r.getEstado().name().contains(EnumEstadoRestaurante.RECHAZADO.name())) {
+			} else */if (r.getEstado().name().contains(EnumEstadoRestaurante.RECHAZADO.name())) {
 
 				throw new Exception("Este restaurante fue rechazado");
 			}
