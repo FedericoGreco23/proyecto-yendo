@@ -1,6 +1,7 @@
 package com.vpi.springboot.Modelo.dto;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
 public class IdPedidoMontoDTO implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -8,6 +9,7 @@ public class IdPedidoMontoDTO implements Serializable {
 	private Double monto;
 	private String estado;
 	private String metodoPago;
+	private LocalDate fecha;
 	
 	
 	public IdPedidoMontoDTO() {
@@ -15,12 +17,13 @@ public class IdPedidoMontoDTO implements Serializable {
 	}
 
 
-	public IdPedidoMontoDTO(Integer idPedido, Double monto, String estado, String metodoPago) {
+	public IdPedidoMontoDTO(Integer idPedido, Double monto, String estado, String metodoPago, LocalDate fecha) {
 		super();
 		this.idPedido = idPedido;
 		this.monto = monto;
 		this.estado = estado;
 		this.metodoPago = metodoPago;
+		this.fecha=fecha;
 	}
 
 
@@ -61,6 +64,16 @@ public class IdPedidoMontoDTO implements Serializable {
 
 	public void setMetodoPago(String metodoPago) {
 		this.metodoPago = metodoPago;
+	}
+
+
+	public LocalDate getFecha() {
+		return fecha;
+	}
+
+
+	public void setFecha(LocalDate fecha) {
+		this.fecha = fecha;
 	}
 	
 	
