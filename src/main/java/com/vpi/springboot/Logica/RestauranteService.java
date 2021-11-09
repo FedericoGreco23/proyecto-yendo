@@ -1482,7 +1482,6 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		Pedido devolucion = new Pedido(pedido.getFecha(), pedido.getCostoTotal() * -1, pedido.getEstadoPedido(),
 				pedido.getMetodoDePago(), pedido.getCarrito(), pedido.getDireccion(), pedido.getRestaurante(),
 				pedido.getCliente(), pedido.getComentario(), pedido.getPago());
-		// devolucion.setEstadoPedido(EnumEstadoPedido.REEMBOLZADO);
 		devolucion.setEstadoPedido(null);
 		pedido.setEstadoPedido(EnumEstadoPedido.REEMBOLZADO);
 		List<Reclamo> reclamos = pedido.getReclamos();
@@ -1490,7 +1489,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			if (reclamo.getId() != idReclamo) {
 				reclamo.setEstado(EnumEstadoReclamo.RECHAZADO);
 				reclamo.setResolucion("El pedido ha sido devuelto");
-				recRepo.save(reclamo);
+				//recRepo.save(reclamo);
 			}
 		}
 		pedidoRepo.save(devolucion);
@@ -1514,16 +1513,16 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			// Se acepta el reclamo
 			// Se llama devolucion pedido
 			// Se envia notificacion con mensaje
-
 			reclamo.setEstado(EnumEstadoReclamo.ACEPTADO);
 			reclamo.setResolucion(comentario);
 			recRepo.save(reclamo);
 			// Envio notificacion al mobile
-
 			if (token != null) {
 
-				Notification notification = Notification.builder().setTitle("Resolucion de reclamo")
-						.setBody("Su reclamo ha sido aceptado por el restaurante " + restaurante).build();
+				Notification notification = Notification.builder()
+						.setTitle("Resolucion de reclamo")
+						.setBody("Su reclamo ha sido aceptado por el restaurante " + restaurante)
+						.build();
 				message = Message.builder().putAllData(map).putData("mensaje", "Nuevo mensaje de sus reclamos")
 						.setToken(token) // deviceId
 						.setNotification(notification).build();
@@ -1537,22 +1536,25 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 					System.out.println("Mensaje de error: " + e.getMessagingErrorCode());
 				}
 			}
-
 			devolucionPedido(reclamo.getPedido().getId(), idReclamo);
 		} else {
 			// No se acepta el reclamo
 			// Se envia notificacion con mensaje
-
 			reclamo.setEstado(EnumEstadoReclamo.RECHAZADO);
+			reclamo.setResolucion(comentario);
 			recRepo.save(reclamo);
 			// Envio notificacion al mobile
-
 			if (token != null) {
-				Notification notification = Notification.builder().setTitle("Resolucion de reclamo")
-						.setBody("Su reclamo ha sido rechazado por el restaurante " + restaurante).build();
-				message = Message.builder().putAllData(map).putData("mensaje", "Nuevo mensaje de sus reclamos")
+				Notification notification = Notification.builder()
+						.setTitle("Resolucion de reclamo")
+						.setBody("Su reclamo ha sido rechazado por el restaurante " + restaurante)
+						.build();
+				message = Message.builder()
+						.putAllData(map)
+						.putData("mensaje", "Nuevo mensaje de sus reclamos")
 						.setToken(token) // deviceId
-						.setNotification(notification).build();
+						.setNotification(notification)
+						.build();
 				try {
 					// DUDA QUE ES appAndroid
 					FirebaseMessaging.getInstance().send(message);
@@ -1567,14 +1569,13 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 		// NOTIFICAR A CLIENTE
 		// se notifica a cliente
-		String base64EncodedEmail = Base64.getEncoder()
+		/*String base64EncodedEmail = Base64.getEncoder()
 				.encodeToString(reclamo.getPedido().getCliente().getMail().getBytes(StandardCharsets.UTF_8));
 
 		simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, "Reclamo");// new DTNotificacionSoket("Su
 																						// pedido ha sido aceptado y se
 																						// está siendo preparado",
 																						// "Reclamo"));
-		
 		DTReclamo dtr = new DTReclamo(reclamo);
 		String to = reclamo.getPedido().getCliente().getMail();
 		String body = mailSender.getResolucionReclamo(dtr, reclamo.getPedido().getCliente());
@@ -1583,14 +1584,12 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			mailSender.sendMail(to, body, topic);
 		} catch (MessagingException e) {
 			return new DTRespuesta("No se pudo mandar mail: " + e.getMessage());
-		}
+		}*/
 		
 		// simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail,"Su
 		// pedido ha sido aceptado y se está siendo preparado");
-
-		//recRepo.save(reclamo);
+		
 		return new DTRespuesta("Se envió la resolución de reclamo con éxito.");
-		//return new DTRespuesta("Se envio la notificacion mobile.");
 	}
 
 	@Override
