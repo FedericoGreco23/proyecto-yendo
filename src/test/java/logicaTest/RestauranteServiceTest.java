@@ -23,9 +23,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -49,7 +47,6 @@ import com.vpi.springboot.Modelo.dto.BalanceVentaDTO;
 import com.vpi.springboot.Modelo.dto.DTProducto;
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.Modelo.dto.DTProductoIdCantidad;
-import com.vpi.springboot.Modelo.dto.DTProductoVendido;
 import com.vpi.springboot.Modelo.dto.DTPromocionConPrecio;
 import com.vpi.springboot.Modelo.dto.DTRestaurantePedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
@@ -69,7 +66,6 @@ import com.vpi.springboot.Repositorios.PromocionRepositorio;
 import com.vpi.springboot.Repositorios.ReclamoRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
 import com.vpi.springboot.Repositorios.mongo.BalanceVentasRepositorio;
-import com.vpi.springboot.Repositorios.mongo.ProductosVendidosRepositorio;
 import com.vpi.springboot.Repositorios.mongo.RestaurantePedidosRepositorio;
 import com.vpi.springboot.exception.CategoriaException;
 import com.vpi.springboot.exception.PedidoException;
@@ -110,8 +106,6 @@ class RestauranteServiceTest {
 	private RestaurantePedidosRepositorio resPedRepo;
 	@Mock
 	private BalanceVentasRepositorio balanceVentasRepo;
-	@Mock
-	private ProductosVendidosRepositorio productosVendidosRepo;
 	@Mock
 	private MailService mailSender;
 	
@@ -167,15 +161,10 @@ class RestauranteServiceTest {
 	private Optional<BalanceVentaDTO> balanceByMailOp3;
 	private Optional<BalanceVentaDTO> balanceByMailOp;
 	private Optional<BalanceVentaDTO> balanceByMailOp2 = Optional.empty();
-	private DTProductoVendido dtProductoVendido;
-	private List<DTProductoVendido> dtProductoVendidoList = new ArrayList<DTProductoVendido>();
-	private Page<DTProductoVendido> dtProductoVendidoPage;
 	private IdPedidoMontoDTO idpedidoMonto;
-	private List<IdPedidoMontoDTO> idpedidosMonto = new ArrayList<>();;
+	private List<IdPedidoMontoDTO> idpedidosMonto = new ArrayList<>();
 	private FechaidPedidoMontoDTO pedidoMonto;
-	private List<FechaidPedidoMontoDTO> listaPedidos = new ArrayList<>();;
-	
-	private Pageable paging;
+	private List<FechaidPedidoMontoDTO> listaPedidos = new ArrayList<>();
 			
 	@SuppressWarnings("deprecation")
 	@BeforeEach
@@ -240,9 +229,9 @@ class RestauranteServiceTest {
 		ob[0] = restaurante.getMail();
 		ob[1] = BigInteger.valueOf(25);
 		listObject.add(ob);
-		//idpedidoMonto = new IdPedidoMontoDTO(pedido.getId(), 25.0, "ACEPTADO", "EFECTIVO");
+		idpedidoMonto = new IdPedidoMontoDTO(pedido.getId(), 25.0, "ACEPTADO", "EFECTIVO", LocalDate.now());
 		idpedidosMonto.add(idpedidoMonto);
-		//pedidoMonto = new FechaidPedidoMontoDTO(LocalDate.now(), idpedidosMonto);
+		pedidoMonto = new FechaidPedidoMontoDTO(LocalDate.now(), idpedidosMonto, 25.0);
 		listaPedidos.add(pedidoMonto);
 		balanceVenta = new BalanceVentaDTO();
 		balanceVenta2 = new BalanceVentaDTO();
@@ -260,11 +249,6 @@ class RestauranteServiceTest {
 		List<FechaidPedidoMontoDTO> pedidosNull = new ArrayList<>();
 		balanceVenta2.setListaPedidos(pedidosNull);
 		balanceByMailOp3 = Optional.of(balanceVenta2);
-		dtProductoVendido = new DTProductoVendido(String.valueOf(producto.getId()), producto.getNombre(), restaurante.getNombre(), "5", "minutas", "2021-10-21");
-		dtProductoVendidoList.add(dtProductoVendido);
-		dtProductoVendidoPage = new PageImpl<>(dtProductoVendidoList);
-		Sort sort = Sort.by(Sort.Order.desc("cantidad"));
-		paging = PageRequest.of(0, 5, sort);
 	}
 	
 	@Test
@@ -670,9 +654,5 @@ class RestauranteServiceTest {
 		mockRestaurante.actualizarBalanceVentas();
 	}
 	
-	/*@Test
-	public void testTopProductos() {
-		Mockito.when(productosVendidosRepo.findAll(paging)).thenReturn(dtProductoVendidoPage);
-		mockRestaurante.topProductos(0, 5);
-	}*/
+	
 }

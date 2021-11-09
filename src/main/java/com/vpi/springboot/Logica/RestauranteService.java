@@ -1,9 +1,9 @@
 package com.vpi.springboot.Logica;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.set;
+
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -17,19 +17,13 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
 import javax.mail.MessagingException;
 
-import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Updates.*;
-
-import org.assertj.core.error.OptionalDoubleShouldHaveValueCloseToOffset;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,11 +37,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.vpi.springboot.Modelo.Cliente;
-import com.vpi.springboot.Modelo.Direccion;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
@@ -65,6 +54,8 @@ import com.vpi.springboot.Modelo.CalificacionCliente;
 import com.vpi.springboot.Modelo.CalificacionRestaurante;
 import com.vpi.springboot.Modelo.Carrito;
 import com.vpi.springboot.Modelo.Categoria;
+import com.vpi.springboot.Modelo.Cliente;
+import com.vpi.springboot.Modelo.Direccion;
 import com.vpi.springboot.Modelo.GeoLocalizacion;
 import com.vpi.springboot.Modelo.Pedido;
 import com.vpi.springboot.Modelo.Producto;
@@ -76,12 +67,8 @@ import com.vpi.springboot.Modelo.dto.BalanceVentaDTO;
 import com.vpi.springboot.Modelo.dto.DTCalificacionCliente;
 import com.vpi.springboot.Modelo.dto.DTCalificacionRestaurante;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
-import com.vpi.springboot.Modelo.dto.DTNotificacionSoket;
 import com.vpi.springboot.Modelo.dto.DTPedido;
-import com.vpi.springboot.Modelo.dto.DTProducto;
-import com.vpi.springboot.Modelo.dto.DTProductoCarrito;
 import com.vpi.springboot.Modelo.dto.DTProductoIdCantidad;
-import com.vpi.springboot.Modelo.dto.DTProductoVendido;
 import com.vpi.springboot.Modelo.dto.DTPromocionConPrecio;
 import com.vpi.springboot.Modelo.dto.DTReclamo;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
@@ -92,12 +79,10 @@ import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
 import com.vpi.springboot.Modelo.dto.FechaidPedidoMontoDTO;
 import com.vpi.springboot.Modelo.dto.IdPedidoMontoDTO;
-import com.vpi.springboot.Modelo.dto.PedidoMonto;
 import com.vpi.springboot.Repositorios.CalificacionClienteRepositorio;
 import com.vpi.springboot.Repositorios.CalificacionRestauranteRepositorio;
 import com.vpi.springboot.Repositorios.CategoriaRepositorio;
 import com.vpi.springboot.Repositorios.ClienteRepositorio;
-import com.vpi.springboot.Repositorios.GeoLocalizacionRepositorio;
 import com.vpi.springboot.Repositorios.MongoRepositorioCarrito;
 import com.vpi.springboot.Repositorios.PedidoRepositorio;
 import com.vpi.springboot.Repositorios.ProductoRepositorio;
@@ -105,7 +90,6 @@ import com.vpi.springboot.Repositorios.PromocionRepositorio;
 import com.vpi.springboot.Repositorios.ReclamoRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
 import com.vpi.springboot.Repositorios.mongo.BalanceVentasRepositorio;
-import com.vpi.springboot.Repositorios.mongo.ProductosVendidosRepositorio;
 import com.vpi.springboot.Repositorios.mongo.RestaurantePedidosRepositorio;
 import com.vpi.springboot.exception.AdministradorException;
 import com.vpi.springboot.exception.CategoriaException;
@@ -114,8 +98,6 @@ import com.vpi.springboot.exception.ProductoException;
 import com.vpi.springboot.exception.PromocionException;
 import com.vpi.springboot.exception.RestauranteException;
 import com.vpi.springboot.exception.UsuarioException;
-
-import BeanFirebase.SingletonFirebase;
 
 @Service
 @EnableScheduling

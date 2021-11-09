@@ -116,7 +116,6 @@ class ClienteServiceTest {
 	private Optional<Producto> optionalProducto;
 	private Producto producto;
 	private Carrito carrito;
-	private Carrito carritoVacio;
 	private Optional<Carrito> optionalCarritoLleno;
 	private DTProductoCarrito dtProductoCarrito;
 	private List<DTProductoCarrito> listProductoCarrito = new ArrayList<DTProductoCarrito>();
@@ -134,17 +133,15 @@ class ClienteServiceTest {
 	private List<Reclamo> reclamos = new ArrayList<Reclamo>();
 	private Page<Reclamo> pageReclamo;
 	private Reclamo reclamo;
-	private Optional<Reclamo> optionalReclamo;
 	private CalificacionCliente calCliente;
-	private Optional<CalificacionCliente> optionalCalCliente;
 	private List<CalificacionCliente> calClienteList = new ArrayList<CalificacionCliente>();
 	private CalificacionRestaurante calRestaurante;
 	private List<CalificacionRestaurante> calRestauranteList = new ArrayList<CalificacionRestaurante>();
 	private Page<CalificacionCliente> pageCalificacion;
 	private List<Restaurante> restauranteList = new ArrayList<Restaurante>();
-	private Page<Restaurante> pageRestaurante;
 	private TokenVerificacion token;
 	
+	@SuppressWarnings("deprecation")
 	@BeforeEach
 	public void init() {
 		MockitoAnnotations.initMocks(this);
@@ -159,8 +156,6 @@ class ClienteServiceTest {
 		restaurante.setAbierto(true);
 		restaurante.setPedidos(null);
 		restauranteList.add(restaurante);
-		
-		pageRestaurante = new PageImpl<>(restauranteList);
 		optionalRestaurante = Optional.of(restaurante);
 		
 		dir = new Direccion("calle1 4555", geo);
@@ -178,7 +173,6 @@ class ClienteServiceTest {
 		dtProductoCarrito = new DTProductoCarrito(new DTProducto(producto), 2);
 		listProductoCarrito.add(dtProductoCarrito);
 		carrito = new Carrito(50, cliente.getMail(), restaurante.getMail(), listProductoCarrito, true);
-		carritoVacio= new Carrito();
 		optionalCarritoLleno = Optional.of(carrito);
 		optionalLastDir = Optional.of(actualDire);
 		pedido = new Pedido(1,LocalDateTime.now(), 1250.2, EnumEstadoPedido.PROCESADO, EnumMetodoDePago.EFECTIVO,50, dir.getCalleNro(), restaurante, cliente, null);
@@ -197,7 +191,6 @@ class ClienteServiceTest {
 		pageReclamo=new PageImpl<>(reclamos);
 		calificacion = new Calificacion(5, "comentario", null, LocalDateTime.now());
 		calCliente = new CalificacionCliente(calificacion, restaurante, cliente);
-		optionalCalCliente = Optional.of(calCliente);
 		calClienteList.add(calCliente);
 		calRestaurante = new  CalificacionRestaurante(5, null, null, null, restaurante, cliente);
 		calRestauranteList.add(calRestaurante);

@@ -27,11 +27,13 @@ import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.GeoLocalizacion;
 import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.Modelo.Restaurante;
+import com.vpi.springboot.Modelo.dto.DTProductoVendido;
 import com.vpi.springboot.Modelo.dto.DTRestaurantePedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Repositorios.AdministradorRepositorio;
 import com.vpi.springboot.Repositorios.ClienteRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
+import com.vpi.springboot.Repositorios.mongo.ProductosVendidosRepositorio;
 import com.vpi.springboot.Repositorios.mongo.RestaurantePedidosRepositorio;
 import com.vpi.springboot.exception.AdministradorException;
 import com.vpi.springboot.exception.RestauranteException;
@@ -49,6 +51,8 @@ class AdministradorServiceTest {
 	RestauranteRepositorio resRepo;
 	@Mock
 	RestaurantePedidosRepositorio restaurantePedidosRepo;
+	@Mock
+	ProductosVendidosRepositorio productosVendidosRepo;
 	
 	@InjectMocks
 	AdministradorService mockAdmin;
@@ -72,11 +76,14 @@ class AdministradorServiceTest {
 	private List<Categoria> catList = new ArrayList<Categoria>();
 	private Pageable paging;
 	private Pageable paging2;
+	private Pageable paging3;
 	private Sort sort; 
 	private DTRestaurantePedido dtResPed;
 	private List<DTRestaurantePedido> dtResPedList = new ArrayList<DTRestaurantePedido>();
 	private Page<DTRestaurantePedido> pageRestaurantePedido;
-	
+	private DTProductoVendido dtProductoVendido;
+	private List<DTProductoVendido> dtProductoVendidoList = new ArrayList<DTProductoVendido>();
+	private Page<DTProductoVendido> dtProductoVendidoPage;
 	
 	@SuppressWarnings("deprecation")
 	@BeforeEach
@@ -113,7 +120,11 @@ class AdministradorServiceTest {
 		sort = Sort.by(Sort.Order.desc("cantPedidos"));
 		paging = PageRequest.of(0, 5);
 		paging2 = PageRequest.of(0, 5, sort);
-				
+		dtProductoVendido = new DTProductoVendido(String.valueOf(producto.getId()), producto.getNombre(), restaurante.getNombre(), "5", "minutas", "2021-10-21");
+		dtProductoVendidoList.add(dtProductoVendido);
+		dtProductoVendidoPage = new PageImpl<>(dtProductoVendidoList);
+		Sort sort1 = Sort.by(Sort.Order.desc("cantidad"));
+		paging3 = PageRequest.of(0, 5, sort1);
 	}
 	
 	@Test
@@ -309,5 +320,11 @@ class AdministradorServiceTest {
 	public void testRestauranteConMasPedidos() {
 		Mockito.when(restaurantePedidosRepo.findAll(paging2)).thenReturn(pageRestaurantePedido);
 		mockAdmin.restaurantesConMasPedidos(0, 5);
+	}
+	
+	@Test
+	public void testTopProductos() {
+		Mockito.when(productosVendidosRepo.findAll(paging3)).thenReturn(dtProductoVendidoPage);
+		mockAdmin.topProductos(0, 5);
 	}
 }
