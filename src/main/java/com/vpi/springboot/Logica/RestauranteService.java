@@ -1656,10 +1656,10 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 					List<IdPedidoMontoDTO> pedidos = new ArrayList<IdPedidoMontoDTO>();
 					IdPedidoMontoDTO idPedidoMontoDTO = new IdPedidoMontoDTO(pedido.getId(),
 							BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue(),
-							pedido.getEstadoPedido().name(), pedido.getMetodoDePago().name());
+							pedido.getEstadoPedido().name(), pedido.getMetodoDePago().name(), pedido.getFecha().toLocalDate());
 					pedidos.add(idPedidoMontoDTO);
 					FechaidPedidoMontoDTO fechaIdPedidoMonto = new FechaidPedidoMontoDTO(
-							pedido.getFecha().toLocalDate(), pedidos);
+							pedido.getFecha().toLocalDate(), pedidos, pedido.getCostoTotal());
 
 					fecha_PedidoMonto.add(fechaIdPedidoMonto);
 					balanceByMail.setListaPedidos(fecha_PedidoMonto);
@@ -1683,9 +1683,10 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 							IdPedidoMontoDTO idPedidoMontoDTO = new IdPedidoMontoDTO(
 									pedido.getId(), BigDecimal.valueOf(pedido.getCostoTotal())
 											.setScale(4, RoundingMode.HALF_UP).doubleValue(),
-									pedido.getEstadoPedido().name(), pedido.getMetodoDePago().name());
+									pedido.getEstadoPedido().name(), pedido.getMetodoDePago().name(), pedido.getFecha().toLocalDate());
 							listaPedidos.add(idPedidoMontoDTO);
 							idPedidoMonto.get().setPedidos(listaPedidos);
+							idPedidoMonto.get().setTotalDelDia(idPedidoMonto.get().getTotalDelDia()+pedido.getCostoTotal());
 
 							// elimino FechaidPedidoMontoDTO que habia y agrego el nuevo
 							// System.out.print(fecha_PedidoMonto!=null);
@@ -1717,10 +1718,10 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				List<IdPedidoMontoDTO> pedidos = new ArrayList<>();
 				IdPedidoMontoDTO idPedidoMontoDTO = new IdPedidoMontoDTO(pedido.getId(),
 						BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue(),
-						pedido.getEstadoPedido().name(), pedido.getMetodoDePago().name());
+						pedido.getEstadoPedido().name(), pedido.getMetodoDePago().name(), pedido.getFecha().toLocalDate());
 				pedidos.add(idPedidoMontoDTO);
 				FechaidPedidoMontoDTO fechaPedidoMontoDto = new FechaidPedidoMontoDTO(pedido.getFecha().toLocalDate(),
-						pedidos);
+						pedidos, pedido.getCostoTotal());
 				fecha_PedidoMonto.add(fechaPedidoMontoDto);
 
 				balanceByMail.setListaPedidos(fecha_PedidoMonto);

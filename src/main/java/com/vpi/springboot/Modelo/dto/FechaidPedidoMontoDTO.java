@@ -10,6 +10,7 @@ public class FechaidPedidoMontoDTO implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private LocalDate fecha;
+	private Double totalDelDia;
 	private List<IdPedidoMontoDTO> pedidos= new ArrayList<IdPedidoMontoDTO>();
 
 	public FechaidPedidoMontoDTO() {
@@ -29,10 +30,11 @@ public class FechaidPedidoMontoDTO implements Serializable {
 	}
 
 
-	public FechaidPedidoMontoDTO(LocalDate fecha, List<IdPedidoMontoDTO> pedidos) {
+	public FechaidPedidoMontoDTO(LocalDate fecha, List<IdPedidoMontoDTO> pedidos, Double totalDelDia) {
 		super();
 		this.fecha = fecha;
 		this.pedidos = pedidos;
+		this.totalDelDia=totalDelDia;
 	}
 
 
@@ -45,5 +47,18 @@ public class FechaidPedidoMontoDTO implements Serializable {
 		this.fecha = fecha;
 	}
 
+
+
+	public Double getTotalDelDia() {
+		return totalDelDia;
+	}
+
+
+
+	public void setTotalDelDia(Double totalDelDia) {
+		this.totalDelDia = totalDelDia;
+	}
+
+	
 
 }
