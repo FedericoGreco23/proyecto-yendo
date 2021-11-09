@@ -1501,13 +1501,14 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				pedido.getMetodoDePago(), pedido.getCarrito(), pedido.getDireccion(), pedido.getRestaurante(),
 				pedido.getCliente(), pedido.getComentario(), pedido.getPago());
 		// devolucion.setEstadoPedido(EnumEstadoPedido.REEMBOLZADO);
-		devolucion.setEstadoPedidido(null);
+		devolucion.setEstadoPedido(null);
 		pedido.setEstadoPedido(EnumEstadoPedido.REEMBOLZADO);
 		List<Reclamo> reclamos = pedido.getReclamos();
 		for (Reclamo reclamo : reclamos) {
 			if (reclamo.getId() != idReclamo) {
 				reclamo.setEstado(EnumEstadoReclamo.RECHAZADO);
 				reclamo.setResolucion("El pedido ha sido devuelto");
+				recRepo.save(reclamo);
 			}
 		}
 		pedidoRepo.save(devolucion);
@@ -1561,6 +1562,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			// Se envia notificacion con mensaje
 
 			reclamo.setEstado(EnumEstadoReclamo.RECHAZADO);
+			recRepo.save(reclamo);
 			// Envio notificacion al mobile
 
 			if (token != null) {
@@ -1601,12 +1603,12 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			return new DTRespuesta("No se pudo mandar mail: " + e.getMessage());
 		}
 		
-
 		// simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail,"Su
 		// pedido ha sido aceptado y se está siendo preparado");
 
-		// recRepo.save(reclamo); Lo muevo arriba porque sobreescribe
-		return new DTRespuesta("Se envio la notificacion mobile.");
+		//recRepo.save(reclamo);
+		return new DTRespuesta("Se envió la resolución de reclamo con éxito.");
+		//return new DTRespuesta("Se envio la notificacion mobile.");
 	}
 
 	@Override
