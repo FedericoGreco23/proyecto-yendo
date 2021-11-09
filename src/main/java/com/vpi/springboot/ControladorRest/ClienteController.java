@@ -269,20 +269,6 @@ public class ClienteController {
 		return mail;
 	}
 	
-	@GetMapping("/listarRestaurantesPorZona")
-	public Map<String, Object> listarRestaurantesPorZona(@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "0") int horarioApertura,
-			@RequestParam(defaultValue = "") String nombre, @RequestParam(defaultValue = "") String categoria,
-			@RequestParam(defaultValue = "") String sort, @RequestParam(defaultValue = "0") int order, 
-			@RequestParam(defaultValue = "0") int idDireccion) {
-		try {
-			return clienteService.listarRestaurantesPorZona(page, size, horarioApertura, nombre, categoria, sort, order, idDireccion);
-		} catch (UsuarioException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-	
 	@PostMapping("/setToken")
 	public ResponseEntity<?> setToken(@RequestParam(required = true) String token, @RequestParam(defaultValue = "") String mailCliente) {
 		try {

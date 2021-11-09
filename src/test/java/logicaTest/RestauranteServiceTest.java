@@ -670,9 +670,9 @@ class RestauranteServiceTest {
 		mockRestaurante.actualizarBalanceVentas();
 	}
 	
-	@Test
+	/*@Test
 	public void testTopProductos() {
 		Mockito.when(productosVendidosRepo.findAll(paging)).thenReturn(dtProductoVendidoPage);
 		mockRestaurante.topProductos(0, 5);
-	}
+	}*/
 }
