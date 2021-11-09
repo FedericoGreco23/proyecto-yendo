@@ -27,5 +27,7 @@ public interface AdministradorServicioInterfaz {
 	
 	public DTRespuesta cambiarEstadoRestaurante(String varRestaurante, int estado) throws RestauranteException;
 	
-	public Map<String, Object> restaurantesConMasPedidos(int page, int size);
+	public Map<String, Object> restaurantesConMasPedidos(int page, int size);	
+	
+	public Map<String, Object> topProductos(int page, int size);
 }

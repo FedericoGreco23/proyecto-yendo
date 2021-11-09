@@ -319,7 +319,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 
 	@Override
 	public Map<String, Object> listarRestaurantes(int page, int size, int horarioApertura, String nombre,
-			String categoria, String sort, int order) throws RestauranteException {
+			String categoria, String sort, int order, int idDireccion) throws RestauranteException {
 		Map<String, Object> response = new HashMap<>();
 		List<DTListarRestaurante> DTListarRestaurantes = new ArrayList<DTListarRestaurante>();
 		List<Restaurante> restaurantes = new ArrayList<Restaurante>();
@@ -366,23 +366,63 @@ public class GeneralService implements GeneralServicioInterfaz {
 		restaurantes = pageRestaurante.getContent();
 		int pagina = pageRestaurante.getNumber();
 		long totalElements = pageRestaurante.getTotalElements();
-		// Si el horarioApertura en el filtro es menor o igual que el horarioApertura
-		// del restaurante se muestra
-		if (horarioApertura > 0) {
+		
+		// Calculo de distancia entre restaurante y cliente
+		if (idDireccion != 0) {
+			double lat1;
+			double lng1;
+			double lat2;
+			double lng2;
+			//Obtengo los datos de latitud y longitud del cliente que recibo su idDireccion
+			Optional<Direccion> optionalDireccion = dirRepo.findById(idDireccion);
+			Direccion direccion = optionalDireccion.get();
+			lat1 = direccion.getGeoLocalizacion().getLatitud();
+			lng1 = direccion.getGeoLocalizacion().getLongitud();
+			
 			for (Restaurante r : restaurantes) {
-				if (r.getHorarioApertura().getHour() >= horarioApertura) {
-					DTListarRestaurantes.add(new DTListarRestaurante(r));
+				lat2 = r.getGeoLocalizacion().getLatitud();
+				lng2 = r.getGeoLocalizacion().getLongitud();
+
+				double radioTierra = 6371;//en kilómetros
+		        double dLat = Math.toRadians(lat2 - lat1);
+		        double dLng = Math.toRadians(lng2 - lng1);
+		        double sindLat = Math.sin(dLat / 2);
+		        double sindLng = Math.sin(dLng / 2);
+		        double va1 = Math.pow(sindLat, 2) + Math.pow(sindLng, 2)
+		                * Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2));
+		        double va2 = 2 * Math.atan2(Math.sqrt(va1), Math.sqrt(1 - va1));
+		        double distancia = radioTierra * va2;
+				if (distancia < 15) {
+
+					if (horarioApertura > 0) {
+						if (r.getHorarioApertura().getHour() >= horarioApertura) {
+							DTListarRestaurantes.add(new DTListarRestaurante(r));
+						} else {
+							totalElements = totalElements - 1;
+						}
+					} else {
+						DTListarRestaurantes.add(new DTListarRestaurante(r));
+					}
 				} else {
 					totalElements = totalElements - 1;
 				}
 			}
 		} else {
+			// Si el horarioApertura en el filtro es menor o igual que el horarioApertura
+			// del restaurante se muestra
 			for (Restaurante r : restaurantes) {
-				DTListarRestaurantes.add(new DTListarRestaurante(r));
+				if (horarioApertura > 0) {
+					if (r.getHorarioApertura().getHour() >= horarioApertura) {
+						DTListarRestaurantes.add(new DTListarRestaurante(r));
+					} else {
+						totalElements = totalElements - 1;
+					}
+				} else {
+					DTListarRestaurantes.add(new DTListarRestaurante(r));
+				}
 			}
 		}
-		// response.put("currentPage", pageRestaurante.getNumber());
-		// response.put("totalItems", pageRestaurante.getTotalElements());
+		
 		response.put("currentPage", pagina);
 		response.put("totalItems", totalElements);
 		response.put("restaurantes", DTListarRestaurantes);

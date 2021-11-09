@@ -86,6 +86,8 @@ public class ClienteService implements ClienteServicioInterfaz {
 	ObjectFactory<HttpSession> httpSessionFactory;
 
 	@Autowired
+	private RestauranteService restService;
+	@Autowired
 	private ClienteRepositorio userRepo;
 	@Autowired
 	private DireccionRepositorio dirRepo;
@@ -458,6 +460,11 @@ public class ClienteService implements ClienteServicioInterfaz {
 					userRepo.save(cliente);
 					carrito.setActivo(false);
 					mongoRepo.save(carrito);
+					int idPedido = pedido.getId();
+					
+					if (pago.equals(EnumMetodoDePago.PAYPAL)) {
+						restService.registrarPago(idPedido);
+					}
 					// return new DTRespuesta("Pedido agregado correctamente.");
 
 					// notificamos al restaurante
@@ -903,110 +910,6 @@ public class ClienteService implements ClienteServicioInterfaz {
 		response.put("totalItems", totalElements);
 		response.put("calificacionGlobal", cliente.getCalificacionPromedio());
 		response.put("restaurantes", DTCalificacionesCliente);
-
-		return response;
-	}
-
-
-
-	// Listo los restaurantes abiertos cercanos a la direccion activa del usuario
-	@Override
-	public Map<String, Object> listarRestaurantesPorZona(int page, int size, int horarioApertura, String nombre,
-			String categoria, String sort, int order, int idDireccion) throws UsuarioException {
-		Map<String, Object> response = new HashMap<>();
-		List<DTListarRestaurante> DTListarRestaurantes = new ArrayList<DTListarRestaurante>();
-		List<Restaurante> restaurantes = new ArrayList<Restaurante>();
-
-		Sort sorting;
-		Pageable paging;
-
-		if (!sort.equalsIgnoreCase("")) {
-			if (order == 1) {
-				sorting = Sort.by(Sort.Order.desc(sort));
-			} else {
-				sorting = Sort.by(Sort.Order.asc(sort));
-			}
-			paging = PageRequest.of(page, size, sorting);
-		} else {
-			paging = PageRequest.of(page, size);
-		}
-
-		Page<Restaurante> pageRestaurante;
-
-		// Devuelve los restaurantes aceptados no bloqueados y activos
-		if (!nombre.equalsIgnoreCase("")) {
-			if (!categoria.equalsIgnoreCase("")) {
-				// Aplico nombre y categoria
-				pageRestaurante = restauranteRepo.listarRestauranteDesdeClientePorNombreYCategoria(nombre, categoria,
-						EnumEstadoRestaurante.ACEPTADO, paging);
-			} else {
-				// Aplico solo nombre
-				pageRestaurante = restauranteRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivosPorNombre(nombre,
-						EnumEstadoRestaurante.ACEPTADO, paging);
-			}
-		}
-		else if (!categoria.equalsIgnoreCase("")) {
-			// Aplico solo categoria
-			pageRestaurante = restauranteRepo.listarRestauranteDesdeClientePorCategoria(categoria,
-					EnumEstadoRestaurante.ACEPTADO, paging);
-		} else {
-			// No aplico ni categoria ni nombre
-			pageRestaurante = restauranteRepo
-					.buscarRestaurantesPorEstadoNoBloqueadosYActivos(EnumEstadoRestaurante.ACEPTADO, paging);
-		}
-
-		restaurantes = pageRestaurante.getContent();
-		int pagina = pageRestaurante.getNumber();
-		long totalElements = pageRestaurante.getTotalElements();
-
-
-		// Calculo de distancia entre restaurante y cliente
-		double lat1;
-		double lng1;
-		double lat2;
-		double lng2;
-		//Obtengo los datos de latitud y longitud del cliente que recibo su idDireccion
-		Optional<Direccion> optionalDireccion = dirRepo.findById(idDireccion);
-		Direccion direccion = optionalDireccion.get();
-		lat1 = direccion.getGeoLocalizacion().getLatitud();
-		lng1 = direccion.getGeoLocalizacion().getLongitud();
-
-		// Si el horarioApertura en el filtro es menor o igual que el horarioApertura
-		// del restaurante se muestra
-		for (Restaurante r : restaurantes) {
-			lat2 = r.getGeoLocalizacion().getLatitud();
-			lng2 = r.getGeoLocalizacion().getLongitud();
-
-			double radioTierra = 6371;//en kilómetros
-	        double dLat = Math.toRadians(lat2 - lat1);
-	        double dLng = Math.toRadians(lng2 - lng1);
-	        double sindLat = Math.sin(dLat / 2);
-	        double sindLng = Math.sin(dLng / 2);
-	        double va1 = Math.pow(sindLat, 2) + Math.pow(sindLng, 2)
-	                * Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2));
-	        double va2 = 2 * Math.atan2(Math.sqrt(va1), Math.sqrt(1 - va1));
-	        double distancia = radioTierra * va2;
-			if (distancia < 15) {
-
-				if (horarioApertura > 0) {
-					if (r.getHorarioApertura().getHour() >= horarioApertura) {
-						DTListarRestaurantes.add(new DTListarRestaurante(r));
-					} else {
-						totalElements = totalElements - 1;
-					}
-				} else {
-					DTListarRestaurantes.add(new DTListarRestaurante(r));
-				}
-			} else {
-				totalElements = totalElements - 1;
-			}
-		}
-
-		// response.put("currentPage", pageRestaurante.getNumber());
-		// response.put("totalItems", pageRestaurante.getTotalElements());
-		response.put("currentPage", pagina);
-		response.put("totalItems", totalElements);
-		response.put("restaurantes", DTListarRestaurantes);
 
 		return response;
 	}

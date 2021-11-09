@@ -66,9 +66,6 @@ public interface ClienteServicioInterfaz {
 	public DTPedido buscarPedidoRealizado(int numeroPedido) throws PedidoException;
 	
 	public Map<String, Object> consultarCalificacion(int page, int size, String sort, int order, String mailCliente);
-
-	public Map<String, Object> listarRestaurantesPorZona(int page, int size, int horarioApertura, String nombre,
-			String categoria, String sort, int order, int idDireccion) throws UsuarioException;
 	
 	public DTCalificacionRestaurante getCalificacionRestaurante(String mailCliente, String mailRestaurante) throws UsuarioException, RestauranteException;
 

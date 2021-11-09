@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import com.vpi.springboot.Modelo.*;
 import com.vpi.springboot.Modelo.dto.DTAdministrador;
 import com.vpi.springboot.Modelo.dto.DTCliente;
+import com.vpi.springboot.Modelo.dto.DTProductoVendido;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
 import com.vpi.springboot.Modelo.dto.DTRestaurantePedido;
@@ -28,6 +29,7 @@ import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Repositorios.AdministradorRepositorio;
 import com.vpi.springboot.Repositorios.ClienteRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
+import com.vpi.springboot.Repositorios.mongo.ProductosVendidosRepositorio;
 import com.vpi.springboot.Repositorios.mongo.RestaurantePedidosRepositorio;
 import com.vpi.springboot.exception.AdministradorException;
 import com.vpi.springboot.exception.RestauranteException;
@@ -50,6 +52,9 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 
 	@Autowired
 	private RestaurantePedidosRepositorio restaurantePedidosRepo;
+	
+	@Autowired
+	private ProductosVendidosRepositorio productosVendidosRepo;
 	
 	@Override
 	public DTRespuesta crearAdministrador(Administrador admin) throws AdministradorException {
@@ -438,6 +443,21 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 		response.put("currentPage", pagina);
 		response.put("totalItems", totalElements);
 		response.put("restaurantes", restauranteList);
+		return response;
+	}
+	
+	@Override
+	public Map<String, Object> topProductos(int page, int size) {
+		Sort sort = Sort.by(Sort.Order.desc("cantidad"));
+		Pageable paging = PageRequest.of(page, size, sort);
+		Map<String, Object> response = new HashMap<>();
+		Page<DTProductoVendido> pageProductos;
+		pageProductos = productosVendidosRepo.findAll(paging);
+		List<DTProductoVendido> DTproductosVendidos = pageProductos.getContent();
+
+		response.put("currentPage", pageProductos.getNumber());
+		response.put("totalItems", pageProductos.getTotalElements());
+		response.put("restaurantes", DTproductosVendidos);
 		return response;
 	}
 }

@@ -161,8 +161,6 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	private BalanceVentasRepositorio balanceVentasRepo;
 	@Autowired
 	private MailService mailSender;
-	@Autowired
-	private ProductosVendidosRepositorio productosVendidosRepo;
 
 	private DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");;
 
@@ -1806,20 +1804,5 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		}
 
 		return new DTRespuesta("Restaurante no encontrado");
-	}
-
-	@Override
-	public Map<String, Object> topProductos(int page, int size) {
-		Sort sort = Sort.by(Sort.Order.desc("cantidad"));
-		Pageable paging = PageRequest.of(page, size, sort);
-		Map<String, Object> response = new HashMap<>();
-		Page<DTProductoVendido> pageProductos;
-		pageProductos = productosVendidosRepo.findAll(paging);
-		List<DTProductoVendido> DTproductosVendidos = pageProductos.getContent();
-
-		response.put("currentPage", pageProductos.getNumber());
-		response.put("totalItems", pageProductos.getTotalElements());
-		response.put("restaurantes", DTproductosVendidos);
-		return response;
 	}
 }
