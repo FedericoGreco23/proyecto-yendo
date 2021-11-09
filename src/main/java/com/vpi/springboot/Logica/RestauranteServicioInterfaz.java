@@ -35,7 +35,7 @@ public interface RestauranteServicioInterfaz {
 	public Map<String, Object> listarPedidos(int page, int size, String mailRestaurante, String id, String fecha,
 			String estado, String sort, int order) throws RestauranteException;
 
-	public DTRespuesta altaRestaurante(Restaurante rest) throws RestauranteException, CategoriaException;
+	public String altaRestaurante(Restaurante rest) throws RestauranteException, CategoriaException;
 
 	public DTRespuesta abrirRestaurante(String mail);
 

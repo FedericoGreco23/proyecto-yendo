@@ -116,9 +116,9 @@ public class PublicRest {
 	@PostMapping("/crearRestaurante")
 	public ResponseEntity<?> crearRestaurante(@RequestBody Restaurante rest) {
 		try {
-			return new ResponseEntity<>(restService.altaRestaurante(rest), HttpStatus.OK);
+			return ResponseEntity.ok(restService.altaRestaurante(rest));
 		} catch (Exception e) {
-			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 

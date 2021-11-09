@@ -24,4 +24,8 @@ public class RestauranteException extends Exception {
 	public static String SinCalificacion(String mail) {
 		return "Restaurante no calificó a cliente " + mail + ".";
 	}
+	
+	public static String altaRestaurante(String mail) {
+		return "Restaurante " + mail + " dado de alta con éxito";
+	}
 }
