@@ -168,7 +168,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	 */
 
 	@Override
-	public String altaRestaurante(Restaurante rest) throws RestauranteException, CategoriaException {
+	public DTRespuesta altaRestaurante(Restaurante rest) throws RestauranteException, CategoriaException {
 
 		// Seccion verificar que nombreRestaurante o restauranteMail no exista ya
 		Optional<Restaurante> busquedaMail = restauranteRepo.findById(rest.getMail());
@@ -206,7 +206,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		rest.setContrasenia(passwordEncoder.encode(rest.getContrasenia()));
 
 		restauranteRepo.save(rest);
-		return "Restaurante " + rest.getNombre() + " dado de alta con éxito";
+		return new DTRespuesta("Restaurante " + rest.getNombre() + " dado de alta con éxito");
 	}
 
 	@Override

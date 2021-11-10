@@ -25,7 +25,7 @@ import com.vpi.springboot.exception.UsuarioException;
 public interface ClienteServicioInterfaz {
 	public List<DTDireccion> getDireccionCliente(String mail) throws UsuarioException;
 
-	public DTRespuesta altaCliente(Cliente usuario) throws UsuarioException, Exception;
+	public String altaCliente(Cliente usuario) throws UsuarioException, Exception;
 
 //	public List<Cliente> obtenerClientes();
 

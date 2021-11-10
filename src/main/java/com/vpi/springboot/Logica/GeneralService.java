@@ -136,7 +136,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 	}
 
 	@Override
-	public DTRespuesta recuperarPassword(String mail) throws UsuarioException {
+	public String recuperarPassword(String mail) throws UsuarioException {
 		String randomPass = randomPass(6);
 		
 		// Se tiene que ver cómo se genera la contraseña opcional
@@ -178,9 +178,9 @@ public class GeneralService implements GeneralServicioInterfaz {
 			} catch (MessagingException e) {
 				System.out.println("Error al mandar mail: " + e.getMessage());
 			}
-			return new DTRespuesta("Mail enviado con contraseña.");
+			return "Mail enviado con contraseña.";
 		} else {
-			return new DTRespuesta("Mail de usuario inválido.");
+			return "Mail de usuario inválido.";
 		}
 	}
 

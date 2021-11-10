@@ -97,7 +97,7 @@ public class PublicRest {
 	@RequestMapping(value = "/crearCliente", method = RequestMethod.POST)
 	public ResponseEntity<?> altaCliente(@RequestBody Cliente usuario) {
 		try {
-			return new ResponseEntity<>(clienteService.altaCliente(usuario), HttpStatus.OK);
+			return ResponseEntity.ok(clienteService.altaCliente(usuario));
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -116,7 +116,7 @@ public class PublicRest {
 	@PostMapping("/crearRestaurante")
 	public ResponseEntity<?> crearRestaurante(@RequestBody Restaurante rest) {
 		try {
-			return ResponseEntity.ok(restService.altaRestaurante(rest));
+			return new ResponseEntity<>(restService.altaRestaurante(rest), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -126,7 +126,7 @@ public class PublicRest {
 	@RequestMapping(value = "/recuperar", method = RequestMethod.POST)
 	public ResponseEntity<?> recuperarPassword(@RequestParam String mail) {
 		try {
-			return new ResponseEntity<>(service.recuperarPassword(mail), HttpStatus.OK);
+			return ResponseEntity.ok(service.recuperarPassword(mail));
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
