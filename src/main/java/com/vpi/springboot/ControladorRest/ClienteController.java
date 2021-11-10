@@ -53,7 +53,7 @@ public class ClienteController {
 	@ResponseBody
 	public ResponseEntity<?> agregarDireccion(@RequestBody DTDireccion direccion) {
 		try {
-			return new ResponseEntity<>(clienteService.altaDireccion(direccion, getMailFromJwt()), HttpStatus.OK);
+			return ResponseEntity.ok(clienteService.altaDireccion(direccion, getMailFromJwt()));
 		} catch (Exception e) {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -62,18 +62,16 @@ public class ClienteController {
 	@PostMapping("bajaCuenta")
 	public ResponseEntity<?> bajaCuenta() {
 		try {
-			return new ResponseEntity<>(clienteService.bajaCuenta(getMailFromJwt()), HttpStatus.OK);
+			return ResponseEntity.ok(clienteService.bajaCuenta(getMailFromJwt()));
 		} catch (Exception e) {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-
 	}
 
 	@PostMapping("modificarDireccion")
 	public ResponseEntity<?> modificarDireccion(@RequestParam int id, @RequestBody DTDireccion direccionNueva) {
 		try {
-			return new ResponseEntity<>(clienteService.modificarDireccion(id, direccionNueva, getMailFromJwt()),
-					HttpStatus.OK);
+			return ResponseEntity.ok(clienteService.modificarDireccion(id, direccionNueva, getMailFromJwt()));
 		} catch (Exception e) {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -82,7 +80,7 @@ public class ClienteController {
 	@PostMapping("eliminarDireccion")
 	public ResponseEntity<?> eliminarDireccion(@RequestParam Integer id) {
 		try {
-			return new ResponseEntity<>(clienteService.eliminarDireccion(id, getMailFromJwt()), HttpStatus.OK);
+			return ResponseEntity.ok(clienteService.eliminarDireccion(id, getMailFromJwt()));
 		} catch (Exception e) {
 			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -92,12 +90,9 @@ public class ClienteController {
 	public ResponseEntity<?> agregarACarrito(@RequestParam int producto, Integer cantidad, String mailRestaurante) {
 		try {
 			String mail = getMailFromJwt();
-			// DTProductoCarrito productoCarrito = new DTProductoCarrito(producto,
-			// cantidad);
-			clienteService.agregarACarrito(producto, cantidad, mail, mailRestaurante);
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Producto agregado con éxito"), HttpStatus.OK);
+			return ResponseEntity.ok(clienteService.agregarACarrito(producto, cantidad, mail, mailRestaurante));
 		} catch (Exception e) {
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 	}
@@ -121,7 +116,7 @@ public class ClienteController {
 			clienteService.setUltimaDireccionSeleccionada(Integer.valueOf(idDireccion), getMailFromJwt());
 			return new ResponseEntity<>(new DTRespuesta("Direccion actualizada con éxito"), HttpStatus.OK);
 		} catch (Exception e) {
-			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -136,7 +131,7 @@ public class ClienteController {
 	}
 
 	@PostMapping("/altaPedido")
-	public ResponseEntity<DTRespuesta> altaPedido(@RequestParam int idCarrito, @RequestParam int metodoPago,
+	public ResponseEntity<?> altaPedido(@RequestParam int idCarrito, @RequestParam int metodoPago,
 			@RequestParam int idDireccion, @RequestParam String comentario) {
 		try {
 			String mail = getMailFromJwt();
@@ -146,11 +141,10 @@ public class ClienteController {
 			} else {
 				pago = EnumMetodoDePago.EFECTIVO;
 			}
-			DTPedido pedidoDTO = clienteService.altaPedido(idCarrito, pago, idDireccion, mail, comentario);
 
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta("Pedido enviado con éxito"), HttpStatus.OK);
+			return new ResponseEntity<>(clienteService.altaPedido(idCarrito, pago, idDireccion, mail, comentario), HttpStatus.OK);
 		} catch (Exception e) {
-			return new ResponseEntity<DTRespuesta>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 	}

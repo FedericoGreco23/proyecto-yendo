@@ -243,7 +243,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 	 */
 
 	@Override
-	public DTRespuesta altaDireccion(DTDireccion direccion, String mail) throws UsuarioException {
+	public String altaDireccion(DTDireccion direccion, String mail) throws UsuarioException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mail);
 		if (optionalCliente.isPresent()) {
 			Cliente cliente = optionalCliente.get();
@@ -266,14 +266,14 @@ public class ClienteService implements ClienteServicioInterfaz {
 
 			// actualiza ultima direccion en mongo
 			setUltimaDireccionSeleccionada(dir.getId(), mail);
-			return new DTRespuesta("Dirección agregada.");
+			return "Dirección agregada";
 		} else {
 			throw new UsuarioException(UsuarioException.NotFoundException(mail));
 		}
 	}
 
 	@Override
-	public DTRespuesta bajaCuenta(String mail) throws UsuarioException {
+	public String bajaCuenta(String mail) throws UsuarioException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mail);
 		if (optionalCliente.isPresent()) {
 			Cliente cliente = optionalCliente.get();
@@ -290,7 +290,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 				for(CalificacionRestaurante c : calificacionesRestaurante)
 					calRestauranteRepo.delete(c);
 
-				return new DTRespuesta("Cuenta dada de baja con éxito.");
+				return "Cuenta dada de baja con éxito.";
 			} else {
 				throw new UsuarioException("El usuario " + mail + " ya esta inactivo");
 			}
@@ -412,7 +412,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 	}
 
 	@Override
-	public DTPedido altaPedido(int idCarrito, EnumMetodoDePago pago, int idDireccion, String mail, String comentario)
+	public DTRespuesta altaPedido(int idCarrito, EnumMetodoDePago pago, int idDireccion, String mail, String comentario)
 			throws RestauranteException, CarritoException, DireccionException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mail);
 		Cliente cliente = optionalCliente.get();
@@ -484,7 +484,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 					// simpMessagingTemplate.convertAndSendToUser(base64EncodedEmail,
 					// "/topic/pedido", pedidoDTO);
 
-					return new DTPedido(pedido);
+					return new DTRespuesta("Pedido enviado con éxito.");
 				} else {
 					throw new DireccionException(DireccionException.NotFoundExceptionId(idDireccion));
 				}
