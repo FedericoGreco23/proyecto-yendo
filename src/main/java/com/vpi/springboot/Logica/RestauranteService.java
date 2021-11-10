@@ -99,6 +99,8 @@ import com.vpi.springboot.exception.PromocionException;
 import com.vpi.springboot.exception.RestauranteException;
 import com.vpi.springboot.exception.UsuarioException;
 
+import BeanFirebase.SingletonFirebase;
+
 @Service
 @EnableScheduling
 public class RestauranteService implements RestauranteServicioInterfaz {
@@ -1482,8 +1484,9 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		Pedido devolucion = new Pedido(pedido.getFecha(), pedido.getCostoTotal() * -1, pedido.getEstadoPedido(),
 				pedido.getMetodoDePago(), pedido.getCarrito(), pedido.getDireccion(), pedido.getRestaurante(),
 				pedido.getCliente(), pedido.getComentario(), pedido.getPago());
-		devolucion.setEstadoPedido(null);
-		pedido.setEstadoPedido(EnumEstadoPedido.REEMBOLZADO);
+		//devolucion.setEstadoPedido(null);
+		//pedido.setEstadoPedido(EnumEstadoPedido.REEMBOLZADO);
+		devolucion.setEstadoPedido(EnumEstadoPedido.REEMBOLZADO);
 		List<Reclamo> reclamos = pedido.getReclamos();
 		for (Reclamo reclamo : reclamos) {
 			if (reclamo.getId() != idReclamo) {
@@ -1518,6 +1521,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			recRepo.save(reclamo);
 			// Envio notificacion al mobile
 			if (token != null) {
+				SingletonFirebase.getInstancia().arrancar();
 
 				Notification notification = Notification.builder()
 						.setTitle("Resolucion de reclamo")
@@ -1545,6 +1549,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			recRepo.save(reclamo);
 			// Envio notificacion al mobile
 			if (token != null) {
+				SingletonFirebase.getInstancia().arrancar();
+				
 				Notification notification = Notification.builder()
 						.setTitle("Resolucion de reclamo")
 						.setBody("Su reclamo ha sido rechazado por el restaurante " + restaurante)
