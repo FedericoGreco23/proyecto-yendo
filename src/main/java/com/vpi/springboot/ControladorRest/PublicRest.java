@@ -95,11 +95,12 @@ public class PublicRest {
 
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@RequestMapping(value = "/crearCliente", method = RequestMethod.POST)
-	public ResponseEntity<?> altaCliente(@RequestBody Cliente usuario) {
+	public ResponseEntity<?> altaCliente(@RequestBody Cliente usuario) throws Exception {
 		try {
 			return ResponseEntity.ok(clienteService.altaCliente(usuario));
 		} catch (Exception e) {
-			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+			throw new Exception(e.getMessage());
+//			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	
