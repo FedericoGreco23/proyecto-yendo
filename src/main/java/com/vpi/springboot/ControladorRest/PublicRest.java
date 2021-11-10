@@ -97,7 +97,7 @@ public class PublicRest {
 	@RequestMapping(value = "/crearCliente", method = RequestMethod.POST)
 	public ResponseEntity<?> altaCliente(@RequestBody Cliente usuario) throws Exception {
 		try {
-			return ResponseEntity.ok(clienteService.altaCliente(usuario));
+			return new ResponseEntity<>(clienteService.altaCliente(usuario), HttpStatus.OK);
 		} catch (Exception e) {
 			throw new Exception(e.getMessage());
 //			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -125,11 +125,12 @@ public class PublicRest {
 
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@RequestMapping(value = "/recuperar", method = RequestMethod.POST)
-	public ResponseEntity<?> recuperarPassword(@RequestParam String mail) {
+	public ResponseEntity<?> recuperarPassword(@RequestParam String mail) throws Exception {
 		try {
 			return ResponseEntity.ok(service.recuperarPassword(mail));
 		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			throw new Exception(e.getMessage());
+//			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 

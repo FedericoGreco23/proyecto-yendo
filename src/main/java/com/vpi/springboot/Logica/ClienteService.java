@@ -190,7 +190,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 	}
 
 	@Override
-	public String altaCliente(Cliente usuario) throws UsuarioException, Exception {
+	public DTRespuesta altaCliente(Cliente usuario) throws UsuarioException, Exception {
 		if (emailExist(usuario.getMail())) {
 			throw new UsuarioException(UsuarioException.UsuarioYaExiste(usuario.getMail()));
 		}
@@ -223,7 +223,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 				throw new Exception("Error: " + e.getMessage());
 			}
 
-			return "Cliente dado de alta con éxito. Se ha enviado un mail para confirmación del usuario.";
+			return new DTRespuesta("Cliente dado de alta con éxito. Se ha enviado un mail para confirmación del usuario.");
 
 		} else {
 			throw new UsuarioException("Mail, nickname y contraseña son campos obligatorios");
@@ -243,7 +243,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 	 */
 
 	@Override
-	public String altaDireccion(DTDireccion direccion, String mail) throws UsuarioException {
+	public DTRespuesta altaDireccion(DTDireccion direccion, String mail) throws UsuarioException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mail);
 		if (optionalCliente.isPresent()) {
 			Cliente cliente = optionalCliente.get();
@@ -266,14 +266,14 @@ public class ClienteService implements ClienteServicioInterfaz {
 
 			// actualiza ultima direccion en mongo
 			setUltimaDireccionSeleccionada(dir.getId(), mail);
-			return "Dirección agregada";
+			return new DTRespuesta("Dirección agregada");
 		} else {
 			throw new UsuarioException(UsuarioException.NotFoundException(mail));
 		}
 	}
 
 	@Override
-	public String bajaCuenta(String mail) throws UsuarioException {
+	public DTRespuesta bajaCuenta(String mail) throws UsuarioException {
 		Optional<Cliente> optionalCliente = userRepo.findById(mail);
 		if (optionalCliente.isPresent()) {
 			Cliente cliente = optionalCliente.get();
@@ -290,7 +290,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 				for(CalificacionRestaurante c : calificacionesRestaurante)
 					calRestauranteRepo.delete(c);
 
-				return "Cuenta dada de baja con éxito.";
+				return new DTRespuesta("Cuenta dada de baja con éxito.");
 			} else {
 				throw new UsuarioException("El usuario " + mail + " ya esta inactivo");
 			}
