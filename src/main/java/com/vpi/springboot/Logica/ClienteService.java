@@ -190,7 +190,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 	}
 
 	@Override
-	public DTRespuesta altaCliente(Cliente usuario) throws UsuarioException, Exception {
+	public String altaCliente(Cliente usuario) throws UsuarioException, Exception {
 		if (emailExist(usuario.getMail())) {
 			throw new UsuarioException(UsuarioException.UsuarioYaExiste(usuario.getMail()));
 		}
@@ -220,11 +220,10 @@ public class ClienteService implements ClienteServicioInterfaz {
 				String topic = "Verificación de usuario " + usuario.getNickname() + ".";
 				mailSender.sendMail(to, body, topic);
 			} catch (Exception e) {
-				return new DTRespuesta("Error: " + e.getMessage());
+				throw new Exception("Error: " + e.getMessage());
 			}
 
-			return new DTRespuesta(
-					"Cliente dado de alta con éxito. Se ha enviado un mail para confirmación del usuario.");
+			return "Cliente dado de alta con éxito. Se ha enviado un mail para confirmación del usuario.";
 
 		} else {
 			throw new UsuarioException("Mail, nickname y contraseña son campos obligatorios");
