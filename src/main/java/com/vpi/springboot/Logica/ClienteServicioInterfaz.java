@@ -22,13 +22,13 @@ import com.vpi.springboot.exception.UsuarioException;
 public interface ClienteServicioInterfaz {
 	public List<DTDireccion> getDireccionCliente(String mail) throws UsuarioException;
 
-	public String altaCliente(Cliente usuario) throws UsuarioException, Exception;
+	public DTRespuesta altaCliente(Cliente usuario) throws UsuarioException, Exception;
 
 //	public List<Cliente> obtenerClientes();
 
-	public String altaDireccion(DTDireccion direccion, String mail) throws UsuarioException;
+	public DTRespuesta altaDireccion(DTDireccion direccion, String mail) throws UsuarioException;
 
-	public String bajaCuenta(String mail) throws UsuarioException;
+	public DTRespuesta bajaCuenta(String mail) throws UsuarioException;
 
 	public DTRespuesta modificarDireccion(int id, DTDireccion nueva, String mail) throws UsuarioException;
 
