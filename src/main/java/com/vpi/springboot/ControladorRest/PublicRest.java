@@ -99,7 +99,7 @@ public class PublicRest {
 		try {
 			return ResponseEntity.ok(clienteService.altaCliente(usuario));
 		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	
