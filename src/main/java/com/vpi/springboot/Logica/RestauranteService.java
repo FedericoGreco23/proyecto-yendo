@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.mail.MessagingException;
 
@@ -1698,7 +1699,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	/**
 	* BALANCE DE VENTAS
 	*/
-	@Scheduled(cron = "*/59 */10 * * * *") // 1 vez cada 5 minutos
+	@Scheduled(cron = "*/59 */1 * * * *") // 1 vez cada 5 minutos
 	public DTRespuesta actualizarBalanceVentas() {
 
 		// descomentar
@@ -1814,7 +1815,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 			Double totalPeriodo = (double) 0;
 
-			Set<FechaidPedidoMontoDTO> lista = new HashSet<>();
+			Set<FechaidPedidoMontoDTO> lista = new TreeSet<>();
 
 			for (FechaidPedidoMontoDTO entry : balanceByMailOp.get().getListaPedidos()) {
 

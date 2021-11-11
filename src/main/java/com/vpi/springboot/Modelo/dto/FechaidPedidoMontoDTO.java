@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class FechaidPedidoMontoDTO implements Serializable {
+public class FechaidPedidoMontoDTO implements Serializable, Comparable<FechaidPedidoMontoDTO> {
 	private static final long serialVersionUID = 1L;
 	
 	private LocalDate fecha;
@@ -57,6 +57,13 @@ public class FechaidPedidoMontoDTO implements Serializable {
 
 	public void setTotalDelDia(Double totalDelDia) {
 		this.totalDelDia = totalDelDia;
+	}
+
+
+
+	@Override
+	public int compareTo(FechaidPedidoMontoDTO o) {
+		return getFecha().compareTo(o.getFecha());
 	}
 
 	
