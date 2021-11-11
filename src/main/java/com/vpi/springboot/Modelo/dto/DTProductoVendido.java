@@ -14,7 +14,7 @@ public class DTProductoVendido implements Serializable {
 	private String _id;
 	private String nombreProducto;
 	private String nombreRestaurante;
-	private String cantidad;
+	private int cantidad;
 	private String categoria;
 	private String fecha;
 	
@@ -23,7 +23,7 @@ public class DTProductoVendido implements Serializable {
 	}
 	
 	public DTProductoVendido(String idProducto, String nombreProducto, String nombreRestaurante, 
-			String cantidad,  String categoria, String fecha) {
+			int cantidad,  String categoria, String fecha) {
 		super();
 		this._id = idProducto;
 		this.nombreProducto = nombreProducto;
@@ -59,11 +59,11 @@ public class DTProductoVendido implements Serializable {
 		this.nombreRestaurante = nombreRestaurante;
 	}
 
-	public String getCantidad() {
+	public int getCantidad() {
 		return cantidad;
 	}
 
-	public void setCantidad(String cantidad) {
+	public void setCantidad(int cantidad) {
 		this.cantidad = cantidad;
 	}
 
