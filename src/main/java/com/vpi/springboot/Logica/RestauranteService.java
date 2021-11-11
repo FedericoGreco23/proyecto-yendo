@@ -79,6 +79,7 @@ import com.vpi.springboot.Modelo.dto.EnumEstadoReclamo;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
 import com.vpi.springboot.Modelo.dto.FechaidPedidoMontoDTO;
+import com.vpi.springboot.Modelo.dto.GetEstadoResponseDTO;
 import com.vpi.springboot.Modelo.dto.IdPedidoMontoDTO;
 import com.vpi.springboot.Repositorios.CalificacionClienteRepositorio;
 import com.vpi.springboot.Repositorios.CalificacionRestauranteRepositorio;
@@ -1860,13 +1861,16 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		return retorno;
 	}
 
-	public Object getEstado(String mailFromJwt) {
+	public GetEstadoResponseDTO getEstado(String mailFromJwt) throws RestauranteException {
 		Optional<Restaurante> restOp = restauranteRepo.findById(mailFromJwt);
 		if (restOp.isPresent()) {
-			String resp = restOp.get().getAbierto() ? "Abierto" : "cerrado";
-			return new DTRespuesta(resp);
+			GetEstadoResponseDTO respuesta= new GetEstadoResponseDTO(restOp.get().getEstado().name(), 
+					restOp.get().getAbierto() ? "Abierto" : "cerrado", restOp.get().getProductos().size());
+			;
+			
+			return respuesta;
 		}
-
-		return new DTRespuesta("Restaurante no encontrado");
+		throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(mailFromJwt));
+		
 	}
 }

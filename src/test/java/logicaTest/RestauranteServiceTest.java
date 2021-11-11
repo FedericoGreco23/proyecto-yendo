@@ -615,7 +615,12 @@ class RestauranteServiceTest {
 	@Test
 	public void testGetEstado() {
 		Mockito.when(restauranteRepo.findById(Mockito.anyString())).thenReturn(optionalRestaurante);
-		mockRestaurante.getEstado(restaurante.getMail());
+		try {
+			mockRestaurante.getEstado(restaurante.getMail());
+		} catch (RestauranteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	@Test
