@@ -158,17 +158,6 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	 * return null; }
 	 */
 
-	/*
-	 * @PostConstruct public void init() throws IOException { FileInputStream
-	 * serviceAccount = new FileInputStream(
-	 * "src/main/java/Resource/yendo-5c371-firebase-adminsdk-rczst-500b815097.json")
-	 * ; System.out.println("SE CARGA FIREBASE EN RESTAURANTE"); FirebaseOptions
-	 * options = new FirebaseOptions.Builder()
-	 * .setCredentials(GoogleCredentials.fromStream(serviceAccount)) .build();
-	 *
-	 * FirebaseApp.initializeApp(options); }
-	 */
-
 	@Override
 	public DTRespuesta altaRestaurante(Restaurante rest) throws RestauranteException, CategoriaException {
 
@@ -445,7 +434,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	}
 
 	@Override
-	public DTRespuesta confirmarPedido(int idPedido) throws PedidoException {
+	public DTRespuesta confirmarPedido(int idPedido) throws PedidoException, IOException {
 		Optional<Pedido> optionalPedido = pedidoRepo.findById(idPedido);
 		if (optionalPedido.isPresent()) {
 			Pedido pedido = optionalPedido.get();
@@ -475,6 +464,36 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 //			}
 //			Carrito carrito = new Carrito(500, "csuarez2211@gmail.com", "lapasiva@lapasiva.com", productos, true);
 
+			////////////////Envio de notificacion mobile///////////////////////////////////
+			
+			String token = pedido.getCliente().getTokenDispositivo();
+			String restaurante = pedido.getRestaurante().getNombre();
+			Message message;
+			Map<String, String> map = new HashMap<>();
+			map.put("llave", "valor");
+			if (token != null) {
+				SingletonFirebase.getInstancia().arrancar();
+
+				Notification notification = Notification.builder()
+						.setTitle("Resolucion de pedido")
+						.setBody("Su pedido ha sido aceptado por el restaurante " + restaurante)
+						.build();
+				message = Message.builder().putAllData(map).putData("mensaje", "Nuevo mensaje de sus pedidos")
+						.setToken(token) // deviceId
+						.setNotification(notification).build();
+				try {
+					// DUDA QUE ES appAndroid
+					FirebaseMessaging.getInstance().send(message);
+					// FirebaseMessaging.getInstance(FirebaseApp.getInstance(appAndroid)).send(message);
+					System.out.println("PRUEBA SE ENVIA NOTIFICACION");
+				} catch (FirebaseMessagingException e) {
+					System.out.println(e.getStackTrace());
+					System.out.println("Mensaje de error: " + e.getMessagingErrorCode());
+				}
+			}
+
+			////////////////Fin notificacion mobile///////////////////////////////////////
+			
 			Optional<Carrito> optionalCarrito = mongoRepo.findById(pedido.getCarrito());
 			Carrito carrito = optionalCarrito.get();
 			DTPedido dtpedido = new DTPedido(pedido, new DTCarrito(carrito));
@@ -597,7 +616,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	}
 
 	@Override
-	public DTRespuesta rechazarPedido(int idPedido) throws PedidoException {
+	public DTRespuesta rechazarPedido(int idPedido) throws PedidoException, IOException {
 		Optional<Pedido> optionalPedido = pedidoRepo.findById(idPedido);
 		if (optionalPedido.isPresent()) {
 			Pedido pedido = optionalPedido.get();
@@ -616,6 +635,36 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			 */
 
 			simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, "Su pedido ha sido rechazado");
+			
+			////////////////Envio de notificacion mobile///////////////////////////////////
+			
+			String token = pedido.getCliente().getTokenDispositivo();
+			String restaurante = pedido.getRestaurante().getNombre();
+			Message message;
+			Map<String, String> map = new HashMap<>();
+			map.put("llave", "valor");
+			if (token != null) {
+				SingletonFirebase.getInstancia().arrancar();
+	
+				Notification notification = Notification.builder()
+						.setTitle("Resolucion de pedido")
+						.setBody("Su pedido ha sido rechazado por el restaurante " + restaurante)
+						.build();
+				message = Message.builder().putAllData(map).putData("mensaje", "Nuevo mensaje de sus pedidos")
+						.setToken(token) // deviceId
+						.setNotification(notification).build();
+				try {
+					// DUDA QUE ES appAndroid
+					FirebaseMessaging.getInstance().send(message);
+					// FirebaseMessaging.getInstance(FirebaseApp.getInstance(appAndroid)).send(message);
+					System.out.println("PRUEBA SE ENVIA NOTIFICACION");
+				} catch (FirebaseMessagingException e) {
+					System.out.println(e.getStackTrace());
+					System.out.println("Mensaje de error: " + e.getMessagingErrorCode());
+				}
+			}
+
+			////////////////Fin notificacion mobile///////////////////////////////////////
 
 			String to = pedido.getCliente().getMail();
 			String body = mailSender.getRechazarPedido(pedido.getRestaurante().getNombre(), pedido.getCliente().getNombre() + " " + pedido.getCliente().getApellido());

@@ -396,7 +396,7 @@ class RestauranteServiceTest {
 	}
 	
 	@Test
-	public void testConfirmarPedido() throws PedidoException, MessagingException {
+	public void testConfirmarPedido() throws PedidoException, MessagingException, IOException {
 		Mockito.when(pedidoRepo.findById(Mockito.anyInt())).thenReturn(optionalPedido);
 		Mockito.doReturn(pedido).when(pedidoRepo).save(Mockito.any(Pedido.class));
 		Mockito.when(mongoRepo.findById(Mockito.anyInt())).thenReturn(optionalCarritoLleno);
@@ -437,7 +437,7 @@ class RestauranteServiceTest {
 	}
 	
 	@Test
-	public void testRechazarPedido() throws PedidoException, MessagingException {
+	public void testRechazarPedido() throws PedidoException, MessagingException, IOException {
 		Mockito.when(pedidoRepo.findById(Mockito.anyInt())).thenReturn(optionalPedido);
 		Mockito.doReturn(pedido).when(pedidoRepo).save(Mockito.any(Pedido.class));
 		Mockito.doNothing().when(simpMessagingTemplate).convertAndSend(Mockito.anyString(),Mockito.anyString());

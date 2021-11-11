@@ -200,4 +200,13 @@ public class AdministradorController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@GetMapping("/topCategorias")
+	public ResponseEntity<?> topCategorias() {
+		try {
+			return new ResponseEntity<>(service.topCategorias(), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }

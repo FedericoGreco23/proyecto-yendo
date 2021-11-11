@@ -5,6 +5,7 @@ import java.time.temporal.ChronoUnit;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -19,11 +20,13 @@ import org.springframework.stereotype.Service;
 
 import com.vpi.springboot.Modelo.*;
 import com.vpi.springboot.Modelo.dto.DTAdministrador;
+import com.vpi.springboot.Modelo.dto.DTCategoria;
 import com.vpi.springboot.Modelo.dto.DTCliente;
 import com.vpi.springboot.Modelo.dto.DTProductoVendido;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
 import com.vpi.springboot.Modelo.dto.DTRestaurantePedido;
+import com.vpi.springboot.Modelo.dto.DTTopCategoria;
 import com.vpi.springboot.Modelo.dto.DTUsuario;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Repositorios.AdministradorRepositorio;
@@ -31,6 +34,7 @@ import com.vpi.springboot.Repositorios.ClienteRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
 import com.vpi.springboot.Repositorios.mongo.ProductosVendidosRepositorio;
 import com.vpi.springboot.Repositorios.mongo.RestaurantePedidosRepositorio;
+import com.vpi.springboot.Repositorios.mongo.TopCategoriasRepositorio;
 import com.vpi.springboot.exception.AdministradorException;
 import com.vpi.springboot.exception.RestauranteException;
 import com.vpi.springboot.exception.UsuarioException;
@@ -55,6 +59,9 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 	
 	@Autowired
 	private ProductosVendidosRepositorio productosVendidosRepo;
+	
+	@Autowired
+	private TopCategoriasRepositorio topCategoriasRepo;
 	
 	@Override
 	public DTRespuesta crearAdministrador(Administrador admin) throws AdministradorException {
@@ -459,5 +466,12 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 		response.put("totalItems", pageProductos.getTotalElements());
 		response.put("restaurantes", DTproductosVendidos);
 		return response;
+	}
+	
+	@Override
+	public List<DTTopCategoria> topCategorias() {
+		//List<DTProductoVendido> lista = productosVendidosRepo.findAllBy(Sort.by(Sort.Direction.DESC, "cantidad"));
+		List<DTTopCategoria> lista = topCategoriasRepo.findAllBy(Sort.by(Sort.Direction.DESC, "cantidad"));
+		return lista;
 	}
 }

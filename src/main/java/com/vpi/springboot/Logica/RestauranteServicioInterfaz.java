@@ -41,7 +41,7 @@ public interface RestauranteServicioInterfaz {
 
 	public DTRespuesta cerrarRestaurante(String mail);
 
-	public DTRespuesta confirmarPedido(int idPedido) throws PedidoException;
+	public DTRespuesta confirmarPedido(int idPedido) throws PedidoException, IOException;
 
 	public DTRespuesta modificarDescuentoProducto(int idProducto, int descuento) throws ProductoException;
 
@@ -52,7 +52,7 @@ public interface RestauranteServicioInterfaz {
 
 	public DTRespuesta bajaPromocion(int idPromo) throws PromocionException;
 
-	public DTRespuesta rechazarPedido(int idPedido) throws PedidoException;
+	public DTRespuesta rechazarPedido(int idPedido) throws PedidoException, IOException;
 
 	public DTRespuesta calificarCliente(String mailCliente, String mailRestaurante, Calificacion calificacion)
 			throws UsuarioException, RestauranteException;
