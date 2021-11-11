@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vpi.springboot.Logica.AdministradorService;
+import com.vpi.springboot.Logica.RestauranteService;
 import com.vpi.springboot.Modelo.Administrador;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.exception.PermisosException;
@@ -34,6 +35,8 @@ public class AdministradorController {
 
 	@Autowired
 	private AdministradorService service;
+	@Autowired
+	private RestauranteService restauranteService;
 
 	@Autowired
 	private JwtUtil jwtUtil;
@@ -207,6 +210,23 @@ public class AdministradorController {
 			return new ResponseEntity<>(service.topCategorias(), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
+	@PostMapping("/balanceVenta")
+	public ResponseEntity<?> getBalanceVenta(@RequestBody Map<String, String> consulta) {
+		if (!esAdmin()) {
+			return new ResponseEntity<>(
+					new UsuarioException(PermisosException.NoPermisosException("ADMIN")).getMessage(),
+					HttpStatus.FORBIDDEN);
+		}
+
+		try {
+			return new ResponseEntity<>(restauranteService.getBalanceVentaByFechaDosRestaurantes(consulta.get("inicio"), consulta.get("fin"), consulta.get("mail1"), 
+					consulta.get("devuelto"),consulta.get("metodoPago"),consulta.get("mail2")), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 }

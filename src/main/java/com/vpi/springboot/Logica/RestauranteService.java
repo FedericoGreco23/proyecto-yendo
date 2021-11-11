@@ -81,6 +81,7 @@ import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
 import com.vpi.springboot.Modelo.dto.FechaidPedidoMontoDTO;
 import com.vpi.springboot.Modelo.dto.GetEstadoResponseDTO;
 import com.vpi.springboot.Modelo.dto.IdPedidoMontoDTO;
+import com.vpi.springboot.Modelo.dto.ListaBalanceVentaDTO;
 import com.vpi.springboot.Repositorios.CalificacionClienteRepositorio;
 import com.vpi.springboot.Repositorios.CalificacionRestauranteRepositorio;
 import com.vpi.springboot.Repositorios.CategoriaRepositorio;
@@ -1872,5 +1873,25 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		}
 		throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(mailFromJwt));
 		
+	}
+
+	public Object getBalanceVentaByFechaDosRestaurantes(String fechaInicio, String fechaHasta, String mail1, 
+			String devuelto, String metodoPago, String mail2) {
+		try {
+		if(mail2==null) {
+			return getBalanceVentaByFecha(fechaInicio, fechaHasta, mail1, 
+					devuelto, metodoPago);
+		}
+		Map<String, BalanceByFechaDTO> balances= new HashMap<String, BalanceByFechaDTO>();
+		balances.put(mail1, (BalanceByFechaDTO) getBalanceVentaByFecha(fechaInicio, fechaHasta, mail1, 
+					devuelto, metodoPago));
+		balances.put(mail2,(BalanceByFechaDTO) getBalanceVentaByFecha(fechaInicio, fechaHasta, mail2, 
+				devuelto, metodoPago));
+		
+		return new ListaBalanceVentaDTO(balances);
+		}catch(Exception e) {
+			return "Balance de Ventas no disponible"; 
+		}
+
 	}
 }
