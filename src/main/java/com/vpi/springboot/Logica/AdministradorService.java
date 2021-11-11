@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -472,7 +474,9 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 	@Override
 	public List<DTTopCategoria> topCategorias() {
 		//List<DTProductoVendido> lista = productosVendidosRepo.findAllBy(Sort.by(Sort.Direction.DESC, "cantidad"));
-		List<DTTopCategoria> lista = (List<DTTopCategoria>) topCategoriasRepo.findAllBy(Sort.by(Sort.Direction.DESC, "cantidad"));
-		return lista;
+		int cantidad = 0;
+		//List<DTTopCategoria> lista = (List<DTTopCategoria>) topCategoriasRepo.listarTopCategorias(cantidad, Sort.by(Sort.Direction.DESC, "cantidad"));
+		//return lista;
+		return null;
 	}
 }

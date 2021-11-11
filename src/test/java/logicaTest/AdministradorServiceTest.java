@@ -120,7 +120,7 @@ class AdministradorServiceTest {
 		sort = Sort.by(Sort.Order.desc("cantPedidos"));
 		paging = PageRequest.of(0, 5);
 		paging2 = PageRequest.of(0, 5, sort);
-		dtProductoVendido = new DTProductoVendido(String.valueOf(producto.getId()), producto.getNombre(), restaurante.getNombre(), "5", "minutas", "2021-10-21");
+		dtProductoVendido = new DTProductoVendido(String.valueOf(producto.getId()), producto.getNombre(), restaurante.getNombre(), 5, "minutas", "2021-10-21");
 		dtProductoVendidoList.add(dtProductoVendido);
 		dtProductoVendidoPage = new PageImpl<>(dtProductoVendidoList);
 		Sort sort1 = Sort.by(Sort.Order.desc("cantidad"));

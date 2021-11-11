@@ -72,7 +72,7 @@ public interface RestauranteServicioInterfaz {
 
 	public DTRespuesta registrarPago(int idPedido);
 	
-	public void ventaProducto(String idProducto, String cantidad, String categoria, String fecha, String nombreRestaurante, String nombreProducto);
+	public void ventaProducto(String idProducto, int cantidad, String categoria, String fecha, String nombreRestaurante, String nombreProducto);
 
 	public DTRespuesta devolucionPedido(int idPedido, int idReclamo);
 	

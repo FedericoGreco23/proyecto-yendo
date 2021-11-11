@@ -22,6 +22,6 @@ public interface ProductosVendidosRepositorio extends MongoRepository<DTProducto
 	/*@Query("SELECT p.categoria, COUNT(p.cantidad) FROM DTProductoVendido p GROUP BY p.categoria ORDER BY p.cantidad DESC")
 	List<DTProductoVendido> findAllBy();*/
 	
-	@Query("SELECT p.categoria, COUNT(p.cantidad) FROM DTProductoVendido p GROUP BY p.categoria")
-	List<DTProductoVendido> findAllBy(Sort sort);
+	/*@Query("SELECT p.categoria, COUNT(p.cantidad) FROM DTProductoVendido p GROUP BY p.categoria")
+	List<DTProductoVendido> findAllBy(Sort sort);*/
 }

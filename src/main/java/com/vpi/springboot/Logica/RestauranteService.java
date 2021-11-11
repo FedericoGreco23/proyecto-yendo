@@ -1463,7 +1463,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		Document productoDocument;
 
 		String idProducto;
-		String cantidad;
+		int cantidad;
 		String categoria;
 		String fecha;
 		String nombreProducto;
@@ -1472,7 +1472,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 		for (Object obj : listaDBObject) {
 			carritoDocument = (Document) obj;
-			cantidad = carritoDocument.get("cantidad").toString();
+			cantidad = carritoDocument.getInteger("cantidad");
 			productoDocument = (Document) carritoDocument.get("producto");
 			idProducto = productoDocument.get("_id").toString();
 			categoria = productoDocument.getString("categoria");
@@ -1486,7 +1486,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	}
 
 	@Override
-	public void ventaProducto(String idProducto, String cantidad, String categoria, String fecha,
+	public void ventaProducto(String idProducto, int cantidad, String categoria, String fecha,
 			String nombreRestaurante, String nombreProducto) {
 		MongoClientURI uri = new MongoClientURI(
 				"mongodb+srv://grupo1:grupo1@cluster0.l17sm.mongodb.net/prueba-concepto");
@@ -1501,15 +1501,12 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			Document pedidoDocument = (Document) collectionPedidos.find(new Document("_id", idProducto)).first();
 
 			// Conversiones a int y suma
-			String cantidadDocumento = pedidoDocument.getString("cantidad");
-			int cantidadDocumentoInt = Integer.parseInt(cantidadDocumento);
-			int cantidadSuma = Integer.parseInt(cantidad);
-			int cantidadSumada = cantidadDocumentoInt + cantidadSuma;
-			String cantidadSumadaString = Integer.toString(cantidadSumada);
+			int cantidadDocumento = pedidoDocument.getInteger("cantidad");
+			int cantidadSumada = cantidadDocumento + cantidad;
 
 			// Modifico el valor
-			Bson filter = eq("cantidad", pedidoDocument.get("cantidad"));
-			Bson updateOperation = set("cantidad", cantidadSumadaString);
+			Bson filter = eq("cantidad", pedidoDocument.getInteger("cantidad"));
+			Bson updateOperation = set("cantidad", cantidadSumada);
 			collectionPedidos.updateOne(filter, updateOperation);
 
 		} else {
