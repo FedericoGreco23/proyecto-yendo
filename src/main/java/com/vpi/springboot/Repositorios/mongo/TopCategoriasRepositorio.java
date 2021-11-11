@@ -17,6 +17,9 @@ public interface TopCategoriasRepositorio extends MongoRepository<DTTopCategoria
 	/*@Query("SELECT p.categoria, COUNT(p.cantidad) FROM DTProductoVendido p GROUP BY p.categoria")
 	List<DTTopCategoria> findAllBy(Sort sort);*/
 
-	@Query("SELECT p.categoria, COUNT(p.cantidad) FROM DTTopCategoria p GROUP BY p.categoria")
+	/*@Query(value = "SELECT COUNT(p) FROM DTTopCategoria p GROUP BY p.categoria", nativeQuery = true)
+	List<DTTopCategoria> findAllBy(Sort sort);*/
+	
+	@Query("SELECT COUNT(p.cantidad) as cantidad, p.categoria FROM DTTopCategoria p GROUP BY p.categoria")
 	List<DTTopCategoria> findAllBy(Sort sort);
 }

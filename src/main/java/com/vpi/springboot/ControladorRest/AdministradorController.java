@@ -204,6 +204,16 @@ public class AdministradorController {
 		}
 	}
 	
+	@GetMapping("/topProductos")
+	public ResponseEntity<?> topProductos(@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "5") int size) {
+		try {
+			return new ResponseEntity<>(service.topProductos(page, size), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
 	@GetMapping("/topCategorias")
 	public ResponseEntity<?> topCategorias() {
 		try {

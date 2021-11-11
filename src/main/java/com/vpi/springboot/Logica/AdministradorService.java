@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.mapreduce.GroupBy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -471,7 +472,7 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 	@Override
 	public List<DTTopCategoria> topCategorias() {
 		//List<DTProductoVendido> lista = productosVendidosRepo.findAllBy(Sort.by(Sort.Direction.DESC, "cantidad"));
-		List<DTTopCategoria> lista = topCategoriasRepo.findAllBy(Sort.by(Sort.Direction.DESC, "cantidad"));
+		List<DTTopCategoria> lista = (List<DTTopCategoria>) topCategoriasRepo.findAllBy(Sort.by(Sort.Direction.DESC, "cantidad"));
 		return lista;
 	}
 }
