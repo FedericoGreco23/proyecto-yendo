@@ -764,6 +764,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		return new DTRespuesta("Calificación de cliente " + mailCliente + " eliminada correctamente");
 	}
 
+	@Override
 	public Map<String, Object> listarReclamos(int page, int size, String cliente, String estado, String fecha,
 			String sort, int order, String mailRestaurante) throws RestauranteException {
 		Optional<Restaurante> optionalRestaurante = restauranteRepo.findById(mailRestaurante);
@@ -1667,6 +1668,29 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			return null;
 //			throw new UsuarioException(RestauranteException.SinCalificacion(mailCliente));
 		return new DTCalificacionCliente(calCliente);
+	}
+	
+	// Abre o cierra los restaurantes dependiendo de la hora
+	@Scheduled(cron = "0 * * * * *") // cada minuto
+	public void checkRestauranteApertura() {
+		List<Restaurante> restaurantes = restauranteRepo.findAll();
+		for(Restaurante r: restaurantes) {
+			if(!r.getBloqueado() && r.getActivo() && r.getEstado() == EnumEstadoRestaurante.ACEPTADO) {
+				// si el restaurante está abierto, nos fijamos si lo tenemos que cerrar
+				if(r.getAbierto()) {
+					if(r.getHorarioCierre() == LocalTime.now() || r.getHorarioCierre().isAfter(LocalTime.now())) {
+						r.setAbierto(false);
+						restauranteRepo.save(r);
+					}
+				// si el restaurante está cerrado, nos fijamos si lo tenemos que abrir
+				} else {
+					if(r.getHorarioApertura().equals(LocalTime.now()) || LocalTime.now().isAfter(r.getHorarioApertura())) {
+						r.setAbierto(true);
+						restauranteRepo.save(r);
+					}
+				}
+			}
+		}
 	}
 
 //////////////////////////////////////////ESTADISTICAS///////////////////////////////////
