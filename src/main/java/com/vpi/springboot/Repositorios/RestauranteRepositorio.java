@@ -16,7 +16,8 @@ import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 public interface RestauranteRepositorio extends UserBaseRepository<Restaurante> {
 	//x.mail LIKE CONCAT('%',UPPER(:mail),'%') enrealidad lo que busca es si el parametro de entrada para buscar esta contenido en la columna mail
 	//Usamos UPPER en las entradas y variables para que discrimine mayusculas y minusculas
-	
+	@Query("SELECT r FROM Restaurante r WHERE r.estado = 'ACEPTADO' and r.bloqueado = false and r.activo = true and r.abierto = :abierto")
+	List<Restaurante> findByAceptado(@Param("abierto") Boolean abierto);
 
 	//no usar, si se rompe arrojar error de nombre repetido
 	@Query("SELECT r FROM Restaurante r WHERE UPPER(r.mail) LIKE CONCAT('%',UPPER(:texto),'%') OR UPPER(r.nombre) LIKE CONCAT('%',UPPER(:texto),'%')")

@@ -1673,22 +1673,19 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	// Abre o cierra los restaurantes dependiendo de la hora
 	@Scheduled(cron = "0 * * * * *") // cada minuto
 	public void checkRestauranteApertura() {
-		List<Restaurante> restaurantes = restauranteRepo.findAll();
-		for(Restaurante r: restaurantes) {
-			if(!r.getBloqueado() && r.getActivo() && r.getEstado() == EnumEstadoRestaurante.ACEPTADO) {
-				// si el restaurante está abierto, nos fijamos si lo tenemos que cerrar
-				if(r.getAbierto()) {
-					if(r.getHorarioCierre() == LocalTime.now() || r.getHorarioCierre().isAfter(LocalTime.now())) {
-						r.setAbierto(false);
-						restauranteRepo.save(r);
-					}
-				// si el restaurante está cerrado, nos fijamos si lo tenemos que abrir
-				} else {
-					if(r.getHorarioApertura().equals(LocalTime.now()) || LocalTime.now().isAfter(r.getHorarioApertura())) {
-						r.setAbierto(true);
-						restauranteRepo.save(r);
-					}
-				}
+		List<Restaurante> restaurantesAbiertos = restauranteRepo.findByAceptado(true);
+		List<Restaurante> restaurantesCerrados = restauranteRepo.findByAceptado(false);
+		for(Restaurante r: restaurantesAbiertos) {
+			if(r.getHorarioCierre() == LocalTime.now() || LocalTime.now().isAfter(r.getHorarioCierre())) {
+				r.setAbierto(false);
+				restauranteRepo.save(r);
+			}
+		}
+		
+		for(Restaurante r: restaurantesCerrados) {
+			if(r.getHorarioApertura().equals(LocalTime.now()) || LocalTime.now().isAfter(r.getHorarioApertura())) {
+				r.setAbierto(true);
+				restauranteRepo.save(r);
 			}
 		}
 	}

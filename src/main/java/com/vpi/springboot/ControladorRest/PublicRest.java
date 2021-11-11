@@ -106,11 +106,12 @@ public class PublicRest {
 	
 	@CrossOrigin(origins = "*", allowedHeaders = "*")
 	@PostMapping("/activarCuenta")
-	public ResponseEntity<?> activarCuenta(@RequestParam(required = true) String token) {
+	public ResponseEntity<?> activarCuenta(@RequestParam(required = true) String token) throws Exception {
 		try {
 			return new ResponseEntity<>(service.activarCuenta(token), HttpStatus.OK);
 		} catch (Exception e) {
-			return new ResponseEntity<>(new DTRespuesta(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+			throw new Exception(e.getMessage());
+//			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
