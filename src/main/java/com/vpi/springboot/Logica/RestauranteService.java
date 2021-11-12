@@ -1675,7 +1675,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	}
 	
 	// Abre o cierra los restaurantes dependiendo de la hora
-	@Scheduled(cron = "0 * * * * *") // cada minuto
+	//@Scheduled(cron = "0 * * * * *") // cada minuto
+	@Scheduled(cron = "0 0 * * * *")
 	public void checkRestauranteApertura() {
 		List<Restaurante> restaurantesAbiertos = restauranteRepo.findByAceptado(true);
 		List<Restaurante> restaurantesCerrados = restauranteRepo.findByAceptado(false);
@@ -1699,7 +1700,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	/**
 	* BALANCE DE VENTAS
 	*/
-	@Scheduled(cron = "*/59 */1 * * * *") // 1 vez cada 5 minutos
+	@Scheduled(cron = "*/59 */7 * * * *") // 1 vez cada 5 minutos
 	public DTRespuesta actualizarBalanceVentas() {
 
 		// descomentar
