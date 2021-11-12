@@ -116,9 +116,8 @@ public class AdministradorController {
 			@RequestParam(defaultValue = "") String texto,
 			@RequestParam(defaultValue = "") String sort,
 			@RequestParam(defaultValue = "0") int order,
-			@RequestParam(defaultValue = "false") Boolean bloqueado,
-			@RequestParam(defaultValue = "false") Boolean desbloqueado) {
-		return service.buscarUsuario(page, size, tipoUsuario, antiguedadUsuario, texto, sort, order, bloqueado, desbloqueado);
+			@RequestParam(defaultValue = "0") int estado) {
+		return service.buscarUsuario(page, size, tipoUsuario, antiguedadUsuario, texto, sort, order, estado);
 	}
 
 	@CrossOrigin(origins = "*", allowedHeaders = "*")

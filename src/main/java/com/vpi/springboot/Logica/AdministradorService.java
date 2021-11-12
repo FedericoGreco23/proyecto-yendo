@@ -200,10 +200,11 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 	// 0 -> cliente
 	// Retorna la lista de usuario (Administrador, restaurante o cliente) de
 	// elementos que cumplen con la busqueda
+	//Para estado 0-> es todos, 1-> bloqueados y 2-> desbloqueados
 //	@SuppressWarnings("unused")
 	@Override
 	public Map<String, Object> buscarUsuario(int page, int size, int tipoUsuario, Integer antiguedadUsuario,
-			String texto, String sort, int order, Boolean bloqueado, Boolean desbloqueado) {
+			String texto, String sort, int order, int estado) {
 		List<DTUsuario> DTUsuarios = new ArrayList<DTUsuario>();
 		List<Administrador> administradores = new ArrayList<Administrador>();
 		List<Restaurante> restaurantes = new ArrayList<Restaurante>();
@@ -230,7 +231,7 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 		case 2:
 			Page<Administrador> pageAdministradores;
 			
-			if (bloqueado) {
+			if (estado == 1) {
 				//Solo bloqueados
 				if (antiguedadUsuario > 0) {
 					if (!texto.equalsIgnoreCase("")) {
@@ -269,7 +270,7 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 						DTUsuarios.add(new DTUsuario(administrador, "Administrador"));
 					}
 				}
-			} else if (desbloqueado) {
+			} else if (estado == 2) {
 				//Solo desbloqueados
 				if (antiguedadUsuario > 0) {
 					if (!texto.equalsIgnoreCase("")) {
@@ -358,7 +359,7 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 		case 1:
 			Page<Restaurante> pageRestaurantes;
 			
-			if (bloqueado) {
+			if (estado == 1) {
 				//Solo bloqueados
 				if (antiguedadUsuario > 0) {
 					if (!texto.equalsIgnoreCase("")) {
@@ -398,7 +399,7 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 						DTUsuarios.add(new DTUsuario(restaurante, "Restaurante", restaurante.getCalificacionPromedio()));
 					}
 				}
-			} else if (desbloqueado) {
+			} else if (estado == 2) {
 				//Solo desbloqueados
 				if (antiguedadUsuario > 0) {
 					if (!texto.equalsIgnoreCase("")) {
@@ -489,7 +490,7 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 		case 0:
 			Page<Cliente> pageClientes;
 			
-			if (bloqueado) {
+			if (estado == 1) {
 				//Solo bloqueados
 				if (antiguedadUsuario > 0) {
 					if (!texto.equalsIgnoreCase("")) {
@@ -529,7 +530,7 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 						DTUsuarios.add(new DTUsuario(cliente, "Cliente", cliente.getCalificacionPromedio()));
 					}
 				}
-			} else if (desbloqueado) {
+			} else if (estado == 2) {
 				//Solo desbloqueados
 				if (antiguedadUsuario > 0) {
 					if (!texto.equalsIgnoreCase("")) {
