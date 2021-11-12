@@ -1253,7 +1253,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				}
 
 				//////////// pedidos///////////////////
-
+				Integer i = (int) (Math.random() * 2);
 				Integer randomR = (int) (Math.random() * 21);
 				String mailREsto = restaurantesList.get(randomR).toLowerCase().replace(" ", "") + "@"
 						+ restaurantesList.get(randomR).toLowerCase().replace(" ", "") + ".com";
@@ -1264,11 +1264,15 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 						clienteService.agregarACarrito(resOp.get().getProductos().get(0).getId(), 3, cliente.getMail(),
 								resOp.get().getMail());
 						DTCarrito carrito = clienteService.verCarrito(cliente.getMail());
-						clienteService.altaPedidosParaCargadeDatos((int) carrito.getId(), EnumMetodoDePago.EFECTIVO,
+						DTPedido dtPedido=clienteService.altaPedidosParaCargadeDatos((int) carrito.getId(), EnumMetodoDePago.values()[i],
 								cli.get().getDirecciones().get(0).getId(), cliente.getMail(), "Muero de hambre");
+						
+						if(dtPedido.getMetodoDePago().name()=="EFECTIVO") {
+							registrarPago(dtPedido.getId());	
+						}
 						// calificaciones
 						clienteService.calificarRestaurante(cliente.getMail(), resOp.get().getMail(), new Calificacion(
-								(int) (Math.random() * 2) + 3, "mejor imposible", null, LocalDateTime.now()));
+								(int) (Math.random() * 6), "mejor imposible", null, LocalDateTime.now()));
 
 						calificarCliente(cliente.getMail(), resOp.get().getMail(), new Calificacion(
 								(int) (Math.random() * 2) + 3, "Sos todo lo que está bien", null, LocalDateTime.now()));
