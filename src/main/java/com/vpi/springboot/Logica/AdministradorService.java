@@ -2,29 +2,23 @@ package com.vpi.springboot.Logica;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.mapreduce.GroupBy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.vpi.springboot.Modelo.*;
-import com.vpi.springboot.Modelo.dto.DTAdministrador;
-import com.vpi.springboot.Modelo.dto.DTCategoria;
-import com.vpi.springboot.Modelo.dto.DTCliente;
+import com.vpi.springboot.Modelo.Administrador;
+import com.vpi.springboot.Modelo.Cliente;
+import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.dto.DTProductoVendido;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;

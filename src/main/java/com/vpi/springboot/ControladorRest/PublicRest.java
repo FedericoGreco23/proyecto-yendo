@@ -29,7 +29,6 @@ import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.dto.AuthenticationRequest;
 import com.vpi.springboot.Modelo.dto.AuthenticationResponse;
 import com.vpi.springboot.Modelo.dto.DTBuscarRestaurante;
-import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
 import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.exception.RestauranteException;

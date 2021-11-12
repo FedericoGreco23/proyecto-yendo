@@ -1,13 +1,8 @@
 package com.vpi.springboot.Repositorios.mongo;
 
-import java.util.List;
-
 import javax.transaction.Transactional;
 
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.repository.query.Param;
 
 import com.vpi.springboot.Modelo.dto.DTProductoVendido;
 

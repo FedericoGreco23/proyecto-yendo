@@ -1,23 +1,16 @@
 package com.vpi.springboot.Logica;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
 import com.vpi.springboot.Modelo.Categoria;
-import com.vpi.springboot.Modelo.Pedido;
-import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.Modelo.dto.DTBuscarRestaurante;
 import com.vpi.springboot.Modelo.dto.DTCategoriaProducto;
-import com.vpi.springboot.Modelo.dto.DTProducto;
 import com.vpi.springboot.Modelo.dto.DTPromocion;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.DTRestaurante;
-import com.vpi.springboot.Modelo.dto.DTRestaurantePedido;
-import com.vpi.springboot.Modelo.dto.DTUsuario;
-import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
 import com.vpi.springboot.exception.RestauranteException;
+import com.vpi.springboot.exception.TokenException;
 import com.vpi.springboot.exception.UsuarioException;
 
 public interface GeneralServicioInterfaz {
@@ -25,7 +18,7 @@ public interface GeneralServicioInterfaz {
 
 	public String recuperarPassword(String mail) throws UsuarioException;
 
-	public DTRespuesta activarCuenta(String token);
+	public DTRespuesta activarCuenta(String token) throws TokenException;
 	
 	public DTRestaurante getRestaurante(String mail) throws RestauranteException;
 	

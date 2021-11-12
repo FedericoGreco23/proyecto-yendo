@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 
 import com.vpi.springboot.Modelo.Calificacion;
 import com.vpi.springboot.Modelo.CalificacionCliente;
-import com.vpi.springboot.Modelo.CalificacionRestaurante;
 
 public class DTCalificacionCliente extends DTCalificacion implements Serializable {
 	private static final long serialVersionUID = 1L;

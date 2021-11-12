@@ -2,8 +2,6 @@ package com.vpi.springboot.Modelo.dto;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import com.vpi.springboot.Modelo.Pedido;
 

@@ -1,13 +1,7 @@
 package com.vpi.springboot.Modelo.dto;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import com.vpi.springboot.Modelo.Producto;
-import com.vpi.springboot.Modelo.Promocion;
 
 
 public class DTPromocionConPrecio implements Serializable {

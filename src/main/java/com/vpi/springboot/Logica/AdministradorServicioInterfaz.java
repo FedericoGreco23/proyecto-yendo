@@ -4,9 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.vpi.springboot.Modelo.Administrador;
-import com.vpi.springboot.Modelo.dto.DTProductoVendido;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
-import com.vpi.springboot.Modelo.dto.DTRestaurante;
 import com.vpi.springboot.Modelo.dto.DTTopCategoria;
 import com.vpi.springboot.exception.AdministradorException;
 import com.vpi.springboot.exception.RestauranteException;

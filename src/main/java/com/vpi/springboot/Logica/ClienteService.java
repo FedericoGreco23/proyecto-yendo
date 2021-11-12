@@ -14,6 +14,7 @@ import java.util.Optional;
 
 import javax.servlet.http.HttpSession;
 
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,7 +22,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.stereotype.Service;
 
 import com.vpi.springboot.IdCompuestas.CalificacionRestauranteId;
@@ -32,19 +32,17 @@ import com.vpi.springboot.Modelo.Carrito;
 import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Direccion;
 import com.vpi.springboot.Modelo.GeoLocalizacion;
-
+import com.vpi.springboot.Modelo.LastDireccioClientenMongo;
+import com.vpi.springboot.Modelo.Pedido;
 import com.vpi.springboot.Modelo.Producto;
 import com.vpi.springboot.Modelo.Reclamo;
 import com.vpi.springboot.Modelo.Restaurante;
 import com.vpi.springboot.Modelo.TokenVerificacion;
-import com.vpi.springboot.Modelo.LastDireccioClientenMongo;
-import com.vpi.springboot.Modelo.Pedido;
 import com.vpi.springboot.Modelo.dto.DTCalificacionCliente;
 import com.vpi.springboot.Modelo.dto.DTCalificacionRestaurante;
 import com.vpi.springboot.Modelo.dto.DTCarrito;
 import com.vpi.springboot.Modelo.dto.DTCliente;
 import com.vpi.springboot.Modelo.dto.DTDireccion;
-import com.vpi.springboot.Modelo.dto.DTListarRestaurante;
 import com.vpi.springboot.Modelo.dto.DTNotificacionSoket;
 import com.vpi.springboot.Modelo.dto.DTPedido;
 import com.vpi.springboot.Modelo.dto.DTPedidoParaAprobar;
@@ -54,30 +52,26 @@ import com.vpi.springboot.Modelo.dto.DTReclamo;
 import com.vpi.springboot.Modelo.dto.DTRespuesta;
 import com.vpi.springboot.Modelo.dto.EnumEstadoPedido;
 import com.vpi.springboot.Modelo.dto.EnumEstadoReclamo;
-import com.vpi.springboot.Modelo.dto.EnumEstadoRestaurante;
 import com.vpi.springboot.Modelo.dto.EnumMetodoDePago;
 import com.vpi.springboot.Repositorios.CalificacionClienteRepositorio;
 import com.vpi.springboot.Repositorios.CalificacionRestauranteRepositorio;
 import com.vpi.springboot.Repositorios.ClienteRepositorio;
 import com.vpi.springboot.Repositorios.DireccionRepositorio;
 import com.vpi.springboot.Repositorios.GeoLocalizacionRepositorio;
-
 import com.vpi.springboot.Repositorios.MongoRepositorioCarrito;
 import com.vpi.springboot.Repositorios.PedidoRepositorio;
 import com.vpi.springboot.Repositorios.ProductoRepositorio;
 import com.vpi.springboot.Repositorios.ReclamoRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
 import com.vpi.springboot.Repositorios.VerificacionRepositorio;
+import com.vpi.springboot.Repositorios.mongo.UltimaDireccionRepositorio;
 import com.vpi.springboot.exception.CarritoException;
 import com.vpi.springboot.exception.DireccionException;
+import com.vpi.springboot.exception.PedidoException;
 import com.vpi.springboot.exception.ProductoException;
 import com.vpi.springboot.exception.ReclamoException;
 import com.vpi.springboot.exception.RestauranteException;
-import com.vpi.springboot.exception.PedidoException;
-import com.vpi.springboot.Repositorios.mongo.UltimaDireccionRepositorio;
-
 import com.vpi.springboot.exception.UsuarioException;
-import org.springframework.beans.factory.ObjectFactory;
 
 @Service
 public class ClienteService implements ClienteServicioInterfaz {

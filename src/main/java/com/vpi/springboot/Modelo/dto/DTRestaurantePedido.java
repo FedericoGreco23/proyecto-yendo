@@ -1,7 +1,6 @@
 package com.vpi.springboot.Modelo.dto;
 
 import java.io.Serializable;
-import java.math.BigInteger;
 
 import javax.persistence.Id;
 

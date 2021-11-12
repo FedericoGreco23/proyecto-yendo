@@ -6,7 +6,6 @@ import java.util.List;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.vpi.springboot.Modelo.dto.DTProductoCarrito;

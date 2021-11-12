@@ -1,10 +1,8 @@
 package com.vpi.springboot.security;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,7 +15,6 @@ import com.vpi.springboot.Modelo.Usuario;
 import com.vpi.springboot.Repositorios.AdministradorRepositorio;
 import com.vpi.springboot.Repositorios.ClienteRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
-import com.vpi.springboot.exception.UsuarioException;
 import com.vpi.springboot.security.util.MyDetails;
 
 @Service

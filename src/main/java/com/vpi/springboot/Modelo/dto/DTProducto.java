@@ -1,10 +1,7 @@
 package com.vpi.springboot.Modelo.dto;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
-import com.vpi.springboot.Modelo.Categoria;
 import com.vpi.springboot.Modelo.Producto;
 
 public class DTProducto implements Serializable {

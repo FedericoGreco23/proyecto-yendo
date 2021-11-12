@@ -1,11 +1,8 @@
 package com.vpi.springboot.Modelo.dto;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.Id;
 

@@ -44,6 +44,7 @@ import com.vpi.springboot.Repositorios.PromocionRepositorio;
 import com.vpi.springboot.Repositorios.RestauranteRepositorio;
 import com.vpi.springboot.Repositorios.VerificacionRepositorio;
 import com.vpi.springboot.exception.RestauranteException;
+import com.vpi.springboot.exception.TokenException;
 import com.vpi.springboot.exception.UsuarioException;
 
 @Service
@@ -185,11 +186,11 @@ public class GeneralService implements GeneralServicioInterfaz {
 	}
 
 	@Override
-	public DTRespuesta activarCuenta(String token) {
+	public DTRespuesta activarCuenta(String token) throws TokenException{
 		TokenVerificacion verificacion = tokenRepo.findByToken(token);
 
 		if (verificacion == null) {
-			return new DTRespuesta("El token no pudo ser encontrado.");
+			throw new TokenException(TokenException.NotFoundException());
 		}
 		Cliente cliente = verificacion.getUsuario();
 
@@ -205,13 +206,13 @@ public class GeneralService implements GeneralServicioInterfaz {
 			try {
 				mailSender.sendMail(to, body, topic);
 			} catch (MessagingException e) {
-				return new DTRespuesta("No se pudo mandar mail: " + e.getMessage());
+				throw new TokenException(TokenException.MailError());
 			} finally {
 				tokenRepo.delete(verificacion);
 			}
 
 			tokenRepo.delete(verificacion);
-			return new DTRespuesta("El token expiró. Se ha reenviado un nuevo mail de verificación.");
+			throw new TokenException(TokenException.ExpiredToken());
 		}
 
 		cliente.setVerificado(true);

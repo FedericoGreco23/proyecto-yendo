@@ -155,7 +155,7 @@ class GeneralServiceTest {
 	}
 	
 	@Test
-	public void testActivarCuenta() throws MessagingException {
+	public void testActivarCuenta() throws MessagingException, Exception {
 		Mockito.when(tokenRepo.findByToken(Mockito.anyString())).thenReturn(token);
 		Mockito.doReturn(token).when(tokenRepo).save(Mockito.any(TokenVerificacion.class));
 		Mockito.doNothing().when(mailSender).sendMail(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
