@@ -203,7 +203,7 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 //	@SuppressWarnings("unused")
 	@Override
 	public Map<String, Object> buscarUsuario(int page, int size, int tipoUsuario, Integer antiguedadUsuario,
-			String texto, String sort, int order) {
+			String texto, String sort, int order, Boolean bloqueado, Boolean desbloqueado) {
 		List<DTUsuario> DTUsuarios = new ArrayList<DTUsuario>();
 		List<Administrador> administradores = new ArrayList<Administrador>();
 		List<Restaurante> restaurantes = new ArrayList<Restaurante>();
@@ -229,43 +229,126 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 		switch (tipoUsuario) {
 		case 2:
 			Page<Administrador> pageAdministradores;
-			if (antiguedadUsuario > 0) {
-				if (!texto.equalsIgnoreCase("")) {
-					// Aplico los 3 filtros
+			
+			if (bloqueado) {
+				//Solo bloqueados
+				if (antiguedadUsuario > 0) {
+					if (!texto.equalsIgnoreCase("")) {
+						// Aplico los 3 filtros
+						pageAdministradores = adminRepo.buscarAdministradorBloqueadoNombre(texto, paging);
+						administradores = pageAdministradores.getContent();
+						for (Administrador administrador : administradores) {
+							long days = ChronoUnit.DAYS.between(administrador.getFechaCreacion(), LocalDate.now());
+							if (days > antiguedadUsuario) {
+								DTUsuarios.add(new DTUsuario(administrador, "Administrador"));
+							}
+						}
+					} else {
+						// Aplico tipo y antiguedad
+						pageAdministradores = adminRepo.buscarAdministradorBloqueado(paging);
+						administradores = pageAdministradores.getContent();
+						for (Administrador administrador : administradores) {
+							long days = ChronoUnit.DAYS.between(administrador.getFechaCreacion(), LocalDate.now());
+							if (days > antiguedadUsuario) {
+								DTUsuarios.add(new DTUsuario(administrador, "Administrador"));
+							}
+						}
+					}
+				} else if (!texto.equalsIgnoreCase("")) {
+					// tipo y nombreUsuario
+					pageAdministradores = adminRepo.buscarAdministradorBloqueadoNombre(texto, paging);
+					administradores = pageAdministradores.getContent();
+					for (Administrador administrador : administradores) {
+						DTUsuarios.add(new DTUsuario(administrador, "Administrador"));
+					}
+				} else {
+					// Solo tipo usuario
+					pageAdministradores = adminRepo.buscarAdministradorBloqueado(paging);
+					administradores = pageAdministradores.getContent();
+					for (Administrador administrador : administradores) {
+						DTUsuarios.add(new DTUsuario(administrador, "Administrador"));
+					}
+				}
+			} else if (desbloqueado) {
+				//Solo desbloqueados
+				if (antiguedadUsuario > 0) {
+					if (!texto.equalsIgnoreCase("")) {
+						// Aplico los 3 filtros
+						pageAdministradores = adminRepo.buscarAdministradorDesbloqueadoNombre(texto, paging);
+						administradores = pageAdministradores.getContent();
+						for (Administrador administrador : administradores) {
+							long days = ChronoUnit.DAYS.between(administrador.getFechaCreacion(), LocalDate.now());
+							if (days > antiguedadUsuario) {
+								DTUsuarios.add(new DTUsuario(administrador, "Administrador"));
+							}
+						}
+					} else {
+						// Aplico tipo y antiguedad
+						pageAdministradores = adminRepo.buscarAdministradorDesbloqueado(paging);
+						administradores = pageAdministradores.getContent();
+						for (Administrador administrador : administradores) {
+							long days = ChronoUnit.DAYS.between(administrador.getFechaCreacion(), LocalDate.now());
+							if (days > antiguedadUsuario) {
+								DTUsuarios.add(new DTUsuario(administrador, "Administrador"));
+							}
+						}
+					}
+				} else if (!texto.equalsIgnoreCase("")) {
+					// tipo y nombreUsuario
+					pageAdministradores = adminRepo.buscarAdministradorDesbloqueadoNombre(texto, paging);
+					administradores = pageAdministradores.getContent();
+					for (Administrador administrador : administradores) {
+						DTUsuarios.add(new DTUsuario(administrador, "Administrador"));
+					}
+				} else {
+					// Solo tipo usuario
+					pageAdministradores = adminRepo.buscarAdministradorDesbloqueado(paging);
+					administradores = pageAdministradores.getContent();
+					for (Administrador administrador : administradores) {
+						DTUsuarios.add(new DTUsuario(administrador, "Administrador"));
+					}
+				}
+			} else {
+				//TODOS
+				if (antiguedadUsuario > 0) {
+					if (!texto.equalsIgnoreCase("")) {
+						// Aplico los 3 filtros
+						pageAdministradores = adminRepo.buscarAdministradorNombre(texto, paging);
+						administradores = pageAdministradores.getContent();
+						for (Administrador administrador : administradores) {
+							long days = ChronoUnit.DAYS.between(administrador.getFechaCreacion(), LocalDate.now());
+							if (days > antiguedadUsuario) {
+								DTUsuarios.add(new DTUsuario(administrador, "Administrador"));
+							}
+						}
+					} else {
+						// Aplico tipo y antiguedad
+						pageAdministradores = adminRepo.buscarAdministrador(paging);
+						administradores = pageAdministradores.getContent();
+						for (Administrador administrador : administradores) {
+							long days = ChronoUnit.DAYS.between(administrador.getFechaCreacion(), LocalDate.now());
+							if (days > antiguedadUsuario) {
+								DTUsuarios.add(new DTUsuario(administrador, "Administrador"));
+							}
+						}
+					}
+				} else if (!texto.equalsIgnoreCase("")) {
+					// tipo y nombreUsuario
 					pageAdministradores = adminRepo.buscarAdministradorNombre(texto, paging);
 					administradores = pageAdministradores.getContent();
 					for (Administrador administrador : administradores) {
-						long days = ChronoUnit.DAYS.between(administrador.getFechaCreacion(), LocalDate.now());
-						if (days > antiguedadUsuario) {
-							DTUsuarios.add(new DTUsuario(administrador, "Administrador"));
-						}
+						DTUsuarios.add(new DTUsuario(administrador, "Administrador"));
 					}
 				} else {
-					// Aplico tipo y antiguedad
+					// Solo tipo usuario
 					pageAdministradores = adminRepo.buscarAdministrador(paging);
 					administradores = pageAdministradores.getContent();
 					for (Administrador administrador : administradores) {
-						long days = ChronoUnit.DAYS.between(administrador.getFechaCreacion(), LocalDate.now());
-						if (days > antiguedadUsuario) {
-							DTUsuarios.add(new DTUsuario(administrador, "Administrador"));
-						}
+						DTUsuarios.add(new DTUsuario(administrador, "Administrador"));
 					}
 				}
-			} else if (!texto.equalsIgnoreCase("")) {
-				// tipo y nombreUsuario
-				pageAdministradores = adminRepo.buscarAdministradorNombre(texto, paging);
-				administradores = pageAdministradores.getContent();
-				for (Administrador administrador : administradores) {
-					DTUsuarios.add(new DTUsuario(administrador, "Administrador"));
-				}
-			} else {
-				// Solo tipo usuario
-				pageAdministradores = adminRepo.buscarAdministrador(paging);
-				administradores = pageAdministradores.getContent();
-				for (Administrador administrador : administradores) {
-					DTUsuarios.add(new DTUsuario(administrador, "Administrador"));
-				}
 			}
+			
 			response.put("currentPage", pageAdministradores.getNumber());
 			response.put("totalItems", pageAdministradores.getTotalElements());
 			response.put("usuarios", DTUsuarios);
@@ -274,42 +357,126 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 
 		case 1:
 			Page<Restaurante> pageRestaurantes;
-			if (antiguedadUsuario > 0) {
-				if (!texto.equalsIgnoreCase("")) {
-					// Aplico los 3 filtros
+			
+			if (bloqueado) {
+				//Solo bloqueados
+				if (antiguedadUsuario > 0) {
+					if (!texto.equalsIgnoreCase("")) {
+						// Aplico los 3 filtros
+						pageRestaurantes = resRepo.buscarRestauranteBloqueadoNombre(texto, paging);
+						restaurantes = pageRestaurantes.getContent();
+						for (Restaurante restaurante : restaurantes) {
+							long days = ChronoUnit.DAYS.between(restaurante.getFechaCreacion(), LocalDate.now());
+							if (days > antiguedadUsuario) {
+								DTUsuarios.add(new DTUsuario(restaurante, "Restaurante", restaurante.getCalificacionPromedio()));
+							}
+						}
+
+					} else {
+						// Aplico tipo y antiguedad
+						pageRestaurantes = resRepo.buscarRestauranteBloqueado(paging);
+						restaurantes = pageRestaurantes.getContent();
+						for (Restaurante restaurante : restaurantes) {
+							long days = ChronoUnit.DAYS.between(restaurante.getFechaCreacion(), LocalDate.now());
+							if (days > antiguedadUsuario) {
+								DTUsuarios.add(new DTUsuario(restaurante, "Restaurante", restaurante.getCalificacionPromedio()));
+							}
+						}
+					}
+				} else if (!texto.equalsIgnoreCase("")) {
+					// tipo y nombreUsuario
+					pageRestaurantes = resRepo.buscarRestauranteBloqueadoNombre(texto, paging);
+					restaurantes = pageRestaurantes.getContent();
+					for (Restaurante restaurante : restaurantes) {
+						DTUsuarios.add(new DTUsuario(restaurante, "Restaurante", restaurante.getCalificacionPromedio()));
+					}
+				} else {
+					// Solo tipo usuario
+					pageRestaurantes = resRepo.buscarRestauranteBloqueado(paging);
+					restaurantes = pageRestaurantes.getContent();
+					for (Restaurante restaurante : restaurantes) {
+						DTUsuarios.add(new DTUsuario(restaurante, "Restaurante", restaurante.getCalificacionPromedio()));
+					}
+				}
+			} else if (desbloqueado) {
+				//Solo desbloqueados
+				if (antiguedadUsuario > 0) {
+					if (!texto.equalsIgnoreCase("")) {
+						// Aplico los 3 filtros
+						pageRestaurantes = resRepo.buscarRestauranteDesbloqueadoNombre(texto, paging);
+						restaurantes = pageRestaurantes.getContent();
+						for (Restaurante restaurante : restaurantes) {
+							long days = ChronoUnit.DAYS.between(restaurante.getFechaCreacion(), LocalDate.now());
+							if (days > antiguedadUsuario) {
+								DTUsuarios.add(new DTUsuario(restaurante, "Restaurante", restaurante.getCalificacionPromedio()));
+							}
+						}
+
+					} else {
+						// Aplico tipo y antiguedad
+						pageRestaurantes = resRepo.buscarRestauranteDesbloqueado(paging);
+						restaurantes = pageRestaurantes.getContent();
+						for (Restaurante restaurante : restaurantes) {
+							long days = ChronoUnit.DAYS.between(restaurante.getFechaCreacion(), LocalDate.now());
+							if (days > antiguedadUsuario) {
+								DTUsuarios.add(new DTUsuario(restaurante, "Restaurante", restaurante.getCalificacionPromedio()));
+							}
+						}
+					}
+				} else if (!texto.equalsIgnoreCase("")) {
+					// tipo y nombreUsuario
+					pageRestaurantes = resRepo.buscarRestauranteDesbloqueadoNombre(texto, paging);
+					restaurantes = pageRestaurantes.getContent();
+					for (Restaurante restaurante : restaurantes) {
+						DTUsuarios.add(new DTUsuario(restaurante, "Restaurante", restaurante.getCalificacionPromedio()));
+					}
+				} else {
+					// Solo tipo usuario
+					pageRestaurantes = resRepo.buscarRestauranteDesbloqueado(paging);
+					restaurantes = pageRestaurantes.getContent();
+					for (Restaurante restaurante : restaurantes) {
+						DTUsuarios.add(new DTUsuario(restaurante, "Restaurante", restaurante.getCalificacionPromedio()));
+					}
+				}
+			} else {
+				//TODOS
+				if (antiguedadUsuario > 0) {
+					if (!texto.equalsIgnoreCase("")) {
+						// Aplico los 3 filtros
+						pageRestaurantes = resRepo.buscarRestauranteNombre(texto, paging);
+						restaurantes = pageRestaurantes.getContent();
+						for (Restaurante restaurante : restaurantes) {
+							long days = ChronoUnit.DAYS.between(restaurante.getFechaCreacion(), LocalDate.now());
+							if (days > antiguedadUsuario) {
+								DTUsuarios.add(new DTUsuario(restaurante, "Restaurante", restaurante.getCalificacionPromedio()));
+							}
+						}
+
+					} else {
+						// Aplico tipo y antiguedad
+						pageRestaurantes = resRepo.buscarRestaurante(paging);
+						restaurantes = pageRestaurantes.getContent();
+						for (Restaurante restaurante : restaurantes) {
+							long days = ChronoUnit.DAYS.between(restaurante.getFechaCreacion(), LocalDate.now());
+							if (days > antiguedadUsuario) {
+								DTUsuarios.add(new DTUsuario(restaurante, "Restaurante", restaurante.getCalificacionPromedio()));
+							}
+						}
+					}
+				} else if (!texto.equalsIgnoreCase("")) {
+					// tipo y nombreUsuario
 					pageRestaurantes = resRepo.buscarRestauranteNombre(texto, paging);
 					restaurantes = pageRestaurantes.getContent();
 					for (Restaurante restaurante : restaurantes) {
-						long days = ChronoUnit.DAYS.between(restaurante.getFechaCreacion(), LocalDate.now());
-						if (days > antiguedadUsuario) {
-							DTUsuarios.add(new DTUsuario(restaurante, "Restaurante", restaurante.getCalificacionPromedio()));
-						}
+						DTUsuarios.add(new DTUsuario(restaurante, "Restaurante", restaurante.getCalificacionPromedio()));
 					}
-
 				} else {
-					// Aplico tipo y antiguedad
+					// Solo tipo usuario
 					pageRestaurantes = resRepo.buscarRestaurante(paging);
 					restaurantes = pageRestaurantes.getContent();
 					for (Restaurante restaurante : restaurantes) {
-						long days = ChronoUnit.DAYS.between(restaurante.getFechaCreacion(), LocalDate.now());
-						if (days > antiguedadUsuario) {
-							DTUsuarios.add(new DTUsuario(restaurante, "Restaurante", restaurante.getCalificacionPromedio()));
-						}
+						DTUsuarios.add(new DTUsuario(restaurante, "Restaurante", restaurante.getCalificacionPromedio()));
 					}
-				}
-			} else if (!texto.equalsIgnoreCase("")) {
-				// tipo y nombreUsuario
-				pageRestaurantes = resRepo.buscarRestauranteNombre(texto, paging);
-				restaurantes = pageRestaurantes.getContent();
-				for (Restaurante restaurante : restaurantes) {
-					DTUsuarios.add(new DTUsuario(restaurante, "Restaurante", restaurante.getCalificacionPromedio()));
-				}
-			} else {
-				// Solo tipo usuario
-				pageRestaurantes = resRepo.buscarRestaurante(paging);
-				restaurantes = pageRestaurantes.getContent();
-				for (Restaurante restaurante : restaurantes) {
-					DTUsuarios.add(new DTUsuario(restaurante, "Restaurante", restaurante.getCalificacionPromedio()));
 				}
 			}
 
@@ -321,42 +488,126 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 
 		case 0:
 			Page<Cliente> pageClientes;
-			if (antiguedadUsuario > 0) {
-				if (!texto.equalsIgnoreCase("")) {
-					// Aplico los 3 filtros
+			
+			if (bloqueado) {
+				//Solo bloqueados
+				if (antiguedadUsuario > 0) {
+					if (!texto.equalsIgnoreCase("")) {
+						// Aplico los 3 filtros
+						pageClientes = (Page<Cliente>) clienteRepo.buscarClienteBloqueadoNombre(texto, paging);
+						clientes = pageClientes.getContent();
+						for (Cliente cliente : clientes) {
+							long days = ChronoUnit.DAYS.between(cliente.getFechaCreacion(), LocalDate.now());
+							if (days > antiguedadUsuario) {
+								DTUsuarios.add(new DTUsuario(cliente, "Cliente", cliente.getCalificacionPromedio()));
+							}
+						}
+
+					} else {
+						// Aplico tipo y antiguedad
+						pageClientes = (Page<Cliente>) clienteRepo.buscarClienteBloqueado(paging);
+						clientes = pageClientes.getContent();
+						for (Cliente cliente : clientes) {
+							long days = ChronoUnit.DAYS.between(cliente.getFechaCreacion(), LocalDate.now());
+							if (days > antiguedadUsuario) {
+								DTUsuarios.add(new DTUsuario(cliente, "Cliente", cliente.getCalificacionPromedio()));
+							}
+						}
+					}
+				} else if (!texto.equalsIgnoreCase("")) {
+					// tipo y nombreUsuario
+					pageClientes = (Page<Cliente>) clienteRepo.buscarClienteBloqueadoNombre(texto, paging);
+					clientes = pageClientes.getContent();
+					for (Cliente cliente : clientes) {
+						DTUsuarios.add(new DTUsuario(cliente, "Cliente", cliente.getCalificacionPromedio()));
+					}
+				} else {
+					// Solo tipo usuario
+					pageClientes = (Page<Cliente>) clienteRepo.buscarClienteBloqueado(paging);
+					clientes = pageClientes.getContent();
+					for (Cliente cliente : clientes) {
+						DTUsuarios.add(new DTUsuario(cliente, "Cliente", cliente.getCalificacionPromedio()));
+					}
+				}
+			} else if (desbloqueado) {
+				//Solo desbloqueados
+				if (antiguedadUsuario > 0) {
+					if (!texto.equalsIgnoreCase("")) {
+						// Aplico los 3 filtros
+						pageClientes = (Page<Cliente>) clienteRepo.buscarClienteDesbloqueadoNombre(texto, paging);
+						clientes = pageClientes.getContent();
+						for (Cliente cliente : clientes) {
+							long days = ChronoUnit.DAYS.between(cliente.getFechaCreacion(), LocalDate.now());
+							if (days > antiguedadUsuario) {
+								DTUsuarios.add(new DTUsuario(cliente, "Cliente", cliente.getCalificacionPromedio()));
+							}
+						}
+
+					} else {
+						// Aplico tipo y antiguedad
+						pageClientes = (Page<Cliente>) clienteRepo.buscarClienteDesbloqueado(paging);
+						clientes = pageClientes.getContent();
+						for (Cliente cliente : clientes) {
+							long days = ChronoUnit.DAYS.between(cliente.getFechaCreacion(), LocalDate.now());
+							if (days > antiguedadUsuario) {
+								DTUsuarios.add(new DTUsuario(cliente, "Cliente", cliente.getCalificacionPromedio()));
+							}
+						}
+					}
+				} else if (!texto.equalsIgnoreCase("")) {
+					// tipo y nombreUsuario
+					pageClientes = (Page<Cliente>) clienteRepo.buscarClienteDesbloqueadoNombre(texto, paging);
+					clientes = pageClientes.getContent();
+					for (Cliente cliente : clientes) {
+						DTUsuarios.add(new DTUsuario(cliente, "Cliente", cliente.getCalificacionPromedio()));
+					}
+				} else {
+					// Solo tipo usuario
+					pageClientes = (Page<Cliente>) clienteRepo.buscarClienteDesbloqueado(paging);
+					clientes = pageClientes.getContent();
+					for (Cliente cliente : clientes) {
+						DTUsuarios.add(new DTUsuario(cliente, "Cliente", cliente.getCalificacionPromedio()));
+					}
+				}
+			} else {
+				//TODOS
+				if (antiguedadUsuario > 0) {
+					if (!texto.equalsIgnoreCase("")) {
+						// Aplico los 3 filtros
+						pageClientes = (Page<Cliente>) clienteRepo.buscarClienteNombre(texto, paging);
+						clientes = pageClientes.getContent();
+						for (Cliente cliente : clientes) {
+							long days = ChronoUnit.DAYS.between(cliente.getFechaCreacion(), LocalDate.now());
+							if (days > antiguedadUsuario) {
+								DTUsuarios.add(new DTUsuario(cliente, "Cliente", cliente.getCalificacionPromedio()));
+							}
+						}
+
+					} else {
+						// Aplico tipo y antiguedad
+						pageClientes = (Page<Cliente>) clienteRepo.buscarCliente(paging);
+						clientes = pageClientes.getContent();
+						for (Cliente cliente : clientes) {
+							long days = ChronoUnit.DAYS.between(cliente.getFechaCreacion(), LocalDate.now());
+							if (days > antiguedadUsuario) {
+								DTUsuarios.add(new DTUsuario(cliente, "Cliente", cliente.getCalificacionPromedio()));
+							}
+						}
+					}
+				} else if (!texto.equalsIgnoreCase("")) {
+					// tipo y nombreUsuario
 					pageClientes = (Page<Cliente>) clienteRepo.buscarClienteNombre(texto, paging);
 					clientes = pageClientes.getContent();
 					for (Cliente cliente : clientes) {
-						long days = ChronoUnit.DAYS.between(cliente.getFechaCreacion(), LocalDate.now());
-						if (days > antiguedadUsuario) {
-							DTUsuarios.add(new DTUsuario(cliente, "Cliente", cliente.getCalificacionPromedio()));
-						}
+						DTUsuarios.add(new DTUsuario(cliente, "Cliente", cliente.getCalificacionPromedio()));
 					}
-
 				} else {
-					// Aplico tipo y antiguedad
+					// Solo tipo usuario
 					pageClientes = (Page<Cliente>) clienteRepo.buscarCliente(paging);
 					clientes = pageClientes.getContent();
 					for (Cliente cliente : clientes) {
-						long days = ChronoUnit.DAYS.between(cliente.getFechaCreacion(), LocalDate.now());
-						if (days > antiguedadUsuario) {
-							DTUsuarios.add(new DTUsuario(cliente, "Cliente", cliente.getCalificacionPromedio()));
-						}
+						DTUsuarios.add(new DTUsuario(cliente, "Cliente", cliente.getCalificacionPromedio()));
 					}
-				}
-			} else if (!texto.equalsIgnoreCase("")) {
-				// tipo y nombreUsuario
-				pageClientes = (Page<Cliente>) clienteRepo.buscarClienteNombre(texto, paging);
-				clientes = pageClientes.getContent();
-				for (Cliente cliente : clientes) {
-					DTUsuarios.add(new DTUsuario(cliente, "Cliente", cliente.getCalificacionPromedio()));
-				}
-			} else {
-				// Solo tipo usuario
-				pageClientes = (Page<Cliente>) clienteRepo.buscarCliente(paging);
-				clientes = pageClientes.getContent();
-				for (Cliente cliente : clientes) {
-					DTUsuarios.add(new DTUsuario(cliente, "Cliente", cliente.getCalificacionPromedio()));
 				}
 			}
 

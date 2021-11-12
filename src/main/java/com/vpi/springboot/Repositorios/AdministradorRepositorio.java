@@ -19,4 +19,20 @@ public interface AdministradorRepositorio extends UserBaseRepository<Administrad
 		
 	@Query("SELECT a FROM Administrador a")
 	public Page<Administrador> buscarAdministrador(@Param("page") Pageable page);
+	
+//-------------------------------------------------------------------------------------------------
+	
+	@Query("SELECT a FROM Administrador a WHERE a.bloqueado = true AND UPPER(a.mail) LIKE CONCAT('%',UPPER(:mail),'%')")
+	public Page<Administrador> buscarAdministradorBloqueadoNombre(@Param("mail") String mail, @Param("page") Pageable page);
+		
+	@Query("SELECT a FROM Administrador a WHERE a.bloqueado = true")
+	public Page<Administrador> buscarAdministradorBloqueado(@Param("page") Pageable page);
+	
+//------------------------------------------------------------------------------------------------
+	
+	@Query("SELECT a FROM Administrador a WHERE a.bloqueado = false AND UPPER(a.mail) LIKE CONCAT('%',UPPER(:mail),'%')")
+	public Page<Administrador> buscarAdministradorDesbloqueadoNombre(@Param("mail") String mail, @Param("page") Pageable page);
+		
+	@Query("SELECT a FROM Administrador a WHERE a.bloqueado = false")
+	public Page<Administrador> buscarAdministradorDesbloqueado(@Param("page") Pageable page);
 }

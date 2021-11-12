@@ -24,6 +24,24 @@ public interface ClienteRepositorio extends UserBaseRepository<Cliente> {
 
 	@Query("SELECT c FROM Cliente c")
 	public Page<Cliente> buscarCliente(@Param("page") Pageable page);
+	
+//-------------------------------------------------------------------------------------------------
+	
+	@Query("SELECT c FROM Cliente c WHERE c.bloqueado = true AND UPPER(c.mail) LIKE CONCAT('%',UPPER(:texto),'%') OR UPPER(c.nickname) LIKE CONCAT('%',UPPER(:texto),'%')")
+	public Page<Cliente> buscarClienteBloqueadoNombre(@Param("texto") String texto, @Param("page") Pageable page);
+
+	@Query("SELECT c FROM Cliente c WHERE c.bloqueado = true")
+	public Page<Cliente> buscarClienteBloqueado(@Param("page") Pageable page);
+	
+//-------------------------------------------------------------------------------------------------
+	
+	@Query("SELECT c FROM Cliente c WHERE c.bloqueado = false AND UPPER(c.mail) LIKE CONCAT('%',UPPER(:texto),'%') OR UPPER(c.nickname) LIKE CONCAT('%',UPPER(:texto),'%')")
+	public Page<Cliente> buscarClienteDesbloqueadoNombre(@Param("texto") String texto, @Param("page") Pageable page);
+
+	@Query("SELECT c FROM Cliente c WHERE c.bloqueado = false")
+	public Page<Cliente> buscarClienteDesbloqueado(@Param("page") Pageable page);
+	
+//-------------------------------------------------------------------------------------------------
 
 	@Query("SELECT a FROM Cliente a WHERE UPPER(a.mail) LIKE CONCAT('%',UPPER(:mail),'%')")
 	List<Cliente> buscarClientesMail(@Param("mail") String mail);

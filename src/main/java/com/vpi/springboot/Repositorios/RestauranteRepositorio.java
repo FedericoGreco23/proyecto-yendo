@@ -26,6 +26,25 @@ public interface RestauranteRepositorio extends UserBaseRepository<Restaurante> 
 	@Query("SELECT r FROM Restaurante r")
 	public Page<Restaurante> buscarRestaurante(@Param("page") Pageable page);
 	
+//-------------------------------------------------------------------------------------------------
+	
+	@Query("SELECT r FROM Restaurante r WHERE r.bloqueado = true AND UPPER(r.mail) LIKE CONCAT('%',UPPER(:texto),'%') OR UPPER(r.nombre) LIKE CONCAT('%',UPPER(:texto),'%')")
+	public Page<Restaurante> buscarRestauranteBloqueadoNombre(@Param("texto") String texto, @Param("page") Pageable page);
+	
+	@Query("SELECT r FROM Restaurante r WHERE r.bloqueado = true")
+	public Page<Restaurante> buscarRestauranteBloqueado(@Param("page") Pageable page);
+	
+//-------------------------------------------------------------------------------------------------
+	
+	@Query("SELECT r FROM Restaurante r WHERE r.bloqueado = false AND UPPER(r.mail) LIKE CONCAT('%',UPPER(:texto),'%') OR UPPER(r.nombre) LIKE CONCAT('%',UPPER(:texto),'%')")
+	public Page<Restaurante> buscarRestauranteDesbloqueadoNombre(@Param("texto") String texto, @Param("page") Pageable page);
+	
+	@Query("SELECT r FROM Restaurante r WHERE r.bloqueado = false")
+	public Page<Restaurante> buscarRestauranteDesbloqueado(@Param("page") Pageable page);
+	
+//-------------------------------------------------------------------------------------------------
+	
+	
 	@Query("SELECT r FROM Restaurante r WHERE UPPER(r.mail) LIKE UPPER(:nombre)")
 	public Restaurante existeRestauranteNombre(@Param("nombre") String nombre);
 //	@Query(value = "SELECT p FROM Restaurante p WHERE p.nombre = ?1", nativeQuery = true)
