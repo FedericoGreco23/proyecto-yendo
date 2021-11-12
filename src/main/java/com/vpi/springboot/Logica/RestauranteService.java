@@ -1257,7 +1257,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				if(i==2) {
 					i=1;
 				}
-				Integer randomR = (int) (Math.random() * 21);
+				Integer randomR = (int) (Math.random() * 5);
 				String mailREsto = restaurantesList.get(randomR).toLowerCase().replace(" ", "") + "@"
 						+ restaurantesList.get(randomR).toLowerCase().replace(" ", "") + ".com";
 				Optional<Restaurante> resOp = resRepo.findById(mailREsto);
@@ -1679,13 +1679,13 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 					if(pedido.getMetodoDePago().name()=="EFECTIVO") {
 						fechaIdPedidoMonto.setTotalEfectivo( BigDecimal.valueOf(pedido.getCostoTotal())
 								.setScale(2, RoundingMode.HALF_UP).doubleValue());
-						fechaIdPedidoMonto.setTotalPaypal(0.0);
+						//fechaIdPedidoMonto.setTotalPaypal(0.0);
 						
 					}else {
 
 						fechaIdPedidoMonto.setTotalPaypal( BigDecimal.valueOf(pedido.getCostoTotal())
 								.setScale(2, RoundingMode.HALF_UP).doubleValue());
-						fechaIdPedidoMonto.setTotalEfectivo(0.0);
+						//fechaIdPedidoMonto.setTotalEfectivo(0.0);
 					}
 
 					fecha_PedidoMonto.add(fechaIdPedidoMonto);
@@ -1726,18 +1726,18 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 							if(pedido.getMetodoDePago().name()=="EFECTIVO") {
 								idPedidoMonto.get().setTotalEfectivo( BigDecimal.valueOf(pedido.getCostoTotal()+idPedidoMonto.get().getTotalEfectivo())
 										.setScale(2, RoundingMode.HALF_UP).doubleValue());
-								idPedidoMonto.get().setTotalPaypal(0.0);
+								//idPedidoMonto.get().setTotalPaypal(0.0);
 								
 							}else {
 
 								idPedidoMonto.get().setTotalPaypal( BigDecimal.valueOf(pedido.getCostoTotal()+idPedidoMonto.get().getTotalPaypal())
 										.setScale(2, RoundingMode.HALF_UP).doubleValue());
-								idPedidoMonto.get().setTotalEfectivo(0.0);
+								//idPedidoMonto.get().setTotalEfectivo(0.0);
 							}
 							fecha_PedidoMonto.add(idPedidoMonto.get());
 
 							balanceByMail.setTotal(BigDecimal.valueOf(balanceByMail.getTotal() + pedido.getCostoTotal())
-									.setScale(4, RoundingMode.HALF_UP).doubleValue());
+									.setScale(2, RoundingMode.HALF_UP).doubleValue());
 							balanceByMail.setListaPedidos(fecha_PedidoMonto);
 
 							balanceVentasRepo.save(balanceByMail);
@@ -1755,7 +1755,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				List<FechaidPedidoMontoDTO> fecha_PedidoMonto = balanceByMail.getListaPedidos();
 				List<IdPedidoMontoDTO> pedidos = new ArrayList<>();
 				IdPedidoMontoDTO idPedidoMontoDTO = new IdPedidoMontoDTO(pedido.getId(),
-						BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue(),
+						BigDecimal.valueOf(pedido.getCostoTotal()).setScale(2, RoundingMode.HALF_UP).doubleValue(),
 						pedido.getEstadoPedido().name(), pedido.getMetodoDePago().name(), pedido.getFecha().toLocalDate());
 				pedidos.add(idPedidoMontoDTO);
 				FechaidPedidoMontoDTO fechaPedidoMontoDto = new FechaidPedidoMontoDTO(pedido.getFecha().toLocalDate(),
@@ -1763,13 +1763,13 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				if(pedido.getMetodoDePago().name()=="EFECTIVO") {
 					fechaPedidoMontoDto.setTotalEfectivo( BigDecimal.valueOf(pedido.getCostoTotal())
 							.setScale(2, RoundingMode.HALF_UP).doubleValue());
-					fechaPedidoMontoDto.setTotalPaypal(0.0);
+					//fechaPedidoMontoDto.setTotalPaypal(0.0);
 					
 				}else {
 
 					fechaPedidoMontoDto.setTotalPaypal( BigDecimal.valueOf(pedido.getCostoTotal())
 							.setScale(2, RoundingMode.HALF_UP).doubleValue());
-					fechaPedidoMontoDto.setTotalEfectivo(0.0);
+					//fechaPedidoMontoDto.setTotalEfectivo(0.0);
 				}
 				fecha_PedidoMonto.add(fechaPedidoMontoDto);
 

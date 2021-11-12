@@ -10,8 +10,8 @@ public class FechaidPedidoMontoDTO implements Serializable, Comparable<FechaidPe
 	
 	private LocalDate fecha;
 	private Double totalDelDia;
-	private Double totalPaypal;
-	private Double totalEfectivo;
+	private Double totalPaypal=0.0;
+	private Double totalEfectivo=0.0;
 	private List<IdPedidoMontoDTO> pedidos= new ArrayList<IdPedidoMontoDTO>();
 
 	public FechaidPedidoMontoDTO() {
