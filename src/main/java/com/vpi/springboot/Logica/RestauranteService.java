@@ -1253,7 +1253,10 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				}
 
 				//////////// pedidos///////////////////
-				Integer i = (int) (Math.random() * 2);
+				Integer i = (int) (Math.random() * 3);
+				if(i==2) {
+					i=1;
+				}
 				Integer randomR = (int) (Math.random() * 21);
 				String mailREsto = restaurantesList.get(randomR).toLowerCase().replace(" ", "") + "@"
 						+ restaurantesList.get(randomR).toLowerCase().replace(" ", "") + ".com";
@@ -1267,6 +1270,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 						DTPedido dtPedido=clienteService.altaPedidosParaCargadeDatos((int) carrito.getId(), EnumMetodoDePago.values()[i],
 								cli.get().getDirecciones().get(0).getId(), cliente.getMail(), "Muero de hambre");
 						
+						confirmarPedidoCargaDeDatos(dtPedido.getId());
 						if(dtPedido.getMetodoDePago().name()=="EFECTIVO") {
 							registrarPago(dtPedido.getId());	
 						}
@@ -1290,59 +1294,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 	}
 
-	private DTRespuesta crearRestaurantesDePrueba(Restaurante rest) throws RestauranteException, CategoriaException {
 
-		// Seccion verificar que nombreRestaurante o restauranteMail no exista ya
-		Optional<Restaurante> busquedaMail = restauranteRepo.findById(rest.getMail());
-		Restaurante busquedaNombre = null;
-		busquedaNombre = restauranteRepo.existeRestauranteNombre(rest.getNombre());
-		if (busquedaMail.isPresent()) {
-			throw new RestauranteException(RestauranteException.RestauranteYaExiste(rest.getMail()));
-		} else if (busquedaNombre != null) {
-			throw new RestauranteException(RestauranteException.RestauranteYaExiste(rest.getNombre()));
-		}
-
-		if (rest.getCategorias().size() > 0) {
-			for (Categoria c : rest.getCategorias()) {
-				Optional<Categoria> optionalCategoria = catRepo.findById(c.getNombre());
-				if (!optionalCategoria.isPresent())
-					throw new CategoriaException(CategoriaException.NotFoundException(c.getNombre()));
-				else {
-					// Se añaden categorías al restaurante
-					Categoria categoria = optionalCategoria.get();
-					rest.addCategoria(categoria);
-				}
-			}
-		}
-
-		rest.setActivo(true);
-		rest.setBloqueado(false);
-		rest.setCalificacionPromedio(5.0f);
-		rest.setFechaCreacion(LocalDate.now());
-		// rest.setEstado(EnumEstadoRestaurante.EN_ESPERA);
-		// rest.setFechaApertura(null);
-		// rest.setProductos(null);
-//		rest.setReclamos(null);
-//		rest.setPedidos(null);
-		LocalTime maximo = LocalTime.of(0, 50, 0);
-		LocalTime minimo = LocalTime.of(0, 20, 0);
-		rest.setTiempoEstimadoMaximo(maximo);
-		rest.setTiempoEstimadoMinimo(minimo);
-		rest.setHorarioApertura(LocalTime.of(10, 0, 0));
-		rest.setHorarioCierre(LocalTime.of(20, 0, 0));
-
-		rest.setAbierto(true);
-		rest.setContrasenia(passwordEncoder.encode(rest.getContrasenia()));
-
-		System.out.println(rest.toString());
-		System.out.println(rest.toString());
-		System.out.println(rest.toString());
-		System.out.println(rest.toString());
-		System.out.println(rest.toString());
-
-		restauranteRepo.save(rest);
-		return new DTRespuesta("Restaurante " + rest.getNombre() + " dado de alta correctamente.");
-	}
 
 	private DTRespuesta crearCliente(Cliente usuario) throws UsuarioException, Exception {
 		if (emailExist(usuario.getMail())) {
@@ -1700,12 +1652,12 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	/**
 	* BALANCE DE VENTAS
 	*/
-	@Scheduled(cron = "*/59 */7 * * * *") // 1 vez cada 5 minutos
+	@Scheduled(cron = "*/59 */7 * * * *") // 1 vez cada 7 minutos
 	public DTRespuesta actualizarBalanceVentas() {
 
 		// descomentar
-		// List<Pedido> pedidosList = pedidoRepo.findAllPagos();
-		List<Pedido> pedidosList = pedidoRepo.findAll();
+		List<Pedido> pedidosList = pedidoRepo.findAllPagos();
+		//List<Pedido> pedidosList = pedidoRepo.findAll();
 
 		for (Pedido pedido : pedidosList) {
 			Optional<BalanceVentaDTO> balanceByMailOp = balanceVentasRepo.findById(pedido.getRestaurante().getMail());
@@ -1892,5 +1844,140 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			return "Balance de Ventas no disponible"; 
 		}
 
+	}
+	
+	
+	////////////////////////////funciones de uso solo para cargar datos////////////////////7
+	public DTRespuesta confirmarPedidoCargaDeDatos(int idPedido) throws PedidoException, IOException {
+		Optional<Pedido> optionalPedido = pedidoRepo.findById(idPedido);
+		if (optionalPedido.isPresent()) {
+			Pedido pedido = optionalPedido.get();
+			pedido.setEstadoPedido(EnumEstadoPedido.ACEPTADO);
+			pedidoRepo.save(pedido);
+
+			// se notifica a cliente
+			String base64EncodedEmail = Base64.getEncoder()
+					.encodeToString(pedido.getCliente().getMail().getBytes(StandardCharsets.UTF_8));
+
+			/*
+			 * DTPedidoParaAprobar pedidoDT = new DTPedidoParaAprobar(pedido);
+			 * pedidoDT.setComentario(pedido.getComentario());
+			 * pedidoDT.setDireccion(pedido.getDireccion()); pedidoDT.setCliente(new
+			 * DTCliente(pedido.getCliente()));
+			 */
+
+			simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail,
+					"Su pedido ha sido aceptado y se está siendo preparado");
+
+			// TESTEO ENVÍO MAIL
+//			List<DTProductoCarrito> productos = new ArrayList<>();
+//			for(int i = 1; i < 5; i++) {
+//				Optional<Producto> optionalProducto = productoRepo.findById(i);
+//				DTProductoCarrito dtpc = new DTProductoCarrito(new DTProducto(optionalProducto.get()), i);
+//				productos.add(dtpc);
+//			}
+//			Carrito carrito = new Carrito(500, "csuarez2211@gmail.com", "lapasiva@lapasiva.com", productos, true);
+
+			////////////////Envio de notificacion mobile///////////////////////////////////
+			
+			String token = pedido.getCliente().getTokenDispositivo();
+			String restaurante = pedido.getRestaurante().getNombre();
+			Message message;
+			Map<String, String> map = new HashMap<>();
+			map.put("llave", "valor");
+			/*if (token != null) {
+				SingletonFirebase.getInstancia().arrancar();
+
+				Notification notification = Notification.builder()
+						.setTitle("Resolucion de pedido")
+						.setBody("Su pedido ha sido aceptado por el restaurante " + restaurante)
+						.build();
+				message = Message.builder().putAllData(map).putData("mensaje", "Nuevo mensaje de sus pedidos")
+						.setToken(token) // deviceId
+						.setNotification(notification).build();
+				try {
+					// DUDA QUE ES appAndroid
+					FirebaseMessaging.getInstance().send(message);
+					// FirebaseMessaging.getInstance(FirebaseApp.getInstance(appAndroid)).send(message);
+					System.out.println("PRUEBA SE ENVIA NOTIFICACION");
+				} catch (FirebaseMessagingException e) {
+					System.out.println(e.getStackTrace());
+					System.out.println("Mensaje de error: " + e.getMessagingErrorCode());
+				}
+			}
+*/
+			////////////////Fin notificacion mobile///////////////////////////////////////
+			
+			Optional<Carrito> optionalCarrito = mongoRepo.findById(pedido.getCarrito());
+			Carrito carrito = optionalCarrito.get();
+			DTPedido dtpedido = new DTPedido(pedido, new DTCarrito(carrito));
+
+			String to = pedido.getCliente().getMail();
+			String body = mailSender.getConfirmarPedido(dtpedido, pedido.getCliente());
+			String topic = "Confirmación de pedido para " + pedido.getCliente().getNickname() + ".";
+			/*try {
+				mailSender.sendMail(to, body, topic);
+			} catch (MessagingException e) {
+				return new DTRespuesta("No se pudo mandar mail: " + e.getMessage());
+			}*/
+
+			return new DTRespuesta("Pedido " + idPedido + " confirmado.");
+		} else {
+			throw new PedidoException(PedidoException.NotFoundExceptionId(idPedido));
+		}
+	}
+	
+	private DTRespuesta crearRestaurantesDePrueba(Restaurante rest) throws RestauranteException, CategoriaException {
+
+		// Seccion verificar que nombreRestaurante o restauranteMail no exista ya
+		Optional<Restaurante> busquedaMail = restauranteRepo.findById(rest.getMail());
+		Restaurante busquedaNombre = null;
+		busquedaNombre = restauranteRepo.existeRestauranteNombre(rest.getNombre());
+		if (busquedaMail.isPresent()) {
+			throw new RestauranteException(RestauranteException.RestauranteYaExiste(rest.getMail()));
+		} else if (busquedaNombre != null) {
+			throw new RestauranteException(RestauranteException.RestauranteYaExiste(rest.getNombre()));
+		}
+
+		if (rest.getCategorias().size() > 0) {
+			for (Categoria c : rest.getCategorias()) {
+				Optional<Categoria> optionalCategoria = catRepo.findById(c.getNombre());
+				if (!optionalCategoria.isPresent())
+					throw new CategoriaException(CategoriaException.NotFoundException(c.getNombre()));
+				else {
+					// Se añaden categorías al restaurante
+					Categoria categoria = optionalCategoria.get();
+					rest.addCategoria(categoria);
+				}
+			}
+		}
+
+		rest.setActivo(true);
+		rest.setBloqueado(false);
+		rest.setCalificacionPromedio(5.0f);
+		rest.setFechaCreacion(LocalDate.now());
+		// rest.setEstado(EnumEstadoRestaurante.EN_ESPERA);
+		// rest.setFechaApertura(null);
+		// rest.setProductos(null);
+//		rest.setReclamos(null);
+//		rest.setPedidos(null);
+		LocalTime maximo = LocalTime.of(0, 50, 0);
+		LocalTime minimo = LocalTime.of(0, 20, 0);
+		rest.setTiempoEstimadoMaximo(maximo);
+		rest.setTiempoEstimadoMinimo(minimo);
+		rest.setHorarioApertura(LocalTime.of(10, 0, 0));
+		rest.setHorarioCierre(LocalTime.of(20, 0, 0));
+
+		rest.setAbierto(true);
+		rest.setContrasenia(passwordEncoder.encode(rest.getContrasenia()));
+
+		System.out.println(rest.toString());
+		System.out.println(rest.toString());
+		System.out.println(rest.toString());
+		System.out.println(rest.toString());
+		System.out.println(rest.toString());
+
+		restauranteRepo.save(rest);
+		return new DTRespuesta("Restaurante " + rest.getNombre() + " dado de alta correctamente.");
 	}
 }
