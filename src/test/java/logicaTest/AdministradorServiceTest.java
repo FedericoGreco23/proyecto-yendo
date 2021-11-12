@@ -198,85 +198,85 @@ class AdministradorServiceTest {
 	@Test
 	public void testBuscarUsuario() {
 		Mockito.when(adminRepo.buscarAdministradorNombre(Mockito.anyString(), Mockito.any())).thenReturn(adminPage);		
-		mockAdmin.buscarUsuario(0, 1, 2, 2, admin.getMail(), "1", 0);
+		mockAdmin.buscarUsuario(0, 1, 2, 2, admin.getMail(), "1", 0, 0);
 	}
 
 	@Test
 	public void testBuscarUsuario2() {
 		Mockito.when(adminRepo.buscarAdministrador(Mockito.any())).thenReturn(adminPage);		
-		mockAdmin.buscarUsuario(0, 1, 2, 2, "", "1", 0);
+		mockAdmin.buscarUsuario(0, 1, 2, 2, "", "1", 0, 1);
 	}
 	
 	@Test
 	public void testBuscarUsuario3() {
 		Mockito.when(adminRepo.buscarAdministradorNombre(Mockito.anyString(), Mockito.any())).thenReturn(adminPage);		
-		mockAdmin.buscarUsuario(0, 1, 2, 0, admin.getMail(), "1", 0);
+		mockAdmin.buscarUsuario(0, 1, 2, 0, admin.getMail(), "1", 0, 2);
 	}
 	
 	@Test
 	public void testBuscarUsuario4() {
 		Mockito.when(adminRepo.buscarAdministrador(Mockito.any())).thenReturn(adminPage);		
-		mockAdmin.buscarUsuario(0, 1, 2, 0, "", "1", 0);
+		mockAdmin.buscarUsuario(0, 1, 2, 0, "", "1", 0, 0);
 	}
 	
 	@Test
 	public void testBuscarUsuario5() {
 		Mockito.when(resRepo.buscarRestauranteNombre(Mockito.anyString(), Mockito.any())).thenReturn(restaurantePage);		
-		mockAdmin.buscarUsuario(0, 1, 1, 2, restaurante.getMail(), "1", 0);
+		mockAdmin.buscarUsuario(0, 1, 1, 2, restaurante.getMail(), "1", 0, 1);
 	}
 
 	@Test
 	public void testBuscarUsuario6() {
 		Mockito.when(resRepo.buscarRestaurante(Mockito.any())).thenReturn(restaurantePage);		
-		mockAdmin.buscarUsuario(0, 1, 1, 2, "", "1", 0);
+		mockAdmin.buscarUsuario(0, 1, 1, 2, "", "1", 0, 2);
 	}
 	
 	@Test
 	public void testBuscarUsuario7() {
 		Mockito.when(resRepo.buscarRestauranteNombre(Mockito.anyString(), Mockito.any())).thenReturn(restaurantePage);		
-		mockAdmin.buscarUsuario(0, 1, 1, 0, restaurante.getMail(), "1", 0);
+		mockAdmin.buscarUsuario(0, 1, 1, 0, restaurante.getMail(), "1", 0, 0);
 	}
 	
 	@Test
 	public void testBuscarUsuario8() {
 		Mockito.when(resRepo.buscarRestaurante(Mockito.any())).thenReturn(restaurantePage);		
-		mockAdmin.buscarUsuario(0, 1, 1, 0, "", "1", 0);
+		mockAdmin.buscarUsuario(0, 1, 1, 0, "", "1", 0, 1);
 	}
 	
 	@Test
 	public void testBuscarUsuario9() {
 		Mockito.when(clienteRepo.buscarClienteNombre(Mockito.anyString(), Mockito.any())).thenReturn(clientePage);		
-		mockAdmin.buscarUsuario(0, 1, 0, 2, cliente.getMail(), "1", 0);
+		mockAdmin.buscarUsuario(0, 1, 0, 2, cliente.getMail(), "1", 0, 2);
 	}
 
 	@Test
 	public void testBuscarUsuario10() {
 		Mockito.when(clienteRepo.buscarCliente(Mockito.any())).thenReturn(clientePage);		
-		mockAdmin.buscarUsuario(0, 1,0 , 2, "", "1", 0);
+		mockAdmin.buscarUsuario(0, 1,0 , 2, "", "1", 0, 0);
 	}
 	
 	@Test
 	public void testBuscarUsuario11() {
 		Mockito.when(clienteRepo.buscarClienteNombre(Mockito.anyString(), Mockito.any())).thenReturn(clientePage);		
-		mockAdmin.buscarUsuario(0, 1, 0, 0, cliente.getMail(), "1", 0);
+		mockAdmin.buscarUsuario(0, 1, 0, 0, cliente.getMail(), "1", 0, 1);
 	}
 	
 	@Test
 	public void testBuscarUsuario12() {
 		Mockito.when(clienteRepo.buscarCliente(Mockito.any())).thenReturn(clientePage);		
-		mockAdmin.buscarUsuario(0, 1, 0, 0, "", "1", 0);
+		mockAdmin.buscarUsuario(0, 1, 0, 0, "", "1", 0, 2);
 	}
 	
 	@Test
 	public void testBuscarUsuario13() {
 		Mockito.when(clienteRepo.buscarCliente(Mockito.any())).thenReturn(clientePage);		
-		mockAdmin.buscarUsuario(0, 1, 0, 0, "", "1", 1);
+		mockAdmin.buscarUsuario(0, 1, 0, 0, "", "1", 1, 0);
 	}
 	
 	@Test
 	public void testBuscarUsuario14() {
 		Mockito.when(clienteRepo.buscarCliente(Mockito.any())).thenReturn(clientePage);		
-		mockAdmin.buscarUsuario(0, 1, 0, 0, "", "", 1);
+		mockAdmin.buscarUsuario(0, 1, 0, 0, "", "", 1, 1);
 	}
 	
 	
