@@ -1192,7 +1192,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			DTProductoIdCantidad pc2= new DTProductoIdCantidad(listProdu.get(promoRandomNum2).getId(), 3);
 			productosPromo.add(pc);
 			productosPromo.add(pc2);
-			DTPromocionConPrecio promocion=  new DTPromocionConPrecio(productosPromo, precioPromo, 45, "Pomo del mes",
+			DTPromocionConPrecio promocion=  new DTPromocionConPrecio(productosPromo, precioPromo, 45, "Promo del mes",
 					"Imperdible promo", fotoPromo);
 			try {
 				altaPromocion(promocion, restau.getMail());
@@ -1671,25 +1671,27 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 					List<FechaidPedidoMontoDTO> fecha_PedidoMonto = balanceByMail.getListaPedidos();
 					List<IdPedidoMontoDTO> pedidos = new ArrayList<IdPedidoMontoDTO>();
 					IdPedidoMontoDTO idPedidoMontoDTO = new IdPedidoMontoDTO(pedido.getId(),
-							BigDecimal.valueOf(pedido.getCostoTotal()).setScale(4, RoundingMode.HALF_UP).doubleValue(),
+							BigDecimal.valueOf(pedido.getCostoTotal()).setScale(2, RoundingMode.HALF_UP).doubleValue(),
 							pedido.getEstadoPedido().name(), pedido.getMetodoDePago().name(), pedido.getFecha().toLocalDate());
 					pedidos.add(idPedidoMontoDTO);
 					FechaidPedidoMontoDTO fechaIdPedidoMonto = new FechaidPedidoMontoDTO(
 							pedido.getFecha().toLocalDate(), pedidos, pedido.getCostoTotal());
 					if(pedido.getMetodoDePago().name()=="EFECTIVO") {
-						fechaIdPedidoMonto.setTotalEfectivo(pedido.getCostoTotal());
+						fechaIdPedidoMonto.setTotalEfectivo( BigDecimal.valueOf(pedido.getCostoTotal())
+								.setScale(2, RoundingMode.HALF_UP).doubleValue());
 						fechaIdPedidoMonto.setTotalPaypal(0.0);
 						
 					}else {
 
-						fechaIdPedidoMonto.setTotalPaypal(pedido.getCostoTotal());
+						fechaIdPedidoMonto.setTotalPaypal( BigDecimal.valueOf(pedido.getCostoTotal())
+								.setScale(2, RoundingMode.HALF_UP).doubleValue());
 						fechaIdPedidoMonto.setTotalEfectivo(0.0);
 					}
 
 					fecha_PedidoMonto.add(fechaIdPedidoMonto);
 					balanceByMail.setListaPedidos(fecha_PedidoMonto);
 					balanceByMail.setTotal(BigDecimal.valueOf(balanceByMail.getTotal() + pedido.getCostoTotal())
-							.setScale(4, RoundingMode.HALF_UP).doubleValue());
+							.setScale(2, RoundingMode.HALF_UP).doubleValue());
 					balanceVentasRepo.save(balanceByMail);
 				}else {//ya hay pedidos en esa fecha
 					Boolean yaAgregado=false;
@@ -1707,7 +1709,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 						if (!yaAgregado) {
 							IdPedidoMontoDTO idPedidoMontoDTO = new IdPedidoMontoDTO(
 									pedido.getId(), BigDecimal.valueOf(pedido.getCostoTotal())
-											.setScale(4, RoundingMode.HALF_UP).doubleValue(),
+											.setScale(2, RoundingMode.HALF_UP).doubleValue(),
 									pedido.getEstadoPedido().name(), pedido.getMetodoDePago().name(), pedido.getFecha().toLocalDate());
 							listaPedidos.add(idPedidoMontoDTO);
 							idPedidoMonto.get().setPedidos(listaPedidos);
@@ -1722,12 +1724,14 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 								}
 							}
 							if(pedido.getMetodoDePago().name()=="EFECTIVO") {
-								idPedidoMonto.get().setTotalEfectivo(pedido.getCostoTotal());
+								idPedidoMonto.get().setTotalEfectivo( BigDecimal.valueOf(pedido.getCostoTotal()+idPedidoMonto.get().getTotalEfectivo())
+										.setScale(2, RoundingMode.HALF_UP).doubleValue());
 								idPedidoMonto.get().setTotalPaypal(0.0);
 								
 							}else {
 
-								idPedidoMonto.get().setTotalPaypal(pedido.getCostoTotal());
+								idPedidoMonto.get().setTotalPaypal( BigDecimal.valueOf(pedido.getCostoTotal()+idPedidoMonto.get().getTotalPaypal())
+										.setScale(2, RoundingMode.HALF_UP).doubleValue());
 								idPedidoMonto.get().setTotalEfectivo(0.0);
 							}
 							fecha_PedidoMonto.add(idPedidoMonto.get());
@@ -1757,12 +1761,14 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				FechaidPedidoMontoDTO fechaPedidoMontoDto = new FechaidPedidoMontoDTO(pedido.getFecha().toLocalDate(),
 						pedidos, pedido.getCostoTotal());
 				if(pedido.getMetodoDePago().name()=="EFECTIVO") {
-					fechaPedidoMontoDto.setTotalEfectivo(pedido.getCostoTotal());
+					fechaPedidoMontoDto.setTotalEfectivo( BigDecimal.valueOf(pedido.getCostoTotal())
+							.setScale(2, RoundingMode.HALF_UP).doubleValue());
 					fechaPedidoMontoDto.setTotalPaypal(0.0);
 					
 				}else {
 
-					fechaPedidoMontoDto.setTotalPaypal(pedido.getCostoTotal());
+					fechaPedidoMontoDto.setTotalPaypal( BigDecimal.valueOf(pedido.getCostoTotal())
+							.setScale(2, RoundingMode.HALF_UP).doubleValue());
 					fechaPedidoMontoDto.setTotalEfectivo(0.0);
 				}
 				fecha_PedidoMonto.add(fechaPedidoMontoDto);
