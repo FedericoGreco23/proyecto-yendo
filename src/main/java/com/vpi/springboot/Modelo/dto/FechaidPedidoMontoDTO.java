@@ -10,6 +10,8 @@ public class FechaidPedidoMontoDTO implements Serializable, Comparable<FechaidPe
 	
 	private LocalDate fecha;
 	private Double totalDelDia;
+	private Double totalPaypal;
+	private Double totalEfectivo;
 	private List<IdPedidoMontoDTO> pedidos= new ArrayList<IdPedidoMontoDTO>();
 
 	public FechaidPedidoMontoDTO() {
@@ -56,6 +58,30 @@ public class FechaidPedidoMontoDTO implements Serializable, Comparable<FechaidPe
 
 	public void setTotalDelDia(Double totalDelDia) {
 		this.totalDelDia = totalDelDia;
+	}
+
+
+
+	public Double getTotalPaypal() {
+		return totalPaypal;
+	}
+
+
+
+	public void setTotalPaypal(Double totalPaypal) {
+		this.totalPaypal = totalPaypal;
+	}
+
+
+
+	public Double getTotalEfectivo() {
+		return totalEfectivo;
+	}
+
+
+
+	public void setTotalEfectivo(Double totalEfectivo) {
+		this.totalEfectivo = totalEfectivo;
 	}
 
 

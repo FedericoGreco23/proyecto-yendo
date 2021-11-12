@@ -1676,6 +1676,15 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 					pedidos.add(idPedidoMontoDTO);
 					FechaidPedidoMontoDTO fechaIdPedidoMonto = new FechaidPedidoMontoDTO(
 							pedido.getFecha().toLocalDate(), pedidos, pedido.getCostoTotal());
+					if(pedido.getMetodoDePago().name()=="EFECTIVO") {
+						fechaIdPedidoMonto.setTotalEfectivo(pedido.getCostoTotal());
+						fechaIdPedidoMonto.setTotalPaypal(0.0);
+						
+					}else {
+
+						fechaIdPedidoMonto.setTotalPaypal(pedido.getCostoTotal());
+						fechaIdPedidoMonto.setTotalEfectivo(0.0);
+					}
 
 					fecha_PedidoMonto.add(fechaIdPedidoMonto);
 					balanceByMail.setListaPedidos(fecha_PedidoMonto);
@@ -1712,6 +1721,15 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 									break;
 								}
 							}
+							if(pedido.getMetodoDePago().name()=="EFECTIVO") {
+								idPedidoMonto.get().setTotalEfectivo(pedido.getCostoTotal());
+								idPedidoMonto.get().setTotalPaypal(0.0);
+								
+							}else {
+
+								idPedidoMonto.get().setTotalPaypal(pedido.getCostoTotal());
+								idPedidoMonto.get().setTotalEfectivo(0.0);
+							}
 							fecha_PedidoMonto.add(idPedidoMonto.get());
 
 							balanceByMail.setTotal(BigDecimal.valueOf(balanceByMail.getTotal() + pedido.getCostoTotal())
@@ -1738,6 +1756,15 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				pedidos.add(idPedidoMontoDTO);
 				FechaidPedidoMontoDTO fechaPedidoMontoDto = new FechaidPedidoMontoDTO(pedido.getFecha().toLocalDate(),
 						pedidos, pedido.getCostoTotal());
+				if(pedido.getMetodoDePago().name()=="EFECTIVO") {
+					fechaPedidoMontoDto.setTotalEfectivo(pedido.getCostoTotal());
+					fechaPedidoMontoDto.setTotalPaypal(0.0);
+					
+				}else {
+
+					fechaPedidoMontoDto.setTotalPaypal(pedido.getCostoTotal());
+					fechaPedidoMontoDto.setTotalEfectivo(0.0);
+				}
 				fecha_PedidoMonto.add(fechaPedidoMontoDto);
 
 				balanceByMail.setListaPedidos(fecha_PedidoMonto);
