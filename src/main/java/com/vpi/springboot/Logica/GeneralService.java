@@ -200,7 +200,6 @@ public class GeneralService implements GeneralServicioInterfaz {
 			tokenRepo.save(newToken);
 
 			String to = cliente.getMail();
-			//TODO hacer página para activar cuenta
 			String body = mailSender.getMailVerificacion("https://prueba-concepto-frontend.herokuapp.com/activarCuenta/" + newToken.getToken() + "/");
 			String topic = "Verificación de usuario " + cliente.getNickname() + ".";
 			try {
