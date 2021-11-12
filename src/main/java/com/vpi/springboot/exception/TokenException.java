@@ -9,7 +9,7 @@ public class TokenException extends Exception {
 	}
 	
 	public static String NotFoundException() {
-		return "El token no pudo ser encontrado.";
+		return "Hubo un error activando su cuenta.";
 	}
 	
 	public static String MailError() {
