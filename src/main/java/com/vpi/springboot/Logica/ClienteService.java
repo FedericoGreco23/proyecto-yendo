@@ -216,7 +216,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 				tokenRepo.save(token);
 
 				String to = usuario.getMail();
-				String body = getMailVerificacion("https://www.youtube.com/");
+				String body = mailSender.getMailVerificacion("https://prueba-concepto-frontend.herokuapp.com/activarCuenta/" + token.getToken() + "/");
 				String topic = "Verificación de usuario " + usuario.getNickname() + ".";
 				mailSender.sendMail(to, body, topic);
 			} catch (Exception e) {
