@@ -3,11 +3,13 @@ package com.vpi.springboot.Logica;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,6 +18,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import com.vpi.springboot.Modelo.Administrador;
 import com.vpi.springboot.Modelo.Cliente;
 import com.vpi.springboot.Modelo.Restaurante;
@@ -467,10 +474,36 @@ public class AdministradorService implements AdministradorServicioInterfaz {
 	
 	@Override
 	public List<DTTopCategoria> topCategorias() {
-		//List<DTProductoVendido> lista = productosVendidosRepo.findAllBy(Sort.by(Sort.Direction.DESC, "cantidad"));
-		int cantidad = 0;
-		//List<DTTopCategoria> lista = (List<DTTopCategoria>) topCategoriasRepo.listarTopCategorias(cantidad, Sort.by(Sort.Direction.DESC, "cantidad"));
-		//return lista;
-		return null;
+		MongoClientURI uri = new MongoClientURI(
+				"mongodb+srv://grupo1:grupo1@cluster0.l17sm.mongodb.net/prueba-concepto");
+		MongoClient mongoClient = new MongoClient(uri);
+		MongoDatabase dataBase = mongoClient.getDatabase("prueba-concepto");
+		MongoCollection<Document> collectionPedidos = dataBase.getCollection("pedidos");
+		
+		List<DTTopCategoria> listaTopCategorias = new ArrayList<DTTopCategoria>();
+		FindIterable<Document> docs = collectionPedidos.find();
+		
+		if (docs == null) {
+			return null;
+		}
+
+		for (Document doc : docs) {
+			Boolean existe = false;
+			//Chequeo si la categoria del documento seleccionado existe en la lista de topCategoria
+			for (DTTopCategoria dtTop : listaTopCategorias) {
+				if (doc.getString("categoria").equalsIgnoreCase(dtTop.getCategoria())) {
+					dtTop.setCantidad(dtTop.getCantidad() + doc.getInteger("cantidad"));
+					existe = true;
+					break;
+				}
+			}
+			//Si no se encuentra la categoria en la lista se crea con cantidad valor inicial
+			if (!existe) {
+				listaTopCategorias.add(new DTTopCategoria(doc.getString("categoria"), doc.getInteger("cantidad")));
+			}
+		}
+		
+		listaTopCategorias.sort((a, b) -> b.getCantidad() - a.getCantidad());
+		return listaTopCategorias;
 	}
 }

@@ -6,19 +6,17 @@ import javax.persistence.Id;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection="pedidos")
 public class DTTopCategoria implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
-	@Id
 	private String categoria;
-	private String cantidad;
+	private int cantidad;
 	
 	public DTTopCategoria() {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public DTTopCategoria(String categoria, String cantidad) {
+	public DTTopCategoria(String categoria, int cantidad) {
 		super();
 		this.categoria = categoria;
 		this.cantidad = cantidad;
@@ -34,11 +32,11 @@ public class DTTopCategoria implements Serializable {
 		this.categoria = categoria;
 	}
 
-	public String getCantidad() {
+	public int getCantidad() {
 		return cantidad;
 	}
 
-	public void setCantidad(String cantidad) {
+	public void setCantidad(int cantidad) {
 		this.cantidad = cantidad;
 	}
 	
