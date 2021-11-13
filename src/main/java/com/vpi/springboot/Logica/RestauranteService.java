@@ -1831,6 +1831,26 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		} else
 			return "Balance de Ventas no disponible";
 	}
+	
+	public Object getBalanceVentaByFechaDosRestaurantes(String fechaInicio, String fechaHasta, String mail1, 
+			String devuelto, String metodoPago, String mail2) {
+		try {
+		if(mail2==null) {
+			return getBalanceVentaByFecha(fechaInicio, fechaHasta, mail1, 
+					devuelto, metodoPago);
+		}
+		Map<String, BalanceByFechaDTO> balances= new HashMap<String, BalanceByFechaDTO>();
+		balances.put("restaurante1", (BalanceByFechaDTO) getBalanceVentaByFecha(fechaInicio, fechaHasta, mail1, 
+					devuelto, metodoPago));
+		balances.put("restaurante2",(BalanceByFechaDTO) getBalanceVentaByFecha(fechaInicio, fechaHasta, mail2, 
+				devuelto, metodoPago));
+		
+		return new ListaBalanceVentaDTO(balances);
+		}catch(Exception e) {
+			return "Balance de Ventas no disponible"; 
+		}
+
+	}
 
 	private List<IdPedidoMontoDTO> inFiltro(List<IdPedidoMontoDTO> entry, String devuelto, String metodoPago) {
 		List<IdPedidoMontoDTO> retorno= new ArrayList<>();
@@ -1859,25 +1879,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		
 	}
 
-	public Object getBalanceVentaByFechaDosRestaurantes(String fechaInicio, String fechaHasta, String mail1, 
-			String devuelto, String metodoPago, String mail2) {
-		try {
-		if(mail2==null) {
-			return getBalanceVentaByFecha(fechaInicio, fechaHasta, mail1, 
-					devuelto, metodoPago);
-		}
-		Map<String, BalanceByFechaDTO> balances= new HashMap<String, BalanceByFechaDTO>();
-		balances.put(mail1, (BalanceByFechaDTO) getBalanceVentaByFecha(fechaInicio, fechaHasta, mail1, 
-					devuelto, metodoPago));
-		balances.put(mail2,(BalanceByFechaDTO) getBalanceVentaByFecha(fechaInicio, fechaHasta, mail2, 
-				devuelto, metodoPago));
-		
-		return new ListaBalanceVentaDTO(balances);
-		}catch(Exception e) {
-			return "Balance de Ventas no disponible"; 
-		}
 
-	}
 	
 	
 	////////////////////////////funciones de uso solo para cargar datos////////////////////7
