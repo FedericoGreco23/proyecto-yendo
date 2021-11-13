@@ -89,6 +89,6 @@ public interface RestauranteRepositorio extends UserBaseRepository<Restaurante> 
 	Page<Restaurante> listarRestauranteDesdeClientePorCategoria(@Param("categoria") String categoria, @Param("estado") EnumEstadoRestaurante estado, Pageable pageable);
 	
 	
-	@Query(value = "SELECT \"restaurante_mail\", COUNT(*) FROM Pedido GROUP BY \"restaurante_mail\" ORDER BY count(*) DESC", nativeQuery = true)
+	@Query(value = "SELECT \"restaurante_mail\", COUNT(*) FROM Pedido WHERE pago = true GROUP BY \"restaurante_mail\" ORDER BY count(*) DESC", nativeQuery = true)
 	List<Object[]> buscarRestaurantesConMasPedidos();
 }
