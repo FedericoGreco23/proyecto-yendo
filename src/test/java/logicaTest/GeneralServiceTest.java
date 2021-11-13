@@ -3,6 +3,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -74,6 +75,7 @@ class GeneralServiceTest {
 	private Optional<Administrador> optionalAdmin;
 	private GeoLocalizacion geo;
 	private Direccion dir;
+	private Direccion dir2;
 	private Optional<Direccion> optionalDireccion;
 	private List<Direccion> direcciones = new ArrayList<Direccion>();
 	private Producto producto;
@@ -112,11 +114,13 @@ class GeneralServiceTest {
 		restaurantePage = new PageImpl<Restaurante>(restauranteList);
 		dir = new Direccion("calle1 4555", geo);
 		dir.setId(3);
+		dir2 = new Direccion("calle2 4555", geo);
+		dir2.setId(0);
 		optionalDireccion = Optional.of(dir);
 		direcciones.add(dir);
 		cliente.setDirecciones(direcciones);
 		token = new TokenVerificacion(cliente);
-		token.setFechaExpiracion(Calendar.getInstance().getTime());
+		token.setFechaExpiracion(new Date(122, 5,3));
 		promo = new Promocion("promo1", "descripcion", 232, null, 0, true);
 		promo.setCategoria(cat);
 		promo.setRestaurante(restaurante);
@@ -234,6 +238,14 @@ class GeneralServiceTest {
 		Mockito.when(dirRepo.findById(Mockito.anyInt())).thenReturn(optionalDireccion);
 		mockGeneral.listarRestaurantes(0, 5, 5, "", "minutas", "", 1, dir.getId());
 	}
+	
+	@Test
+	public void testListarRestaurantes7() throws RestauranteException {
+		Mockito.when(resRepo.listarRestauranteDesdeClientePorCategoria(Mockito.anyString(),Mockito.any(),Mockito.any())).thenReturn(restaurantePage);
+		Mockito.when(dirRepo.findById(Mockito.anyInt())).thenReturn(optionalDireccion);
+		mockGeneral.listarRestaurantes(0, 5, 5, "", "minutas", "", 1, dir2.getId());
+	}
+	
 	
 	@Test
 	public void testListarMenus() throws RestauranteException {

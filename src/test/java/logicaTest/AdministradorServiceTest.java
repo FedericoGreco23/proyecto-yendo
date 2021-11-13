@@ -200,17 +200,72 @@ class AdministradorServiceTest {
 		Mockito.when(adminRepo.buscarAdministradorNombre(Mockito.anyString(), Mockito.any())).thenReturn(adminPage);		
 		mockAdmin.buscarUsuario(0, 1, 2, 2, admin.getMail(), "1", 0, 0);
 	}
+	
+	@Test
+	public void testBuscarUsuario1() {
+		Mockito.when(adminRepo.buscarAdministradorBloqueadoNombre(Mockito.anyString(),Mockito.any())).thenReturn(adminPage);		
+		mockAdmin.buscarUsuario(0, 1, 2, 2, admin.getMail(), "1", 0, 1);
+	}
 
 	@Test
 	public void testBuscarUsuario2() {
-		Mockito.when(adminRepo.buscarAdministrador(Mockito.any())).thenReturn(adminPage);		
+		Mockito.when(adminRepo.buscarAdministradorBloqueado(Mockito.any())).thenReturn(adminPage);		
 		mockAdmin.buscarUsuario(0, 1, 2, 2, "", "1", 0, 1);
 	}
 	
 	@Test
+	public void testBuscarUsuario21() {
+		Mockito.when(adminRepo.buscarAdministradorBloqueadoNombre(Mockito.anyString(),Mockito.any())).thenReturn(adminPage);		
+		mockAdmin.buscarUsuario(0, 1, 2, 0, admin.getMail(), "1", 0, 1);
+	}
+	
+	@Test
+	public void testBuscarUsuario22() {
+		Mockito.when(adminRepo.buscarAdministradorBloqueado(Mockito.any())).thenReturn(adminPage);		
+		mockAdmin.buscarUsuario(0, 1, 2, 0, "", "1", 0, 1);
+	}
+
+	
+	@Test
 	public void testBuscarUsuario3() {
-		Mockito.when(adminRepo.buscarAdministradorNombre(Mockito.anyString(), Mockito.any())).thenReturn(adminPage);		
+		Mockito.when(adminRepo.buscarAdministradorDesbloqueadoNombre(Mockito.anyString(), Mockito.any())).thenReturn(adminPage);		
 		mockAdmin.buscarUsuario(0, 1, 2, 0, admin.getMail(), "1", 0, 2);
+	}
+	
+	@Test
+	public void testBuscarUsuario31() {
+		Mockito.when(adminRepo.buscarAdministradorDesbloqueado(Mockito.any())).thenReturn(adminPage);		
+		mockAdmin.buscarUsuario(0, 1, 2, 0, "", "1", 0, 2);
+	}
+	
+	@Test
+	public void testBuscarUsuario32() {
+		Mockito.when(adminRepo.buscarAdministradorDesbloqueadoNombre(Mockito.anyString(), Mockito.any())).thenReturn(adminPage);		
+		mockAdmin.buscarUsuario(0, 1, 2, 2, admin.getMail(), "1", 0, 2);
+	}
+	
+	@Test
+	public void testBuscarUsuario33() {
+		Mockito.when(adminRepo.buscarAdministradorDesbloqueado(Mockito.any())).thenReturn(adminPage);		
+		mockAdmin.buscarUsuario(0, 1, 2, 0, "", "1", 0, 2);
+	}
+	
+	@Test
+	public void testBuscarUsuario34() {
+		Mockito.when(adminRepo.buscarAdministradorDesbloqueado(Mockito.any())).thenReturn(adminPage);		
+		mockAdmin.buscarUsuario(0, 1, 2, 2, "", "1", 0, 2);
+	}
+	
+	@Test
+	public void testBuscarUsuario35() {
+		Mockito.when(adminRepo.buscarAdministrador( Mockito.any())).thenReturn(adminPage);		
+		mockAdmin.buscarUsuario(0, 1, 2, 2, "", "1", 0, 0);
+	}
+	
+	@Test
+	public void testBuscarUsuario36() {
+		Mockito.when(adminRepo.buscarAdministradorNombre(Mockito.anyString(), Mockito.any())).thenReturn(adminPage);		
+		mockAdmin.buscarUsuario(0, 1, 2, 0, admin.getMail(), "1", 0, 0);
 	}
 	
 	@Test
@@ -221,15 +276,50 @@ class AdministradorServiceTest {
 	
 	@Test
 	public void testBuscarUsuario5() {
-		Mockito.when(resRepo.buscarRestauranteNombre(Mockito.anyString(), Mockito.any())).thenReturn(restaurantePage);		
+		Mockito.when(resRepo.buscarRestauranteBloqueadoNombre(Mockito.anyString(), Mockito.any())).thenReturn(restaurantePage);		
 		mockAdmin.buscarUsuario(0, 1, 1, 2, restaurante.getMail(), "1", 0, 1);
 	}
 
 	@Test
+	public void testBuscarUsuario51() {
+		Mockito.when(resRepo.buscarRestauranteBloqueado(Mockito.any())).thenReturn(restaurantePage);		
+		mockAdmin.buscarUsuario(0, 1, 1, 2, "", "1", 0, 1);
+	}
+	
+	@Test
+	public void testBuscarUsuario52() {
+		Mockito.when(resRepo.buscarRestauranteBloqueadoNombre(Mockito.anyString(), Mockito.any())).thenReturn(restaurantePage);		
+		mockAdmin.buscarUsuario(0, 1, 1, 0, restaurante.getMail(), "1", 0, 1);
+	}
+	
+	
+
+	
+	@Test
 	public void testBuscarUsuario6() {
-		Mockito.when(resRepo.buscarRestaurante(Mockito.any())).thenReturn(restaurantePage);		
+		Mockito.when(resRepo.buscarRestauranteDesbloqueado(Mockito.any())).thenReturn(restaurantePage);		
 		mockAdmin.buscarUsuario(0, 1, 1, 2, "", "1", 0, 2);
 	}
+	
+	@Test
+	public void testBuscarUsuario61() {
+		Mockito.when(resRepo.buscarRestauranteDesbloqueadoNombre(Mockito.anyString(), Mockito.any())).thenReturn(restaurantePage);		
+		mockAdmin.buscarUsuario(0, 1, 1, 2, restaurante.getMail(), "1", 0, 2);
+	}
+	
+	@Test
+	public void testBuscarUsuario62() {
+		Mockito.when(resRepo.buscarRestauranteDesbloqueadoNombre(Mockito.anyString(), Mockito.any())).thenReturn(restaurantePage);		
+		mockAdmin.buscarUsuario(0, 1, 1, 0, restaurante.getMail(), "1", 0, 2);
+	}
+	
+	@Test
+	public void testBuscarUsuario63() {
+		Mockito.when(resRepo.buscarRestauranteDesbloqueado(Mockito.any())).thenReturn(restaurantePage);		
+		mockAdmin.buscarUsuario(0, 1, 1, 0, "", "1", 0, 2);
+	}
+	
+	
 	
 	@Test
 	public void testBuscarUsuario7() {
@@ -238,15 +328,46 @@ class AdministradorServiceTest {
 	}
 	
 	@Test
-	public void testBuscarUsuario8() {
+	public void testBuscarUsuario71() {
+		Mockito.when(resRepo.buscarRestauranteNombre(Mockito.anyString(), Mockito.any())).thenReturn(restaurantePage);		
+		mockAdmin.buscarUsuario(0, 1, 1, 2, restaurante.getMail(), "1", 0, 0);
+	}
+	
+	@Test
+	public void testBuscarUsuario72() {
 		Mockito.when(resRepo.buscarRestaurante(Mockito.any())).thenReturn(restaurantePage);		
+		mockAdmin.buscarUsuario(0, 1, 1, 2, "", "1", 0, 0);
+	}
+	
+	@Test
+	public void testBuscarUsuario73() {
+		Mockito.when(resRepo.buscarRestaurante(Mockito.any())).thenReturn(restaurantePage);		
+		mockAdmin.buscarUsuario(0, 1, 1,0, "", "1", 0, 0);
+	}
+	
+	
+	@Test
+	public void testBuscarUsuario8() {
+		Mockito.when(resRepo.buscarRestauranteBloqueado(Mockito.any())).thenReturn(restaurantePage);		
 		mockAdmin.buscarUsuario(0, 1, 1, 0, "", "1", 0, 1);
 	}
 	
 	@Test
 	public void testBuscarUsuario9() {
-		Mockito.when(clienteRepo.buscarClienteNombre(Mockito.anyString(), Mockito.any())).thenReturn(clientePage);		
+		Mockito.when(clienteRepo.buscarClienteDesbloqueadoNombre(Mockito.anyString(), Mockito.any())).thenReturn(clientePage);		
 		mockAdmin.buscarUsuario(0, 1, 0, 2, cliente.getMail(), "1", 0, 2);
+	}
+	
+	@Test
+	public void testBuscarUsuario91() {
+		Mockito.when(clienteRepo.buscarClienteDesbloqueado(Mockito.any())).thenReturn(clientePage);		
+		mockAdmin.buscarUsuario(0, 1, 0, 2, "", "1", 0, 2);
+	}
+	
+	@Test
+	public void testBuscarUsuario92() {
+		Mockito.when(clienteRepo.buscarClienteDesbloqueadoNombre(Mockito.anyString(), Mockito.any())).thenReturn(clientePage);		
+		mockAdmin.buscarUsuario(0, 1, 0, 0, cliente.getMail(), "1", 0, 2);
 	}
 
 	@Test
@@ -256,14 +377,48 @@ class AdministradorServiceTest {
 	}
 	
 	@Test
-	public void testBuscarUsuario11() {
+	public void testBuscarUsuario101() {
 		Mockito.when(clienteRepo.buscarClienteNombre(Mockito.anyString(), Mockito.any())).thenReturn(clientePage);		
+		mockAdmin.buscarUsuario(0, 1,0 , 2, cliente.getMail(), "1", 0, 0);
+	}
+	
+	@Test
+	public void testBuscarUsuario102() {
+		Mockito.when(clienteRepo.buscarClienteNombre(Mockito.anyString(), Mockito.any())).thenReturn(clientePage);		
+		mockAdmin.buscarUsuario(0, 1,0 , 0, cliente.getMail(), "1", 0, 0);
+	}
+	
+	
+	@Test
+	public void testBuscarUsuario11() {
+		Mockito.when(clienteRepo.buscarClienteBloqueadoNombre(Mockito.anyString(), Mockito.any())).thenReturn(clientePage);		
 		mockAdmin.buscarUsuario(0, 1, 0, 0, cliente.getMail(), "1", 0, 1);
+	}
+	
+	
+	@Test
+	public void testBuscarUsuario111() {
+		Mockito.when(clienteRepo.buscarClienteBloqueado( Mockito.any())).thenReturn(clientePage);		
+		mockAdmin.buscarUsuario(0, 1, 0, 0, "", "1", 0, 1);
+	}
+	
+
+	
+	@Test
+	public void testBuscarUsuario112() {
+		Mockito.when(clienteRepo.buscarClienteBloqueadoNombre(Mockito.anyString(), Mockito.any())).thenReturn(clientePage);		
+		mockAdmin.buscarUsuario(0, 1, 0, 2, cliente.getMail(), "1", 0, 1);
+	}
+	
+	@Test
+	public void testBuscarUsuario113() {
+		Mockito.when(clienteRepo.buscarClienteBloqueado(Mockito.any())).thenReturn(clientePage);		
+		mockAdmin.buscarUsuario(0, 1, 0, 2, "", "1", 0, 1);
 	}
 	
 	@Test
 	public void testBuscarUsuario12() {
-		Mockito.when(clienteRepo.buscarCliente(Mockito.any())).thenReturn(clientePage);		
+		Mockito.when(clienteRepo.buscarClienteDesbloqueado(Mockito.any())).thenReturn(clientePage);		
 		mockAdmin.buscarUsuario(0, 1, 0, 0, "", "1", 0, 2);
 	}
 	
@@ -275,8 +430,8 @@ class AdministradorServiceTest {
 	
 	@Test
 	public void testBuscarUsuario14() {
-		Mockito.when(clienteRepo.buscarCliente(Mockito.any())).thenReturn(clientePage);		
-		mockAdmin.buscarUsuario(0, 1, 0, 0, "", "", 1, 1);
+		Mockito.when(resRepo.buscarRestauranteBloqueado(Mockito.any())).thenReturn(restaurantePage);		
+		mockAdmin.buscarUsuario(0, 1, 1, 0, "", "", 1, 1);
 	}
 	
 	

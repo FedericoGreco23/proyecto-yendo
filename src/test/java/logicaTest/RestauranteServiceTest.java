@@ -659,5 +659,15 @@ class RestauranteServiceTest {
 		mockRestaurante.actualizarBalanceVentas();
 	}
 	
+	@Test
+	public void testGetBalanceByFecha2Restaurante() {
+		Mockito.when(balanceVentasRepo.findById(Mockito.anyString())).thenReturn(balanceByMailOp);
+		mockRestaurante.getBalanceVentaByFechaDosRestaurantes(LocalDate.now().toString(), LocalDate.now().toString(), restaurante.getMail(), "false", null, null);
+	}
 	
+	@Test
+	public void testGetBalanceByFecha2Restaurante2() {
+		Mockito.when(balanceVentasRepo.findById(Mockito.anyString())).thenReturn(balanceByMailOp);
+		mockRestaurante.getBalanceVentaByFechaDosRestaurantes(LocalDate.now().toString(), LocalDate.now().toString(), restaurante.getMail(), "false", null, restaurante.getMail());
+	}
 }
