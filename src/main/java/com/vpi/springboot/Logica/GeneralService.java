@@ -494,6 +494,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 		return response;
 	}
 
+	@Override
 	public List<DTPromocion> listarPromocionesRestaurante(String mailRestaurante) throws RestauranteException {
 		Optional<Restaurante> optionalRestaurante = resRepo.findById(mailRestaurante);
 		if (!optionalRestaurante.isPresent()) {
@@ -513,7 +514,6 @@ public class GeneralService implements GeneralServicioInterfaz {
 	@Override
 	public List<Categoria> listarCategorias() {
 		return catRepo.findAll();
-
 	}
 
 	@Override
