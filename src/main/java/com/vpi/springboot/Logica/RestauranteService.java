@@ -1630,8 +1630,35 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	//@Scheduled(cron = "0 * * * * *") // cada minuto
 	@Scheduled(cron = "0 0 * * * *")
 	public void checkRestauranteApertura() {
-		List<Restaurante> restaurantesAbiertos = restauranteRepo.findByAceptado(true);
-		List<Restaurante> restaurantesCerrados = restauranteRepo.findByAceptado(false);
+		int diaSemana = LocalDate.now().getDayOfWeek().getValue();
+		String dia = "";
+		
+		switch(diaSemana) {
+		case 1: 
+			dia = "L";
+			break;
+		case 2:
+			dia = "M";
+			break;
+		case 3:
+			dia = "W";
+			break;
+		case 4:
+			dia = "J";
+			break;
+		case 5:
+			dia = "V";
+			break;
+		case 6:
+			dia = "S";
+			break;
+		case 7:
+			dia = "D";
+			break;
+		}
+		
+		List<Restaurante> restaurantesAbiertos = restauranteRepo.findByAceptado(true, dia);
+		List<Restaurante> restaurantesCerrados = restauranteRepo.findByAceptado(false, dia);
 		for(Restaurante r: restaurantesAbiertos) {
 			if(r.getHorarioCierre() == LocalTime.now() || LocalTime.now().isAfter(r.getHorarioCierre())) {
 				r.setAbierto(false);
