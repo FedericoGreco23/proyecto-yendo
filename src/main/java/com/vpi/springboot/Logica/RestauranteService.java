@@ -1827,6 +1827,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			LocalDate fin = LocalDate.of(anho1, mes1, dia1);
 
 			Double totalPeriodo = (double) 0;
+			Double totalPeriodoEfectivo = (double) 0;
+			Double totalPeriodoPaypal = (double) 0;
 
 			Set<FechaidPedidoMontoDTO> lista = new TreeSet<>();
 
@@ -1841,6 +1843,11 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 						lista.add(entry);
 						for (IdPedidoMontoDTO entry2 : filtrados) {
 							totalPeriodo = totalPeriodo + Double.valueOf(entry2.getMonto());
+							if (entry2.getMetodoPago()==EnumMetodoDePago.EFECTIVO.name()){
+								totalPeriodoEfectivo= totalPeriodoEfectivo + Double.valueOf(entry2.getMonto());
+							}else {
+								totalPeriodoPaypal= totalPeriodoPaypal + Double.valueOf(entry2.getMonto());
+							}
 						}
 					}
 
@@ -1849,7 +1856,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			}
 
 			if (lista.size() > 0) {
-				return new BalanceByFechaDTO(lista, totalPeriodo.toString());
+				return new BalanceByFechaDTO(lista, totalPeriodo.toString(), totalPeriodoEfectivo.toString(), totalPeriodoPaypal.toString());
 			} else {
 
 				return "El restaurante no tuvo ventas entre esas fechas.";
