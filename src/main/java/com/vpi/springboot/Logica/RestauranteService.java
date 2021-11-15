@@ -467,8 +467,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 //			}
 //			Carrito carrito = new Carrito(500, "csuarez2211@gmail.com", "lapasiva@lapasiva.com", productos, true);
 
-			////////////////Envio de notificacion mobile///////////////////////////////////
-			
+			//////////////// Envio de notificacion mobile///////////////////////////////////
+
 			String token = pedido.getCliente().getTokenDispositivo();
 			String restaurante = pedido.getRestaurante().getNombre();
 			Message message;
@@ -477,10 +477,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			if (token != null) {
 				SingletonFirebase.getInstancia().arrancar();
 
-				Notification notification = Notification.builder()
-						.setTitle("Resolucion de pedido")
-						.setBody("Su pedido ha sido aceptado por el restaurante " + restaurante)
-						.build();
+				Notification notification = Notification.builder().setTitle("Resolucion de pedido")
+						.setBody("Su pedido ha sido aceptado por el restaurante " + restaurante).build();
 				message = Message.builder().putAllData(map).putData("mensaje", "Nuevo mensaje de sus pedidos")
 						.setToken(token) // deviceId
 						.setNotification(notification).build();
@@ -495,8 +493,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				}
 			}
 
-			////////////////Fin notificacion mobile///////////////////////////////////////
-			
+			//////////////// Fin notificacion mobile///////////////////////////////////////
+
 			Optional<Carrito> optionalCarrito = mongoRepo.findById(pedido.getCarrito());
 			Carrito carrito = optionalCarrito.get();
 			DTPedido dtpedido = new DTPedido(pedido, new DTCarrito(carrito));
@@ -638,9 +636,9 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			 */
 
 			simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, "Su pedido ha sido rechazado");
-			
-			////////////////Envio de notificacion mobile///////////////////////////////////
-			
+
+			//////////////// Envio de notificacion mobile///////////////////////////////////
+
 			String token = pedido.getCliente().getTokenDispositivo();
 			String restaurante = pedido.getRestaurante().getNombre();
 			Message message;
@@ -648,11 +646,9 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			map.put("llave", "valor");
 			if (token != null) {
 				SingletonFirebase.getInstancia().arrancar();
-	
-				Notification notification = Notification.builder()
-						.setTitle("Resolucion de pedido")
-						.setBody("Su pedido ha sido rechazado por el restaurante " + restaurante)
-						.build();
+
+				Notification notification = Notification.builder().setTitle("Resolucion de pedido")
+						.setBody("Su pedido ha sido rechazado por el restaurante " + restaurante).build();
 				message = Message.builder().putAllData(map).putData("mensaje", "Nuevo mensaje de sus pedidos")
 						.setToken(token) // deviceId
 						.setNotification(notification).build();
@@ -667,17 +663,18 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				}
 			}
 
-			////////////////Fin notificacion mobile///////////////////////////////////////
+			//////////////// Fin notificacion mobile///////////////////////////////////////
 
 			String to = pedido.getCliente().getMail();
-			String body = mailSender.getRechazarPedido(pedido.getRestaurante().getNombre(), pedido.getCliente().getNombre() + " " + pedido.getCliente().getApellido());
+			String body = mailSender.getRechazarPedido(pedido.getRestaurante().getNombre(),
+					pedido.getCliente().getNombre() + " " + pedido.getCliente().getApellido());
 			String topic = "Rechazo de pedido para " + pedido.getCliente().getNickname() + ".";
 			try {
 				mailSender.sendMail(to, body, topic);
 			} catch (MessagingException e) {
 				return new DTRespuesta("No se pudo mandar mail: " + e.getMessage());
 			}
-			
+
 			return new DTRespuesta("Pedido " + idPedido + " rechazado.");
 
 		} else {
@@ -1179,20 +1176,21 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 			// guardar resto
 
-			/////////////promociones//////////////////
+			///////////// promociones//////////////////
 
 			List<Producto> listProdu = productoRepo.findAllByRestaurante(restau);
 			Integer promoRandomNum = (int) (Math.random() * listProdu.size());
 			Integer promoRandomNum2 = (int) (Math.random() * listProdu.size());
-			String fotoPromo="https://www.bolsalea.com/blog/media/Bolsa-take-away-personalizada.jpg";
+			String fotoPromo = "https://www.bolsalea.com/blog/media/Bolsa-take-away-personalizada.jpg";
 
-			Integer precioPromo= (int) ((listProdu.get(promoRandomNum).getPrecio()+listProdu.get(promoRandomNum2).getPrecio()));
-			List<DTProductoIdCantidad>	productosPromo=new ArrayList<DTProductoIdCantidad>();
-			DTProductoIdCantidad pc= new DTProductoIdCantidad(listProdu.get(promoRandomNum).getId(), 2);
-			DTProductoIdCantidad pc2= new DTProductoIdCantidad(listProdu.get(promoRandomNum2).getId(), 3);
+			Integer precioPromo = (int) ((listProdu.get(promoRandomNum).getPrecio()
+					+ listProdu.get(promoRandomNum2).getPrecio()));
+			List<DTProductoIdCantidad> productosPromo = new ArrayList<DTProductoIdCantidad>();
+			DTProductoIdCantidad pc = new DTProductoIdCantidad(listProdu.get(promoRandomNum).getId(), 2);
+			DTProductoIdCantidad pc2 = new DTProductoIdCantidad(listProdu.get(promoRandomNum2).getId(), 3);
 			productosPromo.add(pc);
 			productosPromo.add(pc2);
-			DTPromocionConPrecio promocion=  new DTPromocionConPrecio(productosPromo, precioPromo, 45, "Promo del mes",
+			DTPromocionConPrecio promocion = new DTPromocionConPrecio(productosPromo, precioPromo, 45, "Promo del mes",
 					"Imperdible promo", fotoPromo);
 			try {
 				altaPromocion(promocion, restau.getMail());
@@ -1254,8 +1252,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 				//////////// pedidos///////////////////
 				Integer i = (int) (Math.random() * 3);
-				if(i==2) {
-					i=1;
+				if (i == 2) {
+					i = 1;
 				}
 				Integer randomR = (int) (Math.random() * 5);
 				String mailREsto = restaurantesList.get(randomR).toLowerCase().replace(" ", "") + "@"
@@ -1267,12 +1265,13 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 						clienteService.agregarACarrito(resOp.get().getProductos().get(0).getId(), 3, cliente.getMail(),
 								resOp.get().getMail());
 						DTCarrito carrito = clienteService.verCarrito(cliente.getMail());
-						DTPedido dtPedido=clienteService.altaPedidosParaCargadeDatos((int) carrito.getId(), EnumMetodoDePago.values()[i],
-								cli.get().getDirecciones().get(0).getId(), cliente.getMail(), "Muero de hambre");
-						
+						DTPedido dtPedido = clienteService.altaPedidosParaCargadeDatos((int) carrito.getId(),
+								EnumMetodoDePago.values()[i], cli.get().getDirecciones().get(0).getId(),
+								cliente.getMail(), "Muero de hambre");
+
 						confirmarPedidoCargaDeDatos(dtPedido.getId());
-						if(dtPedido.getMetodoDePago().name()=="EFECTIVO") {
-							registrarPago(dtPedido.getId());	
+						if (dtPedido.getMetodoDePago().name() == "EFECTIVO") {
+							registrarPago(dtPedido.getId());
 						}
 						// calificaciones
 						clienteService.calificarRestaurante(cliente.getMail(), resOp.get().getMail(), new Calificacion(
@@ -1293,8 +1292,6 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		}
 
 	}
-
-
 
 	private DTRespuesta crearCliente(Cliente usuario) throws UsuarioException, Exception {
 		if (emailExist(usuario.getMail())) {
@@ -1442,8 +1439,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	}
 
 	@Override
-	public void ventaProducto(String idProducto, int cantidad, String categoria, String fecha,
-			String nombreRestaurante, String nombreProducto) {
+	public void ventaProducto(String idProducto, int cantidad, String categoria, String fecha, String nombreRestaurante,
+			String nombreProducto) {
 		MongoClientURI uri = new MongoClientURI(
 				"mongodb+srv://grupo1:grupo1@cluster0.l17sm.mongodb.net/prueba-concepto");
 		MongoClient mongoClient = new MongoClient(uri);
@@ -1490,15 +1487,15 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		Pedido devolucion = new Pedido(pedido.getFecha(), pedido.getCostoTotal() * -1, pedido.getEstadoPedido(),
 				pedido.getMetodoDePago(), pedido.getCarrito(), pedido.getDireccion(), pedido.getRestaurante(),
 				pedido.getCliente(), pedido.getComentario(), pedido.getPago());
-		//devolucion.setEstadoPedido(null);
-		//pedido.setEstadoPedido(EnumEstadoPedido.REEMBOLZADO);
+		// devolucion.setEstadoPedido(null);
+		// pedido.setEstadoPedido(EnumEstadoPedido.REEMBOLZADO);
 		devolucion.setEstadoPedido(EnumEstadoPedido.REEMBOLZADO);
 		List<Reclamo> reclamos = pedido.getReclamos();
 		for (Reclamo reclamo : reclamos) {
 			if (reclamo.getId() != idReclamo) {
 				reclamo.setEstado(EnumEstadoReclamo.RECHAZADO);
 				reclamo.setResolucion("El pedido ha sido devuelto");
-				//recRepo.save(reclamo);
+				// recRepo.save(reclamo);
 			}
 		}
 		pedidoRepo.save(devolucion);
@@ -1529,10 +1526,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			if (token != null) {
 				SingletonFirebase.getInstancia().arrancar();
 
-				Notification notification = Notification.builder()
-						.setTitle("Resolucion de reclamo")
-						.setBody("Su reclamo ha sido aceptado por el restaurante " + restaurante)
-						.build();
+				Notification notification = Notification.builder().setTitle("Resolucion de reclamo")
+						.setBody("Su reclamo ha sido aceptado por el restaurante " + restaurante).build();
 				message = Message.builder().putAllData(map).putData("mensaje", "Nuevo mensaje de sus reclamos")
 						.setToken(token) // deviceId
 						.setNotification(notification).build();
@@ -1556,17 +1551,12 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			// Envio notificacion al mobile
 			if (token != null) {
 				SingletonFirebase.getInstancia().arrancar();
-				
-				Notification notification = Notification.builder()
-						.setTitle("Resolucion de reclamo")
-						.setBody("Su reclamo ha sido rechazado por el restaurante " + restaurante)
-						.build();
-				message = Message.builder()
-						.putAllData(map)
-						.putData("mensaje", "Nuevo mensaje de sus reclamos")
+
+				Notification notification = Notification.builder().setTitle("Resolucion de reclamo")
+						.setBody("Su reclamo ha sido rechazado por el restaurante " + restaurante).build();
+				message = Message.builder().putAllData(map).putData("mensaje", "Nuevo mensaje de sus reclamos")
 						.setToken(token) // deviceId
-						.setNotification(notification)
-						.build();
+						.setNotification(notification).build();
 				try {
 					// DUDA QUE ES appAndroid
 					FirebaseMessaging.getInstance().send(message);
@@ -1581,26 +1571,26 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 
 		// NOTIFICAR A CLIENTE
 		// se notifica a cliente
-		/*String base64EncodedEmail = Base64.getEncoder()
-				.encodeToString(reclamo.getPedido().getCliente().getMail().getBytes(StandardCharsets.UTF_8));
+		/*
+		 * String base64EncodedEmail = Base64.getEncoder()
+		 * .encodeToString(reclamo.getPedido().getCliente().getMail().getBytes(
+		 * StandardCharsets.UTF_8));
+		 * 
+		 * simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail,
+		 * "Reclamo");// new DTNotificacionSoket("Su // pedido ha sido aceptado y se //
+		 * está siendo preparado", // "Reclamo")); DTReclamo dtr = new
+		 * DTReclamo(reclamo); String to = reclamo.getPedido().getCliente().getMail();
+		 * String body = mailSender.getResolucionReclamo(dtr,
+		 * reclamo.getPedido().getCliente()); String topic =
+		 * "Resolución de reclamo para cliente " +
+		 * reclamo.getPedido().getCliente().getNickname() + "."; try {
+		 * mailSender.sendMail(to, body, topic); } catch (MessagingException e) { return
+		 * new DTRespuesta("No se pudo mandar mail: " + e.getMessage()); }
+		 */
 
-		simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail, "Reclamo");// new DTNotificacionSoket("Su
-																						// pedido ha sido aceptado y se
-																						// está siendo preparado",
-																						// "Reclamo"));
-		DTReclamo dtr = new DTReclamo(reclamo);
-		String to = reclamo.getPedido().getCliente().getMail();
-		String body = mailSender.getResolucionReclamo(dtr, reclamo.getPedido().getCliente());
-		String topic = "Resolución de reclamo para cliente " + reclamo.getPedido().getCliente().getNickname() + ".";
-		try {
-			mailSender.sendMail(to, body, topic);
-		} catch (MessagingException e) {
-			return new DTRespuesta("No se pudo mandar mail: " + e.getMessage());
-		}*/
-		
 		// simpMessagingTemplate.convertAndSend("/topic/" + base64EncodedEmail,"Su
 		// pedido ha sido aceptado y se está siendo preparado");
-		
+
 		return new DTRespuesta("Se envió la resolución de reclamo con éxito.");
 	}
 
@@ -1625,16 +1615,16 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 //			throw new UsuarioException(RestauranteException.SinCalificacion(mailCliente));
 		return new DTCalificacionCliente(calCliente);
 	}
-	
+
 	// Abre o cierra los restaurantes dependiendo de la hora
-	//@Scheduled(cron = "0 * * * * *") // cada minuto
+	// @Scheduled(cron = "0 * * * * *") // cada minuto
 	@Scheduled(cron = "0 0 * * * *")
 	public void checkRestauranteApertura() {
 		int diaSemana = LocalDate.now().getDayOfWeek().getValue();
 		String dia = "";
-		
-		switch(diaSemana) {
-		case 1: 
+
+		switch (diaSemana) {
+		case 1:
 			dia = "L";
 			break;
 		case 2:
@@ -1656,18 +1646,18 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			dia = "D";
 			break;
 		}
-		
+
 		List<Restaurante> restaurantesAbiertos = restauranteRepo.findByAceptado(true, dia);
 		List<Restaurante> restaurantesCerrados = restauranteRepo.findByAceptado(false, dia);
-		for(Restaurante r: restaurantesAbiertos) {
-			if(r.getHorarioCierre() == LocalTime.now() || LocalTime.now().isAfter(r.getHorarioCierre())) {
+		for (Restaurante r : restaurantesAbiertos) {
+			if (r.getHorarioCierre() == LocalTime.now() || LocalTime.now().isAfter(r.getHorarioCierre())) {
 				r.setAbierto(false);
 				restauranteRepo.save(r);
 			}
 		}
-		
-		for(Restaurante r: restaurantesCerrados) {
-			if(r.getHorarioApertura().equals(LocalTime.now()) || LocalTime.now().isAfter(r.getHorarioApertura())) {
+
+		for (Restaurante r : restaurantesCerrados) {
+			if (r.getHorarioApertura().equals(LocalTime.now()) || LocalTime.now().isAfter(r.getHorarioApertura())) {
 				r.setAbierto(true);
 				restauranteRepo.save(r);
 			}
@@ -1677,14 +1667,14 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 //////////////////////////////////////////ESTADISTICAS///////////////////////////////////
 
 	/**
-	* BALANCE DE VENTAS
-	*/
-	@Scheduled(cron = "*/59 */7 * * * *") // 1 vez cada 7 minutos
+	 * BALANCE DE VENTAS
+	 */
+	@Scheduled(cron = "*/59 */10 * * * *") // 1 vez cada 7 minutos
 	public DTRespuesta actualizarBalanceVentas() {
 
 		// descomentar
 		List<Pedido> pedidosList = pedidoRepo.findAllPagos();
-		//List<Pedido> pedidosList = pedidoRepo.findAll();
+		// List<Pedido> pedidosList = pedidoRepo.findAll();
 
 		for (Pedido pedido : pedidosList) {
 			Optional<BalanceVentaDTO> balanceByMailOp = balanceVentasRepo.findById(pedido.getRestaurante().getMail());
@@ -1699,20 +1689,21 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 					List<IdPedidoMontoDTO> pedidos = new ArrayList<IdPedidoMontoDTO>();
 					IdPedidoMontoDTO idPedidoMontoDTO = new IdPedidoMontoDTO(pedido.getId(),
 							BigDecimal.valueOf(pedido.getCostoTotal()).setScale(2, RoundingMode.HALF_UP).doubleValue(),
-							pedido.getEstadoPedido().name(), pedido.getMetodoDePago().name(), pedido.getFecha().toLocalDate());
+							pedido.getEstadoPedido().name(), pedido.getMetodoDePago().name(),
+							pedido.getFecha().toLocalDate());
 					pedidos.add(idPedidoMontoDTO);
 					FechaidPedidoMontoDTO fechaIdPedidoMonto = new FechaidPedidoMontoDTO(
 							pedido.getFecha().toLocalDate(), pedidos, pedido.getCostoTotal());
-					if(pedido.getMetodoDePago().name()=="EFECTIVO") {
-						fechaIdPedidoMonto.setTotalEfectivo( BigDecimal.valueOf(pedido.getCostoTotal())
+					if (pedido.getMetodoDePago().name() == "EFECTIVO") {
+						fechaIdPedidoMonto.setTotalEfectivo(BigDecimal.valueOf(pedido.getCostoTotal())
 								.setScale(2, RoundingMode.HALF_UP).doubleValue());
-						//fechaIdPedidoMonto.setTotalPaypal(0.0);
-						
-					}else {
+						// fechaIdPedidoMonto.setTotalPaypal(0.0);
 
-						fechaIdPedidoMonto.setTotalPaypal( BigDecimal.valueOf(pedido.getCostoTotal())
+					} else {
+
+						fechaIdPedidoMonto.setTotalPaypal(BigDecimal.valueOf(pedido.getCostoTotal())
 								.setScale(2, RoundingMode.HALF_UP).doubleValue());
-						//fechaIdPedidoMonto.setTotalEfectivo(0.0);
+						// fechaIdPedidoMonto.setTotalEfectivo(0.0);
 					}
 
 					fecha_PedidoMonto.add(fechaIdPedidoMonto);
@@ -1720,27 +1711,31 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 					balanceByMail.setTotal(BigDecimal.valueOf(balanceByMail.getTotal() + pedido.getCostoTotal())
 							.setScale(2, RoundingMode.HALF_UP).doubleValue());
 					balanceVentasRepo.save(balanceByMail);
-				}else {//ya hay pedidos en esa fecha
-					Boolean yaAgregado=false;
+				} else {// ya hay pedidos en esa fecha
+					Boolean yaAgregado = false;
 					List<FechaidPedidoMontoDTO> fecha_PedidoMonto = balanceByMail.getListaPedidos();
 
-					Optional<FechaidPedidoMontoDTO> idPedidoMonto = fecha_PedidoMonto.stream().filter(o -> o.getFecha().equals(pedido.getFecha().toLocalDate())).findFirst();
-					if(idPedidoMonto!= null && idPedidoMonto.isPresent()) {
-						List<IdPedidoMontoDTO> listaPedidos= idPedidoMonto.get().getPedidos();//lista de pedidos de esa fecha
+					Optional<FechaidPedidoMontoDTO> idPedidoMonto = fecha_PedidoMonto.stream()
+							.filter(o -> o.getFecha().equals(pedido.getFecha().toLocalDate())).findFirst();
+					if (idPedidoMonto != null && idPedidoMonto.isPresent()) {
+						List<IdPedidoMontoDTO> listaPedidos = idPedidoMonto.get().getPedidos();// lista de pedidos de
+																								// esa fecha
 
-						for(IdPedidoMontoDTO l: listaPedidos) {
-							if(l.getIdPedido()==pedido.getId()) {
-								yaAgregado=true;
+						for (IdPedidoMontoDTO l : listaPedidos) {
+							if (l.getIdPedido() == pedido.getId()) {
+								yaAgregado = true;
 							}
 						}
 						if (!yaAgregado) {
-							IdPedidoMontoDTO idPedidoMontoDTO = new IdPedidoMontoDTO(
-									pedido.getId(), BigDecimal.valueOf(pedido.getCostoTotal())
-											.setScale(2, RoundingMode.HALF_UP).doubleValue(),
-									pedido.getEstadoPedido().name(), pedido.getMetodoDePago().name(), pedido.getFecha().toLocalDate());
+							IdPedidoMontoDTO idPedidoMontoDTO = new IdPedidoMontoDTO(pedido.getId(),
+									BigDecimal.valueOf(pedido.getCostoTotal()).setScale(2, RoundingMode.HALF_UP)
+											.doubleValue(),
+									pedido.getEstadoPedido().name(), pedido.getMetodoDePago().name(),
+									pedido.getFecha().toLocalDate());
 							listaPedidos.add(idPedidoMontoDTO);
 							idPedidoMonto.get().setPedidos(listaPedidos);
-							idPedidoMonto.get().setTotalDelDia(idPedidoMonto.get().getTotalDelDia()+pedido.getCostoTotal());
+							idPedidoMonto.get()
+									.setTotalDelDia(idPedidoMonto.get().getTotalDelDia() + pedido.getCostoTotal());
 
 							// elimino FechaidPedidoMontoDTO que habia y agrego el nuevo
 							// System.out.print(fecha_PedidoMonto!=null);
@@ -1750,16 +1745,19 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 									break;
 								}
 							}
-							if(pedido.getMetodoDePago().name()=="EFECTIVO") {
-								idPedidoMonto.get().setTotalEfectivo( BigDecimal.valueOf(pedido.getCostoTotal()+idPedidoMonto.get().getTotalEfectivo())
+							if (pedido.getMetodoDePago().name() == "EFECTIVO") {
+								idPedidoMonto.get().setTotalEfectivo(BigDecimal
+										.valueOf(pedido.getCostoTotal() + idPedidoMonto.get().getTotalEfectivo())
 										.setScale(2, RoundingMode.HALF_UP).doubleValue());
-								//idPedidoMonto.get().setTotalPaypal(0.0);
-								
-							}else {
+								// idPedidoMonto.get().setTotalPaypal(0.0);
 
-								idPedidoMonto.get().setTotalPaypal( BigDecimal.valueOf(pedido.getCostoTotal()+idPedidoMonto.get().getTotalPaypal())
-										.setScale(2, RoundingMode.HALF_UP).doubleValue());
-								//idPedidoMonto.get().setTotalEfectivo(0.0);
+							} else {
+
+								idPedidoMonto.get()
+										.setTotalPaypal(BigDecimal
+												.valueOf(pedido.getCostoTotal() + idPedidoMonto.get().getTotalPaypal())
+												.setScale(2, RoundingMode.HALF_UP).doubleValue());
+								// idPedidoMonto.get().setTotalEfectivo(0.0);
 							}
 							fecha_PedidoMonto.add(idPedidoMonto.get());
 
@@ -1783,20 +1781,21 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				List<IdPedidoMontoDTO> pedidos = new ArrayList<>();
 				IdPedidoMontoDTO idPedidoMontoDTO = new IdPedidoMontoDTO(pedido.getId(),
 						BigDecimal.valueOf(pedido.getCostoTotal()).setScale(2, RoundingMode.HALF_UP).doubleValue(),
-						pedido.getEstadoPedido().name(), pedido.getMetodoDePago().name(), pedido.getFecha().toLocalDate());
+						pedido.getEstadoPedido().name(), pedido.getMetodoDePago().name(),
+						pedido.getFecha().toLocalDate());
 				pedidos.add(idPedidoMontoDTO);
 				FechaidPedidoMontoDTO fechaPedidoMontoDto = new FechaidPedidoMontoDTO(pedido.getFecha().toLocalDate(),
 						pedidos, pedido.getCostoTotal());
-				if(pedido.getMetodoDePago().name()=="EFECTIVO") {
-					fechaPedidoMontoDto.setTotalEfectivo( BigDecimal.valueOf(pedido.getCostoTotal())
-							.setScale(2, RoundingMode.HALF_UP).doubleValue());
-					//fechaPedidoMontoDto.setTotalPaypal(0.0);
-					
-				}else {
+				if (pedido.getMetodoDePago().name() == "EFECTIVO") {
+					fechaPedidoMontoDto.setTotalEfectivo(
+							BigDecimal.valueOf(pedido.getCostoTotal()).setScale(2, RoundingMode.HALF_UP).doubleValue());
+					// fechaPedidoMontoDto.setTotalPaypal(0.0);
 
-					fechaPedidoMontoDto.setTotalPaypal( BigDecimal.valueOf(pedido.getCostoTotal())
-							.setScale(2, RoundingMode.HALF_UP).doubleValue());
-					//fechaPedidoMontoDto.setTotalEfectivo(0.0);
+				} else {
+
+					fechaPedidoMontoDto.setTotalPaypal(
+							BigDecimal.valueOf(pedido.getCostoTotal()).setScale(2, RoundingMode.HALF_UP).doubleValue());
+					// fechaPedidoMontoDto.setTotalEfectivo(0.0);
 				}
 				fecha_PedidoMonto.add(fechaPedidoMontoDto);
 
@@ -1811,7 +1810,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		return new DTRespuesta("Balance de Ventas actualizado");
 	}
 
-	public Object getBalanceVentaByFecha(String fechaInicio, String fechaHasta, String mailFromJwt, String devuelto, String metodoPago) {
+	public Object getBalanceVentaByFecha(String fechaInicio, String fechaHasta, String mailFromJwt, String devuelto,
+			String metodoPago) {
 		Optional<BalanceVentaDTO> balanceByMailOp = balanceVentasRepo.findById(mailFromJwt);
 		if (balanceByMailOp.isPresent()) {
 			String[] fecha = fechaInicio.split("-");
@@ -1837,16 +1837,20 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				if (entry.getFecha().equals(inicio) || entry.getFecha().equals(fin)
 						|| (entry.getFecha().isAfter(inicio) && entry.getFecha().isBefore(fin))) {
 
-					List<IdPedidoMontoDTO> filtrados = inFiltro(entry.getPedidos(), devuelto, metodoPago!=null?metodoPago.toUpperCase():metodoPago);
+					List<IdPedidoMontoDTO> filtrados = inFiltro(entry.getPedidos(), devuelto,
+							metodoPago != null ? metodoPago.toUpperCase() : metodoPago);
 					if (!filtrados.isEmpty()) {
 						entry.setPedidos(filtrados);
 						lista.add(entry);
 						for (IdPedidoMontoDTO entry2 : filtrados) {
-							totalPeriodo = totalPeriodo + Double.valueOf(entry2.getMonto());
-							if (entry2.getMetodoPago()==EnumMetodoDePago.EFECTIVO.name()){
-								totalPeriodoEfectivo= totalPeriodoEfectivo + Double.valueOf(entry2.getMonto());
-							}else {
-								totalPeriodoPaypal= totalPeriodoPaypal + Double.valueOf(entry2.getMonto());
+							totalPeriodo = BigDecimal.valueOf(totalPeriodo + Double.valueOf(entry2.getMonto()))
+									.setScale(2, RoundingMode.HALF_UP).doubleValue();
+							if (entry2.getMetodoPago().contains(EnumMetodoDePago.EFECTIVO.name())) {
+								totalPeriodoEfectivo = BigDecimal.valueOf(totalPeriodoEfectivo + Double.valueOf(entry2.getMonto()))
+										.setScale(2, RoundingMode.HALF_UP).doubleValue();
+							} else {
+								totalPeriodoPaypal = BigDecimal.valueOf(totalPeriodoPaypal + Double.valueOf(entry2.getMonto()))
+										.setScale(2, RoundingMode.HALF_UP).doubleValue();
 							}
 						}
 					}
@@ -1856,46 +1860,47 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			}
 
 			if (lista.size() > 0) {
-				return new BalanceByFechaDTO(lista, totalPeriodo.toString(), totalPeriodoEfectivo.toString(), totalPeriodoPaypal.toString());
+				return new BalanceByFechaDTO(lista, totalPeriodo.toString(), totalPeriodoEfectivo.toString(),
+						totalPeriodoPaypal.toString());
 			} else {
 
-				return "El restaurante no tuvo ventas entre esas fechas.";
+
+				return new BalanceByFechaDTO(new TreeSet<>(), "0", "0", "0");
 			}
 
 		} else
 			return "Balance de Ventas no disponible";
 	}
-	
-	public Object getBalanceVentaByFechaDosRestaurantes(String fechaInicio, String fechaHasta, String mail1, 
+
+	public Object getBalanceVentaByFechaDosRestaurantes(String fechaInicio, String fechaHasta, String mail1,
 			String devuelto, String metodoPago, String mail2) {
 		try {
-		if(mail2==null) {
-			return getBalanceVentaByFecha(fechaInicio, fechaHasta, mail1, 
-					devuelto, metodoPago);
-		}
-		Map<String, BalanceByFechaDTO> balances= new HashMap<String, BalanceByFechaDTO>();
-		balances.put("restaurante1", (BalanceByFechaDTO) getBalanceVentaByFecha(fechaInicio, fechaHasta, mail1, 
-					devuelto, metodoPago));
-		balances.put("restaurante2",(BalanceByFechaDTO) getBalanceVentaByFecha(fechaInicio, fechaHasta, mail2, 
-				devuelto, metodoPago));
-		
-		return new ListaBalanceVentaDTO(balances);
-		}catch(Exception e) {
-			return "Balance de Ventas no disponible"; 
+			if (mail2 == null) {
+				return getBalanceVentaByFecha(fechaInicio, fechaHasta, mail1, devuelto, metodoPago);
+			}
+			Map<String, BalanceByFechaDTO> balances = new HashMap<String, BalanceByFechaDTO>();
+			balances.put("restaurante1",
+					(BalanceByFechaDTO) getBalanceVentaByFecha(fechaInicio, fechaHasta, mail1, devuelto, metodoPago));
+			balances.put("restaurante2",
+					(BalanceByFechaDTO) getBalanceVentaByFecha(fechaInicio, fechaHasta, mail2, devuelto, metodoPago));
+
+			return new ListaBalanceVentaDTO(balances);
+		} catch (Exception e) {
+			return "Balance de Ventas no disponible";
 		}
 
 	}
 
 	private List<IdPedidoMontoDTO> inFiltro(List<IdPedidoMontoDTO> entry, String devuelto, String metodoPago) {
-		List<IdPedidoMontoDTO> retorno= new ArrayList<>();
-		
-		for(IdPedidoMontoDTO pedido: entry) {
-			if(((devuelto.contains("true") && pedido.getEstado().contains(EnumEstadoPedido.REEMBOLZADO.name()))
-					|| devuelto.contains("false")) && (metodoPago==null || metodoPago.contains(pedido.getMetodoPago()))) {
+		List<IdPedidoMontoDTO> retorno = new ArrayList<>();
+
+		for (IdPedidoMontoDTO pedido : entry) {
+			if (((devuelto.contains("true") && pedido.getEstado().contains(EnumEstadoPedido.REEMBOLZADO.name()))
+					|| devuelto.contains("false"))
+					&& (metodoPago == null || metodoPago.contains(pedido.getMetodoPago()))) {
 				retorno.add(pedido);
 			}
-				
-			
+
 		}
 		return retorno;
 	}
@@ -1903,20 +1908,18 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	public GetEstadoResponseDTO getEstado(String mailFromJwt) throws RestauranteException {
 		Optional<Restaurante> restOp = restauranteRepo.findById(mailFromJwt);
 		if (restOp.isPresent()) {
-			GetEstadoResponseDTO respuesta= new GetEstadoResponseDTO(restOp.get().getEstado().name(), 
+			GetEstadoResponseDTO respuesta = new GetEstadoResponseDTO(restOp.get().getEstado().name(),
 					restOp.get().getAbierto() ? "Abierto" : "cerrado", restOp.get().getProductos().size());
 			;
-			
+
 			return respuesta;
 		}
 		throw new RestauranteException(RestauranteException.NotFoundExceptionNombre(mailFromJwt));
-		
+
 	}
 
-
-	
-	
-	////////////////////////////funciones de uso solo para cargar datos////////////////////7
+	//////////////////////////// funciones de uso solo para cargar
+	//////////////////////////// datos////////////////////7
 	public DTRespuesta confirmarPedidoCargaDeDatos(int idPedido) throws PedidoException, IOException {
 		Optional<Pedido> optionalPedido = pedidoRepo.findById(idPedido);
 		if (optionalPedido.isPresent()) {
@@ -1947,36 +1950,30 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 //			}
 //			Carrito carrito = new Carrito(500, "csuarez2211@gmail.com", "lapasiva@lapasiva.com", productos, true);
 
-			////////////////Envio de notificacion mobile///////////////////////////////////
-			
+			//////////////// Envio de notificacion mobile///////////////////////////////////
+
 			String token = pedido.getCliente().getTokenDispositivo();
 			String restaurante = pedido.getRestaurante().getNombre();
 			Message message;
 			Map<String, String> map = new HashMap<>();
 			map.put("llave", "valor");
-			/*if (token != null) {
-				SingletonFirebase.getInstancia().arrancar();
+			/*
+			 * if (token != null) { SingletonFirebase.getInstancia().arrancar();
+			 * 
+			 * Notification notification = Notification.builder()
+			 * .setTitle("Resolucion de pedido")
+			 * .setBody("Su pedido ha sido aceptado por el restaurante " + restaurante)
+			 * .build(); message = Message.builder().putAllData(map).putData("mensaje",
+			 * "Nuevo mensaje de sus pedidos") .setToken(token) // deviceId
+			 * .setNotification(notification).build(); try { // DUDA QUE ES appAndroid
+			 * FirebaseMessaging.getInstance().send(message); //
+			 * FirebaseMessaging.getInstance(FirebaseApp.getInstance(appAndroid)).send(
+			 * message); System.out.println("PRUEBA SE ENVIA NOTIFICACION"); } catch
+			 * (FirebaseMessagingException e) { System.out.println(e.getStackTrace());
+			 * System.out.println("Mensaje de error: " + e.getMessagingErrorCode()); } }
+			 */
+			//////////////// Fin notificacion mobile///////////////////////////////////////
 
-				Notification notification = Notification.builder()
-						.setTitle("Resolucion de pedido")
-						.setBody("Su pedido ha sido aceptado por el restaurante " + restaurante)
-						.build();
-				message = Message.builder().putAllData(map).putData("mensaje", "Nuevo mensaje de sus pedidos")
-						.setToken(token) // deviceId
-						.setNotification(notification).build();
-				try {
-					// DUDA QUE ES appAndroid
-					FirebaseMessaging.getInstance().send(message);
-					// FirebaseMessaging.getInstance(FirebaseApp.getInstance(appAndroid)).send(message);
-					System.out.println("PRUEBA SE ENVIA NOTIFICACION");
-				} catch (FirebaseMessagingException e) {
-					System.out.println(e.getStackTrace());
-					System.out.println("Mensaje de error: " + e.getMessagingErrorCode());
-				}
-			}
-*/
-			////////////////Fin notificacion mobile///////////////////////////////////////
-			
 			Optional<Carrito> optionalCarrito = mongoRepo.findById(pedido.getCarrito());
 			Carrito carrito = optionalCarrito.get();
 			DTPedido dtpedido = new DTPedido(pedido, new DTCarrito(carrito));
@@ -1984,18 +1981,17 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			String to = pedido.getCliente().getMail();
 			String body = mailSender.getConfirmarPedido(dtpedido, pedido.getCliente());
 			String topic = "Confirmación de pedido para " + pedido.getCliente().getNickname() + ".";
-			/*try {
-				mailSender.sendMail(to, body, topic);
-			} catch (MessagingException e) {
-				return new DTRespuesta("No se pudo mandar mail: " + e.getMessage());
-			}*/
+			/*
+			 * try { mailSender.sendMail(to, body, topic); } catch (MessagingException e) {
+			 * return new DTRespuesta("No se pudo mandar mail: " + e.getMessage()); }
+			 */
 
 			return new DTRespuesta("Pedido " + idPedido + " confirmado.");
 		} else {
 			throw new PedidoException(PedidoException.NotFoundExceptionId(idPedido));
 		}
 	}
-	
+
 	private DTRespuesta crearRestaurantesDePrueba(Restaurante rest) throws RestauranteException, CategoriaException {
 
 		// Seccion verificar que nombreRestaurante o restauranteMail no exista ya
