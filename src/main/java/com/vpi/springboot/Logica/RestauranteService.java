@@ -623,6 +623,9 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			Pedido pedido = optionalPedido.get();
 			pedido.setEstadoPedido(EnumEstadoPedido.RECHAZADO);
 			pedidoRepo.save(pedido);
+			if (pedido.getMetodoDePago() == EnumMetodoDePago.PAYPAL) {
+				devolucionPedidoPaypal(pedido.getId());
+			}
 
 			// se notifica a cliente
 			String base64EncodedEmail = Base64.getEncoder()
@@ -680,6 +683,20 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		} else {
 			throw new PedidoException(PedidoException.NotFoundExceptionId(idPedido));
 		}
+	}
+	
+	public void devolucionPedidoPaypal(int idPedido) {
+		Optional<Pedido> optionalPedido = pedidoRepo.findById(idPedido);
+		Pedido pedido = optionalPedido.get();
+		Pedido devolucion = new Pedido(pedido.getFecha(), pedido.getCostoTotal() * -1, pedido.getEstadoPedido(),
+				pedido.getMetodoDePago(), pedido.getCarrito(), pedido.getDireccion(), pedido.getRestaurante(),
+				pedido.getCliente(), pedido.getComentario(), pedido.getPago());
+		// devolucion.setEstadoPedido(null);
+		// pedido.setEstadoPedido(EnumEstadoPedido.REEMBOLZADO);
+		devolucion.setEstadoPedido(EnumEstadoPedido.REEMBOLZADO);
+
+		pedidoRepo.save(devolucion);
+		pedidoRepo.save(pedido);
 	}
 
 	@Override

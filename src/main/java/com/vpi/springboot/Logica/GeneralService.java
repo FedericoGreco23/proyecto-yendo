@@ -287,7 +287,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 			                * Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2));  
 			        double va2 = 2 * Math.atan2(Math.sqrt(va1), Math.sqrt(1 - va1));  
 			        double distancia = radioTierra * va2; 
-					if (distancia < 15) {
+					if (distancia < 10) {
 						DTBuscarRestaurantes.add(new DTBuscarRestaurante(restaurante.getNombre(), restaurante.getFoto(),
 								restaurante.getDireccion(), restaurante.getMail(), false));
 					} else {
@@ -392,7 +392,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 		                * Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2));
 		        double va2 = 2 * Math.atan2(Math.sqrt(va1), Math.sqrt(1 - va1));
 		        double distancia = radioTierra * va2;
-				if (distancia < 15) {
+				if (distancia < 10) {
 
 					if (horarioApertura > 0) {
 						if (r.getHorarioApertura().getHour() >= horarioApertura) {
