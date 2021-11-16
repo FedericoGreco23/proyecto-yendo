@@ -1085,7 +1085,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 						resto.toLowerCase().replace(" ", "") + "@" + resto.toLowerCase().replace(" ", "") + ".com",
 						"123456", "9" + telefono.toString(), null, false, true, resto, direccionesList.get(dir),
 						Float.valueOf(calificacion), EnumEstadoRestaurante.values()[i - 1], null, null, null, envio,
-						null, null, "LMWJVSD", true);
+						null, null, "LMWJVSD".substring(i), true);
 
 				// Set<Categoria> categoriaRandom = new HashSet<Categoria>();
 
@@ -1262,23 +1262,56 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				Optional<Cliente> cli = userRepo.findById(cliente.getMail());
 				if (cli.isPresent() && resOp.isPresent() && resOp.get().getActivo() && !resOp.get().getBloqueado()) {
 					try {
-						clienteService.agregarACarrito(resOp.get().getProductos().get(0).getId(), 3, cliente.getMail(),
-								resOp.get().getMail());
-						DTCarrito carrito = clienteService.verCarrito(cliente.getMail());
-						DTPedido dtPedido = clienteService.altaPedidosParaCargadeDatos((int) carrito.getId(),
-								EnumMetodoDePago.values()[i], cli.get().getDirecciones().get(0).getId(),
-								cliente.getMail(), "Muero de hambre");
+						for (int y = 0; y < 5; i++) {
+							clienteService.agregarACarrito(resOp.get().getProductos().get(y).getId(), 3,
+									cliente.getMail(), resOp.get().getMail());
+							DTCarrito carrito = clienteService.verCarrito(cliente.getMail());
+							DTPedido dtPedido = clienteService.altaPedidosParaCargadeDatos((int) carrito.getId(),
+									EnumMetodoDePago.values()[i], cli.get().getDirecciones().get(0).getId(),
+									cliente.getMail(), "Muero de hambre");
 
-						confirmarPedidoCargaDeDatos(dtPedido.getId());
-						if (dtPedido.getMetodoDePago().name() == "EFECTIVO") {
-							registrarPago(dtPedido.getId());
+							confirmarPedidoCargaDeDatos(dtPedido.getId());
+							if (dtPedido.getMetodoDePago().name() == "EFECTIVO") {
+								registrarPago(dtPedido.getId());
+							}
+							// calificaciones
+							Integer calif=(int) (Math.random() * 6);
+							String comentario;
+							switch (calif) {
+							case 1:
+
+								comentario= "La comida estaba fria y la calidad no está acorde al precio";
+								break;
+							case 2:
+
+								comentario= "Nunca volvería a pedir, hay muchas opciones mejores";
+								break;
+							case 3:
+
+								comentario= "Aceptable, quizás le de otra oportunidad";
+								break;
+							case 4:
+
+								comentario= "Muy buena!!";
+								break;
+							case 5:
+
+								comentario= "Lo mejor, le ponen mucho amor a lo que hacen!! sigan así! Me hacen la vida más fácil";
+								break;
+
+							default:
+								comentario= "Bien igual";
+								break;
+							}
+							
+							clienteService.calificarRestaurante(cliente.getMail(), resOp.get().getMail(),
+									new Calificacion(calif, comentario, null,
+											LocalDateTime.now()));
+
+							calificarCliente(cliente.getMail(), resOp.get().getMail(),
+									new Calificacion((int) (Math.random() * 2) + 3, "Sos todo lo que está bien", null,
+											LocalDateTime.now()));
 						}
-						// calificaciones
-						clienteService.calificarRestaurante(cliente.getMail(), resOp.get().getMail(), new Calificacion(
-								(int) (Math.random() * 6), "mejor imposible", null, LocalDateTime.now()));
-
-						calificarCliente(cliente.getMail(), resOp.get().getMail(), new Calificacion(
-								(int) (Math.random() * 2) + 3, "Sos todo lo que está bien", null, LocalDateTime.now()));
 					} catch (Exception e) {
 
 					}
@@ -1910,7 +1943,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		if (restOp.isPresent()) {
 			GetEstadoResponseDTO respuesta = new GetEstadoResponseDTO(restOp.get().getEstado().name(),
 					restOp.get().getAbierto() ? "Abierto" : "cerrado", restOp.get().getProductos().size());
-			;
+			
 
 			return respuesta;
 		}
@@ -2016,7 +2049,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				}
 			}
 		}
-
+		Integer aperturaHora = (int) (Math.random() * 4 + 1);
 		rest.setActivo(true);
 		rest.setBloqueado(false);
 		rest.setCalificacionPromedio(5.0f);
@@ -2026,12 +2059,12 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		// rest.setProductos(null);
 //		rest.setReclamos(null);
 //		rest.setPedidos(null);
-		LocalTime maximo = LocalTime.of(0, 50, 0);
-		LocalTime minimo = LocalTime.of(0, 20, 0);
+		LocalTime maximo = LocalTime.of(0, 40+aperturaHora, 0);
+		LocalTime minimo = LocalTime.of(0, 15+aperturaHora, 0);
 		rest.setTiempoEstimadoMaximo(maximo);
 		rest.setTiempoEstimadoMinimo(minimo);
-		rest.setHorarioApertura(LocalTime.of(10, 0, 0));
-		rest.setHorarioCierre(LocalTime.of(20, 0, 0));
+		rest.setHorarioApertura(LocalTime.of(aperturaHora+7, 0, 0));
+		rest.setHorarioCierre(LocalTime.of(aperturaHora+18, 0, 0));
 
 		rest.setAbierto(true);
 		rest.setContrasenia(passwordEncoder.encode(rest.getContrasenia()));
