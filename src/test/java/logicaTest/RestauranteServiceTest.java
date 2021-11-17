@@ -637,7 +637,7 @@ class RestauranteServiceTest {
 	
 	@Test
 	public void testActualizarBalanceVentas() {
-		Mockito.when(pedidoRepo.findAll()).thenReturn(pedidos);
+		Mockito.when(pedidoRepo.findAllPagos()).thenReturn(pedidos);
 		Mockito.when(balanceVentasRepo.findById(Mockito.anyString())).thenReturn(balanceByMailOp);
 		Mockito.doReturn(balanceVenta).when(balanceVentasRepo).save(Mockito.any(BalanceVentaDTO.class));
 		mockRestaurante.actualizarBalanceVentas();
@@ -645,7 +645,7 @@ class RestauranteServiceTest {
 	
 	@Test
 	public void testActualizarBalanceVentas2() {
-		Mockito.when(pedidoRepo.findAll()).thenReturn(pedidos);
+		Mockito.when(pedidoRepo.findAllPagos()).thenReturn(pedidos);
 		Mockito.when(balanceVentasRepo.findById(Mockito.anyString())).thenReturn(balanceByMailOp2);
 		Mockito.doReturn(balanceVenta).when(balanceVentasRepo).save(Mockito.any(BalanceVentaDTO.class));
 		mockRestaurante.actualizarBalanceVentas();
@@ -653,7 +653,7 @@ class RestauranteServiceTest {
 	
 	@Test
 	public void testActualizarBalanceVentas3() {
-		Mockito.when(pedidoRepo.findAll()).thenReturn(pedidos);
+		Mockito.when(pedidoRepo.findAllPagos()).thenReturn(pedidos);
 		Mockito.when(balanceVentasRepo.findById(Mockito.anyString())).thenReturn(balanceByMailOp3);
 		Mockito.doReturn(balanceVenta2).when(balanceVentasRepo).save(Mockito.any(BalanceVentaDTO.class));
 		mockRestaurante.actualizarBalanceVentas();
