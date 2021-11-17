@@ -256,6 +256,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 			restaurantes = resRepo.buscarRestauranteDesdeClientePorCategoria(nombreCategoria,
 					EnumEstadoRestaurante.ACEPTADO);
 		}
+		idDireccion = 0;
 		if (restaurantes != null) {
 			if (idDireccion == 0) {
 				for (Restaurante restaurante : restaurantes) {
@@ -289,10 +290,10 @@ public class GeneralService implements GeneralServicioInterfaz {
 			        double distancia = radioTierra * va2; 
 					if (distancia < 10) {
 						DTBuscarRestaurantes.add(new DTBuscarRestaurante(restaurante.getNombre(), restaurante.getFoto(),
-								restaurante.getDireccion(), restaurante.getMail(), false));
+								restaurante.getDireccion(), restaurante.getMail()));
 					} else {
 						DTBuscarRestaurantes.add(new DTBuscarRestaurante(restaurante.getNombre(), restaurante.getFoto(),
-								restaurante.getDireccion(), restaurante.getMail(), true));
+								restaurante.getDireccion(), restaurante.getMail()));
 					}
 				}
 			}
@@ -366,7 +367,8 @@ public class GeneralService implements GeneralServicioInterfaz {
 		restaurantes = pageRestaurante.getContent();
 		int pagina = pageRestaurante.getNumber();
 		long totalElements = pageRestaurante.getTotalElements();
-		
+		idDireccion = 0;
+		horarioApertura = 0;
 		// Calculo de distancia entre restaurante y cliente
 		if (idDireccion != 0) {
 			double lat1;

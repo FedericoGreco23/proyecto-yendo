@@ -10,7 +10,6 @@ public class DTBuscarRestaurante implements Serializable {
 	private String foto;
 	private String direccion;
 	private String mail;
-	private Boolean lejano;
 	
 	
 	public DTBuscarRestaurante() {
@@ -23,15 +22,6 @@ public class DTBuscarRestaurante implements Serializable {
 		this.foto = foto;
 		this.direccion = direccion;
 		this.mail = mail;
-	}
-	
-	public DTBuscarRestaurante(String nombre, String foto, String direccion, String mail, Boolean lejano) {
-		super();
-		this.nombre = nombre;
-		this.foto = foto;
-		this.direccion = direccion;
-		this.mail = mail;
-		this.lejano = lejano;
 	}
 
 	
@@ -68,14 +58,6 @@ public class DTBuscarRestaurante implements Serializable {
 
 	public void setMail(String mail) {
 		this.mail = mail;
-	}
-
-	public Boolean getLejano() {
-		return lejano;
-	}
-
-	public void setLejano(Boolean lejano) {
-		this.lejano = lejano;
 	}
 	
 }
