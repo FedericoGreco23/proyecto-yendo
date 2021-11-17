@@ -6,6 +6,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -55,11 +56,15 @@ public interface RestauranteRepositorio extends UserBaseRepository<Restaurante> 
 	@Query("SELECT u FROM Restaurante u WHERE u.estado = :estado")
 	Page<Restaurante> findByEstado(@Param("estado") EnumEstadoRestaurante estado, Pageable pageable);
 	
+//PARA LISTAR RESTAURANTES
+	
 	@Query("SELECT u FROM Restaurante u WHERE u.estado = :estado AND u.bloqueado = FALSE AND u.activo = TRUE")
-	Page<Restaurante> buscarRestaurantesPorEstadoNoBloqueadosYActivos(@Param("estado") EnumEstadoRestaurante estado, Pageable pageable);
+	List<Restaurante> buscarRestaurantesPorEstadoNoBloqueadosYActivos(@Param("estado") EnumEstadoRestaurante estado, Sort sorting);
 
 	@Query("SELECT r FROM Restaurante r WHERE UPPER(r.nombre) LIKE CONCAT('%',UPPER(:nombre),'%') AND r.estado = :estado AND r.bloqueado = FALSE AND r.activo = TRUE")
-	Page<Restaurante> buscarRestaurantesPorEstadoNoBloqueadosYActivosPorNombre(@Param("nombre") String nombre, @Param("estado") EnumEstadoRestaurante estado, Pageable pageable);
+	List<Restaurante> buscarRestaurantesPorEstadoNoBloqueadosYActivosPorNombre(@Param("nombre") String nombre, @Param("estado") EnumEstadoRestaurante estado, Sort sorting);
+	
+//----------------------------------------------
 	
 	//	@Query("SELECT u FROM User u WHERE u.status = :status and u.name = :name")
 //	User findUserByStatusAndNameNamedParams(
@@ -77,17 +82,20 @@ public interface RestauranteRepositorio extends UserBaseRepository<Restaurante> 
 	@Query("SELECT r FROM Restaurante r INNER JOIN r.categorias c WHERE UPPER(c.nombre) LIKE UPPER(:categoria) AND r.estado = :estado AND r.bloqueado = FALSE AND r.activo = TRUE")
 	List<Restaurante> buscarRestauranteDesdeClientePorCategoria(@Param("categoria") String categoria, @Param("estado") EnumEstadoRestaurante estado);
 	
-//PARA LISTAR RESTAURANTES
+
 	
 	@Query("SELECT r FROM Restaurante r WHERE UPPER(r.nombre) LIKE CONCAT('%',UPPER(:texto),'%') AND r.estado = :estado AND r.bloqueado = FALSE AND r.activo = TRUE")
-	Page<Restaurante> listarRestauranteDesdeClientePorNombre(@Param("texto") String texto, @Param("estado") EnumEstadoRestaurante estado, Pageable pageable);
+	List<Restaurante> listarRestauranteDesdeClientePorNombre(@Param("texto") String texto, @Param("estado") EnumEstadoRestaurante estado, Pageable pageable);
+	
+//PARA LISTAR RESTAURANTES
 	
 	@Query("SELECT r FROM Restaurante r INNER JOIN r.categorias c WHERE UPPER(c.nombre) LIKE UPPER(:categoria) AND UPPER(r.nombre) LIKE CONCAT('%',UPPER(:texto),'%') AND r.estado = :estado AND r.bloqueado = FALSE AND r.activo = TRUE")
-	Page<Restaurante> listarRestauranteDesdeClientePorNombreYCategoria(@Param("texto") String texto, @Param("categoria") String categoria, @Param("estado") EnumEstadoRestaurante estado, Pageable pageable);
+	List<Restaurante> listarRestauranteDesdeClientePorNombreYCategoria(@Param("texto") String texto, @Param("categoria") String categoria, @Param("estado") EnumEstadoRestaurante estado, Sort sorting);
 	
 	@Query("SELECT r FROM Restaurante r INNER JOIN r.categorias c WHERE UPPER(c.nombre) LIKE UPPER(:categoria) AND r.estado = :estado AND r.bloqueado = FALSE AND r.activo = TRUE")
-	Page<Restaurante> listarRestauranteDesdeClientePorCategoria(@Param("categoria") String categoria, @Param("estado") EnumEstadoRestaurante estado, Pageable pageable);
+	List<Restaurante> listarRestauranteDesdeClientePorCategoria(@Param("categoria") String categoria, @Param("estado") EnumEstadoRestaurante estado, Sort sorting);
 	
+//----------------------------------------------
 	
 	@Query(value = "SELECT \"restaurante_mail\", COUNT(*) FROM Pedido WHERE pago = true GROUP BY \"restaurante_mail\" ORDER BY count(*) DESC", nativeQuery = true)
 	List<Object[]> buscarRestaurantesConMasPedidos();

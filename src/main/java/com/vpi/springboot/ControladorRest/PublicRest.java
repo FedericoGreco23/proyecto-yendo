@@ -138,7 +138,7 @@ public class PublicRest {
 	public Map<String, Object> listarRestaurantesAbiertos(@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "0") int horarioApertura,
 			@RequestParam(defaultValue = "") String nombre, @RequestParam(defaultValue = "") String categoria,
-			@RequestParam(defaultValue = "") String sort, @RequestParam(defaultValue = "0") int order,
+			@RequestParam(defaultValue = "abierto") String sort, @RequestParam(defaultValue = "0") int order,
 			@RequestParam(defaultValue = "0") int idDireccion) {
 		try {
 			return service.listarRestaurantes(page, size, horarioApertura, nombre, categoria, sort, order, idDireccion);

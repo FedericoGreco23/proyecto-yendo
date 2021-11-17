@@ -195,7 +195,7 @@ class GeneralServiceTest {
 		mockGeneral.buscarRestaurante("", "minutas", dir.getId());
 	}
 	
-	@Test
+	/*@Test
 	public void testListarRestaurantes() throws RestauranteException {
 		Mockito.when(resRepo.listarRestauranteDesdeClientePorNombreYCategoria(Mockito.anyString(),Mockito.anyString(),Mockito.any(),Mockito.any())).thenReturn(restaurantePage);
 		Mockito.when(dirRepo.findById(Mockito.anyInt())).thenReturn(optionalDireccion);
@@ -244,7 +244,7 @@ class GeneralServiceTest {
 		Mockito.when(resRepo.listarRestauranteDesdeClientePorCategoria(Mockito.anyString(),Mockito.any(),Mockito.any())).thenReturn(restaurantePage);
 		Mockito.when(dirRepo.findById(Mockito.anyInt())).thenReturn(optionalDireccion);
 		mockGeneral.listarRestaurantes(0, 5, 5, "", "minutas", "", 1, dir2.getId());
-	}
+	}*/
 	
 	
 	@Test

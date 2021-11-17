@@ -2,6 +2,7 @@ package com.vpi.springboot.Logica;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import javax.mail.MessagingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -256,7 +258,6 @@ public class GeneralService implements GeneralServicioInterfaz {
 			restaurantes = resRepo.buscarRestauranteDesdeClientePorCategoria(nombreCategoria,
 					EnumEstadoRestaurante.ACEPTADO);
 		}
-		idDireccion = 0;
 		if (restaurantes != null) {
 			if (idDireccion == 0) {
 				for (Restaurante restaurante : restaurantes) {
@@ -323,52 +324,39 @@ public class GeneralService implements GeneralServicioInterfaz {
 			String categoria, String sort, int order, int idDireccion) throws RestauranteException {
 		Map<String, Object> response = new HashMap<>();
 		List<DTListarRestaurante> DTListarRestaurantes = new ArrayList<DTListarRestaurante>();
-		List<Restaurante> restaurantes = new ArrayList<Restaurante>();
 
 		Sort sorting;
-		Pageable paging;
 
-		if (!sort.equalsIgnoreCase("")) {
-			if (order == 1) {
-				sorting = Sort.by(Sort.Order.desc(sort));
-			} else {
-				sorting = Sort.by(Sort.Order.asc(sort));
-			}
-			paging = PageRequest.of(page, size, sorting);
+		if (order == 0) {
+			sorting = Sort.by(Sort.Order.desc(sort));
 		} else {
-			paging = PageRequest.of(page, size);
+			sorting = Sort.by(Sort.Order.asc(sort));
 		}
 
-		Page<Restaurante> pageRestaurante;
+		List<Restaurante> listaRestaurantes = new ArrayList<Restaurante>();
 
 		// Devuelve los restaurantes aceptados no bloqueados y activos
 		if (!nombre.equalsIgnoreCase("")) {
 			if (!categoria.equalsIgnoreCase("")) {
 				// Aplico nombre y categoria
-				pageRestaurante = resRepo.listarRestauranteDesdeClientePorNombreYCategoria(nombre, categoria,
-						EnumEstadoRestaurante.ACEPTADO, paging);
+				listaRestaurantes = resRepo.listarRestauranteDesdeClientePorNombreYCategoria(nombre, categoria,
+						EnumEstadoRestaurante.ACEPTADO, sorting);
 			} else {
 				// Aplico solo nombre
-				pageRestaurante = resRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivosPorNombre(nombre,
-						EnumEstadoRestaurante.ACEPTADO, paging);
+				listaRestaurantes = resRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivosPorNombre(nombre,
+						EnumEstadoRestaurante.ACEPTADO, sorting);
 			}
 
 		} else if (!categoria.equalsIgnoreCase("")) {
 			// Aplico solo categoria
-			pageRestaurante = resRepo.listarRestauranteDesdeClientePorCategoria(categoria,
-					EnumEstadoRestaurante.ACEPTADO, paging);
+			listaRestaurantes = resRepo.listarRestauranteDesdeClientePorCategoria(categoria,
+					EnumEstadoRestaurante.ACEPTADO, sorting);
 		} else {
 			// No aplico ni categoria ni nombre
-			pageRestaurante = resRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivos(EnumEstadoRestaurante.ACEPTADO,
-					paging);
+			listaRestaurantes = resRepo.buscarRestaurantesPorEstadoNoBloqueadosYActivos(EnumEstadoRestaurante.ACEPTADO,
+					sorting);
 		}
 		
-
-		restaurantes = pageRestaurante.getContent();
-		int pagina = pageRestaurante.getNumber();
-		long totalElements = pageRestaurante.getTotalElements();
-		idDireccion = 0;
-		horarioApertura = 0;
 		// Calculo de distancia entre restaurante y cliente
 		if (idDireccion != 0) {
 			double lat1;
@@ -381,7 +369,7 @@ public class GeneralService implements GeneralServicioInterfaz {
 			lat1 = direccion.getGeoLocalizacion().getLatitud();
 			lng1 = direccion.getGeoLocalizacion().getLongitud();
 			
-			for (Restaurante r : restaurantes) {
+			for (Restaurante r : listaRestaurantes) {
 				lat2 = r.getGeoLocalizacion().getLatitud();
 				lng2 = r.getGeoLocalizacion().getLongitud();
 
@@ -399,25 +387,19 @@ public class GeneralService implements GeneralServicioInterfaz {
 					if (horarioApertura > 0) {
 						if (r.getHorarioApertura().getHour() >= horarioApertura) {
 							DTListarRestaurantes.add(new DTListarRestaurante(r));
-						} else {
-							totalElements = totalElements - 1;
 						}
 					} else {
 						DTListarRestaurantes.add(new DTListarRestaurante(r));
 					}
-				} else {
-					totalElements = totalElements - 1;
 				}
 			}
 		} else {
 			// Si el horarioApertura en el filtro es menor o igual que el horarioApertura
 			// del restaurante se muestra
-			for (Restaurante r : restaurantes) {
+			for (Restaurante r : listaRestaurantes) {
 				if (horarioApertura > 0) {
 					if (r.getHorarioApertura().getHour() >= horarioApertura) {
 						DTListarRestaurantes.add(new DTListarRestaurante(r));
-					} else {
-						totalElements = totalElements - 1;
 					}
 				} else {
 					DTListarRestaurantes.add(new DTListarRestaurante(r));
@@ -425,9 +407,27 @@ public class GeneralService implements GeneralServicioInterfaz {
 			}
 		}
 		
+		List<DTListarRestaurante> subListaPaginada = new ArrayList<DTListarRestaurante>();
+		
+		int startItem = page * size;
+		
+		if (DTListarRestaurantes.size() < startItem) {
+			subListaPaginada = Collections.emptyList();
+		} else {
+			int toIndex = Math.min(startItem + size, DTListarRestaurantes.size());
+			subListaPaginada = DTListarRestaurantes.subList(startItem, toIndex);
+		}
+		
+		Page<DTListarRestaurante> pageRestaurante = new PageImpl<DTListarRestaurante>(subListaPaginada, PageRequest.of(page, size), DTListarRestaurantes.size());
+		
+		List<DTListarRestaurante> retorno = pageRestaurante.getContent();
+		
+		int pagina = pageRestaurante.getNumber();
+		long totalElements = pageRestaurante.getTotalElements();
+		
 		response.put("currentPage", pagina);
 		response.put("totalItems", totalElements);
-		response.put("restaurantes", DTListarRestaurantes);
+		response.put("restaurantes", retorno);
 
 		return response;
 	}
