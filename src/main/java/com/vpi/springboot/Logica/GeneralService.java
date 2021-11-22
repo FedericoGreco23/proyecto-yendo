@@ -292,9 +292,6 @@ public class GeneralService implements GeneralServicioInterfaz {
 					if (distancia < 10) {
 						DTBuscarRestaurantes.add(new DTBuscarRestaurante(restaurante.getNombre(), restaurante.getFoto(),
 								restaurante.getDireccion(), restaurante.getMail()));
-					} else {
-						DTBuscarRestaurantes.add(new DTBuscarRestaurante(restaurante.getNombre(), restaurante.getFoto(),
-								restaurante.getDireccion(), restaurante.getMail()));
 					}
 				}
 			}
