@@ -1119,7 +1119,8 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				Double latitud = BigDecimal.valueOf(lat + rand).setScale(4, RoundingMode.HALF_UP).doubleValue();
 				Double longitud = BigDecimal.valueOf(lon + rand).setScale(4, RoundingMode.HALF_UP).doubleValue();
 
-				Integer i = (int) (Math.random() * 5);
+				Integer i = (int) (Math.random() * 2 + 1);
+				Integer diasR = (int) (Math.random() * 5);
 				Integer envio = (int) (Math.random() * 30 + 1);
 				Integer randomFoto = (int) (Math.random() * 10);
 				Integer telefono = (int) (Math.random() * 999999);
@@ -1136,7 +1137,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 						resto.toLowerCase().replace(" ", "") + "@" + resto.toLowerCase().replace(" ", "") + ".com",
 						"123456", "9" + telefono.toString(), null, false, true, resto, direccionesList.get(dir),
 						Float.valueOf(calificacion), EnumEstadoRestaurante.values()[i - 1], null, null, null, envio,
-						null, null, diasAbiertos.get(i), true);
+						null, null, diasAbiertos.get(diasR), true);
 
 				// Set<Categoria> categoriaRandom = new HashSet<Categoria>();
 
