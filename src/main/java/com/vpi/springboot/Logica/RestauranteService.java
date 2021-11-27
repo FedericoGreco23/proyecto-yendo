@@ -989,12 +989,13 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		List<String> bebidasList = Arrays.asList(bebidasString.split(","));
 		List<Producto> bebidasProductoList = new ArrayList<Producto>();
 		for (String s : bebidasList) {
-			int randomFotoBebida=  (int) (Math.random() * fotosBebidaList.size());
+			int randomFotoBebida=  (int) (Math.random() * fotosBebidaList.size()-1);
 			Producto p0 = new Producto(s, "la más rica " + s, (Math.random() * 200),
 					fotosBebidaList.get(randomFotoBebida), 15, true);
 			p0.setCategoria(catRepo.findById("Bebidas").get());
 			bebidasProductoList.add(p0);
 		}
+		System.out.println("bebidas creadas");
 
 		String orientalString = "Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot,Pekinés,Sopa Wan Tan,Mapo doufu,Rollitos de primavera,Zongzi,Pollo Gong Bao o Kung Pao,Jiaozi,Wan Tan Mee,Chow Mein,Huo Guo o Hot Pot";
 		List<String> orientalList = Arrays.asList(orientalString.split(","));
@@ -1005,13 +1006,13 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		
 		List<Producto> orientalProductoList = new ArrayList<Producto>();
 		for (String s : orientalList) {
-		int randomfotosOriental=  (int) (Math.random() * fotosOrientalList.size());
+		int randomfotosOriental=  (int) (Math.random() * fotosOrientalList.size()-1);
 			Producto p0 = new Producto(s, "埃斯特柏拉圖" + s, (Math.random() * 400),
 					fotosOrientalList.get(randomfotosOriental), 20, true);
 			p0.setCategoria(catRepo.findById("Comida oriental").get());
 			orientalProductoList.add(p0);
 		}
-
+		System.out.println("oriental creadas");
 		
 		String fotosChivito= "https://www.cocinayvino.com/wp-content/uploads/2017/06/66936686_ml-1-1-e1496693034402.jpg,https://sc2.elpais.com.uy/files/article_default_content/uploads/2019/11/29/5de166c224ef1.jpeg,https://i.blogs.es/2d1c3e/receta-sandwich-chivito-uruguayo-pakus-directo-paladar/1366_2000.jpg,https://img-global.cpcdn.com/recipes/recipes_38143_v1393350360_receta_foto_00038143/400x400cq70/photo.jpg,https://saborgourmet.com//wp-content/uploads/chivito-uruguayo-receta.jpg,https://images-gmi-pmc.edge-generalmills.com/50e3c816-1fc7-440f-881d-1047b90809d5.jpg,https://cdn.queapetito.com/wp-content/uploads/2020/03/chivito-uruguayo-1200-amp.jpg,https://www.maxionline.ec/wp-content/uploads/2019/09/chivito.jpg,https://www.ahumados.shop/wp-content/uploads/2021/04/354712_hires.jpg,https://hacerasado.com.ar/wp-content/uploads/2019/09/chivito-al-pan-uruguayo.jpg,https://ep01.epimg.net/elcomidista/imagenes/2021/07/06/receta/1625572040_373287_1625572401_media_normal.jpg,https://www.cucinare.tv/wp-content/uploads/2019/10/Chivito-uruguayo.jpg,https://i.ytimg.com/vi/pdNXrjhn0z4/maxresdefault.jpg,https://i.ytimg.com/vi/iJGd2CEQk_o/hqdefault.jpg,https://marcapaisuruguay.gub.uy/wp-content/uploads/2019/10/chivito-hugo-soca.jpg,https://images-gmi-pmc.edge-generalmills.com/6e3b1e95-31a5-481a-b4da-139d410162a3.jpg";
 		List<String> fotosChivitolList= Arrays.asList(fotosChivito.split(","));
@@ -1020,12 +1021,13 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		List<String> chivitoList = Arrays.asList(chivitoString.split(","));
 		List<Producto> chivitoProductoList = new ArrayList<Producto>();
 		for (String s : chivitoList) {
-		int randomfotosChivito=  (int) (Math.random() * fotosChivitolList.size());
+		int randomfotosChivito=  (int) (Math.random() * fotosChivitolList.size()-1);
 			Producto p0 = new Producto(s, "Para los que saben lo que es bueno", (Math.random() * 500),
 					fotosChivitolList.get(randomfotosChivito), 5, true);
 			p0.setCategoria(catRepo.findById("Chivitos").get());
 			chivitoProductoList.add(p0);
 		}
+		System.out.println("chivito creadas");
 
 		// empanadas
 		
@@ -1037,14 +1039,14 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		List<String> empanadasListString = Arrays.asList(empanadasString.split(","));
 		List<Producto> empanadasProductoList = new ArrayList<Producto>();
 		for (String s : empanadasListString) {
-		int randomfotosEmpanadas=  (int) (Math.random() * fotosEmpanadaslList.size());
+		int randomfotosEmpanadas=  (int) (Math.random() * fotosEmpanadaslList.size()-1);
 			Producto p0 = new Producto(s, "Para los que saben lo que es bueno", (Math.random() * 500),
-					empanadasListString.get(randomfotosEmpanadas), 5,
+					fotosEmpanadaslList.get(randomfotosEmpanadas), 5,
 					true);
 			p0.setCategoria(catRepo.findById("Empanadas").get());
 			empanadasProductoList.add(p0);
 		}
-
+		System.out.println("empanada creadas");
 		// pizza
 		
 		
@@ -1055,13 +1057,14 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		List<String> pizzaListString = Arrays.asList(pizzaString.split(","));
 		List<Producto> pizzaProductoList = new ArrayList<Producto>();
 		for (String s : pizzaListString) {
-		int randomfotosPizza=  (int) (Math.random() * fotosPizzaList.size());
+		int randomfotosPizza=  (int) (Math.random() * fotosPizzaList.size()-1);
 			Producto p0 = new Producto(s, "Con los mejores ingredientes", (Math.random() * 500),
 					fotosPizzaList.get(randomfotosPizza),
 					5, true);
 			p0.setCategoria(catRepo.findById("Pizzas").get());
 			pizzaProductoList.add(p0);
 		}
+		System.out.println("pizza creadas");
 
 		// hamburguezas
 		
@@ -1074,12 +1077,13 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		List<String> burguerListString = Arrays.asList(burguerString.split(","));
 		List<Producto> burguerStringProductoList = new ArrayList<Producto>();
 		for (String s : burguerListString) {
-		int randomfotosHamburg=  (int) (Math.random() * fotosHamburgList.size());
+		int randomfotosHamburg=  (int) (Math.random() * fotosHamburgList.size()-1);
 			Producto p0 = new Producto(s, "Para paladares exigentes", (Math.random() * 500),
 					fotosHamburgList.get(randomfotosHamburg), 12, true);
 			p0.setCategoria(catRepo.findById("Hamburguesas").get());
 			burguerStringProductoList.add(p0);
 		}
+		System.out.println("hamburg creadas");
 
 		///// seguir agregando
 
