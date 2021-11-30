@@ -725,6 +725,7 @@ public class ClienteService implements ClienteServicioInterfaz {
 		} else
 			avg = 5.0f;
 
+		avg /= calificaciones.size();
 		restaurante.setCalificacionPromedio(avg);
 		restauranteRepo.save(restaurante);
 
