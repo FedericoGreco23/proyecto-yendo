@@ -1704,6 +1704,65 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 //			throw new UsuarioException(RestauranteException.SinCalificacion(mailCliente));
 		return new DTCalificacionCliente(calCliente);
 	}
+	
+	public Map<String, Object> checkRestauranteResponse() {
+		int diaSemana = LocalDate.now().getDayOfWeek().getValue();
+		String dia = "";
+
+		switch (diaSemana) {
+		case 1:
+			dia = "L";
+			break;
+		case 2:
+			dia = "M";
+			break;
+		case 3:
+			dia = "W";
+			break;
+		case 4:
+			dia = "J";
+			break;
+		case 5:
+			dia = "V";
+			break;
+		case 6:
+			dia = "S";
+			break;
+		case 7:
+			dia = "D";
+			break;
+		}
+
+		List<Restaurante> restaurantesAbiertos = restauranteRepo.findByAceptado(true, dia);
+		List<Restaurante> restaurantesCerrados = restauranteRepo.findByAceptado(false, dia);
+		
+		List<Restaurante> restaurantesC = new ArrayList<>();
+		List<Restaurante> restaurantesA = new ArrayList<>();
+		
+		for (Restaurante r : restaurantesAbiertos) {
+			if (r.getHorarioCierre() == LocalTime.now() || LocalTime.now().isAfter(r.getHorarioCierre())) {
+				r.setAbierto(false);
+				restauranteRepo.save(r);
+				restaurantesA.add(r);
+			}
+		}
+
+		for (Restaurante r : restaurantesCerrados) {
+			if (r.getHorarioApertura().equals(LocalTime.now()) || LocalTime.now().isAfter(r.getHorarioApertura())) {
+				r.setAbierto(true);
+				restauranteRepo.save(r);
+				restaurantesC.add(r);
+			}
+		}
+		
+		Map<String, Object> response = new HashMap<>();
+		response.put("dia", dia);
+		response.put("hora", LocalTime.now());
+		response.put("restaurantesCerrados", restaurantesC);
+		response.put("restaurantesAbiertos", restaurantesA);
+		
+		return response;
+	}
 
 	// Abre o cierra los restaurantes dependiendo de la hora
 	// @Scheduled(cron = "0 * * * * *") // cada minuto
