@@ -1743,7 +1743,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			if (r.getHorarioCierre() == LocalTime.now() || LocalTime.now().isAfter(r.getHorarioCierre())) {
 				r.setAbierto(false);
 				restauranteRepo.save(r);
-				restaurantesA.add(r.getMail());
+				restaurantesC.add(r.getMail());
 			}
 		}
 
@@ -1751,7 +1751,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			if (r.getHorarioApertura().equals(LocalTime.now()) || LocalTime.now().isAfter(r.getHorarioApertura())) {
 				r.setAbierto(true);
 				restauranteRepo.save(r);
-				restaurantesC.add(r.getMail());
+				restaurantesA.add(r.getMail());
 			}
 		}
 		
