@@ -75,5 +75,7 @@ public interface RestauranteServicioInterfaz {
 	
 	public DTCalificacionCliente getCalificacionCliente(String mailCliente, String mailRestaurante) throws UsuarioException, RestauranteException;
 	
+	public Map<String, Object> checkRestauranteResponse();
+	
 	void cargarDatos2();
 }
