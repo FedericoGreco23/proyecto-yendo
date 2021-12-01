@@ -1736,14 +1736,14 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		List<Restaurante> restaurantesAbiertos = restauranteRepo.findByAceptado(true, dia);
 		List<Restaurante> restaurantesCerrados = restauranteRepo.findByAceptado(false, dia);
 		
-		List<Restaurante> restaurantesC = new ArrayList<>();
-		List<Restaurante> restaurantesA = new ArrayList<>();
+		List<String> restaurantesC = new ArrayList<>();
+		List<String> restaurantesA = new ArrayList<>();
 		
 		for (Restaurante r : restaurantesAbiertos) {
 			if (r.getHorarioCierre() == LocalTime.now() || LocalTime.now().isAfter(r.getHorarioCierre())) {
 				r.setAbierto(false);
 				restauranteRepo.save(r);
-				restaurantesA.add(r);
+				restaurantesA.add(r.getMail());
 			}
 		}
 
@@ -1751,7 +1751,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			if (r.getHorarioApertura().equals(LocalTime.now()) || LocalTime.now().isAfter(r.getHorarioApertura())) {
 				r.setAbierto(true);
 				restauranteRepo.save(r);
-				restaurantesC.add(r);
+				restaurantesC.add(r.getMail());
 			}
 		}
 		
