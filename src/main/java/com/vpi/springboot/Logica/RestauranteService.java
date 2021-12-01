@@ -1748,7 +1748,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		}
 
 		for (Restaurante r : restaurantesCerrados) {
-			if (r.getHorarioApertura().equals(LocalTime.now()) || LocalTime.now().isAfter(r.getHorarioApertura())) {
+			if (r.getHorarioApertura() == LocalTime.now() || (LocalTime.now().isAfter(r.getHorarioApertura()) && r.getHorarioCierre().isAfter(LocalTime.now()))) {
 				r.setAbierto(true);
 				restauranteRepo.save(r);
 				restaurantesA.add(r.getMail());
@@ -1805,7 +1805,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 		}
 
 		for (Restaurante r : restaurantesCerrados) {
-			if (r.getHorarioApertura().equals(LocalTime.now()) || LocalTime.now().isAfter(r.getHorarioApertura())) {
+			if (r.getHorarioApertura() == LocalTime.now() || (LocalTime.now().isAfter(r.getHorarioApertura()) && r.getHorarioCierre().isAfter(LocalTime.now()))) {
 				r.setAbierto(true);
 				restauranteRepo.save(r);
 			}
