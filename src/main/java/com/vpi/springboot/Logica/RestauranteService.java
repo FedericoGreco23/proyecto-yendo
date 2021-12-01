@@ -1708,52 +1708,71 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 	public Map<String, Object> checkRestauranteResponse() {
 		int diaSemana = LocalDate.now().getDayOfWeek().getValue();
 		String dia = "";
-
-		switch (diaSemana) {
-		case 1:
-			dia = "L";
-			break;
-		case 2:
-			dia = "M";
-			break;
-		case 3:
-			dia = "W";
-			break;
-		case 4:
-			dia = "J";
-			break;
-		case 5:
-			dia = "V";
-			break;
-		case 6:
-			dia = "S";
-			break;
-		case 7:
-			dia = "D";
-			break;
-		}
-
-		List<Restaurante> restaurantesAbiertos = restauranteRepo.findByAceptado(true, dia);
-		List<Restaurante> restaurantesCerrados = restauranteRepo.findByAceptado(false, dia);
+		
+//		List<Restaurante> restaurantesAbiertos = restauranteRepo.findByAceptado(true, dia);
+//		List<Restaurante> restaurantesCerrados = restauranteRepo.findByAceptado(false, dia);
+//
+//		switch (diaSemana) {
+//		case 1:
+//			dia = "L";
+//			break;
+//		case 2:
+//			dia = "M";
+//			break;
+//		case 3:
+//			dia = "W";
+//			break;
+//		case 4:
+//			dia = "J";
+//			break;
+//		case 5:
+//			dia = "V";
+//			break;
+//		case 6:
+//			dia = "S";
+//			break;
+//		case 7:
+//			dia = "D";
+//			break;
+//		}
+		
+		List<Restaurante> restaurantesTotal = restauranteRepo.findAll();
 		
 		List<String> restaurantesC = new ArrayList<>();
 		List<String> restaurantesA = new ArrayList<>();
 		
-		for (Restaurante r : restaurantesAbiertos) {
-			if (r.getHorarioCierre() == LocalTime.now() || LocalTime.now().isAfter(r.getHorarioCierre())) {
-				r.setAbierto(false);
-				restauranteRepo.save(r);
-				restaurantesC.add(r.getMail());
+		for (Restaurante r : restaurantesTotal) {
+			if(r.getAbierto()) {
+				if (r.getHorarioCierre() == LocalTime.now() || LocalTime.now().isAfter(r.getHorarioCierre())) {
+					r.setAbierto(false);
+					restauranteRepo.save(r);
+					restaurantesC.add(r.getMail());
+				} 
+			}
+			else {
+				if (r.getHorarioApertura() == LocalTime.now() || (LocalTime.now().isAfter(r.getHorarioApertura()) && r.getHorarioCierre().isAfter(LocalTime.now()))) {
+					r.setAbierto(true);
+					restauranteRepo.save(r);
+					restaurantesA.add(r.getMail());
+				}
 			}
 		}
 
-		for (Restaurante r : restaurantesCerrados) {
-			if (r.getHorarioApertura() == LocalTime.now() || (LocalTime.now().isAfter(r.getHorarioApertura()) && r.getHorarioCierre().isAfter(LocalTime.now()))) {
-				r.setAbierto(true);
-				restauranteRepo.save(r);
-				restaurantesA.add(r.getMail());
-			}
-		}
+//		for (Restaurante r : restaurantesAbiertos) {
+//			if (r.getHorarioCierre() == LocalTime.now() || LocalTime.now().isAfter(r.getHorarioCierre())) {
+//				r.setAbierto(false);
+//				restauranteRepo.save(r);
+//				restaurantesC.add(r.getMail());
+//			}
+//		}
+//
+//		for (Restaurante r : restaurantesCerrados) {
+//			if (r.getHorarioApertura() == LocalTime.now() || (LocalTime.now().isAfter(r.getHorarioApertura()) && r.getHorarioCierre().isAfter(LocalTime.now()))) {
+//				r.setAbierto(true);
+//				restauranteRepo.save(r);
+//				restaurantesA.add(r.getMail());
+//			}
+//		}
 		
 		Map<String, Object> response = new HashMap<>();
 		response.put("dia", dia);
