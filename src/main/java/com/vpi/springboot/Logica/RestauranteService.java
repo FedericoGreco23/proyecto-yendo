@@ -15,6 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1997,7 +1998,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 			Double totalPeriodoEfectivo = (double) 0;
 			Double totalPeriodoPaypal = (double) 0;
 
-			Set<FechaidPedidoMontoDTO> lista = new TreeSet<>();
+			List<FechaidPedidoMontoDTO> lista = new ArrayList<>();
 
 			for (FechaidPedidoMontoDTO entry : balanceByMailOp.get().getListaPedidos()) {
 
@@ -2025,7 +2026,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				}
 
 			}
-
+			Collections.sort(lista);
 			if (lista.size() > 0) {
 				return new BalanceByFechaDTO(lista, totalPeriodo.toString(), totalPeriodoEfectivo.toString(),
 						totalPeriodoPaypal.toString());
