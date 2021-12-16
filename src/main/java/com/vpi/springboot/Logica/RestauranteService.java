@@ -693,7 +693,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				pedido.getMetodoDePago(), pedido.getCarrito(), pedido.getDireccion(), pedido.getRestaurante(),
 				pedido.getCliente(), pedido.getComentario(), pedido.getPago());
 		// devolucion.setEstadoPedido(null);
-		// pedido.setEstadoPedido(EnumEstadoPedido.REEMBOLZADO);
+		pedido.setEstadoPedido(EnumEstadoPedido.REEMBOLZADO);
 		devolucion.setEstadoPedido(EnumEstadoPedido.REEMBOLZADO);
 
 		pedidoRepo.save(devolucion);
@@ -1578,7 +1578,7 @@ public class RestauranteService implements RestauranteServicioInterfaz {
 				pedido.getMetodoDePago(), pedido.getCarrito(), pedido.getDireccion(), pedido.getRestaurante(),
 				pedido.getCliente(), pedido.getComentario(), pedido.getPago());
 		// devolucion.setEstadoPedido(null);
-		// pedido.setEstadoPedido(EnumEstadoPedido.REEMBOLZADO);
+		pedido.setEstadoPedido(EnumEstadoPedido.REEMBOLZADO);
 		devolucion.setEstadoPedido(EnumEstadoPedido.REEMBOLZADO);
 		List<Reclamo> reclamos = pedido.getReclamos();
 		for (Reclamo reclamo : reclamos) {
